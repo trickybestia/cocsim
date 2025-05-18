@@ -16,8 +16,8 @@ BORDER_CELL_INVERTED_COLOR = pygame.color.Color(20, 30, 0)
 
 
 def draw_grid(screen: pygame.Surface):
-    for tile_y in range(MAP_WIDTH):
-        for tile_x in range(MAP_HEIGHT):
+    for tile_x in range(MAP_WIDTH):
+        for tile_y in range(MAP_HEIGHT):
             border_cell = (
                 tile_y < MAP_BORDERS
                 or tile_x < MAP_BORDERS
