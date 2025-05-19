@@ -1,8 +1,7 @@
 import pygame
 
 from .consts import *
-from .utils import is_border
-from .tile_color import get_tile_color
+from .utils import is_border, get_tile_color
 from .buildings import Building
 from .units import Unit
 
@@ -11,6 +10,7 @@ class Game:
     buildings: list[Building]
     occupied_tiles: list[list[bool]]
     drop_zone: list[list[bool]]
+    collision: list[list[bool]]
     units: list[Unit]
 
     screen: pygame.Surface
@@ -21,6 +21,7 @@ class Game:
 
     def draw(self):
         self._draw_grid()
+        self._draw_collision()
 
     def _draw_grid(self):
         for x in range(MAP_WIDTH):
@@ -34,19 +35,52 @@ class Game:
                         self.occupied_tiles[x][y],
                     ),
                     (
-                        x * PIXELS_PER_CELL,
-                        y * PIXELS_PER_CELL,
-                        PIXELS_PER_CELL,
-                        PIXELS_PER_CELL,
+                        x * PIXELS_PER_TILE,
+                        y * PIXELS_PER_TILE,
+                        PIXELS_PER_TILE,
+                        PIXELS_PER_TILE,
                     ),
                 )
+
+    def _draw_collision(self):
+        PIXELS_PER_COLLISION_TILE = (
+            PIXELS_PER_TILE / COLLISION_TILES_PER_MAP_TILE
+        )
+
+        collision_surface = pygame.Surface(self.screen.get_size())
+
+        collision_surface.set_alpha(100)
+
+        for x in range(MAP_WIDTH * COLLISION_TILES_PER_MAP_TILE):
+            for y in range(MAP_HEIGHT * COLLISION_TILES_PER_MAP_TILE):
+                if self.collision[x][y]:
+                    pygame.draw.rect(
+                        collision_surface,
+                        COLLISION_TILE_COLOR,
+                        (
+                            x * PIXELS_PER_COLLISION_TILE,
+                            y * PIXELS_PER_COLLISION_TILE,
+                            PIXELS_PER_COLLISION_TILE,
+                            PIXELS_PER_COLLISION_TILE,
+                        ),
+                    )
+
+        self.screen.blit(collision_surface, (0, 0))
+
+    def compute_collision(self):
+        self.collision = [
+            [False] * MAP_HEIGHT * COLLISION_TILES_PER_MAP_TILE
+            for _ in range(MAP_WIDTH * COLLISION_TILES_PER_MAP_TILE)
+        ]
+
+        for building in self.buildings:
+            building.update_collision()
 
     def compute_occupied_tiles(self):
         self.occupied_tiles = [[False] * MAP_HEIGHT for _ in range(MAP_WIDTH)]
 
         for building in self.buildings:
-            for x, y in building.get_occupied_tiles():
-                self.occupied_tiles[x][y] = True
+            building.occupy_tiles()
 
     def compute_drop_zone(self):
         def get_neighbors(x: int, y: int) -> list[tuple[int, int]]:

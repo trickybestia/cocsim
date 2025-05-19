@@ -9,7 +9,7 @@ def main():
     pygame.init()
 
     screen = pygame.display.set_mode(
-        (MAP_WIDTH * PIXELS_PER_CELL, MAP_HEIGHT * PIXELS_PER_CELL)
+        (MAP_WIDTH * PIXELS_PER_TILE, MAP_HEIGHT * PIXELS_PER_TILE)
     )
 
     game = Game()
@@ -21,6 +21,7 @@ def main():
     game.screen = screen
     game.buildings = [th]
 
+    game.compute_collision()
     game.compute_occupied_tiles()
     game.compute_drop_zone()
 
