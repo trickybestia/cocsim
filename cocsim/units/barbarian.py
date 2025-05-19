@@ -4,7 +4,7 @@ from ..buildings import Building
 from .unit import Unit
 from .. import game
 
-from cocsim.utils import distance, normalize
+from cocsim.utils import distance, normalize, check_intersection
 from cocsim.consts import *
 
 
@@ -163,7 +163,6 @@ class Barbarian(Unit):
         nearest_point_y = int(nearest_point[1] * COLLISION_TILES_PER_MAP_TILE)
 
         collision_waypoints = [(nearest_point_x, nearest_point_y)]
-        self.waypoints = [nearest_point]
 
         while collision_waypoints[-1] != (start_x, start_y):
             x, y = collision_waypoints[-1]
@@ -171,13 +170,31 @@ class Barbarian(Unit):
             for neighbor_x, neighbor_y in get_neighbors(x, y):
                 if distances[neighbor_x][neighbor_y] == distances[x][y] - 1:
                     collision_waypoints.append((neighbor_x, neighbor_y))
-                    self.waypoints.append(
-                        (
-                            neighbor_x / COLLISION_TILES_PER_MAP_TILE,
-                            neighbor_y / COLLISION_TILES_PER_MAP_TILE,
-                        )
-                    )
 
                     break
 
-        self.waypoints.reverse()
+        collision_waypoints = self._simplify_waypoints(collision_waypoints)
+
+        self.waypoints = [
+            (x / COLLISION_TILES_PER_MAP_TILE, y / COLLISION_TILES_PER_MAP_TILE)
+            for x, y in collision_waypoints
+        ][::-1]
+
+    def _simplify_waypoints(
+        self, waypoints: list[tuple[int, int]]
+    ) -> list[tuple[int, int]]:
+        result = [waypoints[0]]
+
+        for i in range(1, len(waypoints)):
+            waypoint = waypoints[i]
+
+            if check_intersection(
+                result[-1][0],
+                result[-1][1],
+                waypoint[0],
+                waypoint[1],
+                self.game.collision,
+            ):
+                result.append(waypoints[i - 1])
+
+        return result
