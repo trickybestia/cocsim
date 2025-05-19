@@ -1,8 +1,8 @@
 import pygame
 
-from .utils import compute_drop_zone
 from .consts import *
 from .game import Game
+from .buildings import TownHall
 
 
 def main():
@@ -14,10 +14,15 @@ def main():
 
     game = Game()
 
+    th = TownHall(game)
+    th.x = 10
+    th.y = 10
+
     game.screen = screen
-    game.buildings = [[False] * MAP_HEIGHT for _ in range(MAP_WIDTH)]
-    game.buildings[10][10] = True
-    game.drop_zone = compute_drop_zone(game.buildings)
+    game.buildings = [th]
+
+    game.compute_occupied_tiles()
+    game.compute_drop_zone()
 
     game.draw()
 

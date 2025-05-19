@@ -1,13 +1,13 @@
-from ..game import Game
+from .. import game
 
 
 class Unit:
-    game: Game
+    game: "game.Game"
     dead: bool
     x: float
     y: float
 
-    def __init__(self, game: Game):
+    def __init__(self, game: "game.Game"):
         self.game = game
         self.dead = False
         self.x = 0.0

@@ -1,0 +1,20 @@
+from .. import game
+
+
+class Building:
+    game: "game.Game"
+    destroyed: bool
+    x: int
+    y: int
+
+    def __init__(self, game: "game.Game"):
+        self.game = game
+        self.destroyed = False
+        self.x = 0
+        self.y = 0
+
+    def tick(self, delta_t: float): ...
+
+    def draw(self): ...
+
+    def get_occupied_tiles(self) -> list[tuple[int, int]]: ...

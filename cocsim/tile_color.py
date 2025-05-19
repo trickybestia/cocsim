@@ -10,8 +10,15 @@ TILE_ODD_COLOR = Color(10, 10, 10)
 BORDER_TILE_EVEN_COLOR = Color(30, 60, 0)
 BORDER_TILE_ODD_COLOR = Color(20, 30, 0)
 
+BUILDING_TILE_EVEN_COLOR = Color(120, 88, 0)
+BUILDING_TILE_ODD_COLOR = Color(64, 47, 0)
 
-def get_tile_color(even: bool, border: bool, drop_zone: bool) -> Color:
+
+def get_tile_color(
+    even: bool, border: bool, drop_zone: bool, occupied: bool
+) -> Color:
+    if occupied:
+        return BUILDING_TILE_EVEN_COLOR if even else BUILDING_TILE_ODD_COLOR
     if drop_zone:
         if border:
             return (
