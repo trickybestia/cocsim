@@ -31,3 +31,17 @@ def get_tile_color(
             return BORDER_TILE_EVEN_COLOR if even else BORDER_TILE_ODD_COLOR
         else:
             return TILE_EVEN_COLOR if even else TILE_ODD_COLOR
+
+
+def distance(x1: float, y1: float, x2: float, y2: float) -> float:
+    """Returns distance between points (x1, y1) and (x2, y2)."""
+
+    return ((x1 - x2) ** 2 + (y1 - y2) ** 2) ** 0.5
+
+
+def normalize(x: float, y: float) -> tuple[float, float]:
+    """Normalize vector."""
+
+    length = (x**2 + y**2) ** 0.5
+
+    return x / length, y / length

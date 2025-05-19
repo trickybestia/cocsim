@@ -8,10 +8,14 @@ class TownHall(Building):
     WIDTH = 4
     HEIGHT = 4
 
-    COLLIDER = RectCollider.from_center(2, 2, WIDTH * 0.8, HEIGHT * 0.8)
-
-    def __init__(self, game: "game.Game"):
+    def __init__(self, game: "game.Game", x: float, y: float):
         super().__init__(game)
+
+        self.x = x
+        self.y = y
+        self.collider = RectCollider.from_center(
+            x + 2, y + 2, self.WIDTH * 0.8, self.HEIGHT * 0.8
+        )
 
     def occupy_tiles(self):
         for x in range(self.x, self.x + self.WIDTH):
@@ -27,4 +31,7 @@ class TownHall(Building):
                 if self.destroyed:
                     self.game.collision[abs_x][abs_y] = False
                 else:
-                    self.game.collision[abs_x][abs_y] = (x, y) in self.COLLIDER
+                    self.game.collision[abs_x][abs_y] = (
+                        abs_x / COLLISION_TILES_PER_MAP_TILE,
+                        abs_y / COLLISION_TILES_PER_MAP_TILE,
+                    ) in self.collider

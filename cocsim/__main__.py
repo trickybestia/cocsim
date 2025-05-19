@@ -1,5 +1,7 @@
 import pygame
 
+from .units.barbarian import Barbarian
+
 from .consts import *
 from .game import Game
 from .buildings import TownHall
@@ -14,9 +16,7 @@ def main():
 
     game = Game()
 
-    th = TownHall(game)
-    th.x = 10
-    th.y = 10
+    th = TownHall(game, 10, 10)
 
     game.screen = screen
     game.buildings = [th]
@@ -25,11 +25,24 @@ def main():
     game.compute_occupied_tiles()
     game.compute_drop_zone()
 
-    game.draw()
+    bb1 = Barbarian(game)
+    bb1.x = 1
+    bb1.y = 1
 
-    pygame.display.update()
+    bb2 = Barbarian(game)
+    bb2.x = 11
+    bb2.y = 1
 
-    input()
+    game.units = [bb1, bb2]
+
+    while True:
+        game.draw()
+
+        pygame.display.update()
+
+        input()
+
+        game.tick(0.05)
 
 
 main()

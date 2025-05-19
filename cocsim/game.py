@@ -3,7 +3,7 @@ import pygame
 from .consts import *
 from .utils import is_border, get_tile_color
 from .buildings import Building
-from .units import Unit
+from . import units
 
 
 class Game:
@@ -11,17 +11,28 @@ class Game:
     occupied_tiles: list[list[bool]]
     drop_zone: list[list[bool]]
     collision: list[list[bool]]
-    units: list[Unit]
+    units: list["units.Unit"]
 
     screen: pygame.Surface
 
     def __init__(self): ...
 
-    def tick(self, delta_t: float): ...
+    def tick(self, delta_t: float):
+        for building in self.buildings:
+            building.tick(delta_t)
+
+        for unit in self.units:
+            unit.tick(delta_t)
 
     def draw(self):
         self._draw_grid()
         self._draw_collision()
+
+        for building in self.buildings:
+            building.draw()
+
+        for unit in self.units:
+            unit.draw()
 
     def _draw_grid(self):
         for x in range(MAP_WIDTH):

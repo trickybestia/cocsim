@@ -12,6 +12,10 @@ PIXELS_PER_TILE = 20
 
 COLLISION_TILES_PER_MAP_TILE = 10  # used for pathfinding
 
+DISTANCE_TO_WAYPOINT_EPS = (
+    0.1  # unit distance to waypoint to consider it visited
+)
+
 # colors
 DROP_ZONE_TILE_EVEN_COLOR = Color(50, 70, 40)
 DROP_ZONE_TILE_ODD_COLOR = Color(30, 30, 10)

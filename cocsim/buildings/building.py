@@ -1,15 +1,18 @@
 from .. import game
+from .colliders import Collider
 
 
 class Building:
     game: "game.Game"
     destroyed: bool
+    collider: Collider | None
     x: int
     y: int
 
     def __init__(self, game: "game.Game"):
         self.game = game
         self.destroyed = False
+        self.collider = None
         self.x = 0
         self.y = 0
 
