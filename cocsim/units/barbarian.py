@@ -1,5 +1,7 @@
 import pygame
 
+import heapq
+
 from ..buildings import Building
 from .unit import Unit
 from .. import game
@@ -117,6 +119,15 @@ class Barbarian(Unit):
 
             return result
 
+        nearest_point = building.collider.get_attack_area(
+            self.RANGE
+        ).get_nearest_point(self.x, self.y)
+        nearest_point_x = int(nearest_point[0] * COLLISION_TILES_PER_MAP_TILE)
+        nearest_point_y = int(nearest_point[1] * COLLISION_TILES_PER_MAP_TILE)
+
+        def get_tile_to_check_priority(x: int, y: int) -> int:
+            return abs(x - nearest_point_x) + abs(y - nearest_point_y)
+
         BIG_NUMBER = 1000000000
 
         distances = [
@@ -131,15 +142,19 @@ class Barbarian(Unit):
         start_x = int(self.x * COLLISION_TILES_PER_MAP_TILE)
         start_y = int(self.y * COLLISION_TILES_PER_MAP_TILE)
 
-        tiles_to_check: list[tuple[int, int]] = [(start_x, start_y)]
+        tiles_to_check = []  # heapq's heap
+        heapq.heappush(tiles_to_check, (0, start_x, start_y))
 
         distances[start_x][start_y] = 0
         checked_tiles[start_x][start_y] = True
 
         i = 0
 
-        while len(tiles_to_check) != 0:
-            x, y = tiles_to_check.pop(0)
+        while (
+            len(tiles_to_check) != 0
+            and distances[nearest_point_x][nearest_point_y] == BIG_NUMBER
+        ):
+            _, x, y = heapq.heappop(tiles_to_check)
 
             for neighbor_x, neighbor_y in get_neighbors(x, y):
                 distances[neighbor_x][neighbor_y] = min(
@@ -147,20 +162,20 @@ class Barbarian(Unit):
                 )
 
                 if not checked_tiles[neighbor_x][neighbor_y]:
-                    tiles_to_check.append((neighbor_x, neighbor_y))
+                    heapq.heappush(
+                        tiles_to_check,
+                        (
+                            get_tile_to_check_priority(neighbor_x, neighbor_y),
+                            neighbor_x,
+                            neighbor_y,
+                        ),
+                    )
 
                     checked_tiles[neighbor_x][neighbor_y] = True
 
             i += 1
 
-            if i % 1000 == 0:
-                print(i)
-
-        nearest_point = building.collider.get_attack_area(
-            self.RANGE
-        ).get_nearest_point(self.x, self.y)
-        nearest_point_x = int(nearest_point[0] * COLLISION_TILES_PER_MAP_TILE)
-        nearest_point_y = int(nearest_point[1] * COLLISION_TILES_PER_MAP_TILE)
+            print(i)
 
         collision_waypoints = [(nearest_point_x, nearest_point_y)]
 
