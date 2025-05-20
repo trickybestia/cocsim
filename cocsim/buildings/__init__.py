@@ -16,3 +16,4 @@ from .gold_storage import GoldStorage
 from .laboratory import Laboratory
 from .mortar import Mortar
 from .townhall import TownHall
+from .wall import Wall

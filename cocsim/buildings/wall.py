@@ -1,0 +1,44 @@
+from .passive_building import PassiveBuilding
+from .. import game
+from .colliders import RectCollider
+
+
+class Wall(PassiveBuilding):
+    HEALTH = [
+        300,
+        500,
+        700,
+        900,
+        1400,
+        2000,
+        2500,
+        3000,
+        3500,
+        4000,
+        5000,
+        7000,
+        9000,
+        11000,
+        12500,
+        13500,
+        14500,
+        15500,
+    ]
+    WIDTH = 1
+    HEIGHT = 1
+
+    def __init__(self, game: "game.Game", x: float, y: float, level: int):
+        super().__init__(
+            game,
+            x,
+            y,
+            self.HEALTH[level],
+            self.WIDTH,
+            self.HEIGHT,
+            RectCollider.from_center(
+                x + self.WIDTH / 2,
+                y + self.HEIGHT / 2,
+                self.WIDTH * 0.65,
+                self.HEIGHT * 0.65,
+            ),
+        )
