@@ -11,17 +11,21 @@ from cocsim.consts import *
 
 
 class Barbarian(Unit):
+    ATTACK_DAMAGE = 8
+    ATTACK_COOLDOWN = 1.0
     SPEED = 2.0
     RANGE = 0.4
 
     target: Building | None
     waypoints: list[tuple[float, float]] | None
+    attack_cooldown: float | None
 
     def __init__(self, game: "game.Game"):
         super().__init__(game)
 
         self.target = None
         self.waypoints = None
+        self.attack_cooldown = None
 
     def draw(self):
         if not self.dead:
@@ -36,6 +40,7 @@ class Barbarian(Unit):
         if self.target is None or self.target.destroyed:
             self.target = None
             self.waypoints = None
+            self.attack_cooldown = None
 
             self._find_target()
 
@@ -50,13 +55,25 @@ class Barbarian(Unit):
                 <= DISTANCE_TO_WAYPOINT_EPS
             ):
                 if len(self.waypoints) == 1:
-                    ...  # attack
+                    if self.attack_cooldown is None:
+                        self.attack_cooldown = self.ATTACK_COOLDOWN
+                    elif self.attack_cooldown == 0.0:
+                        self.attack_cooldown = self.ATTACK_COOLDOWN
+
+                        self._attack(self.target)
+                    else:
+                        self.attack_cooldown = max(
+                            0, self.attack_cooldown - delta_t
+                        )
                 else:
                     self.waypoints.pop(0)
 
                     self._move(delta_t)
             else:
                 self._move(delta_t)
+
+    def _attack(self, target: Building):
+        target.apply_damage(self.ATTACK_DAMAGE)
 
     def _move(self, delta_t: float):
         if (
@@ -148,8 +165,6 @@ class Barbarian(Unit):
         distances[start_x][start_y] = 0
         checked_tiles[start_x][start_y] = True
 
-        i = 0
-
         while (
             len(tiles_to_check) != 0
             and distances[nearest_point_x][nearest_point_y] == BIG_NUMBER
@@ -172,10 +187,6 @@ class Barbarian(Unit):
                     )
 
                     checked_tiles[neighbor_x][neighbor_y] = True
-
-            i += 1
-
-            print(i)
 
         collision_waypoints = [(nearest_point_x, nearest_point_y)]
 

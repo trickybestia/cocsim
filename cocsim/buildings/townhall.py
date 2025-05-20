@@ -5,17 +5,28 @@ from cocsim.consts import *
 
 
 class TownHall(Building):
+    HEALTH = 450
     WIDTH = 4
     HEIGHT = 4
 
     def __init__(self, game: "game.Game", x: float, y: float):
         super().__init__(game)
 
+        self.health = self.HEALTH
         self.x = x
         self.y = y
         self.collider = RectCollider.from_center(
             x + 2, y + 2, self.WIDTH * 0.8, self.HEIGHT * 0.8
         )
+
+    def apply_damage(self, damage: int):
+        assert not self.destroyed
+
+        self.health = max(0, self.health - damage)
+
+        if self.destroyed:
+            self.game.building_destroyed(self)
+            self.update_collision()
 
     def occupy_tiles(self):
         for x in range(self.x, self.x + self.WIDTH):

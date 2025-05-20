@@ -16,7 +16,12 @@ DISTANCE_TO_WAYPOINT_EPS = (
     0.1  # unit distance to waypoint to consider it visited
 )
 
+FPS = 60
+TIMER_POSITION = (500, 10)
+
 # colors
+TIMER_COLOR = Color(255, 255, 255)
+
 DROP_ZONE_TILE_EVEN_COLOR = Color(50, 70, 40)
 DROP_ZONE_TILE_ODD_COLOR = Color(30, 30, 10)
 DROP_ZONE_BORDER_TILE_EVEN_COLOR = Color(50, 70, 0)

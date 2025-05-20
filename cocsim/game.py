@@ -2,7 +2,7 @@ import pygame
 
 from .consts import *
 from .utils import is_border, get_tile_color
-from .buildings import Building
+from .buildings import Building, TownHall
 from . import units
 
 
@@ -13,16 +13,42 @@ class Game:
     collision: list[list[bool]]
     units: list["units.Unit"]
 
-    screen: pygame.Surface
+    time_left: float
 
-    def __init__(self): ...
+    screen: pygame.Surface
+    font: pygame.font.Font
+
+    _townhall_destroyed: bool
+    _destroyed_buildings_count: int
+
+    @property
+    def done(self) -> bool:
+        return self.time_left == 0.0 or self.stars == 3
+
+    @property
+    def stars(self) -> int:
+        return (
+            int(self._townhall_destroyed)
+            + int(self._destroyed_buildings_count / len(self.buildings) >= 0.5)
+            + int(self._destroyed_buildings_count == len(self.buildings))
+        )
+
+    def __init__(self):
+        self.time_left = 210.0
+        self.font = pygame.font.SysFont("Arial", 30)
+        self._townhall_destroyed = False
+        self._destroyed_buildings_count = 0
 
     def tick(self, delta_t: float):
+        assert not self.done
+
         for building in self.buildings:
             building.tick(delta_t)
 
         for unit in self.units:
             unit.tick(delta_t)
+
+        self.time_left = max(0.0, self.time_left - delta_t)
 
     def draw(self):
         self._draw_grid()
@@ -33,6 +59,16 @@ class Game:
 
         for unit in self.units:
             unit.draw()
+
+        self._draw_timer()
+
+    def building_destroyed(self, building: Building):
+        """Called once by every Building when it gets destroyed."""
+
+        if isinstance(building, TownHall):
+            self._townhall_destroyed = True
+
+        self._destroyed_buildings_count += 1
 
     def _draw_grid(self):
         for x in range(MAP_WIDTH):
@@ -77,6 +113,22 @@ class Game:
                     )
 
         self.screen.blit(collision_surface, (0, 0))
+
+    def _draw_timer(self):
+        seconds = int(self.time_left)
+        minutes = seconds // 60
+        seconds %= 60
+
+        text = f"{int(self._destroyed_buildings_count / len(self.buildings) * 100.0)} % | {self.stars} star |"
+
+        if minutes != 0:
+            text += f" {minutes} min"
+
+        text += f" {seconds} s left"
+
+        text_surface = self.font.render(text, True, TIMER_COLOR)
+
+        self.screen.blit(text_surface, TIMER_POSITION)
 
     def compute_collision(self):
         self.collision = [

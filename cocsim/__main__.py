@@ -1,7 +1,7 @@
 import pygame
 
+from .spin_timer import SpinTimer
 from .units.barbarian import Barbarian
-
 from .consts import *
 from .game import Game
 from .buildings import TownHall
@@ -35,14 +35,25 @@ def main():
 
     game.units = [bb1, bb2]
 
-    while True:
+    timer = SpinTimer(1 / FPS)
+
+    def on_tick(delta_t: float | None):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                timer.stop()
+
+                return
+
         game.draw()
+
+        if not game.done and delta_t is not None:
+            game.tick(delta_t)
 
         pygame.display.update()
 
-        input()
+    timer.on_tick = on_tick
 
-        game.tick(0.05)
+    timer.run()
 
 
 main()
