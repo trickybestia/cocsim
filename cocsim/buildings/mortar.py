@@ -1,30 +1,29 @@
-from .passive_building import PassiveBuilding
+from .active_building import ActiveBuilding
 from .. import game
 from .colliders import RectCollider
 
 
-class TownHall(PassiveBuilding):
+class Mortar(ActiveBuilding):
     HEALTH = [
+        400,
         450,
-        1600,
-        1850,
-        2100,
-        2400,
-        2800,
-        3300,
-        3900,
-        4600,
-        5500,
-        6800,
-        7500,
-        8200,
-        8900,
-        9600,
-        10000,
-        10400,
+        500,
+        600,
+        650,
+        700,
+        800,
+        950,
+        1100,
+        1300,
+        1500,
+        1700,
+        1950,
+        2150,
+        2300,
+        2450,
     ]
-    WIDTH = 4
-    HEIGHT = 4
+    WIDTH = 3
+    HEIGHT = 3
 
     def __init__(self, game: "game.Game", x: float, y: float, level: int):
         super().__init__(
@@ -37,7 +36,7 @@ class TownHall(PassiveBuilding):
             RectCollider.from_center(
                 x + self.WIDTH / 2,
                 y + self.HEIGHT / 2,
-                self.WIDTH * 0.8,
-                self.HEIGHT * 0.8,
+                self.WIDTH * 0.65,
+                self.HEIGHT * 0.65,
             ),
         )

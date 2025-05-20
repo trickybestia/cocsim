@@ -16,7 +16,7 @@ def main():
 
     game = Game()
 
-    th = TownHall(game, 10, 10)
+    th = TownHall(game, 10, 10, 0)
 
     game.screen = screen
     game.buildings = [th]
