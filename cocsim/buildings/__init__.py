@@ -1,4 +1,5 @@
 from .building import Building
+from .simple_building import SimpleBuilding
 from .passive_building import PassiveBuilding
 
 from .army_camp import ArmyCamp
