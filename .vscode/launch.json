@@ -5,6 +5,12 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "cocsim.map_editor_gui.compose_base_images",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "cocsim.map_editor_gui.compose_base_images"
+        },
+        {
             "name": "cocsim.map_editor_gui",
             "type": "debugpy",
             "request": "launch",

@@ -6,27 +6,10 @@ import PIL.ImageDraw
 import wand.image
 
 from cocsim.consts import *
+from .compose_base_images import compose_base_images
 
 
 SQUARE_IMAGE_SIZE = 832
-
-
-def compose_base_images(
-    top: PIL.Image.Image, bottom: PIL.Image.Image
-) -> PIL.Image.Image:
-    BOTTOM_CROP_Y = 236
-    BOTTOM_PASTE_Y = 636 + BOTTOM_CROP_Y
-
-    composed = PIL.Image.new(
-        "RGB", (top.width, BOTTOM_PASTE_Y - BOTTOM_CROP_Y + bottom.height)
-    )
-
-    bottom = bottom.crop((0, BOTTOM_CROP_Y, bottom.width, bottom.height))
-
-    composed.paste(top, (0, 0))
-    composed.paste(bottom, (0, BOTTOM_PASTE_Y))
-
-    return composed
 
 
 def reverse_projection(image: PIL.Image.Image) -> PIL.Image.Image:
@@ -83,10 +66,15 @@ def draw_grid(image: PIL.Image.Image):
 
 
 def main():
-    top = PIL.Image.open("top.jpg")
-    bottom = PIL.Image.open("bottom.jpg")
+    top = PIL.Image.open("compose_base_images_dataset/top1.jpg")
+    bottom = PIL.Image.open("compose_base_images_dataset/bottom1.jpg")
 
     composed = compose_base_images(top, bottom)
+
+    composed.show()  # first priority is to make NN work
+
+    return
+
     square = reverse_projection(composed)
 
     draw_grid(
