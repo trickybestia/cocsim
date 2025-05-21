@@ -8,48 +8,62 @@ from safetensors.torch import load_model, save_model, save_file, load_file
 import PIL.Image
 
 from .model import Model, device, MODEL_PATH
+from .logic import encode_image
+from .consts import *
 
 
 def add_image_to_dataset(
     image_path: str,
     all_inputs: list[torch.Tensor],
     all_outputs: list[torch.Tensor],
-    items: int | None = None,
 ):
     image = PIL.Image.open(image_path).convert("L")
 
-    if items is None:
-        items = image.height
-    else:
-        items //= 2
-
-    for y in range(1, image.height):
-        inputs = []
+    for y in range(
+        MODEL_TOP_IMAGE_LINES - 1, image.height - MODEL_BOTTOM_IMAGE_LINES
+    ):
         outputs = [1.0, 0.0]
 
-        for x in range(image.width):
-            inputs.append(image.getpixel((x, y - 1)))
-        for x in range(image.width):
-            inputs.append(image.getpixel((x, y)))
+        top_input_image = image.crop(
+            (
+                0,
+                y - MODEL_TOP_IMAGE_LINES + 1,
+                image.width,
+                y + 1,
+            )
+        )
+        top_inputs = encode_image(top_input_image)
+        bottom_input_image = image.crop(
+            (0, y + 1, image.width, y + 1 + MODEL_BOTTOM_IMAGE_LINES)
+        )
+        bottom_inputs = encode_image(bottom_input_image)
 
-        all_inputs.append(torch.tensor(inputs) / 255 - 0.5)
+        all_inputs.append(torch.cat((top_inputs, bottom_inputs)))
         all_outputs.append(torch.tensor(outputs))
 
-    for y in range(image.height):
-        inputs = []
+    for y_top in range(image.height - MODEL_TOP_IMAGE_LINES):
         outputs = [0.0, 1.0]
 
-        y1 = randint(0, image.height - 1)
+        y_bottom = randint(0, image.height - MODEL_BOTTOM_IMAGE_LINES - 1)
 
-        if y == y1 or y1 == y - 1:
+        if y_top == y_bottom or y_bottom == y_top + MODEL_TOP_IMAGE_LINES:
             continue
 
-        for x in range(image.width):
-            inputs.append(image.getpixel((x, y)))
-        for x in range(image.width):
-            inputs.append(image.getpixel((x, y1)))
+        top_input_image = image.crop(
+            (
+                0,
+                y_top,
+                image.width,
+                y_top + MODEL_TOP_IMAGE_LINES,
+            )
+        )
+        top_inputs = encode_image(top_input_image)
+        bottom_input_image = image.crop(
+            (0, y_bottom, image.width, y_bottom + MODEL_BOTTOM_IMAGE_LINES)
+        )
+        bottom_inputs = encode_image(bottom_input_image)
 
-        all_inputs.append(torch.tensor(inputs) / 255 - 0.5)
+        all_inputs.append(torch.cat((top_inputs, bottom_inputs)))
         all_outputs.append(torch.tensor(outputs))
 
 
@@ -58,12 +72,12 @@ def load_dataset() -> tuple[torch.Tensor, torch.Tensor]:
     all_outputs = []
 
     for image_path in listdir("compose_base_images_dataset"):
-        add_image_to_dataset(
-            "compose_base_images_dataset/" + image_path,
-            all_inputs,
-            all_outputs,
-            100,
-        )
+        if image_path.endswith(".jpg"):
+            add_image_to_dataset(
+                "compose_base_images_dataset/" + image_path,
+                all_inputs,
+                all_outputs,
+            )
 
     return torch.stack(all_inputs), torch.stack(all_outputs)
 
@@ -81,6 +95,8 @@ def check_accuracy(model: Model) -> float:
     accuracy = 0
 
     for inputs, expected in zip(all_inputs, all_outputs):
+        inputs = inputs.to(device)
+        expected = expected.to(device)
         output = model.forward(inputs)
 
         if expected.argmax() == output.argmax():
@@ -89,13 +105,13 @@ def check_accuracy(model: Model) -> float:
     return accuracy / len(all_inputs)
 
 
-REBUILD_DATASET = True
+REBUILD_DATASET = False
 
 
 def main():
     model = Model().to(device)
 
-    load_model(model, MODEL_PATH)
+    load_model(model, MODEL_PATH, device=device)
 
     # print(check_accuracy(model))
 
@@ -117,16 +133,16 @@ def main():
         all_outputs = loaded_dataset["all_outputs"]
 
     dataset = TensorDataset(all_inputs, all_outputs)
-    loader = DataLoader(dataset, 32, num_workers=1)
+    loader = DataLoader(dataset, 32)
 
     optimizer = torch.optim.Adam(model.parameters())
 
     for epoch in range(1000):
         epoch_loss = 0
 
-        for i, batch in enumerate(loader):
-            inputs = batch[0]
-            expected = batch[1]
+        for inputs, expected in loader:
+            inputs = inputs.to(device)
+            expected = expected.to(device)
 
             output = model.forward(inputs)
 

@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-MODEL_PATH = "model.safetensors"
+from .consts import *
 
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -12,15 +12,14 @@ class Model(nn.Module):
     def __init__(self) -> None:
         super().__init__()
 
-        self.fc1 = nn.Linear(2400 * 2, 128, device=device)
-        self.fc2 = nn.Linear(128, 384, device=device)
-        self.fc3 = nn.Linear(384, 2, device=device)
-
-    def inference_forward(self, data: list[int]) -> bool:
-        with torch.no_grad():
-            inputs = torch.tensor(data) / 255 - 0.5
-
-            return self.forward(inputs).argmax().item() == 0
+        self.fc1 = nn.Linear(
+            MODEL_IMAGE_WIDTH
+            * (MODEL_TOP_IMAGE_LINES + MODEL_BOTTOM_IMAGE_LINES),
+            128,
+            device=device,
+        )
+        self.fc2 = nn.Linear(128, 64, device=device)
+        self.fc3 = nn.Linear(64, 2, device=device)
 
     def forward(self, batch: torch.Tensor) -> torch.Tensor:
         with torch.autocast(device):

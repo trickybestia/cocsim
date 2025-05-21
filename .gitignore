@@ -1,4 +1,5 @@
 __pycache__
+*.safetensors
 
 # I have .vscode in my global .gitignore
 !/.vscode
