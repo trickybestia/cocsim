@@ -20,33 +20,33 @@ def add_image_to_dataset(
     image = PIL.Image.open(image_path).convert("L")
 
     for y in range(
-        MODEL_TOP_IMAGE_LINES - 1, image.height - MODEL_BOTTOM_IMAGE_LINES
+        MODEL_IMAGE_CONTEXT_LINES - 1, image.height - MODEL_IMAGE_CONTEXT_LINES
     ):
         outputs = [1.0, 0.0]
 
         top_input_image = image.crop(
             (
                 0,
-                y - MODEL_TOP_IMAGE_LINES + 1,
+                y - MODEL_IMAGE_CONTEXT_LINES + 1,
                 image.width,
                 y + 1,
             )
         )
         top_inputs = encode_image(top_input_image)
         bottom_input_image = image.crop(
-            (0, y + 1, image.width, y + 1 + MODEL_BOTTOM_IMAGE_LINES)
+            (0, y + 1, image.width, y + 1 + MODEL_IMAGE_CONTEXT_LINES)
         )
         bottom_inputs = encode_image(bottom_input_image)
 
         all_inputs.append(torch.cat((top_inputs, bottom_inputs)))
         all_outputs.append(torch.tensor(outputs))
 
-    for y_top in range(image.height - MODEL_TOP_IMAGE_LINES):
+    for y_top in range(image.height - MODEL_IMAGE_CONTEXT_LINES):
         outputs = [0.0, 1.0]
 
-        y_bottom = randint(0, image.height - MODEL_BOTTOM_IMAGE_LINES - 1)
+        y_bottom = randint(0, image.height - MODEL_IMAGE_CONTEXT_LINES - 1)
 
-        if y_top == y_bottom or y_bottom == y_top + MODEL_TOP_IMAGE_LINES:
+        if y_top == y_bottom or y_bottom == y_top + MODEL_IMAGE_CONTEXT_LINES:
             continue
 
         top_input_image = image.crop(
@@ -54,12 +54,12 @@ def add_image_to_dataset(
                 0,
                 y_top,
                 image.width,
-                y_top + MODEL_TOP_IMAGE_LINES,
+                y_top + MODEL_IMAGE_CONTEXT_LINES,
             )
         )
         top_inputs = encode_image(top_input_image)
         bottom_input_image = image.crop(
-            (0, y_bottom, image.width, y_bottom + MODEL_BOTTOM_IMAGE_LINES)
+            (0, y_bottom, image.width, y_bottom + MODEL_IMAGE_CONTEXT_LINES)
         )
         bottom_inputs = encode_image(bottom_input_image)
 
@@ -105,17 +105,13 @@ def check_accuracy(model: Model) -> float:
     return accuracy / len(all_inputs)
 
 
-REBUILD_DATASET = False
+REBUILD_DATASET = True
 
 
 def main():
     model = Model().to(device)
 
     load_model(model, MODEL_PATH, device=device)
-
-    # print(check_accuracy(model))
-
-    # return
 
     if REBUILD_DATASET:
         all_inputs, all_outputs = load_dataset()
@@ -133,9 +129,9 @@ def main():
         all_outputs = loaded_dataset["all_outputs"]
 
     dataset = TensorDataset(all_inputs, all_outputs)
-    loader = DataLoader(dataset, 32)
+    loader = DataLoader(dataset, 512)
 
-    optimizer = torch.optim.Adam(model.parameters())
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
 
     for epoch in range(1000):
         epoch_loss = 0
@@ -155,7 +151,7 @@ def main():
 
         print(f"{epoch}: loss={epoch_loss}")
 
-        if epoch % 10 == 0:
+        if epoch % 50 == 0:
             save_model(model, MODEL_PATH)
             print("Model saved! Accuracy:", check_accuracy(model))
 

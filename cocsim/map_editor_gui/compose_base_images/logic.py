@@ -31,7 +31,8 @@ def compose_base_images(
 def encode_image(image: PIL.Image.Image) -> torch.Tensor:
     return (
         torch.frombuffer(
-            bytearray(image.convert("L").tobytes()), dtype=torch.uint8
+            bytearray(image.convert("L").resize(MODEL_IMAGE_RESIZE).tobytes()),
+            dtype=torch.uint8,
         ).to(dtype=torch.float)
         / 255
         - 0.5
@@ -50,18 +51,18 @@ def _find_tear_line(top: PIL.Image.Image, bottom: PIL.Image.Image) -> int:
     bottom_grayscale = bottom.convert("L")
 
     bottom_input_image = bottom_grayscale.crop(
-        (0, 0, top.width, MODEL_BOTTOM_IMAGE_LINES)
+        (0, 0, top.width, MODEL_IMAGE_CONTEXT_LINES)
     )
     bottom_inputs = encode_image(bottom_input_image).to(device=device)
 
     last_y = None
 
     # for y in range(top.height // 2, int(top.height * 0.8)):
-    for y in range(MODEL_TOP_IMAGE_LINES - 1, top.height):
+    for y in range(MODEL_IMAGE_CONTEXT_LINES - 1, top.height):
         top_input_image = top_grayscale.crop(
             (
                 0,
-                y - MODEL_TOP_IMAGE_LINES + 1,
+                y - MODEL_IMAGE_CONTEXT_LINES + 1,
                 top.width,
                 y + 1,
             )
