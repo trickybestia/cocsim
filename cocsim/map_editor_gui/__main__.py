@@ -64,12 +64,12 @@ def reverse_projection(image: PIL.Image.Image) -> PIL.Image.Image:
 
 
 def draw_grid(image: PIL.Image.Image):
-    pixels_per_tile = SQUARE_IMAGE_SIZE // MAP_WIDTH
+    pixels_per_tile = SQUARE_IMAGE_SIZE // MAP_SIZE
 
     draw = PIL.ImageDraw.ImageDraw(image)
 
-    for x in range(MAP_WIDTH):
-        for y in range(MAP_HEIGHT):
+    for x in range(MAP_SIZE):
+        for y in range(MAP_SIZE):
             draw.rectangle(
                 (
                     (x * pixels_per_tile, y * pixels_per_tile),

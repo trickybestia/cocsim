@@ -11,7 +11,7 @@ def main():
     pygame.init()
 
     screen = pygame.display.set_mode(
-        (MAP_WIDTH * PIXELS_PER_TILE, MAP_HEIGHT * PIXELS_PER_TILE)
+        (MAP_SIZE * PIXELS_PER_TILE, MAP_SIZE * PIXELS_PER_TILE)
     )
 
     game = Game()
