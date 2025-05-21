@@ -5,7 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python Debugger: Module",
+            "name": "cocsim.map_editor_gui",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "cocsim.map_editor_gui"
+        },
+        {
+            "name": "cocsim",
             "type": "debugpy",
             "request": "launch",
             "module": "cocsim"
