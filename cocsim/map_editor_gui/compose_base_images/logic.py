@@ -55,7 +55,8 @@ def _find_tear_line(top: PIL.Image.Image, bottom: PIL.Image.Image) -> int:
     )
     bottom_inputs = encode_image(bottom_input_image).to(device=device)
 
-    last_y = None
+    max_certainity_y = None
+    max_certainity = None
 
     # for y in range(top.height // 2, int(top.height * 0.8)):
     for y in range(MODEL_IMAGE_CONTEXT_LINES - 1, top.height):
@@ -71,9 +72,16 @@ def _find_tear_line(top: PIL.Image.Image, bottom: PIL.Image.Image) -> int:
         inputs = torch.cat((top_inputs, bottom_inputs))
 
         with torch.no_grad():
-            if model.forward(inputs).argmax().item() == 0:
-                print(y)
+            outputs = model.forward(inputs)
+            certainity = outputs.max().item() - outputs.min().item()
 
-                last_y = y
+            if outputs.argmax().item() == 0:
+                print(y, certainity)
 
-    return last_y
+                if max_certainity is None or certainity > max_certainity:
+                    max_certainity_y = y
+                    max_certainity = certainity
+
+    print(max_certainity_y)
+
+    return max_certainity_y

@@ -131,7 +131,7 @@ def main():
     dataset = TensorDataset(all_inputs, all_outputs)
     loader = DataLoader(dataset, 512)
 
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.00001)
 
     for epoch in range(1000):
         epoch_loss = 0
