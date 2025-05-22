@@ -18,9 +18,7 @@ def compose_base_images(
 
     bottom_paste_y = _find_tear_line(top, bottom) + 1
 
-    composed = PIL.Image.new(
-        "RGB", (top.width, bottom_paste_y - BOTTOM_CROP_Y + bottom.height)
-    )
+    composed = PIL.Image.new("RGB", (top.width, bottom_paste_y + bottom.height))
 
     composed.paste(top, (0, 0))
     composed.paste(bottom, (0, bottom_paste_y))
@@ -47,6 +45,8 @@ def _find_tear_line(top: PIL.Image.Image, bottom: PIL.Image.Image) -> int:
 
         load_model(model, MODEL_PATH, device=device)
 
+        model.eval()
+
     top_grayscale = top.convert("L")
     bottom_grayscale = bottom.convert("L")
 
@@ -72,8 +72,8 @@ def _find_tear_line(top: PIL.Image.Image, bottom: PIL.Image.Image) -> int:
         inputs = torch.cat((top_inputs, bottom_inputs))
 
         with torch.no_grad():
-            outputs = model.forward(inputs)
-            certainity = outputs.max().item() - outputs.min().item()
+            outputs = model.forward(inputs).exp()
+            certainity = outputs.max().item()
 
             if outputs.argmax().item() == 0:
                 print(y, certainity)

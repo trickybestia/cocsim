@@ -4,5 +4,4 @@ from .test_map import TestMap
 
 
 class PracticeGiantSmash(TestMap):
-    def load(self, game: Game):
-        
+    def load(self, game: Game): ...

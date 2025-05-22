@@ -1,10 +1,10 @@
-from os import listdir
+import os
 from random import randint
+from typing import Generator
 
 import torch
-from torch.utils.data import DataLoader, TensorDataset
+from torch.utils.data import DataLoader, Dataset
 from safetensors.torch import load_model, save_model, save_file, load_file
-
 import PIL.Image
 
 from .model import Model, device, MODEL_PATH
@@ -14,9 +14,7 @@ from .consts import *
 
 def add_image_to_dataset(
     image_path: str,
-    all_inputs: list[torch.Tensor],
-    all_outputs: list[torch.Tensor],
-):
+) -> Generator[tuple[torch.Tensor, torch.Tensor], None, None]:
     image = PIL.Image.open(image_path).convert("L")
 
     for y in range(
@@ -38,8 +36,7 @@ def add_image_to_dataset(
         )
         bottom_inputs = encode_image(bottom_input_image)
 
-        all_inputs.append(torch.cat((top_inputs, bottom_inputs)))
-        all_outputs.append(torch.tensor(outputs))
+        yield torch.cat((top_inputs, bottom_inputs)), torch.tensor(outputs)
 
     for y_top in range(image.height - MODEL_IMAGE_CONTEXT_LINES):
         outputs = [0.0, 1.0]
@@ -63,75 +60,76 @@ def add_image_to_dataset(
         )
         bottom_inputs = encode_image(bottom_input_image)
 
-        all_inputs.append(torch.cat((top_inputs, bottom_inputs)))
-        all_outputs.append(torch.tensor(outputs))
+        yield torch.cat((top_inputs, bottom_inputs)), torch.tensor(outputs)
 
 
-def load_dataset() -> tuple[torch.Tensor, torch.Tensor]:
-    all_inputs = []
-    all_outputs = []
+def create_dataset(source_path: str, destination_path: str):
+    os.mkdir(destination_path)
 
-    for image_path in listdir("compose_base_images_dataset"):
-        if image_path.endswith(".jpg"):
-            add_image_to_dataset(
-                "compose_base_images_dataset/" + image_path,
-                all_inputs,
-                all_outputs,
-            )
+    i = 0
 
-    return torch.stack(all_inputs), torch.stack(all_outputs)
+    for image_name in os.listdir(source_path):
+        if image_name.endswith(".jpg"):
+            for inputs, outputs in add_image_to_dataset(
+                f"{source_path}/{image_name}"
+            ):
+                save_file(
+                    {"inputs": inputs, "outputs": outputs},
+                    f"{destination_path}/{i}.safetensors",
+                )
+
+                i += 1
 
 
 def check_accuracy(model: Model) -> float:
-    all_inputs: list[torch.Tensor] = []
-    all_outputs: list[torch.Tensor] = []
-
-    add_image_to_dataset(
-        "compose_base_images_dataset/bottom0.jpg",
-        all_inputs,
-        all_outputs,
-    )
-
     accuracy = 0
+    count = 0
 
-    for inputs, expected in zip(all_inputs, all_outputs):
-        inputs = inputs.to(device)
-        expected = expected.to(device)
-        output = model.forward(inputs)
+    with torch.no_grad():
+        for inputs, expected in add_image_to_dataset(
+            f"{RAW_DATASET_PATH}/Screenshot_2025-05-22-07-41-50-220_com.supercell.clashofclans.jpg"
+        ):
+            inputs = inputs.to(device)
+            expected = expected.to(device)
+            output = model.forward(inputs)
 
-        if expected.argmax() == output.argmax():
-            accuracy += 1
+            if expected.argmax() == output.argmax():
+                accuracy += 1
 
-    return accuracy / len(all_inputs)
+            count += 1
+
+    return accuracy / count
 
 
-REBUILD_DATASET = True
+class ComposeBaseImagesDataset(Dataset):
+    directory_path: str
+
+    def __init__(self, directory_path: str):
+        super().__init__()
+
+        self.directory_path = directory_path
+
+    def __getitem__(self, index: int):
+        loaded_dict = load_file(f"{self.directory_path}/{index}.safetensors")
+
+        return loaded_dict["inputs"], loaded_dict["outputs"]
+
+    def __len__(self) -> int:
+        return len(os.listdir(self.directory_path))
 
 
 def main():
     model = Model().to(device)
 
+    if RECREATE_DATASET:
+        create_dataset(RAW_DATASET_PATH, DATASET_PATH)
+
     load_model(model, MODEL_PATH, device=device)
 
-    if REBUILD_DATASET:
-        all_inputs, all_outputs = load_dataset()
+    dataset = ComposeBaseImagesDataset(DATASET_PATH)
+    loader = DataLoader(dataset, 32, shuffle=True, num_workers=1)
 
-        save_file(
-            {"all_inputs": all_inputs, "all_outputs": all_outputs},
-            "compose_base_images_dataset.safetensors",
-        )
-    else:
-        loaded_dataset = load_file(
-            "compose_base_images_dataset.safetensors", device=device
-        )
-
-        all_inputs = loaded_dataset["all_inputs"]
-        all_outputs = loaded_dataset["all_outputs"]
-
-    dataset = TensorDataset(all_inputs, all_outputs)
-    loader = DataLoader(dataset, 512)
-
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.00001)
+    optimizer = torch.optim.Adam(model.parameters())
 
     for epoch in range(1000):
         epoch_loss = 0
@@ -151,9 +149,8 @@ def main():
 
         print(f"{epoch}: loss={epoch_loss}")
 
-        if epoch % 50 == 0:
-            save_model(model, MODEL_PATH)
-            print("Model saved! Accuracy:", check_accuracy(model))
+        save_model(model, MODEL_PATH)
+        print("Model saved! Accuracy:", check_accuracy(model))
 
 
 main()

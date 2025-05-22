@@ -24,12 +24,13 @@ class Model(nn.Module):
         with torch.autocast(device):
             x = F.leaky_relu(self.fc1(batch))
             x = F.leaky_relu(self.fc2(x))
-            x = F.leaky_relu(self.fc3(x))
+            x = self.fc3(x)
+            x = F.log_softmax(x, 0)
 
             return x
 
     def loss(self, output, expected) -> torch.Tensor:
         with torch.autocast(device):
-            loss = nn.CrossEntropyLoss()(output, expected)
+            loss = nn.NLLLoss()(output, expected)
 
             return loss

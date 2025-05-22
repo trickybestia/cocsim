@@ -1,5 +1,7 @@
 __pycache__
 *.safetensors
 
+/compose_base_images_dataset
+
 # I have .vscode in my global .gitignore
 !/.vscode

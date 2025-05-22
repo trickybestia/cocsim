@@ -1,3 +1,7 @@
+RECREATE_DATASET = False
+RAW_DATASET_PATH = "raw_compose_base_images_dataset"
+DATASET_PATH = "compose_base_images_dataset"
+
 MODEL_PATH = "model.safetensors"
 MODEL_IMAGE_CONTEXT_LINES = 20
-MODEL_IMAGE_RESIZE = (1200, 10)
+MODEL_IMAGE_RESIZE = (1200, MODEL_IMAGE_CONTEXT_LINES)
