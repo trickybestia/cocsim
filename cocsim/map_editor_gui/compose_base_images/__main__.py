@@ -156,8 +156,9 @@ def main():
 
         print(f"{epoch}: loss={epoch_loss}")
 
-        save_model(model, MODEL_PATH)
-        print("Model saved! Accuracy:", check_accuracy(model))
+        if epoch % 5 == 0:
+            save_model(model, MODEL_PATH)
+            print("Model saved! Accuracy:", check_accuracy(model))
 
 
 main()
