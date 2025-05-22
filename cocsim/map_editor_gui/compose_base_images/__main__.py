@@ -86,6 +86,8 @@ def check_accuracy(model: Model) -> float:
     accuracy = 0
     count = 0
 
+    model.train(False)
+
     with torch.no_grad():
         for inputs, expected_class in add_image_to_dataset(
             f"test_images/top1.jpg", DATASET_SAMPLES_PER_IMAGE
@@ -98,6 +100,8 @@ def check_accuracy(model: Model) -> float:
                 accuracy += 1
 
             count += 1
+
+    model.train(True)
 
     return accuracy / count
 
