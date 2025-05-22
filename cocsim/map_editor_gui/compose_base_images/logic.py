@@ -75,7 +75,7 @@ def _find_tear_line(top: PIL.Image.Image, bottom: PIL.Image.Image) -> int:
             outputs = model.forward(inputs).exp()[0]
             certainity = outputs.max().item()
 
-            if outputs.argmax().item() == 0:
+            if outputs.argmax().item() == 1:
                 print(y, certainity)
 
                 if max_certainity is None or certainity > max_certainity:
