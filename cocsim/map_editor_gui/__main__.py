@@ -66,8 +66,8 @@ def draw_grid(image: PIL.Image.Image):
 
 
 def main():
-    top = PIL.Image.open("raw_compose_base_images_dataset/top1.jpg")
-    bottom = PIL.Image.open("raw_compose_base_images_dataset/bottom1.jpg")
+    top = PIL.Image.open("test_images/top1.jpg")
+    bottom = PIL.Image.open("test_images/bottom1.jpg")
 
     composed = compose_base_images(top, bottom)
 

@@ -1,5 +1,7 @@
 BATCH_SIZE = 512
 
+DATASET_SAMPLES_PER_IMAGE = 200
+
 RAW_DATASET_PATH = "raw_compose_base_images_dataset"
 DATASET_PATH = "compose_base_images_dataset"
 

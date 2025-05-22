@@ -13,13 +13,17 @@ from .consts import *
 
 
 def add_image_to_dataset(
-    image_path: str,
+    image_path: str, samples: int
 ) -> Generator[tuple[torch.Tensor, torch.Tensor], None, None]:
     image = PIL.Image.open(image_path).convert("L")
 
-    for y in range(
-        MODEL_IMAGE_CONTEXT_LINES - 1, image.height - MODEL_IMAGE_CONTEXT_LINES
-    ):
+    samples //= 2
+
+    for _ in range(samples):
+        y = randint(
+            MODEL_IMAGE_CONTEXT_LINES - 1,
+            image.height - MODEL_IMAGE_CONTEXT_LINES - 1,
+        )
         top_input_image = image.crop(
             (
                 0,
@@ -36,7 +40,8 @@ def add_image_to_dataset(
 
         yield torch.cat((top_inputs, bottom_inputs)), torch.tensor(1)
 
-    for y_top in range(image.height - MODEL_IMAGE_CONTEXT_LINES):
+    for _ in range(samples):
+        y_top = randint(0, image.height - MODEL_IMAGE_CONTEXT_LINES - 1)
         y_bottom = randint(0, image.height - MODEL_IMAGE_CONTEXT_LINES - 1)
 
         if y_top == y_bottom or y_bottom == y_top + MODEL_IMAGE_CONTEXT_LINES:
@@ -67,7 +72,7 @@ def create_dataset(source_path: str, destination_path: str):
     for image_name in os.listdir(source_path):
         if image_name.endswith(".jpg"):
             for inputs, outputs in add_image_to_dataset(
-                f"{source_path}/{image_name}"
+                f"{source_path}/{image_name}", DATASET_SAMPLES_PER_IMAGE
             ):
                 save_file(
                     {"inputs": inputs, "output_class": outputs},
@@ -83,7 +88,7 @@ def check_accuracy(model: Model) -> float:
 
     with torch.no_grad():
         for inputs, expected_class in add_image_to_dataset(
-            f"{RAW_DATASET_PATH}/top1.jpg"
+            f"test_images/top1.jpg", DATASET_SAMPLES_PER_IMAGE
         ):
             inputs = inputs.to(device).reshape((1, -1))
             expected_class = expected_class.to(device)
