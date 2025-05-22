@@ -83,7 +83,7 @@ def check_accuracy(model: Model) -> float:
 
     with torch.no_grad():
         for inputs, expected_class in add_image_to_dataset(
-            f"{RAW_DATASET_PATH}/Screenshot_2025-05-22-07-41-50-220_com.supercell.clashofclans.jpg"
+            f"{RAW_DATASET_PATH}/top1.jpg"
         ):
             inputs = inputs.to(device).reshape((1, -1))
             expected_class = expected_class.to(device)
@@ -126,7 +126,7 @@ def main():
     dataset = ComposeBaseImagesDataset(DATASET_PATH)
     loader = DataLoader(dataset, BATCH_SIZE, shuffle=True, num_workers=1)
 
-    optimizer = torch.optim.Adam(model.parameters())
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
 
     for epoch in range(1000):
         epoch_loss = 0

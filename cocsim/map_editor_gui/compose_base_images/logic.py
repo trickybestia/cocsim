@@ -12,7 +12,7 @@ model: Model | None = None
 def compose_base_images(
     top: PIL.Image.Image, bottom: PIL.Image.Image
 ) -> PIL.Image.Image:
-    BOTTOM_CROP_Y = 200  # vignette end
+    BOTTOM_CROP_Y = 100  # vignette end
 
     bottom = bottom.crop((0, BOTTOM_CROP_Y, bottom.width, bottom.height))
 
