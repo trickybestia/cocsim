@@ -103,20 +103,25 @@ def check_accuracy(model: Model) -> float:
 
 
 class ComposeBaseImagesDataset(Dataset):
-    directory_path: str
+    _directory_path: str
+    _length: int | None
 
     def __init__(self, directory_path: str):
         super().__init__()
 
-        self.directory_path = directory_path
+        self._directory_path = directory_path
+        self._length = None
 
     def __getitem__(self, index: int):
-        loaded_dict = load_file(f"{self.directory_path}/{index}.safetensors")
+        loaded_dict = load_file(f"{self._directory_path}/{index}.safetensors")
 
         return loaded_dict["inputs"], loaded_dict["output_class"]
 
     def __len__(self) -> int:
-        return len(os.listdir(self.directory_path))
+        if self._length is None:
+            self._length = len(os.listdir(self._directory_path))
+
+        return self._length
 
 
 def main():
