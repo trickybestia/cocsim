@@ -32,8 +32,8 @@ def encode_image(image: PIL.Image.Image) -> torch.Tensor:
             bytearray(image.convert("L").resize(MODEL_IMAGE_RESIZE).tobytes()),
             dtype=torch.uint8,
         ).to(dtype=torch.float)
-        / 255
-        - 0.5
+        / 127.5
+        - 1.0
     )
 
 
