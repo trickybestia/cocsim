@@ -20,8 +20,6 @@ def add_image_to_dataset(
     for y in range(
         MODEL_IMAGE_CONTEXT_LINES - 1, image.height - MODEL_IMAGE_CONTEXT_LINES
     ):
-        outputs = [1.0, 0.0]
-
         top_input_image = image.crop(
             (
                 0,
@@ -36,11 +34,9 @@ def add_image_to_dataset(
         )
         bottom_inputs = encode_image(bottom_input_image)
 
-        yield torch.cat((top_inputs, bottom_inputs)), torch.tensor(outputs)
+        yield torch.cat((top_inputs, bottom_inputs)), torch.tensor(1)
 
     for y_top in range(image.height - MODEL_IMAGE_CONTEXT_LINES):
-        outputs = [0.0, 1.0]
-
         y_bottom = randint(0, image.height - MODEL_IMAGE_CONTEXT_LINES - 1)
 
         if y_top == y_bottom or y_bottom == y_top + MODEL_IMAGE_CONTEXT_LINES:
@@ -60,7 +56,7 @@ def add_image_to_dataset(
         )
         bottom_inputs = encode_image(bottom_input_image)
 
-        yield torch.cat((top_inputs, bottom_inputs)), torch.tensor(outputs)
+        yield torch.cat((top_inputs, bottom_inputs)), torch.tensor(0)
 
 
 def create_dataset(source_path: str, destination_path: str):
@@ -74,7 +70,7 @@ def create_dataset(source_path: str, destination_path: str):
                 f"{source_path}/{image_name}"
             ):
                 save_file(
-                    {"inputs": inputs, "outputs": outputs},
+                    {"inputs": inputs, "output_class": outputs},
                     f"{destination_path}/{i}.safetensors",
                 )
 
@@ -112,7 +108,7 @@ class ComposeBaseImagesDataset(Dataset):
     def __getitem__(self, index: int):
         loaded_dict = load_file(f"{self.directory_path}/{index}.safetensors")
 
-        return loaded_dict["inputs"], loaded_dict["outputs"]
+        return loaded_dict["inputs"], loaded_dict["output_class"]
 
     def __len__(self) -> int:
         return len(os.listdir(self.directory_path))
@@ -121,7 +117,7 @@ class ComposeBaseImagesDataset(Dataset):
 def main():
     model = Model().to(device)
 
-    if RECREATE_DATASET:
+    if not os.path.exists(DATASET_PATH):
         create_dataset(RAW_DATASET_PATH, DATASET_PATH)
 
     load_model(model, MODEL_PATH, device=device)
@@ -134,14 +130,14 @@ def main():
     for epoch in range(1000):
         epoch_loss = 0
 
-        for inputs, expected in loader:
+        for inputs, expected_class in loader:
             inputs = inputs.to(device)
-            expected = expected.to(device)
+            expected_class = expected_class.to(device)
 
             output = model.forward(inputs)
 
             model.zero_grad()
-            loss = model.loss(output, expected)
+            loss = model.loss(output, expected_class)
             loss.backward()
             optimizer.step()
 

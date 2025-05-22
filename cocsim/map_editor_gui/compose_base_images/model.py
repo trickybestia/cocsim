@@ -29,8 +29,10 @@ class Model(nn.Module):
 
             return x
 
-    def loss(self, output, expected) -> torch.Tensor:
+    def loss(
+        self, output: torch.Tensor, expected_class: torch.Tensor
+    ) -> torch.Tensor:
         with torch.autocast(device):
-            loss = nn.NLLLoss()(output, expected)
+            loss = nn.NLLLoss()(output, expected_class)
 
             return loss

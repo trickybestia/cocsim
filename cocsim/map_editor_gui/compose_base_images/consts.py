@@ -1,4 +1,3 @@
-RECREATE_DATASET = False
 RAW_DATASET_PATH = "raw_compose_base_images_dataset"
 DATASET_PATH = "compose_base_images_dataset"
 
