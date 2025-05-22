@@ -69,10 +69,10 @@ def _find_tear_line(top: PIL.Image.Image, bottom: PIL.Image.Image) -> int:
             )
         )
         top_inputs = encode_image(top_input_image).to(device=device)
-        inputs = torch.cat((top_inputs, bottom_inputs))
+        inputs = torch.cat((top_inputs, bottom_inputs)).reshape((1, -1))
 
         with torch.no_grad():
-            outputs = model.forward(inputs).exp()
+            outputs = model.forward(inputs).exp()[0]
             certainity = outputs.max().item()
 
             if outputs.argmax().item() == 0:

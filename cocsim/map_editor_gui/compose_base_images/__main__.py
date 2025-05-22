@@ -82,14 +82,14 @@ def check_accuracy(model: Model) -> float:
     count = 0
 
     with torch.no_grad():
-        for inputs, expected in add_image_to_dataset(
+        for inputs, expected_class in add_image_to_dataset(
             f"{RAW_DATASET_PATH}/Screenshot_2025-05-22-07-41-50-220_com.supercell.clashofclans.jpg"
         ):
-            inputs = inputs.to(device)
-            expected = expected.to(device)
-            output = model.forward(inputs)
+            inputs = inputs.to(device).reshape((1, -1))
+            expected_class = expected_class.to(device)
+            output = model.forward(inputs)[0]
 
-            if expected.argmax() == output.argmax():
+            if output.argmax() == expected_class.item():
                 accuracy += 1
 
             count += 1
@@ -120,7 +120,8 @@ def main():
     if not os.path.exists(DATASET_PATH):
         create_dataset(RAW_DATASET_PATH, DATASET_PATH)
 
-    load_model(model, MODEL_PATH, device=device)
+    if os.path.exists(MODEL_PATH):
+        load_model(model, MODEL_PATH, device=device)
 
     dataset = ComposeBaseImagesDataset(DATASET_PATH)
     loader = DataLoader(dataset, 32, shuffle=True, num_workers=1)
