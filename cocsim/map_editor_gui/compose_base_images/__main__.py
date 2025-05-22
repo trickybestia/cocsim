@@ -124,7 +124,7 @@ def main():
         load_model(model, MODEL_PATH, device=device)
 
     dataset = ComposeBaseImagesDataset(DATASET_PATH)
-    loader = DataLoader(dataset, 32, shuffle=True, num_workers=1)
+    loader = DataLoader(dataset, BATCH_SIZE, shuffle=True, num_workers=1)
 
     optimizer = torch.optim.Adam(model.parameters())
 
