@@ -156,7 +156,9 @@ def main():
     loader = DataLoader(dataset, BATCH_SIZE, shuffle=True, num_workers=1)
 
     optimizer = torch.optim.Adam(model.parameters())
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer)
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+        optimizer, threshold=0.01, threshold_mode="abs"
+    )
 
     for epoch in range(1000):
         epoch_loss = 0
