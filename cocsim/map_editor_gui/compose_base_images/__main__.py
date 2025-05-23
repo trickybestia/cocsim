@@ -160,7 +160,9 @@ def main():
 
     for epoch in range(1000):
         epoch_loss = 0
+        epoch_accuracy = 0
         batch_count = 0
+        samples_count = 0
 
         for inputs, expected_class in loader:
             inputs = inputs.to(device)
@@ -174,19 +176,22 @@ def main():
             optimizer.step()
 
             epoch_loss += loss.item()
+            epoch_accuracy += (output.argmax(1) == expected_class).sum().item()
             batch_count += 1
+            samples_count += inputs.shape[0]
 
         epoch_loss /= batch_count
+        epoch_accuracy /= samples_count
 
         print(
-            f"{epoch}: loss={epoch_loss}, lr={optimizer.param_groups[0]['lr']}"
+            f"{epoch}: loss={epoch_loss}, accuracy={epoch_accuracy}, lr={optimizer.param_groups[0]['lr']}"
         )
 
         scheduler.step(epoch_loss)
 
         if epoch % 5 == 0:
             save_model(model, MODEL_PATH)
-            print("Model saved! Accuracy:", check_accuracy(model))
+            print("Model saved! Test dataset accuracy:", check_accuracy(model))
 
 
 main()
