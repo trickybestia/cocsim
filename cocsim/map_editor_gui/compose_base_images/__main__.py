@@ -92,7 +92,7 @@ def check_accuracy(model: Model) -> float:
         for inputs, expected_class in add_image_to_dataset(
             f"test_images/top1.jpg", DATASET_SAMPLES_PER_IMAGE
         ):
-            inputs = inputs.to(device).reshape((1, -1))
+            inputs = inputs.to(device).unsqueeze(0)
             expected_class = expected_class.to(device)
             output = model.forward(inputs)[0]
 
