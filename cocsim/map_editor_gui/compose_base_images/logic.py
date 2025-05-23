@@ -75,6 +75,8 @@ def _remove_top_vignette(image: PIL.Image.Image):
 def _find_tear_line(top: PIL.Image.Image, bottom: PIL.Image.Image) -> int:
     global model
 
+    IGNORE_BORDERS_X = 400
+
     if model is None:
         model = Model().to(device)
 
@@ -93,7 +95,9 @@ def _find_tear_line(top: PIL.Image.Image, bottom: PIL.Image.Image) -> int:
         certainity = 0
 
         for x in range(
-            0, top.width - MODEL_IMAGE_SIZE[0] - 1, MODEL_IMAGE_SIZE[0]
+            IGNORE_BORDERS_X,
+            top.width - MODEL_IMAGE_SIZE[0] - 1 - IGNORE_BORDERS_X,
+            MODEL_IMAGE_SIZE[0],
         ):
             bottom_input_image = bottom_grayscale.crop(
                 (x, 0, x + MODEL_IMAGE_SIZE[0], MODEL_IMAGE_SIZE[1])
