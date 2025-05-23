@@ -53,7 +53,7 @@ def remove_vignette(
 def compose_base_images(
     top: PIL.Image.Image, bottom: PIL.Image.Image
 ) -> PIL.Image.Image:
-    bottom_paste_y = find_tear_line(top, bottom) + 1
+    bottom_paste_y = find_tear_line(top, bottom)
 
     composed = PIL.Image.new("RGB", (top.width, bottom_paste_y + bottom.height))
 
