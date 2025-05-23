@@ -151,7 +151,8 @@ def main():
     dataset = ComposeBaseImagesDataset(DATASET_PATH)
     loader = DataLoader(dataset, BATCH_SIZE, shuffle=True, num_workers=1)
 
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
+    optimizer = torch.optim.Adam(model.parameters())
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer)
 
     for epoch in range(1000):
         epoch_loss = 0
@@ -169,7 +170,11 @@ def main():
 
             epoch_loss += loss.item()
 
-        print(f"{epoch}: loss={epoch_loss}")
+        print(
+            f"{epoch}: loss={epoch_loss}, lr={optimizer.param_groups[0]['lr']}"
+        )
+
+        scheduler.step(epoch_loss)
 
         if epoch % 5 == 0:
             save_model(model, MODEL_PATH)
