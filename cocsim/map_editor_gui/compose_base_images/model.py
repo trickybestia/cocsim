@@ -13,7 +13,7 @@ class Model(nn.Module):
         super().__init__()
 
         self.fc1 = nn.Linear(
-            MODEL_IMAGE_RESIZE[0] * MODEL_IMAGE_RESIZE[1] * 2,
+            MODEL_IMAGE_SIZE[0] * MODEL_IMAGE_SIZE[1] * 2,
             128,
             device=device,
         )

@@ -20,44 +20,55 @@ def add_image_to_dataset(
     samples //= 2
 
     for _ in range(samples):
-        y = randint(
-            MODEL_IMAGE_CONTEXT_LINES - 1,
-            image.height - MODEL_IMAGE_CONTEXT_LINES - 1,
-        )
+        x = randint(0, image.width - MODEL_IMAGE_SIZE[0] - 1)
+        y_top = randint(0, image.height - 2 * MODEL_IMAGE_SIZE[1] - 1)
+        y_bottom = y_top + MODEL_IMAGE_SIZE[1]
+
         top_input_image = image.crop(
             (
-                0,
-                y - MODEL_IMAGE_CONTEXT_LINES + 1,
-                image.width,
-                y + 1,
+                x,
+                y_top,
+                x + MODEL_IMAGE_SIZE[0],
+                y_top + MODEL_IMAGE_SIZE[1],
             )
         )
         top_inputs = encode_image(top_input_image)
         bottom_input_image = image.crop(
-            (0, y + 1, image.width, y + 1 + MODEL_IMAGE_CONTEXT_LINES)
+            (
+                x,
+                y_bottom,
+                x + MODEL_IMAGE_SIZE[0],
+                y_bottom + MODEL_IMAGE_SIZE[1],
+            )
         )
         bottom_inputs = encode_image(bottom_input_image)
 
         yield torch.cat((top_inputs, bottom_inputs)), torch.tensor(1)
 
     for _ in range(samples):
-        y_top = randint(0, image.height - MODEL_IMAGE_CONTEXT_LINES - 1)
-        y_bottom = randint(0, image.height - MODEL_IMAGE_CONTEXT_LINES - 1)
+        x = randint(0, image.width - MODEL_IMAGE_SIZE[0] - 1)
+        y_top = randint(0, image.height - MODEL_IMAGE_SIZE[1] - 1)
+        y_bottom = randint(0, image.height - MODEL_IMAGE_SIZE[1] - 1)
 
-        if y_top == y_bottom or y_bottom == y_top + MODEL_IMAGE_CONTEXT_LINES:
+        if y_top == y_bottom or y_bottom == y_top + MODEL_IMAGE_SIZE[1]:
             continue
 
         top_input_image = image.crop(
             (
-                0,
+                x,
                 y_top,
-                image.width,
-                y_top + MODEL_IMAGE_CONTEXT_LINES,
+                x + MODEL_IMAGE_SIZE[0],
+                y_top + MODEL_IMAGE_SIZE[1],
             )
         )
         top_inputs = encode_image(top_input_image)
         bottom_input_image = image.crop(
-            (0, y_bottom, image.width, y_bottom + MODEL_IMAGE_CONTEXT_LINES)
+            (
+                x,
+                y_bottom,
+                x + MODEL_IMAGE_SIZE[0],
+                y_bottom + MODEL_IMAGE_SIZE[1],
+            )
         )
         bottom_inputs = encode_image(bottom_input_image)
 
