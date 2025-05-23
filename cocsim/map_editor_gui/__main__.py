@@ -13,57 +13,49 @@ from cocsim.consts import *
 SQUARE_IMAGE_SIZE = 832
 
 
-def remove_vignette(image: PIL.Image.Image):
-    VIGNETTE_SIZE = 200
+def remove_vignette(
+    image: PIL.Image.Image, strength: float = 0.26
+) -> PIL.Image.Image:
+    # AI GENERATED!!!
 
-    for y in range(VIGNETTE_SIZE):
-        r_offset = (
-            9.340e-06 * y**3 - 2.450e-03 * y**2 - 4.349e-02 * y + 3.862e01
-        )
-        g_offset = (
-            1.106e-05 * y**3 - 3.010e-03 * y**2 - 3.807e-02 * y + 4.894e01
-        )
-        b_offset = (
-            3.450e-06 * y**3 - 1.006e-03 * y**2 - 2.616e-02 * y + 2.091e01
-        )
+    # Open the image and convert to RGB (if not already in this mode)
+    width, height = image.size
 
-        if y >= 180:
-            K = (200 - y) / (200 - 180)
-            r_offset *= K
-            g_offset *= K
-            b_offset *= K
+    # Convert to a numpy array (float32 for precision)
+    img_array = np.array(image, dtype=np.float32) / 255.0
 
-        r_offset = int(r_offset)
-        g_offset = int(g_offset)
-        b_offset = int(b_offset)
+    # Create a normalized coordinate grid (ranging from -1 to 1)
+    x = np.linspace(-1, 1, width)
+    y = np.linspace(-1, 1, height)
+    X, Y = np.meshgrid(x, y)
 
-        for x in range(image.width):
-            r, g, b = image.getpixel((x, y))
+    # Vignette model (1 - strength * r^2)
+    radius = np.sqrt(X**2 + Y**2)
+    vignette = 1 - strength * (radius**2)
 
-            image.putpixel(
-                (x, y),
-                (
-                    r + r_offset,
-                    g + g_offset,
-                    b + b_offset,
-                ),
-            )
+    # Normalize the vignette (so max value is 1)
+    vignette = vignette / np.max(vignette)
+
+    # Apply correction (divide the image by the vignette mask)
+    corrected = (
+        img_array / vignette[..., np.newaxis]
+    )  # Add axis for RGB channels
+
+    # Clip values and convert back to 0-255 range
+    corrected = np.clip(corrected * 255, 0, 255).astype(np.uint8)
+
+    # Create and save the corrected image
+    result = PIL.Image.fromarray(corrected)
+
+    return result
 
 
 def compose_base_images(
     top: PIL.Image.Image, bottom: PIL.Image.Image
 ) -> PIL.Image.Image:
-    BOTTOM_CROP_Y = 0  # vignette end
-
-    remove_vignette(bottom)
-
-    bottom = bottom.crop((0, BOTTOM_CROP_Y, bottom.width, bottom.height))
-
     bottom_paste_y = find_tear_line(top, bottom) + 1
 
-    composed = PIL.Image.new(
-        "RGB", (top.width, bottom_paste_y - BOTTOM_CROP_Y + bottom.height)
-    )
+    composed = PIL.Image.new("RGB", (top.width, bottom_paste_y + bottom.height))
 
     composed.paste(top, (0, 0))
     composed.paste(bottom, (0, bottom_paste_y))
@@ -72,12 +64,20 @@ def compose_base_images(
 
 
 def find_tear_line(top: PIL.Image.Image, bottom: PIL.Image.Image) -> int:
+    IGNORE_BORDERS = 400
+    MAX_HEIGHT = 100
+
+    top = top.crop((IGNORE_BORDERS, 0, top.width - IGNORE_BORDERS, top.height))
+    bottom = bottom.crop(
+        (IGNORE_BORDERS, 0, bottom.width - IGNORE_BORDERS, bottom.height)
+    )
+
     smallest_difference = None
     smallest_difference_y = None
 
     for y in range(top.height // 2, int(top.height * 0.8)):
         image = PIL.ImageChops.subtract(
-            top.crop((0, y, top.width, top.height)), bottom
+            top.crop((0, y, top.width, y + MAX_HEIGHT)), bottom
         )
         difference = np.asarray(image, dtype="int32").sum() / image.size[1]
 
@@ -146,12 +146,15 @@ def draw_grid(image: PIL.Image.Image):
 
 
 def main():
-    top = PIL.Image.open("compose_base_images_dataset/top2.jpg")
-    bottom = PIL.Image.open("compose_base_images_dataset/bottom2.jpg")
+    top = PIL.Image.open("test_images/top7.jpg")
+    bottom = PIL.Image.open("test_images/bottom7.jpg")
+
+    top = remove_vignette(top)
+    bottom = remove_vignette(bottom)
 
     composed = compose_base_images(top, bottom)
 
-    composed.show()  # first priority is to make NN work
+    composed.show()
 
     return
 
