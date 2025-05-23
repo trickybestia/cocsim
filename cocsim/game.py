@@ -34,7 +34,7 @@ class Game:
         )
 
     def __init__(self):
-        self.time_left = 210.0
+        self.time_left = 180.0
         self.font = pygame.font.SysFont("Arial", 30)
         self._townhall_destroyed = False
         self._destroyed_buildings_count = 0
