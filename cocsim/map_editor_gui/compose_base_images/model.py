@@ -18,9 +18,11 @@ class Model(nn.Module):
             device=device,
         )
         self.dropout1 = nn.Dropout()
-        self.fc2 = nn.Linear(128, 64, device=device)
+        self.fc2 = nn.Linear(128, 128, device=device)
         self.dropout2 = nn.Dropout()
-        self.fc3 = nn.Linear(64, 2, device=device)
+        self.fc3 = nn.Linear(128, 64, device=device)
+        self.dropout3 = nn.Dropout()
+        self.fc4 = nn.Linear(64, 2, device=device)
 
     def forward(self, batch: torch.Tensor) -> torch.Tensor:
         with torch.autocast(device):
@@ -28,8 +30,9 @@ class Model(nn.Module):
             x = self.dropout1(x)
             x = F.relu(self.fc2(x))
             x = self.dropout2(x)
-            x = self.fc3(x)
-            x = F.log_softmax(x, 1)
+            x = F.relu(self.fc3(x))
+            x = self.dropout3(x)
+            x = F.log_softmax(self.fc4(x), 1)
 
             return x
 
