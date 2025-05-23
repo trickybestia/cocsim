@@ -24,7 +24,10 @@ def add_image_to_dataset(
     samples //= 2
 
     for _ in range(samples):
-        x = randint(0, image.width - MODEL_IMAGE_SIZE[0] - 1)
+        x = randint(
+            IGNORE_BORDERS_X,
+            image.width - MODEL_IMAGE_SIZE[0] - IGNORE_BORDERS_X - 1,
+        )
         y_top = randint(0, image.height - 2 * MODEL_IMAGE_SIZE[1] - 1)
         y_bottom = y_top + MODEL_IMAGE_SIZE[1]
 
@@ -50,7 +53,10 @@ def add_image_to_dataset(
         yield torch.cat((top_inputs, bottom_inputs)), torch.tensor(1)
 
     for _ in range(samples):
-        x = randint(0, image.width - MODEL_IMAGE_SIZE[0] - 1)
+        x = randint(
+            IGNORE_BORDERS_X,
+            image.width - MODEL_IMAGE_SIZE[0] - IGNORE_BORDERS_X - 1,
+        )
         y_top = randint(0, image.height - MODEL_IMAGE_SIZE[1] - 1)
         y_bottom = randint(0, image.height - MODEL_IMAGE_SIZE[1] - 1)
 
