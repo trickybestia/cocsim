@@ -3,7 +3,7 @@ from random import randint
 from typing import Generator
 
 import torch
-from torch.utils.data import DataLoader, Dataset
+from torch.utils.data import DataLoader, Dataset, random_split
 from safetensors.torch import load_model, save_model, save_file, load_file
 import PIL.Image
 
@@ -103,16 +103,14 @@ def create_dataset(source_path: str, destination_path: str):
                 i += 1
 
 
-def check_accuracy(model: Model) -> float:
+def check_accuracy(model: Model, test_dataset: Dataset) -> float:
     accuracy = 0
     count = 0
 
     model.train(False)
 
     with torch.no_grad():
-        for inputs, expected_class in add_image_to_dataset(
-            f"test_images/top1.jpg", DATASET_SAMPLES_PER_IMAGE
-        ):
+        for inputs, expected_class in test_dataset:
             inputs = inputs.to(device).unsqueeze(0)
             expected_class = expected_class.to(device)
             output = model.forward(inputs)[0]
@@ -159,7 +157,12 @@ def main():
         load_model(model, MODEL_PATH, device=device)
 
     dataset = ComposeBaseImagesDataset(DATASET_PATH)
-    loader = DataLoader(dataset, BATCH_SIZE, shuffle=True, num_workers=1)
+    train_dataset, test_dataset = random_split(
+        dataset, (0.85, 0.15), torch.Generator().manual_seed(42)
+    )
+    train_dataset_loader = DataLoader(
+        train_dataset, BATCH_SIZE, shuffle=True, num_workers=1
+    )
 
     optimizer = torch.optim.Adam(model.parameters())
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
@@ -172,7 +175,7 @@ def main():
         batch_count = 0
         samples_count = 0
 
-        for inputs, expected_class in loader:
+        for inputs, expected_class in train_dataset_loader:
             inputs = inputs.to(device)
             expected_class = expected_class.to(device)
 
@@ -199,7 +202,10 @@ def main():
 
         if epoch % 5 == 0:
             save_model(model, MODEL_PATH)
-            print("Model saved! Test dataset accuracy:", check_accuracy(model))
+            print(
+                "Model saved! Test dataset accuracy:",
+                check_accuracy(model, test_dataset),
+            )
 
 
 main()
