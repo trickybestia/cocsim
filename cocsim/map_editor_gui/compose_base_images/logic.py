@@ -12,7 +12,7 @@ model: Model | None = None
 def compose_base_images(
     top: PIL.Image.Image, bottom: PIL.Image.Image
 ) -> PIL.Image.Image:
-    _remove_top_vignette(bottom)
+    remove_top_vignette(bottom)
 
     bottom_paste_y = _find_tear_line(top, bottom) + 1
 
@@ -35,7 +35,7 @@ def encode_image(image: PIL.Image.Image) -> torch.Tensor:
     )
 
 
-def _remove_top_vignette(image: PIL.Image.Image):
+def remove_top_vignette(image: PIL.Image.Image):
     VIGNETTE_SIZE = 200
 
     for y in range(VIGNETTE_SIZE):

@@ -8,14 +8,18 @@ from safetensors.torch import load_model, save_model, save_file, load_file
 import PIL.Image
 
 from .model import Model, device, MODEL_PATH
-from .logic import encode_image
+from .logic import encode_image, remove_top_vignette
 from .consts import *
 
 
 def add_image_to_dataset(
     image_path: str, samples: int
 ) -> Generator[tuple[torch.Tensor, torch.Tensor], None, None]:
-    image = PIL.Image.open(image_path).convert("L")
+    image = PIL.Image.open(image_path)
+
+    remove_top_vignette(image)
+
+    image = image.convert("L")
 
     samples //= 2
 
