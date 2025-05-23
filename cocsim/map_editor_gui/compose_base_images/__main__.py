@@ -8,7 +8,7 @@ from safetensors.torch import load_model, save_model, save_file, load_file
 import PIL.Image
 
 from .model import Model, device, MODEL_PATH
-from .logic import encode_image, remove_top_vignette
+from .logic import encode_image, remove_top_vignette, join_model_inputs
 from .consts import *
 
 
@@ -26,63 +26,63 @@ def add_image_to_dataset(
     for _ in range(samples):
         x = randint(
             IGNORE_BORDERS_X,
-            image.width - MODEL_IMAGE_SIZE[0] - IGNORE_BORDERS_X - 1,
+            image.width - MODEL_HALF_IMAGE_SIZE[0] - IGNORE_BORDERS_X - 1,
         )
-        y_top = randint(0, image.height - 2 * MODEL_IMAGE_SIZE[1] - 1)
-        y_bottom = y_top + MODEL_IMAGE_SIZE[1]
+        y_top = randint(0, image.height - 2 * MODEL_HALF_IMAGE_SIZE[1] - 1)
+        y_bottom = y_top + MODEL_HALF_IMAGE_SIZE[1]
 
         top_input_image = image.crop(
             (
                 x,
                 y_top,
-                x + MODEL_IMAGE_SIZE[0],
-                y_top + MODEL_IMAGE_SIZE[1],
+                x + MODEL_HALF_IMAGE_SIZE[0],
+                y_top + MODEL_HALF_IMAGE_SIZE[1],
             )
         )
-        top_inputs = encode_image(top_input_image)
         bottom_input_image = image.crop(
             (
                 x,
                 y_bottom,
-                x + MODEL_IMAGE_SIZE[0],
-                y_bottom + MODEL_IMAGE_SIZE[1],
+                x + MODEL_HALF_IMAGE_SIZE[0],
+                y_bottom + MODEL_HALF_IMAGE_SIZE[1],
             )
         )
-        bottom_inputs = encode_image(bottom_input_image)
 
-        yield torch.cat((top_inputs, bottom_inputs)), torch.tensor(1)
+        yield join_model_inputs(
+            encode_image(top_input_image), encode_image(bottom_input_image)
+        ), torch.tensor(1)
 
     for _ in range(samples):
         x = randint(
             IGNORE_BORDERS_X,
-            image.width - MODEL_IMAGE_SIZE[0] - IGNORE_BORDERS_X - 1,
+            image.width - MODEL_HALF_IMAGE_SIZE[0] - IGNORE_BORDERS_X - 1,
         )
-        y_top = randint(0, image.height - MODEL_IMAGE_SIZE[1] - 1)
-        y_bottom = randint(0, image.height - MODEL_IMAGE_SIZE[1] - 1)
+        y_top = randint(0, image.height - MODEL_HALF_IMAGE_SIZE[1] - 1)
+        y_bottom = randint(0, image.height - MODEL_HALF_IMAGE_SIZE[1] - 1)
 
-        if y_top == y_bottom or y_bottom == y_top + MODEL_IMAGE_SIZE[1]:
+        if y_top == y_bottom or y_bottom == y_top + MODEL_HALF_IMAGE_SIZE[1]:
             continue
 
         top_input_image = image.crop(
             (
                 x,
                 y_top,
-                x + MODEL_IMAGE_SIZE[0],
-                y_top + MODEL_IMAGE_SIZE[1],
+                x + MODEL_HALF_IMAGE_SIZE[0],
+                y_top + MODEL_HALF_IMAGE_SIZE[1],
             )
         )
-        top_inputs = encode_image(top_input_image)
         bottom_input_image = image.crop(
             (
                 x,
                 y_bottom,
-                x + MODEL_IMAGE_SIZE[0],
-                y_bottom + MODEL_IMAGE_SIZE[1],
+                x + MODEL_HALF_IMAGE_SIZE[0],
+                y_bottom + MODEL_HALF_IMAGE_SIZE[1],
             )
         )
-        bottom_inputs = encode_image(bottom_input_image)
 
-        yield torch.cat((top_inputs, bottom_inputs)), torch.tensor(0)
+        yield join_model_inputs(
+            encode_image(top_input_image), encode_image(bottom_input_image)
+        ), torch.tensor(0)
 
 
 def create_dataset(source_path: str, destination_path: str):
@@ -107,7 +107,7 @@ def check_accuracy(model: Model, test_dataset: Dataset) -> float:
     accuracy = 0
     count = 0
 
-    model.train(False)
+    model.eval()
 
     with torch.no_grad():
         for inputs, expected_class in test_dataset:
@@ -120,7 +120,7 @@ def check_accuracy(model: Model, test_dataset: Dataset) -> float:
 
             count += 1
 
-    model.train(True)
+    model.train()
 
     return accuracy / count
 

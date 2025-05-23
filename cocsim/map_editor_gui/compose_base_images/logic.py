@@ -1,4 +1,5 @@
 import torch
+import torchvision.transforms.functional as FT
 import PIL.Image
 from safetensors.torch import load_model
 
@@ -25,14 +26,13 @@ def compose_base_images(
 
 
 def encode_image(image: PIL.Image.Image) -> torch.Tensor:
-    return (
-        torch.frombuffer(
-            bytearray(image.convert("L").tobytes()),
-            dtype=torch.uint8,
-        ).to(dtype=torch.float)
-        / 127.5
-        - 1.0
-    )
+    assert image.size == MODEL_HALF_IMAGE_SIZE
+
+    return FT.to_tensor(image) * 2.0 - 1.0
+
+
+def join_model_inputs(top: torch.Tensor, bottom: torch.Tensor) -> torch.Tensor:
+    return torch.cat((top, bottom), dim=2)
 
 
 def remove_top_vignette(image: PIL.Image.Image):
@@ -88,29 +88,33 @@ def _find_tear_line(top: PIL.Image.Image, bottom: PIL.Image.Image) -> int:
     max_certainity_y = None
     max_certainity = None
 
-    # for y in range(top.height // 2, int(top.height * 0.8)):
     for y in range(top.height - MODEL_IMAGE_SIZE[1]):
         certainity = 0
 
         for x in range(
             IGNORE_BORDERS_X,
-            top.width - MODEL_IMAGE_SIZE[0] - 1 - IGNORE_BORDERS_X,
-            MODEL_IMAGE_SIZE[0],
+            top.width - MODEL_HALF_IMAGE_SIZE[0] - 1 - IGNORE_BORDERS_X,
+            MODEL_HALF_IMAGE_SIZE[0] // 2,
         ):
             bottom_input_image = bottom_grayscale.crop(
-                (x, 0, x + MODEL_IMAGE_SIZE[0], MODEL_IMAGE_SIZE[1])
+                (x, 0, x + MODEL_HALF_IMAGE_SIZE[0], MODEL_HALF_IMAGE_SIZE[1])
             )
-            bottom_inputs = encode_image(bottom_input_image).to(device=device)
             top_input_image = top_grayscale.crop(
                 (
                     x,
-                    y - MODEL_IMAGE_SIZE[1] + 1,
-                    x + MODEL_IMAGE_SIZE[0],
+                    y - MODEL_HALF_IMAGE_SIZE[1] + 1,
+                    x + MODEL_HALF_IMAGE_SIZE[0],
                     y + 1,
                 )
             )
-            top_inputs = encode_image(top_input_image).to(device=device)
-            inputs = torch.cat((top_inputs, bottom_inputs)).unsqueeze(0)
+            inputs = (
+                join_model_inputs(
+                    encode_image(top_input_image),
+                    encode_image(bottom_input_image),
+                )
+                .to(device=device)
+                .unsqueeze(0)
+            )
 
             with torch.no_grad():
                 outputs = model.forward(inputs).exp()[0]

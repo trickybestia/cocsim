@@ -12,35 +12,26 @@ class Model(nn.Module):
     def __init__(self) -> None:
         super().__init__()
 
+        self.conv1 = nn.Conv2d(1, 16, (3, 3), padding=1, device=device)
+        self.conv2 = nn.Conv2d(16, 8, (3, 3), padding=1, device=device)
         self.fc1 = nn.Linear(
-            MODEL_IMAGE_SIZE[0] * MODEL_IMAGE_SIZE[1] * 2,
+            8 * 20 * 40,
             128,
             device=device,
         )
-        self.dropout1 = nn.Dropout()
-        self.fc2 = nn.Linear(128, 128, device=device)
-        self.dropout2 = nn.Dropout()
-        self.fc3 = nn.Linear(128, 128, device=device)
-        self.dropout3 = nn.Dropout()
-        self.fc4 = nn.Linear(128, 128, device=device)
-        self.dropout4 = nn.Dropout()
-        self.fc5 = nn.Linear(128, 64, device=device)
-        self.dropout5 = nn.Dropout()
-        self.fc6 = nn.Linear(64, 2, device=device)
+        self.fc2 = nn.Linear(128, 64, device=device)
+        self.fc3 = nn.Linear(64, 2, device=device)
 
     def forward(self, batch: torch.Tensor) -> torch.Tensor:
         with torch.autocast(device):
-            x = F.relu(self.fc1(batch))
-            x = self.dropout1(x)
-            x = F.relu(self.fc2(x))
-            x = self.dropout2(x)
-            x = F.relu(self.fc3(x))
-            x = self.dropout3(x)
-            x = F.relu(self.fc4(x))
-            x = self.dropout4(x)
-            x = F.relu(self.fc5(x))
-            x = self.dropout5(x)
-            x = F.log_softmax(self.fc6(x), 1)
+            x = F.relu(self.conv1(batch))
+            x = F.dropout2d(F.max_pool2d(x, 2))
+            x = F.relu(self.conv2(x))
+            x = F.dropout2d(F.max_pool2d(x, 2))
+            x = x.flatten(1)
+            x = F.dropout(F.relu(self.fc1(x)))
+            x = F.dropout(F.relu(self.fc2(x)))
+            x = F.log_softmax(self.fc3(x), 1)
 
             return x
 
