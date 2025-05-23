@@ -146,15 +146,16 @@ def draw_grid(image: PIL.Image.Image):
 
 
 def main():
-    top = PIL.Image.open("test_images/top7.jpg")
-    bottom = PIL.Image.open("test_images/bottom7.jpg")
+    for i in range(8):
+        top = PIL.Image.open(f"test_images/top{i}.jpg")
+        bottom = PIL.Image.open(f"test_images/bottom{i}.jpg")
 
-    top = remove_vignette(top)
-    bottom = remove_vignette(bottom)
+        top = remove_vignette(top)
+        bottom = remove_vignette(bottom)
 
-    composed = compose_base_images(top, bottom)
+        composed = compose_base_images(top, bottom)
 
-    composed.show()
+        composed.show()
 
     return
 
