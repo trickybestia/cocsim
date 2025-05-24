@@ -3,6 +3,7 @@ from .simple_building import SimpleBuilding
 from .passive_building import PassiveBuilding
 from .active_building import ActiveBuilding
 
+from .air_defense import AirDefense
 from .archer_tower import ArcherTower
 from .army_camp import ArmyCamp
 from .barracks import Barracks
