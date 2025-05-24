@@ -3,13 +3,13 @@ from typing import Callable, Type
 
 from cocsim.consts import *
 from cocsim.buildings import Building
-from .utils import get_buildings_with_size, fuzzy_sort
-from .level_selection_window import LevelSelectionWindow
+from .utils import fuzzy_sort
 
 
-class BuildingSelectionWindow:
+class LevelSelectionWindow:
     on_building_selected: Callable[[Type[Building], int], None]
-    buildings: list[Type[Building]]
+    building: Type[Building]
+    levels: list[int]
 
     root: Tk
     window: Toplevel
@@ -22,11 +22,12 @@ class BuildingSelectionWindow:
     def __init__(
         self,
         root: Tk,
-        selection_size: tuple[int, int],
+        building: Type[Building],
         on_building_selected: Callable[[Type[Building], int], None],
     ):
         self.on_building_selected = on_building_selected
-        self.buildings = get_buildings_with_size(selection_size)
+        self.building = building
+        self.levels = list(range(building.levels()))
 
         self.root = root
         self.window = Toplevel(self.root)
@@ -44,7 +45,7 @@ class BuildingSelectionWindow:
         )
 
         self.list_variable = StringVar(
-            self.window, [b.__name__ for b in self.buildings]
+            self.window, [str(level + 1) for level in self.levels]
         )
         self.listbox = Listbox(
             self.window, selectmode=SINGLE, listvariable=self.list_variable
@@ -67,9 +68,9 @@ class BuildingSelectionWindow:
     def on_entry_text_change(self, *args):
         text = self.entry_variable.get()
 
-        fuzzy_sort(text, self.buildings, lambda b: b.__name__)
+        fuzzy_sort(text, self.levels, str)
 
-        self.list_variable.set([b.__name__ for b in self.buildings])
+        self.list_variable.set([str(level + 1) for level in self.levels])
         self.listbox.selection_clear(0, END)
         self.listbox.selection_set(0)
 
@@ -97,12 +98,8 @@ class BuildingSelectionWindow:
         if len(self.listbox.curselection()) == 0:
             return
 
-        building = self.buildings[self.listbox.curselection()[0]]
+        self.on_building_selected(
+            self.building, self.levels[self.listbox.curselection()[0]]
+        )
 
         self.window.destroy()
-
-        LevelSelectionWindow(
-            self.root,
-            building,
-            self.on_building_selected,
-        )

@@ -1,4 +1,4 @@
-from typing import Type
+from typing import Callable, Type
 
 from rapidfuzz import fuzz
 from rapidfuzz.utils import default_process
@@ -20,10 +20,10 @@ def get_buildings_with_size(size: tuple[int, int]) -> list[Type[Building]]:
     return result
 
 
-def buildings_fuzzy_sort(search_text: str, buildings: list[Type[Building]]):
-    buildings.sort(
+def fuzzy_sort(search_text: str, items: list, to_str: Callable[[object], str]):
+    items.sort(
         reverse=True,
         key=lambda b: fuzz.ratio(
-            search_text, b.__name__, processor=default_process
+            search_text, to_str(b), processor=default_process
         ),
     )

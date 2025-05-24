@@ -19,7 +19,13 @@ def main():
 
     base_image = reverse_projection(composed)
 
-    MainWindow(base_image).run()
+    window = MainWindow(base_image)
+
+    window.run()
+
+    print(
+        f"({', '.join(str(building.to_tuple()) for building in window.buildings)})"
+    )
 
 
 main()
