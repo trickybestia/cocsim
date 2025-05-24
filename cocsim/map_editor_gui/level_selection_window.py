@@ -66,7 +66,10 @@ class LevelSelectionWindow:
         self.entry.focus()
 
     def on_entry_text_change(self, *args):
-        text = self.entry_variable.get()
+        try:
+            text = str(int(self.entry_variable.get()) - 1)
+        except:
+            return
 
         fuzzy_sort(text, self.levels, str)
 
