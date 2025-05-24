@@ -19,6 +19,7 @@ class Game:
 
     _townhall_destroyed: bool
     _destroyed_buildings_count: int
+    _total_buildings_count: int
 
     @property
     def done(self) -> bool:
@@ -33,10 +34,12 @@ class Game:
         )
 
     def __init__(self):
+        self.buildings = []
         self.time_left = 180.0
         self.font = pygame.font.SysFont("Arial", 30)
         self._townhall_destroyed = False
         self._destroyed_buildings_count = 0
+        self._total_buildings_count = 0
 
     def tick(self, delta_t: float):
         assert not self.done
@@ -128,6 +131,13 @@ class Game:
         text_surface = self.font.render(text, True, TIMER_COLOR)
 
         self.screen.blit(text_surface, TIMER_POSITION)
+
+    def compute_buildings_count(self):
+        self._total_buildings_count = 0
+
+        for building in self.buildings:
+            if not isinstance(building, buildings.Wall):
+                self._total_buildings_count += 1
 
     def compute_collision(self):
         self.collision = [

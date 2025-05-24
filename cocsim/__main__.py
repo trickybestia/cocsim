@@ -1,5 +1,7 @@
 import pygame
 
+from .test_maps.practice_giant_smash import PracticeGiantSmash
+
 from .spin_timer import SpinTimer
 from .units.barbarian import Barbarian
 from .consts import *
@@ -16,14 +18,9 @@ def main():
 
     game = Game()
 
-    th = TownHall(game, 10, 10, 0)
-
     game.screen = screen
-    game.buildings = [th]
 
-    game.compute_collision()
-    game.compute_occupied_tiles()
-    game.compute_drop_zone()
+    PracticeGiantSmash().load(game)
 
     bb1 = Barbarian(game)
     bb1.x = 1
