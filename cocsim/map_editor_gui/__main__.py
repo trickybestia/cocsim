@@ -2,7 +2,6 @@ from io import BytesIO
 
 import PIL
 import PIL.Image
-import PIL.ImageChops
 import PIL.ImageDraw
 import wand.image
 import numpy as np
@@ -50,10 +49,16 @@ def remove_vignette(
     return result
 
 
-def compose_base_images(
-    top: PIL.Image.Image, bottom: PIL.Image.Image
+def _compose_base_images_internal(
+    top: PIL.Image.Image,
+    bottom: PIL.Image.Image,
+    ignore_borders: int,
+    y_start: int,
+    y_stop: int,
 ) -> PIL.Image.Image:
-    bottom_paste_y = find_tear_line(top, bottom)
+    bottom_paste_y = _find_tear_line(
+        top, bottom, ignore_borders, y_start, y_stop
+    )
 
     composed = PIL.Image.new("RGB", (top.width, bottom_paste_y + bottom.height))
 
@@ -63,33 +68,78 @@ def compose_base_images(
     return composed
 
 
-def find_tear_line(top: PIL.Image.Image, bottom: PIL.Image.Image) -> int:
-    IGNORE_BORDERS = 400
-    MAX_HEIGHT = 100
+def _find_tear_line(
+    top: PIL.Image.Image,
+    bottom: PIL.Image.Image,
+    ignore_borders: int,
+    y_start: int,
+    y_stop: int,
+) -> int:
+    WINDOW_HEIGHT = 100
 
-    top = top.crop((IGNORE_BORDERS, 0, top.width - IGNORE_BORDERS, top.height))
+    top = top.crop((ignore_borders, 0, top.width - ignore_borders, top.height))
     bottom = bottom.crop(
-        (IGNORE_BORDERS, 0, bottom.width - IGNORE_BORDERS, bottom.height)
+        (ignore_borders, 0, bottom.width - ignore_borders, bottom.height)
     )
 
     smallest_difference = None
     smallest_difference_y = None
 
-    for y in range(top.height // 2, int(top.height * 0.8)):
-        image = PIL.ImageChops.subtract(
-            top.crop((0, y, top.width, y + MAX_HEIGHT)), bottom
-        )
-        difference = np.asarray(image, dtype="int32").sum() / image.size[1]
+    for y in range(y_start, min(y_stop, top.height - WINDOW_HEIGHT)):
+        top_crop = top.crop((0, y, top.width, y + WINDOW_HEIGHT))
+        bottom_crop = bottom.crop((0, 0, bottom.width, WINDOW_HEIGHT))
+        difference = np.abs(
+            np.asarray(top_crop, dtype="int32")
+            - np.asarray(bottom_crop, dtype="int32")
+        ).sum()
 
         if smallest_difference is None or difference < smallest_difference:
             smallest_difference_y = y
             smallest_difference = difference
 
-        print(y, image.size, difference)
-
-    print(smallest_difference_y, smallest_difference)
-
     return smallest_difference_y
+
+
+def compose_4_base_images(
+    left_top: PIL.Image.Image,
+    left_bottom: PIL.Image.Image,
+    right_top: PIL.Image.Image,
+    right_bottom: PIL.Image.Image,
+) -> PIL.Image.Image:
+    VERTICAL_IGNORE_BORDERS = 400
+    VERTICAL_Y_START = 400
+    VERTICAL_Y_STOP = 900
+
+    left = _compose_base_images_internal(
+        left_top,
+        left_bottom,
+        VERTICAL_IGNORE_BORDERS,
+        VERTICAL_Y_START,
+        VERTICAL_Y_STOP,
+    )
+    right = _compose_base_images_internal(
+        right_top,
+        right_bottom,
+        VERTICAL_IGNORE_BORDERS,
+        VERTICAL_Y_START,
+        VERTICAL_Y_STOP,
+    )
+
+    left = left.crop((0, 0, left.width // 2, left.height))
+
+    HORIZONTAL_IGNORE_BORDERS = 150
+    HORIZONTAL_Y_START = 200
+    HORIZONTAL_Y_STOP = 1500
+
+    composed = _compose_base_images_internal(
+        right.rotate(90, expand=True),
+        left.rotate(90, expand=True),
+        HORIZONTAL_IGNORE_BORDERS,
+        HORIZONTAL_Y_START,
+        HORIZONTAL_Y_STOP,
+    ).rotate(-90, expand=True)
+
+    return composed
 
 
 def reverse_projection(image: PIL.Image.Image) -> PIL.Image.Image:
@@ -146,16 +196,20 @@ def draw_grid(image: PIL.Image.Image):
 
 
 def main():
-    for i in range(8):
-        top = PIL.Image.open(f"test_images/top{i}.jpg")
-        bottom = PIL.Image.open(f"test_images/bottom{i}.jpg")
+    for i in range(1):
+        left_top = PIL.Image.open(f"test_images/lt{i}.jpg")
+        left_bottom = PIL.Image.open(f"test_images/lb{i}.jpg")
+        right_top = PIL.Image.open(f"test_images/rt{i}.jpg")
+        right_bottom = PIL.Image.open(f"test_images/rb{i}.jpg")
 
-        top = remove_vignette(top)
-        bottom = remove_vignette(bottom)
+        left_top = remove_vignette(left_top)
+        left_bottom = remove_vignette(left_bottom)
+        right_top = remove_vignette(right_top)
+        right_bottom = remove_vignette(right_bottom)
 
-        composed = compose_base_images(top, bottom)
-
-        composed.show()
+        compose_4_base_images(
+            left_top, left_bottom, right_top, right_bottom
+        ).show()
 
     return
 
