@@ -1,4 +1,4 @@
-from .building import Building
+from .building import Building, BUILDINGS
 from .simple_building import SimpleBuilding
 from .passive_building import PassiveBuilding
 from .active_building import ActiveBuilding

@@ -1,5 +1,9 @@
+from typing import Type
+
 from .. import game
 from .colliders import Collider
+
+BUILDINGS: list[Type["Building"]] = []
 
 
 class Building:

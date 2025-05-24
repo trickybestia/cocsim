@@ -1,3 +1,4 @@
+from .building import BUILDINGS
 from .active_building import ActiveBuilding
 from .. import game
 from .colliders import RectCollider
@@ -53,3 +54,6 @@ class Cannon(ActiveBuilding):
                 self.height() * 0.65,
             ),
         )
+
+
+BUILDINGS.append(Cannon)

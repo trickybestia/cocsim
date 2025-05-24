@@ -1,3 +1,4 @@
+from .building import BUILDINGS
 from .active_building import ActiveBuilding
 from .. import game
 from .colliders import RectCollider
@@ -48,3 +49,6 @@ class Mortar(ActiveBuilding):
                 self.height() * 0.65,
             ),
         )
+
+
+BUILDINGS.append(Mortar)

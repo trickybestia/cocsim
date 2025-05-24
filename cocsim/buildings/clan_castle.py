@@ -1,3 +1,4 @@
+from .building import BUILDINGS
 from .passive_building import PassiveBuilding
 from .. import game
 from .colliders import RectCollider
@@ -45,3 +46,6 @@ class ClanCastle(PassiveBuilding):
                 self.height() * 0.65,
             ),
         )
+
+
+BUILDINGS.append(ClanCastle)

@@ -2,12 +2,11 @@ import pygame
 
 from .consts import *
 from .utils import is_border, get_tile_color
-from .buildings import Building, TownHall
-from . import units
+from . import buildings, units
 
 
 class Game:
-    buildings: list[Building]
+    buildings: list["buildings.Building"]
     occupied_tiles: list[list[bool]]
     drop_zone: list[list[bool]]
     collision: list[list[bool]]
@@ -62,10 +61,10 @@ class Game:
 
         self._draw_timer()
 
-    def building_destroyed(self, building: Building):
+    def building_destroyed(self, building: "buildings.Building"):
         """Called once by every Building when it gets destroyed."""
 
-        if isinstance(building, TownHall):
+        if isinstance(building, buildings.TownHall):
             self._townhall_destroyed = True
 
         self._destroyed_buildings_count += 1

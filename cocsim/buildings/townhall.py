@@ -1,3 +1,4 @@
+from .building import BUILDINGS
 from .passive_building import PassiveBuilding
 from .. import game
 from .colliders import RectCollider
@@ -49,3 +50,6 @@ class TownHall(PassiveBuilding):
                 self.height() * 0.8,
             ),
         )
+
+
+BUILDINGS.append(TownHall)

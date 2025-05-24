@@ -1,10 +1,10 @@
+from typing import Union
 import pygame
 
 import heapq
 
-from ..buildings import Building
 from .unit import Unit
-from .. import game
+from .. import game, buildings
 
 from cocsim.utils import distance, normalize, check_intersection
 from cocsim.consts import *
@@ -16,9 +16,9 @@ class Barbarian(Unit):
     SPEED = 2.0
     RANGE = 0.4
 
-    target: Building | None
-    waypoints: list[tuple[float, float]] | None
-    attack_cooldown: float | None
+    target: Union["buildings.Building", None]
+    waypoints: Union[list[tuple[float, float]], None]
+    attack_cooldown: Union[float, None]
 
     def __init__(self, game: "game.Game"):
         super().__init__(game)
@@ -72,7 +72,7 @@ class Barbarian(Unit):
             else:
                 self._move(delta_t)
 
-    def _attack(self, target: Building):
+    def _attack(self, target: "buildings.Building"):
         target.apply_damage(self.ATTACK_DAMAGE)
 
     def _move(self, delta_t: float):
@@ -115,7 +115,7 @@ class Barbarian(Unit):
 
         self.target = nearest_target
 
-    def _find_path(self, building: Building):
+    def _find_path(self, building: "buildings.Building"):
         def get_neighbors(x: int, y: int) -> list[tuple[int, int]]:
             result = []
 
