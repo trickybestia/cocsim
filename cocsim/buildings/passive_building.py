@@ -11,15 +11,6 @@ class PassiveBuilding(SimpleBuilding):
         x: int,
         y: int,
         health: int,
-        width: int,
-        height: int,
         collider: Collider,
     ):
-        super().__init__(game, x, y, health, width, height, collider)
-
-        self.x = x
-        self.y = y
-        self.health = health
-        self.width = width
-        self.height = height
-        self.collider = collider
+        super().__init__(game, x, y, health, collider)

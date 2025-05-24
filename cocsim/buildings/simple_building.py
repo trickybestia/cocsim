@@ -5,17 +5,12 @@ from cocsim.consts import *
 
 
 class SimpleBuilding(Building):
-    width: int
-    height: int
-
     def __init__(
         self,
         game: "game.Game",
         x: int,
         y: int,
         health: int,
-        width: int,
-        height: int,
         collider: Collider,
     ):
         super().__init__(game)
@@ -23,8 +18,6 @@ class SimpleBuilding(Building):
         self.x = x
         self.y = y
         self.health = health
-        self.width = width
-        self.height = height
         self.collider = collider
 
     def apply_damage(self, damage: int):
@@ -37,13 +30,13 @@ class SimpleBuilding(Building):
             self.update_collision()
 
     def occupy_tiles(self):
-        for x in range(self.x, self.x + self.width):
-            for y in range(self.y, self.y + self.height):
+        for x in range(self.x, self.x + self.width()):
+            for y in range(self.y, self.y + self.height()):
                 self.game.occupied_tiles[x][y] = True
 
     def update_collision(self):
-        for x in range(self.width * COLLISION_TILES_PER_MAP_TILE):
-            for y in range(self.height * COLLISION_TILES_PER_MAP_TILE):
+        for x in range(self.width() * COLLISION_TILES_PER_MAP_TILE):
+            for y in range(self.height() * COLLISION_TILES_PER_MAP_TILE):
                 abs_x = self.x * COLLISION_TILES_PER_MAP_TILE + x
                 abs_y = self.y * COLLISION_TILES_PER_MAP_TILE + y
 

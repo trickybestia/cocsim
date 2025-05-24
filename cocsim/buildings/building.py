@@ -9,6 +9,16 @@ class Building:
     x: int
     y: int
 
+    @classmethod
+    def width(cls) -> int: ...
+
+    @classmethod
+    def height(cls) -> int: ...
+
+    @classmethod
+    def levels(cls) -> int:
+        """Returns levels count."""
+
     @property
     def destroyed(self) -> bool:
         return self.health == 0

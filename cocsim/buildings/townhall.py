@@ -23,8 +23,18 @@ class TownHall(PassiveBuilding):
         10000,
         10400,
     ]
-    WIDTH = 4
-    HEIGHT = 4
+
+    @classmethod
+    def width(cls) -> int:
+        return 4
+
+    @classmethod
+    def height(cls) -> int:
+        return 4
+
+    @classmethod
+    def levels(cls) -> int:
+        return len(cls.HEALTH)
 
     def __init__(self, game: "game.Game", x: float, y: float, level: int):
         super().__init__(
@@ -32,12 +42,10 @@ class TownHall(PassiveBuilding):
             x,
             y,
             self.HEALTH[level],
-            self.WIDTH,
-            self.HEIGHT,
             RectCollider.from_center(
-                x + self.WIDTH / 2,
-                y + self.HEIGHT / 2,
-                self.WIDTH * 0.8,
-                self.HEIGHT * 0.8,
+                x + self.width() / 2,
+                y + self.height() / 2,
+                self.width() * 0.8,
+                self.height() * 0.8,
             ),
         )
