@@ -9,11 +9,11 @@ class BuildersHut(PassiveBuilding):
 
     @classmethod
     def width(cls) -> int:
-        return 1
+        return 2
 
     @classmethod
     def height(cls) -> int:
-        return 1
+        return 2
 
     @classmethod
     def levels(cls) -> int:
