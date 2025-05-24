@@ -143,9 +143,9 @@ def compose_4_base_images(
 
 
 def reverse_projection(image: PIL.Image.Image) -> PIL.Image.Image:
-    TOP_CORNER_POS = (1220, 41)
-    BOTTOM_CORNER_POS = (1221, 1536)
-    LEFT_CORNER_POS = (222, 788)
+    TOP_CORNER_POS = (1250, 41)
+    BOTTOM_CORNER_POS = (1247, 1572)
+    LEFT_CORNER_POS = (223, 810)
 
     image_stream = BytesIO()
 
@@ -196,7 +196,7 @@ def draw_grid(image: PIL.Image.Image):
 
 
 def main():
-    for i in range(1):
+    for i in range(4):
         left_top = PIL.Image.open(f"test_images/lt{i}.jpg")
         left_bottom = PIL.Image.open(f"test_images/lb{i}.jpg")
         right_top = PIL.Image.open(f"test_images/rt{i}.jpg")
@@ -207,19 +207,17 @@ def main():
         right_top = remove_vignette(right_top)
         right_bottom = remove_vignette(right_bottom)
 
-        compose_4_base_images(
+        composed = compose_4_base_images(
             left_top, left_bottom, right_top, right_bottom
-        ).show()
+        ).resize((2498, 1756))
 
-    return
+        square = reverse_projection(composed)
 
-    square = reverse_projection(composed)
+        draw_grid(
+            square,
+        )
 
-    draw_grid(
-        square,
-    )
-
-    square.show()
+        square.show()
 
 
 main()
