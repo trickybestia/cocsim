@@ -18,3 +18,5 @@ from .laboratory import Laboratory
 from .mortar import Mortar
 from .townhall import TownHall
 from .wall import Wall
+
+BUILDINGS_DICT = dict((building.__name__, building) for building in BUILDINGS)

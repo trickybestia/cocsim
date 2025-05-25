@@ -1,12 +1,18 @@
-import pygame
+import json
+from pathlib import Path
 
-from .test_maps.practice_giant_smash import PracticeGiantSmash
+import pygame
 
 from .spin_timer import SpinTimer
 from .units.barbarian import Barbarian
 from .consts import *
-from .game import Game
-from .buildings import TownHall
+from .game import Game, MapBuilding
+
+
+def load_test_map(name: str) -> list[MapBuilding]:
+    path = Path("test_maps") / (name + ".json")
+
+    return json.loads(path.read_text())
 
 
 def main():
@@ -16,11 +22,11 @@ def main():
         (MAP_SIZE * PIXELS_PER_TILE, MAP_SIZE * PIXELS_PER_TILE)
     )
 
-    game = Game()
+    map = load_test_map("practice_giant_smash")
+
+    game = Game(map)
 
     game.screen = screen
-
-    PracticeGiantSmash().load(game)
 
     bb1 = Barbarian(game)
     bb1.x = 1

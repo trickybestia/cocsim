@@ -1,8 +1,17 @@
+from typing import TypedDict
+
 import pygame
 
 from .consts import *
 from .utils import is_border, get_tile_color
 from . import buildings, units
+
+
+class MapBuilding(TypedDict):
+    name: str
+    level: int
+    x: int
+    y: int
 
 
 class Game:
@@ -33,13 +42,25 @@ class Game:
             + int(self._destroyed_buildings_count == len(self.buildings))
         )
 
-    def __init__(self):
+    def __init__(self, map_buildings: list[MapBuilding]):
         self.buildings = []
         self.time_left = 180.0
         self.font = pygame.font.SysFont("Arial", 30)
         self._townhall_destroyed = False
         self._destroyed_buildings_count = 0
         self._total_buildings_count = 0
+
+        for building in map_buildings:
+            self.buildings.append(
+                buildings.BUILDINGS_DICT[building["name"]](
+                    self, building["x"], building["y"], building["level"]
+                )
+            )
+
+        self.compute_buildings_count()
+        self.compute_collision()
+        self.compute_occupied_tiles()
+        self.compute_drop_zone()
 
     def tick(self, delta_t: float):
         assert not self.done

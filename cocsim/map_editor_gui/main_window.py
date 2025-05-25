@@ -5,7 +5,8 @@ from tkinter import *
 import PIL.Image
 import PIL.ImageTk
 
-from ..buildings import Building, Wall
+from ..game import MapBuilding
+from ..buildings import Building, Wall, BUILDINGS_DICT
 from cocsim.consts import *
 from .compose_base_images import REVERSE_PROJECTION_IMAGE_SIZE
 from .building_selection_window import BuildingSelectionWindow
@@ -36,7 +37,9 @@ class MainWindow:
     buildings: list[BuildingInfo]
     buildings_grid: list[list[BuildingInfo | None]]
 
-    def __init__(self, image: PIL.Image.Image):
+    def __init__(
+        self, image: PIL.Image.Image, map_buildings: list[MapBuilding]
+    ):
         self.cursor_rectangle = None
         self.selection_rectangle = None
         self.selection_start_pos = None
@@ -63,6 +66,25 @@ class MainWindow:
         )
         self.canvas.create_image(0, 0, image=self.image, anchor=NW)
         self.canvas.pack()
+
+        for building in map_buildings:
+            self._add_building(
+                BUILDINGS_DICT[building["name"]],
+                building["level"],
+                building["x"],
+                building["y"],
+            )
+
+    def get_map_buildings(self) -> list[MapBuilding]:
+        return [
+            {
+                "name": building.building.__name__,
+                "level": building.level,
+                "x": building.tile_x,
+                "y": building.tile_y,
+            }
+            for building in self.buildings
+        ]
 
     def on_left_click(self, event):
         tile_x, tile_y = self._get_tile_position(event.x, event.y)

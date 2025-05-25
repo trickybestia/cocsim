@@ -1,3 +1,6 @@
+import json
+from pathlib import Path
+
 import PIL
 import PIL.Image
 
@@ -16,16 +19,20 @@ def main():
     composed = compose_4_base_images(
         left_top, left_bottom, right_top, right_bottom
     )
-
     base_image = reverse_projection(composed)
 
-    window = MainWindow(base_image)
+    map_path = Path("test_maps") / "practice_giant_smash.json"
+
+    if map_path.exists():
+        map_buildings = json.loads(map_path.read_text())
+    else:
+        map_buildings = []
+
+    window = MainWindow(base_image, map_buildings)
 
     window.run()
 
-    print(
-        f"({', '.join(str(building.to_tuple()) for building in window.buildings)})"
-    )
+    map_path.write_text(json.dumps(window.get_map_buildings(), indent=4) + "\n")
 
 
 main()
