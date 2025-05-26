@@ -8,7 +8,10 @@
             "name": "cocsim.map_editor_gui.compose_base_images",
             "type": "debugpy",
             "request": "launch",
-            "module": "cocsim.map_editor_gui.compose_base_images"
+            "module": "cocsim.map_editor_gui.compose_base_images",
+            "args": [
+                "0"
+            ]
         },
         {
             "name": "cocsim.map_editor_gui",
