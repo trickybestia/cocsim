@@ -1,38 +1,33 @@
 import json
 from pathlib import Path
-
-import PIL
-import PIL.Image
+from sys import argv
 
 from cocsim.consts import *
 from .main_window import MainWindow
-from .compose_base_images import compose_4_base_images, reverse_projection
+from .compose_base_images import (
+    compose_base_images,
+    reverse_projection,
+    load_base_images,
+)
 
 
 def main():
-    i = 2
-    left_top = PIL.Image.open(f"test_images/lt{i}.jpg")
-    left_bottom = PIL.Image.open(f"test_images/lb{i}.jpg")
-    right_top = PIL.Image.open(f"test_images/rt{i}.jpg")
-    right_bottom = PIL.Image.open(f"test_images/rb{i}.jpg")
-
-    composed = compose_4_base_images(
-        left_top, left_bottom, right_top, right_bottom
-    )
+    left, right = load_base_images(Path("test_images") / argv[1])
+    composed = compose_base_images(left, right)
     base_image = reverse_projection(composed)
 
-    map_path = Path("test_maps") / "practice_giant_smash.json"
+    window = MainWindow(base_image)
+
+    map_path = Path("test_maps") / "single_player_goblin_gauntlet.json"
 
     if map_path.exists():
-        map_buildings = json.loads(map_path.read_text())
-    else:
-        map_buildings = []
+        map = json.loads(map_path.read_text())
 
-    window = MainWindow(base_image, map_buildings)
+        window.set_map(map)
 
     window.run()
 
-    map_path.write_text(json.dumps(window.get_map_buildings(), indent=4) + "\n")
+    map_path.write_text(json.dumps(window.get_map(), indent=4) + "\n")
 
 
 main()

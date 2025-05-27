@@ -1,11 +1,6 @@
 from pygame.color import Color
 
 
-BASE_SIZE = 44
-MAP_BORDERS = 4
-
-MAP_SIZE = BASE_SIZE + MAP_BORDERS * 2
-
 PIXELS_PER_TILE = 20
 
 COLLISION_TILES_PER_MAP_TILE = 10  # used for pathfinding

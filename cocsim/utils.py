@@ -1,15 +1,6 @@
 from .consts import *
 
 
-def is_border(x: int, y: int) -> bool:
-    return (
-        y < MAP_BORDERS
-        or x < MAP_BORDERS
-        or y >= BASE_SIZE + MAP_BORDERS
-        or x >= BASE_SIZE + MAP_BORDERS
-    )
-
-
 def get_tile_color(
     even: bool, border: bool, drop_zone: bool, occupied: bool
 ) -> Color:

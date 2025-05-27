@@ -126,10 +126,12 @@ class Barbarian(Unit):
                 (x - 1, y),
             ):
                 if (
-                    0 <= neighbor_x < MAP_SIZE * COLLISION_TILES_PER_MAP_TILE
+                    0
+                    <= neighbor_x
+                    < self.game.total_size * COLLISION_TILES_PER_MAP_TILE
                     and 0
                     <= neighbor_y
-                    < MAP_SIZE * COLLISION_TILES_PER_MAP_TILE
+                    < self.game.total_size * COLLISION_TILES_PER_MAP_TILE
                     and not self.game.collision[neighbor_x][neighbor_y]
                 ):
                     result.append((neighbor_x, neighbor_y))
@@ -148,12 +150,12 @@ class Barbarian(Unit):
         BIG_NUMBER = 1000000000
 
         distances = [
-            [BIG_NUMBER] * MAP_SIZE * COLLISION_TILES_PER_MAP_TILE
-            for _ in range(MAP_SIZE * COLLISION_TILES_PER_MAP_TILE)
+            [BIG_NUMBER] * self.game.total_size * COLLISION_TILES_PER_MAP_TILE
+            for _ in range(self.game.total_size * COLLISION_TILES_PER_MAP_TILE)
         ]
         checked_tiles = [
-            [False] * MAP_SIZE * COLLISION_TILES_PER_MAP_TILE
-            for _ in range(MAP_SIZE * COLLISION_TILES_PER_MAP_TILE)
+            [False] * self.game.total_size * COLLISION_TILES_PER_MAP_TILE
+            for _ in range(self.game.total_size * COLLISION_TILES_PER_MAP_TILE)
         ]
 
         start_x = int(self.x * COLLISION_TILES_PER_MAP_TILE)

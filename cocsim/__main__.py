@@ -3,13 +3,14 @@ from pathlib import Path
 
 import pygame
 
+from .map import Map
 from .spin_timer import SpinTimer
 from .units.barbarian import Barbarian
 from .consts import *
-from .game import Game, MapBuilding
+from .game import Game
 
 
-def load_test_map(name: str) -> list[MapBuilding]:
+def load_test_map(name: str) -> Map:
     path = Path("test_maps") / (name + ".json")
 
     return json.loads(path.read_text())
@@ -18,13 +19,13 @@ def load_test_map(name: str) -> list[MapBuilding]:
 def main():
     pygame.init()
 
-    screen = pygame.display.set_mode(
-        (MAP_SIZE * PIXELS_PER_TILE, MAP_SIZE * PIXELS_PER_TILE)
-    )
-
     map = load_test_map("practice_giant_smash")
 
     game = Game(map)
+
+    screen = pygame.display.set_mode(
+        (game.total_size * PIXELS_PER_TILE, game.total_size * PIXELS_PER_TILE)
+    )
 
     game.screen = screen
 

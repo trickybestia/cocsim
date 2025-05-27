@@ -17,7 +17,10 @@
             "name": "cocsim.map_editor_gui",
             "type": "debugpy",
             "request": "launch",
-            "module": "cocsim.map_editor_gui"
+            "module": "cocsim.map_editor_gui",
+            "args": [
+                "1"
+            ]
         },
         {
             "name": "cocsim",

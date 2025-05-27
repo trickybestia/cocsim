@@ -1,20 +1,15 @@
-from typing import TypedDict
-
 import pygame
 
 from .consts import *
-from .utils import is_border, get_tile_color
+from .utils import get_tile_color
+from .map import Map
 from . import buildings, units
 
 
-class MapBuilding(TypedDict):
-    name: str
-    level: int
-    x: int
-    y: int
-
-
 class Game:
+    base_size: int
+    border_size: int
+
     buildings: list["buildings.Building"]
     occupied_tiles: list[list[bool]]
     drop_zone: list[list[bool]]
@@ -31,6 +26,10 @@ class Game:
     _total_buildings_count: int
 
     @property
+    def total_size(self) -> int:
+        return self.base_size + 2 * self.border_size
+
+    @property
     def done(self) -> bool:
         return self.time_left == 0.0 or self.stars == 3
 
@@ -42,7 +41,10 @@ class Game:
             + int(self._destroyed_buildings_count == len(self.buildings))
         )
 
-    def __init__(self, map_buildings: list[MapBuilding]):
+    def __init__(self, map: Map):
+        self.base_size = map["base_size"]
+        self.border_size = map["border_size"]
+
         self.buildings = []
         self.time_left = 180.0
         self.font = pygame.font.SysFont("Arial", 30)
@@ -50,7 +52,7 @@ class Game:
         self._destroyed_buildings_count = 0
         self._total_buildings_count = 0
 
-        for building in map_buildings:
+        for building in map["buildings"]:
             self.buildings.append(
                 buildings.BUILDINGS_DICT[building["name"]](
                     self, building["x"], building["y"], building["level"]
@@ -61,6 +63,14 @@ class Game:
         self.compute_collision()
         self.compute_occupied_tiles()
         self.compute_drop_zone()
+
+    def is_border(self, x: int, y: int) -> bool:
+        return (
+            y < self.border_size
+            or x < self.border_size
+            or y >= self.base_size + self.border_size
+            or x >= self.base_size + self.border_size
+        )
 
     def tick(self, delta_t: float):
         assert not self.done
@@ -94,13 +104,13 @@ class Game:
         self._destroyed_buildings_count += 1
 
     def _draw_grid(self):
-        for x in range(MAP_SIZE):
-            for y in range(MAP_SIZE):
+        for x in range(self.total_size):
+            for y in range(self.total_size):
                 pygame.draw.rect(
                     self.screen,
                     get_tile_color(
                         (y ^ x) & 1,
-                        is_border(x, y),
+                        self.is_border(x, y),
                         self.drop_zone[x][y],
                         self.occupied_tiles[x][y],
                     ),
@@ -121,8 +131,8 @@ class Game:
 
         collision_surface.set_alpha(100)
 
-        for x in range(MAP_SIZE * COLLISION_TILES_PER_MAP_TILE):
-            for y in range(MAP_SIZE * COLLISION_TILES_PER_MAP_TILE):
+        for x in range(self.total_size * COLLISION_TILES_PER_MAP_TILE):
+            for y in range(self.total_size * COLLISION_TILES_PER_MAP_TILE):
                 if self.collision[x][y]:
                     pygame.draw.rect(
                         collision_surface,
@@ -162,15 +172,17 @@ class Game:
 
     def compute_collision(self):
         self.collision = [
-            [False] * MAP_SIZE * COLLISION_TILES_PER_MAP_TILE
-            for _ in range(MAP_SIZE * COLLISION_TILES_PER_MAP_TILE)
+            [False] * self.total_size * COLLISION_TILES_PER_MAP_TILE
+            for _ in range(self.total_size * COLLISION_TILES_PER_MAP_TILE)
         ]
 
         for building in self.buildings:
             building.update_collision()
 
     def compute_occupied_tiles(self):
-        self.occupied_tiles = [[False] * MAP_SIZE for _ in range(MAP_SIZE)]
+        self.occupied_tiles = [
+            [False] * self.total_size for _ in range(self.total_size)
+        ]
 
         for building in self.buildings:
             building.occupy_tiles()
@@ -182,17 +194,19 @@ class Game:
             for neighbor_x in range(x - 1, x + 2):
                 for neighbor_y in range(y - 1, y + 2):
                     if (
-                        0 <= neighbor_x < MAP_SIZE
-                        and 0 <= neighbor_y < MAP_SIZE
+                        0 <= neighbor_x < self.total_size
+                        and 0 <= neighbor_y < self.total_size
                     ):
                         result.append((neighbor_x, neighbor_y))
 
             return result
 
-        self.drop_zone = [[True] * MAP_SIZE for _ in range(MAP_SIZE)]
+        self.drop_zone = [
+            [True] * self.total_size for _ in range(self.total_size)
+        ]
 
-        for x in range(MAP_SIZE):
-            for y in range(MAP_SIZE):
+        for x in range(self.total_size):
+            for y in range(self.total_size):
                 if self.occupied_tiles[x][y]:
                     for neighbor_x, neighbor_y in get_neighbors(x, y):
                         self.drop_zone[neighbor_x][neighbor_y] = False
