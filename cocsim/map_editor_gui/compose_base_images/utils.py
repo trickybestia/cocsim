@@ -3,15 +3,13 @@ from pathlib import Path
 import PIL.Image
 
 
-def load_test_images(
-    index: int,
+def load_base_images(
+    path: Path,
 ) -> tuple[list[PIL.Image.Image], list[PIL.Image.Image]]:
     left = []
     right = []
 
-    test_images = Path("test_images") / str(index)
-
-    for file_path in test_images.iterdir():
+    for file_path in path.iterdir():
         if file_path.name.startswith("l"):
             left.append((file_path.name, PIL.Image.open(file_path)))
         else:
