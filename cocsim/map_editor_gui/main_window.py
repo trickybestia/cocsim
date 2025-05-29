@@ -61,7 +61,7 @@ class MainWindow:
     invalid_tiles_selected: bool
 
     base_image_id: int | None
-    grid_tiles_ids: list[int]
+    grid_nodes_ids: list[int]
 
     buildings: list[BuildingInfo]
     buildings_grid: list[list[BuildingInfo | None]]
@@ -83,7 +83,7 @@ class MainWindow:
         self.selection_rectangle = None
         self.selection_start_pos = None
         self.invalid_tiles_selected = False
-        self.grid_tiles_ids = []
+        self.grid_nodes_ids = []
 
         self.root = Tk()
         self.root.resizable(False, False)
@@ -289,17 +289,25 @@ class MainWindow:
             self.selection_rectangle = None
 
     def _on_draw_grid_changed(self, *args):
-        for tile_id in self.grid_tiles_ids:
+        for tile_id in self.grid_nodes_ids:
             self.canvas.delete(tile_id)
 
-        self.grid_tiles_ids = []
+        self.grid_nodes_ids = []
 
         if self.draw_grid_variable.get():
-            for tile_x in range(self.total_size):
-                for tile_y in range(self.total_size):
-                    self.grid_tiles_ids.append(
-                        self._draw_tiles_rectangle(
-                            tile_x, tile_y, tile_x, tile_y, outline="white"
+            for tile_x in range(self.total_size + 1):
+                for tile_y in range(self.total_size + 1):
+                    x = tile_x * self._pixels_per_tile
+                    y = tile_y * self._pixels_per_tile
+
+                    self.grid_nodes_ids.append(
+                        self.canvas.create_oval(
+                            x - 1,
+                            y - 1,
+                            x + 1,
+                            y + 1,
+                            fill="white",
+                            outline="white",
                         )
                     )
 
