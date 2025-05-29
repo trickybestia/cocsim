@@ -23,10 +23,10 @@ class BuildingInfo:
         return self.building.__name__, self.level, self.tile_x, self.tile_y
 
 
+CANVAS_SIZE = 832
+
 INITIAL_BASE_SIZE = 44
 INITIAL_BORDER_SIZE = 4
-
-PIXELS_PER_TILE = 16
 
 
 class MainWindow:
@@ -52,9 +52,12 @@ class MainWindow:
     image_start_y_label: Label
     image_start_y_variable: IntVar
     image_start_y_spinbox: Spinbox
-    image_size_y_label: Label
-    image_size_y_variable: IntVar
-    image_size_y_spinbox: Spinbox
+    image_end_x_label: Label
+    image_end_x_variable: IntVar
+    image_end_x_spinbox: Spinbox
+    image_end_y_label: Label
+    image_end_y_variable: IntVar
+    image_end_y_spinbox: Spinbox
 
     cursor_rectangle: int | None
     selection_rectangle: int | None
@@ -74,8 +77,8 @@ class MainWindow:
         )
 
     @property
-    def _canvas_size(self) -> int:
-        return self.total_size * PIXELS_PER_TILE
+    def _pixels_per_tile(self) -> float:
+        return CANVAS_SIZE / self.total_size
 
     def __init__(self, image: PIL.Image.Image):
         self.image = image
@@ -98,11 +101,13 @@ class MainWindow:
         self.image_size_y_variable = IntVar(
             value=min(image.width, image.height)
         )
+        self.image_end_x_variable = IntVar(value=image.width - 1)
+        self.image_end_y_variable = IntVar(value=image.height - 1)
 
         self.buildings = []
         self._update_buildings_grid()
 
-        self.canvas = Canvas(width=self._canvas_size, height=self._canvas_size)
+        self.canvas = Canvas(width=CANVAS_SIZE, height=CANVAS_SIZE)
         self.tk_image = None
         self.base_image_id = None
         self._update_base_image()
@@ -135,7 +140,7 @@ class MainWindow:
         self.base_size_spinbox = Spinbox(
             self.controls_frame,
             textvariable=self.base_size_variable,
-            from_=0,
+            from_=1,
             to=44,
         )
         self.base_size_variable.trace_add("write", self._on_base_size_changed)
@@ -181,18 +186,31 @@ class MainWindow:
         self.image_start_y_label.grid(column=0, row=4, sticky=N + E + W)
         self.image_start_y_spinbox.grid(column=1, row=4, sticky=N + E + W)
 
-        self.image_size_y_label = Label(
-            self.controls_frame, text="Size:", anchor=E
+        self.image_end_x_label = Label(
+            self.controls_frame, text="End X:", anchor=E
         )
-        self.image_size_y_spinbox = Spinbox(
+        self.image_end_x_spinbox = Spinbox(
             self.controls_frame,
-            textvariable=self.image_size_y_variable,
+            textvariable=self.image_end_x_variable,
             from_=0,
-            to=min(image.width, image.height),
+            to=image.width - 1,
         )
-        self.image_size_y_variable.trace_add("write", self._update_base_image)
-        self.image_size_y_label.grid(column=0, row=5, sticky=N + E + W)
-        self.image_size_y_spinbox.grid(column=1, row=5, sticky=N + E + W)
+        self.image_end_x_variable.trace_add("write", self._update_base_image)
+        self.image_end_x_label.grid(column=0, row=5, sticky=N + E + W)
+        self.image_end_x_spinbox.grid(column=1, row=5, sticky=N + E + W)
+
+        self.image_end_y_label = Label(
+            self.controls_frame, text="End Y:", anchor=E
+        )
+        self.image_end_y_spinbox = Spinbox(
+            self.controls_frame,
+            textvariable=self.image_end_y_variable,
+            from_=0,
+            to=image.height - 1,
+        )
+        self.image_end_y_variable.trace_add("write", self._update_base_image)
+        self.image_end_y_label.grid(column=0, row=6, sticky=N + E + W)
+        self.image_end_y_spinbox.grid(column=1, row=6, sticky=N + E + W)
 
     def set_map(self, map: Map):
         self.base_size_variable.set(map["base_size"])
@@ -291,6 +309,11 @@ class MainWindow:
             self.selection_rectangle = None
 
     def _on_draw_grid_changed(self, *args):
+        for tile_id in self.grid_tiles_ids:
+            self.canvas.delete(tile_id)
+
+        self.grid_tiles_ids = []
+
         if self.draw_grid_variable.get():
             for tile_x in range(self.total_size):
                 for tile_y in range(self.total_size):
@@ -299,36 +322,21 @@ class MainWindow:
                             tile_x, tile_y, tile_x, tile_y, outline="white"
                         )
                     )
-        else:
-            for tile_id in self.grid_tiles_ids:
-                self.canvas.delete(tile_id)
-
-            self.grid_tiles_ids = []
 
     def _on_base_size_changed(self, *args):
         self._update_buildings_grid()
-
-        self.canvas.configure(width=self._canvas_size, height=self._canvas_size)
+        self._on_draw_grid_changed()
 
     def _update_base_image(self, *args):
         image = self.image.crop(
             (
                 self.image_start_x_variable.get(),
                 self.image_start_y_variable.get(),
-                self.image.width,
-                self.image.height,
+                self.image_end_x_variable.get() + 1,
+                self.image_end_y_variable.get() + 1,
             )
         )
-        image = image.resize(
-            (
-                round(
-                    self.image.width
-                    * self.image_size_y_variable.get()
-                    / self.image.height
-                ),
-                self.image_size_y_variable.get(),
-            )
-        )
+        image = image.resize((CANVAS_SIZE, CANVAS_SIZE))
 
         self.canvas.delete(self.base_image_id)
         del self.tk_image
@@ -414,8 +422,8 @@ class MainWindow:
                 ] = None
 
     def _get_tile_position(self, x: int, y: int) -> tuple[int, int]:
-        tile_x = x // PIXELS_PER_TILE
-        tile_y = y // PIXELS_PER_TILE
+        tile_x = int(x / self._pixels_per_tile)
+        tile_y = int(y / self._pixels_per_tile)
 
         return tile_x, tile_y
 
@@ -459,18 +467,20 @@ class MainWindow:
         **kwargs,
     ) -> int:
         min_x = min(
-            start_tile_x * PIXELS_PER_TILE, end_tile_x * PIXELS_PER_TILE
+            start_tile_x * self._pixels_per_tile,
+            end_tile_x * self._pixels_per_tile,
         )
         max_x = max(
-            (start_tile_x + 1) * PIXELS_PER_TILE - 1,
-            (end_tile_x + 1) * PIXELS_PER_TILE - 1,
+            (start_tile_x + 1) * self._pixels_per_tile - 1,
+            (end_tile_x + 1) * self._pixels_per_tile - 1,
         )
         min_y = min(
-            start_tile_y * PIXELS_PER_TILE, end_tile_y * PIXELS_PER_TILE
+            start_tile_y * self._pixels_per_tile,
+            end_tile_y * self._pixels_per_tile,
         )
         max_y = max(
-            (start_tile_y + 1) * PIXELS_PER_TILE - 1,
-            (end_tile_y + 1) * PIXELS_PER_TILE - 1,
+            (start_tile_y + 1) * self._pixels_per_tile - 1,
+            (end_tile_y + 1) * self._pixels_per_tile - 1,
         )
 
         return self.canvas.create_rectangle(
