@@ -1,0 +1,414 @@
+{
+    "base_size": 32,
+    "border_size": 0,
+    "buildings": [
+        {
+            "name": "TownHall",
+            "level": 0,
+            "x": 17,
+            "y": 9
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 10,
+            "y": 7
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 10,
+            "y": 8
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 10,
+            "y": 9
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 10,
+            "y": 10
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 10,
+            "y": 11
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 10,
+            "y": 12
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 10,
+            "y": 13
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 10,
+            "y": 14
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 10,
+            "y": 15
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 10,
+            "y": 16
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 10,
+            "y": 17
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 11,
+            "y": 17
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 12,
+            "y": 17
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 13,
+            "y": 17
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 14,
+            "y": 17
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 11,
+            "y": 7
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 12,
+            "y": 7
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 13,
+            "y": 7
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 14,
+            "y": 7
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 15,
+            "y": 7
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 16,
+            "y": 7
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 16,
+            "y": 8
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 16,
+            "y": 9
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 16,
+            "y": 10
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 16,
+            "y": 11
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 16,
+            "y": 12
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 16,
+            "y": 13
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 17,
+            "y": 8
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 18,
+            "y": 8
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 19,
+            "y": 8
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 20,
+            "y": 8
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 21,
+            "y": 8
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 21,
+            "y": 9
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 21,
+            "y": 10
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 21,
+            "y": 11
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 21,
+            "y": 12
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 21,
+            "y": 13
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 21,
+            "y": 14
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 21,
+            "y": 15
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 12,
+            "y": 15
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 13,
+            "y": 15
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 14,
+            "y": 15
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 15,
+            "y": 15
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 16,
+            "y": 15
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 17,
+            "y": 15
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 18,
+            "y": 15
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 19,
+            "y": 15
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 20,
+            "y": 15
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 12,
+            "y": 10
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 12,
+            "y": 11
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 12,
+            "y": 12
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 12,
+            "y": 13
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 12,
+            "y": 14
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 17,
+            "y": 13
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 19,
+            "y": 13
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 20,
+            "y": 13
+        },
+        {
+            "name": "Cannon",
+            "level": 0,
+            "x": 19,
+            "y": 16
+        },
+        {
+            "name": "Cannon",
+            "level": 0,
+            "x": 7,
+            "y": 7
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 2,
+            "y": 29
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 2,
+            "y": 30
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 2,
+            "y": 31
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 3,
+            "y": 31
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 4,
+            "y": 31
+        },
+        {
+            "name": "Wall",
+            "level": 0,
+            "x": 5,
+            "y": 31
+        },
+        {
+            "name": "GoblinHut",
+            "level": 0,
+            "x": 14,
+            "y": 8
+        },
+        {
+            "name": "GoblinHut",
+            "level": 0,
+            "x": 14,
+            "y": 11
+        },
+        {
+            "name": "GoblinHut",
+            "level": 0,
+            "x": 12,
+            "y": 18
+        }
+    ]
+}
