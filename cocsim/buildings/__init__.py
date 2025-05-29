@@ -12,6 +12,7 @@ from .cannon import Cannon
 from .clan_castle import ClanCastle
 from .elixir_collector import ElixirCollector
 from .elixir_storage import ElixirStorage
+from .goblin_hut import GoblinHut
 from .gold_mine import GoldMine
 from .gold_storage import GoldStorage
 from .laboratory import Laboratory
