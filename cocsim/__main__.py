@@ -18,8 +18,9 @@ def load_test_map(name: str) -> Map:
 
 def main():
     pygame.init()
+    pygame.display.set_caption("cocsim")
 
-    map = load_test_map("practice_giant_smash")
+    map = load_test_map("single_player_goblin_gauntlet")
 
     game = Game(map)
 
@@ -52,6 +53,7 @@ def main():
 
         if not game.done and delta_t is not None:
             game.tick(delta_t)
+            pygame.display.set_caption(f"cocsim | {game.progress_info()}")
 
         pygame.display.update()
 

@@ -19,7 +19,6 @@ class Game:
     time_left: float
 
     screen: pygame.Surface
-    font: pygame.font.Font
 
     _townhall_destroyed: bool
     _destroyed_buildings_count: int
@@ -47,7 +46,6 @@ class Game:
 
         self.buildings = []
         self.time_left = 180.0
-        self.font = pygame.font.SysFont("Arial", 30)
         self._townhall_destroyed = False
         self._destroyed_buildings_count = 0
         self._total_buildings_count = 0
@@ -93,7 +91,7 @@ class Game:
         for unit in self.units:
             unit.draw()
 
-        self._draw_timer()
+        self.progress_info()
 
     def building_destroyed(self, building: "buildings.Building"):
         """Called once by every Building when it gets destroyed."""
@@ -102,6 +100,20 @@ class Game:
             self._townhall_destroyed = True
 
         self._destroyed_buildings_count += 1
+
+    def progress_info(self):
+        seconds = int(self.time_left)
+        minutes = seconds // 60
+        seconds %= 60
+
+        text = f"{int(self._destroyed_buildings_count / len(self.buildings) * 100.0)} % | {self.stars} star |"
+
+        if minutes != 0:
+            text += f" {minutes} min"
+
+        text += f" {seconds} s left"
+
+        return text
 
     def _draw_grid(self):
         for x in range(self.total_size):
@@ -146,22 +158,6 @@ class Game:
                     )
 
         self.screen.blit(collision_surface, (0, 0))
-
-    def _draw_timer(self):
-        seconds = int(self.time_left)
-        minutes = seconds // 60
-        seconds %= 60
-
-        text = f"{int(self._destroyed_buildings_count / len(self.buildings) * 100.0)} % | {self.stars} star |"
-
-        if minutes != 0:
-            text += f" {minutes} min"
-
-        text += f" {seconds} s left"
-
-        text_surface = self.font.render(text, True, TIMER_COLOR)
-
-        self.screen.blit(text_surface, TIMER_POSITION)
 
     def compute_buildings_count(self):
         self._total_buildings_count = 0
