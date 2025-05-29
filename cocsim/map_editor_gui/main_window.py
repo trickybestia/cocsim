@@ -5,6 +5,7 @@ from tkinter import *
 import PIL.Image
 import PIL.ImageTk
 
+from .named_spinbox import NamedSpinbox
 from ..buildings import Building, Wall, BUILDINGS_DICT
 from ..map import Map
 from cocsim.consts import *
@@ -40,24 +41,19 @@ class MainWindow:
     draw_grid_label: Label
     draw_grid_variable: BooleanVar
     draw_grid_checkbutton: Checkbutton
-    base_size_label: Label
+
     base_size_variable: IntVar
-    base_size_spinbox: Spinbox
-    border_size_label: Label
+    base_size_spinbox: NamedSpinbox
     border_size_variable: IntVar
-    border_size_spinbox: Spinbox
-    image_start_x_label: Label
+    border_size_spinbox: NamedSpinbox
     image_start_x_variable: IntVar
-    image_start_x_spinbox: Spinbox
-    image_start_y_label: Label
+    image_start_x_spinbox: NamedSpinbox
     image_start_y_variable: IntVar
-    image_start_y_spinbox: Spinbox
-    image_end_x_label: Label
+    image_start_y_spinbox: NamedSpinbox
     image_end_x_variable: IntVar
-    image_end_x_spinbox: Spinbox
-    image_end_y_label: Label
+    image_end_x_spinbox: NamedSpinbox
     image_end_y_variable: IntVar
-    image_end_y_spinbox: Spinbox
+    image_end_y_spinbox: NamedSpinbox
 
     cursor_rectangle: int | None
     selection_rectangle: int | None
@@ -134,83 +130,67 @@ class MainWindow:
         self.draw_grid_label.grid(column=0, row=0, sticky=N + E + W)
         self.draw_grid_checkbutton.grid(column=1, row=0, sticky=N + E + W)
 
-        self.base_size_label = Label(
-            self.controls_frame, text="Base size:", anchor=E
-        )
-        self.base_size_spinbox = Spinbox(
-            self.controls_frame,
-            textvariable=self.base_size_variable,
-            from_=1,
-            to=44,
+        self.base_size_spinbox = NamedSpinbox(
+            self.controls_frame, "Base size:", 1, 44, self.base_size_variable
         )
         self.base_size_variable.trace_add("write", self._on_base_size_changed)
-        self.base_size_label.grid(column=0, row=1, sticky=N + E + W)
-        self.base_size_spinbox.grid(column=1, row=1, sticky=N + E + W)
+        self.base_size_spinbox.label.grid(column=0, row=1, sticky=N + E + W)
+        self.base_size_spinbox.spinbox.grid(column=1, row=1, sticky=N + E + W)
 
-        self.border_size_label = Label(
-            self.controls_frame, text="Border size:", anchor=E
-        )
-        self.border_size_spinbox = Spinbox(
-            self.controls_frame,
-            textvariable=self.border_size_variable,
-            from_=0,
-            to=4,
+        self.border_size_spinbox = NamedSpinbox(
+            self.controls_frame, "Border size:", 0, 4, self.border_size_variable
         )
         self.border_size_variable.trace_add("write", self._on_base_size_changed)
-        self.border_size_label.grid(column=0, row=2, sticky=N + E + W)
-        self.border_size_spinbox.grid(column=1, row=2, sticky=N + E + W)
+        self.border_size_spinbox.label.grid(column=0, row=2, sticky=N + E + W)
+        self.border_size_spinbox.spinbox.grid(column=1, row=2, sticky=N + E + W)
 
-        self.image_start_x_label = Label(
-            self.controls_frame, text="Start X:", anchor=E
-        )
-        self.image_start_x_spinbox = Spinbox(
+        self.image_start_x_spinbox = NamedSpinbox(
             self.controls_frame,
-            textvariable=self.image_start_x_variable,
-            from_=0,
-            to=image.width - 1,
+            "Start X:",
+            0,
+            image.width - 1,
+            self.image_start_x_variable,
         )
         self.image_start_x_variable.trace_add("write", self._update_base_image)
-        self.image_start_x_label.grid(column=0, row=3, sticky=N + E + W)
-        self.image_start_x_spinbox.grid(column=1, row=3, sticky=N + E + W)
-
-        self.image_start_y_label = Label(
-            self.controls_frame, text="Start Y:", anchor=E
+        self.image_start_x_spinbox.label.grid(column=0, row=3, sticky=N + E + W)
+        self.image_start_x_spinbox.spinbox.grid(
+            column=1, row=3, sticky=N + E + W
         )
-        self.image_start_y_spinbox = Spinbox(
+
+        self.image_start_y_spinbox = NamedSpinbox(
             self.controls_frame,
-            textvariable=self.image_start_y_variable,
-            from_=0,
-            to=image.height - 1,
+            "Start Y:",
+            0,
+            image.height - 1,
+            self.image_start_y_variable,
         )
         self.image_start_y_variable.trace_add("write", self._update_base_image)
-        self.image_start_y_label.grid(column=0, row=4, sticky=N + E + W)
-        self.image_start_y_spinbox.grid(column=1, row=4, sticky=N + E + W)
-
-        self.image_end_x_label = Label(
-            self.controls_frame, text="End X:", anchor=E
+        self.image_start_y_spinbox.label.grid(column=0, row=4, sticky=N + E + W)
+        self.image_start_y_spinbox.spinbox.grid(
+            column=1, row=4, sticky=N + E + W
         )
-        self.image_end_x_spinbox = Spinbox(
+
+        self.image_end_x_spinbox = NamedSpinbox(
             self.controls_frame,
-            textvariable=self.image_end_x_variable,
-            from_=0,
-            to=image.width - 1,
+            "End X:",
+            0,
+            image.width - 1,
+            self.image_end_x_variable,
         )
         self.image_end_x_variable.trace_add("write", self._update_base_image)
-        self.image_end_x_label.grid(column=0, row=5, sticky=N + E + W)
-        self.image_end_x_spinbox.grid(column=1, row=5, sticky=N + E + W)
+        self.image_end_x_spinbox.label.grid(column=0, row=5, sticky=N + E + W)
+        self.image_end_x_spinbox.spinbox.grid(column=1, row=5, sticky=N + E + W)
 
-        self.image_end_y_label = Label(
-            self.controls_frame, text="End Y:", anchor=E
-        )
-        self.image_end_y_spinbox = Spinbox(
+        self.image_end_y_spinbox = NamedSpinbox(
             self.controls_frame,
-            textvariable=self.image_end_y_variable,
-            from_=0,
-            to=image.height - 1,
+            "End Y:",
+            0,
+            image.height - 1,
+            self.image_end_y_variable,
         )
         self.image_end_y_variable.trace_add("write", self._update_base_image)
-        self.image_end_y_label.grid(column=0, row=6, sticky=N + E + W)
-        self.image_end_y_spinbox.grid(column=1, row=6, sticky=N + E + W)
+        self.image_end_y_spinbox.label.grid(column=0, row=6, sticky=N + E + W)
+        self.image_end_y_spinbox.spinbox.grid(column=1, row=6, sticky=N + E + W)
 
     def set_map(self, map: Map):
         self.base_size_variable.set(map["base_size"])
