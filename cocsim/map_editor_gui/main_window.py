@@ -324,11 +324,14 @@ class MainWindow:
                 self.image_end_x_variable.get() + 1,
                 self.image_end_y_variable.get() + 1,
             )
-        ).resize((CANVAS_SIZE, CANVAS_SIZE))
+        )
+        image_size = max(self.cropped_image.size)
+        self.cropped_image = self.cropped_image.resize((image_size, image_size))
+        resized_image = self.cropped_image.resize((CANVAS_SIZE, CANVAS_SIZE))
 
         self.canvas.delete(self.base_image_id)
         del self.tk_image
-        self.tk_image = PIL.ImageTk.PhotoImage(self.cropped_image)
+        self.tk_image = PIL.ImageTk.PhotoImage(resized_image)
         self.base_image_id = self.canvas.create_image(
             0, 0, image=self.tk_image, anchor=NW
         )
