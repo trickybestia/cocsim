@@ -1,4 +1,19 @@
+import json
+from pathlib import Path
+
+import PIL.Image
+
+from .map import Map
 from .consts import *
+
+
+def load_test_map(name: str) -> tuple[Map, PIL.Image.Image]:
+    map_dir_path = Path(TEST_MAPS_PATH) / name
+
+    map_path = map_dir_path / "map.json"
+    map_image_path = map_dir_path / "map.jpg"
+
+    return json.loads(map_path.read_text()), PIL.Image.open(map_image_path)
 
 
 def get_tile_color(

@@ -32,6 +32,7 @@ INITIAL_BORDER_SIZE = 4
 
 class MainWindow:
     image: PIL.Image.Image
+    cropped_image: PIL.Image.Image
 
     root: Tk
     tk_image: PIL.ImageTk.PhotoImage | None
@@ -316,19 +317,18 @@ class MainWindow:
         self._on_draw_grid_changed()
 
     def _update_base_image(self, *args):
-        image = self.image.crop(
+        self.cropped_image = self.image.crop(
             (
                 self.image_start_x_variable.get(),
                 self.image_start_y_variable.get(),
                 self.image_end_x_variable.get() + 1,
                 self.image_end_y_variable.get() + 1,
             )
-        )
-        image = image.resize((CANVAS_SIZE, CANVAS_SIZE))
+        ).resize((CANVAS_SIZE, CANVAS_SIZE))
 
         self.canvas.delete(self.base_image_id)
         del self.tk_image
-        self.tk_image = PIL.ImageTk.PhotoImage(image)
+        self.tk_image = PIL.ImageTk.PhotoImage(self.cropped_image)
         self.base_image_id = self.canvas.create_image(
             0, 0, image=self.tk_image, anchor=NW
         )

@@ -1,5 +1,7 @@
 from pygame.color import Color
 
+TEST_IMAGES_PATH = "test_images"
+TEST_MAPS_PATH = "test_maps"
 
 PIXELS_PER_TILE = 20
 

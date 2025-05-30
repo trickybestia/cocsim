@@ -1,26 +1,17 @@
-import json
-from pathlib import Path
-
 import pygame
 
-from .map import Map
+from .utils import load_test_map
 from .spin_timer import SpinTimer
 from .units.barbarian import Barbarian
 from .consts import *
 from .game import Game
 
 
-def load_test_map(name: str) -> Map:
-    path = Path("test_maps") / (name + ".json")
-
-    return json.loads(path.read_text())
-
-
 def main():
     pygame.init()
     pygame.display.set_caption("cocsim")
 
-    map = load_test_map("single_player_goblin_gauntlet")
+    map, base_image = load_test_map("single_player/goblin_gauntlet")
 
     game = Game(map)
 
@@ -30,13 +21,8 @@ def main():
 
     game.screen = screen
 
-    bb1 = Barbarian(game)
-    bb1.x = 1
-    bb1.y = 1
-
-    bb2 = Barbarian(game)
-    bb2.x = 11
-    bb2.y = 1
+    bb1 = Barbarian(game, 1.0, 1.0)
+    bb2 = Barbarian(game, 11.0, 1.0)
 
     game.units = [bb1, bb2]
 

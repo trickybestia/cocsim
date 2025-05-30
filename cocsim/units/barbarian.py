@@ -16,14 +16,12 @@ class Barbarian(Unit):
     SPEED = 2.0
     RANGE = 0.4
 
-    target: Union["buildings.Building", None]
     waypoints: Union[list[tuple[float, float]], None]
     attack_cooldown: Union[float, None]
 
-    def __init__(self, game: "game.Game"):
-        super().__init__(game)
+    def __init__(self, game: "game.Game", x: float, y: float):
+        super().__init__(game, x, y)
 
-        self.target = None
         self.waypoints = None
         self.attack_cooldown = None
 
