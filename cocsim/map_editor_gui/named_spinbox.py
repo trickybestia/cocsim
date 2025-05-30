@@ -27,7 +27,7 @@ class NamedSpinbox:
         self.from_ = from_
         self.to = to
         self._variable = variable
-        self._variable_internal = Variable(master)
+        self._variable_internal = Variable(master, value=variable.get())
 
         self.label = Label(master, text=label_text, anchor=E)
         self.spinbox = Spinbox(
