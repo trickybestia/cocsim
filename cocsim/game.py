@@ -1,4 +1,5 @@
 import pygame
+import PIL.Image
 
 from .consts import *
 from .utils import get_tile_color
@@ -19,6 +20,7 @@ class Game:
     time_left: float
 
     screen: pygame.Surface
+    _base_image: pygame.Surface
 
     _townhall_destroyed: bool
     _destroyed_buildings_count: int
@@ -40,7 +42,7 @@ class Game:
             + int(self._destroyed_buildings_count == len(self.buildings))
         )
 
-    def __init__(self, map: Map):
+    def __init__(self, map: Map, base_image: PIL.Image.Image | None):
         self.base_size = map["base_size"]
         self.border_size = map["border_size"]
 
@@ -49,6 +51,20 @@ class Game:
         self._townhall_destroyed = False
         self._destroyed_buildings_count = 0
         self._total_buildings_count = 0
+
+        if base_image is not None:
+            base_image = base_image.resize(
+                (
+                    self.total_size * PIXELS_PER_TILE,
+                    self.total_size * PIXELS_PER_TILE,
+                )
+            )
+            self._base_image = pygame.image.frombytes(
+                base_image.tobytes(), base_image.size, base_image.mode
+            )
+            self._base_image.set_alpha(100)
+        else:
+            self._base_image = None
 
         for building in map["buildings"]:
             self.buildings.append(
@@ -85,13 +101,14 @@ class Game:
         self._draw_grid()
         self._draw_collision()
 
+        if self._base_image is not None:
+            self.screen.blit(self._base_image, (0, 0))
+
         for building in self.buildings:
             building.draw()
 
         for unit in self.units:
             unit.draw()
-
-        self.progress_info()
 
     def building_destroyed(self, building: "buildings.Building"):
         """Called once by every Building when it gets destroyed."""
@@ -141,7 +158,7 @@ class Game:
 
         collision_surface = pygame.Surface(self.screen.get_size())
 
-        collision_surface.set_alpha(100)
+        collision_surface.set_alpha(150)
 
         for x in range(self.total_size * COLLISION_TILES_PER_MAP_TILE):
             for y in range(self.total_size * COLLISION_TILES_PER_MAP_TILE):

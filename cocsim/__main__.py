@@ -13,7 +13,7 @@ def main():
 
     map, base_image = load_test_map("single_player/goblin_gauntlet")
 
-    game = Game(map)
+    game = Game(map, base_image)
 
     screen = pygame.display.set_mode(
         (game.total_size * PIXELS_PER_TILE, game.total_size * PIXELS_PER_TILE)
