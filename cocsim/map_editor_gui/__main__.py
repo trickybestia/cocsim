@@ -47,7 +47,8 @@ def main():
     (map_dir_path / "map.json").write_text(
         json.dumps(window.get_map(), indent=4) + "\n"
     )
-    window.cropped_image.save(map_dir_path / "map.jpg")
+    if window.get_cropped_image_changed():
+        window.cropped_image.save(map_dir_path / "map.jpg")
 
 
 main()

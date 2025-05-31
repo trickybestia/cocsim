@@ -246,6 +246,9 @@ class MainWindow:
 
         return result
 
+    def get_cropped_image_changed(self) -> bool:
+        return self.cropped_image.size != self.image.size
+
     def on_left_click(self, event):
         tile_x, tile_y = self._get_tile_position(event.x, event.y)
 
