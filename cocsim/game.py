@@ -1,3 +1,5 @@
+from typing import Union
+
 import pygame
 import PIL.Image
 
@@ -131,6 +133,11 @@ class Game:
         text += f" {seconds} s left"
 
         return text
+
+    def get_building(self, x: int, y: int) -> Union["buildings.Building", None]:
+        for building in self.buildings:
+            if building.x == x and building.y == y:
+                return building
 
     def _draw_grid(self):
         for x in range(self.total_size):
