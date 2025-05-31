@@ -271,6 +271,8 @@ class MainWindow:
     def on_motion(self, event):
         tile_x, tile_y = self._get_tile_position(event.x, event.y)
 
+        self.root.title(f"cocsim.map_editor_gui | X: {tile_x}, Y: {tile_y}")
+
         if self.cursor_rectangle is not None:
             self.canvas.delete(self.cursor_rectangle)
         if self.selection_rectangle is not None:
