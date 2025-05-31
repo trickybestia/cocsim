@@ -56,6 +56,10 @@ class MainWindow:
     image_end_y_variable: IntVar
     image_end_y_spinbox: NamedSpinbox
 
+    draw_positions_label: Label
+    draw_positions_variable: BooleanVar
+    draw_positions_checkbutton: Checkbutton
+
     cursor_rectangle: int | None
     selection_rectangle: int | None
     selection_start_pos: tuple[int, int] | None
@@ -63,6 +67,7 @@ class MainWindow:
 
     base_image_id: int | None
     grid_nodes_ids: list[int]
+    tiles_positions_ids: list[int]
 
     buildings: list[BuildingInfo]
     buildings_grid: list[list[BuildingInfo | None]]
@@ -85,6 +90,7 @@ class MainWindow:
         self.selection_start_pos = None
         self.invalid_tiles_selected = False
         self.grid_nodes_ids = []
+        self.tiles_positions_ids = []
 
         self.root = Tk()
         self.root.resizable(False, False)
@@ -100,6 +106,7 @@ class MainWindow:
         )
         self.image_end_x_variable = IntVar(value=image.width - 1)
         self.image_end_y_variable = IntVar(value=image.height - 1)
+        self.draw_positions_variable = BooleanVar()
 
         self.buildings = []
         self._update_buildings_grid()
@@ -192,6 +199,18 @@ class MainWindow:
         self.image_end_y_variable.trace_add("write", self._update_base_image)
         self.image_end_y_spinbox.label.grid(column=0, row=6, sticky=N + E + W)
         self.image_end_y_spinbox.spinbox.grid(column=1, row=6, sticky=N + E + W)
+
+        self.draw_positions_label = Label(
+            self.controls_frame, text="Draw pos:", anchor=E
+        )
+        self.draw_positions_checkbutton = Checkbutton(
+            self.controls_frame, variable=self.draw_positions_variable
+        )
+        self.draw_positions_variable.trace_add(
+            "write", self._on_draw_positions_changed
+        )
+        self.draw_positions_label.grid(column=0, row=7, sticky=N + E + W)
+        self.draw_positions_checkbutton.grid(column=1, row=7, sticky=N + E + W)
 
     def set_map(self, map: Map):
         self.base_size_variable.set(map["base_size"])
@@ -291,6 +310,28 @@ class MainWindow:
             self.canvas.delete(self.selection_rectangle)
             self.selection_rectangle = None
 
+    def _on_draw_positions_changed(self, *args):
+        for position_id in self.tiles_positions_ids:
+            self.canvas.delete(position_id)
+
+        self.tiles_positions_ids = []
+
+        if self.draw_positions_variable.get():
+            for tile_x in range(self.total_size):
+                for tile_y in range(self.total_size):
+                    x = (tile_x + 0.5) * self._pixels_per_tile
+                    y = (tile_y + 0.5) * self._pixels_per_tile
+
+                    self.tiles_positions_ids.append(
+                        self.canvas.create_text(
+                            x,
+                            y,
+                            text=f"{tile_x},{tile_y}",
+                            angle=-45,
+                            font="Arial 7",
+                        )
+                    )
+
     def _on_draw_grid_changed(self, *args):
         for tile_id in self.grid_nodes_ids:
             self.canvas.delete(tile_id)
@@ -317,6 +358,7 @@ class MainWindow:
     def _on_base_size_changed(self, *args):
         self._update_buildings_grid()
         self._on_draw_grid_changed()
+        self._on_draw_positions_changed()
 
     def _update_base_image(self, *args):
         self.cropped_image = self.image.crop(
