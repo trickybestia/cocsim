@@ -19,23 +19,10 @@ class ListCollider(Collider):
         )
 
     def get_nearest_point(self, x: float, y: float) -> tuple[float, float]:
-        nearest_point = None
-        nearest_point_distance = None
-
-        for collider in self.colliders:
-            collider_nearest_point = collider.get_nearest_point(x, y)
-            collider_nearest_point_distance = distance(
-                x, y, collider_nearest_point[0], collider_nearest_point[1]
-            )
-
-            if (
-                nearest_point_distance is None
-                or collider_nearest_point_distance < nearest_point_distance
-            ):
-                nearest_point = collider_nearest_point
-                nearest_point_distance = collider_nearest_point_distance
-
-        return nearest_point
+        return min(
+            (collider.get_nearest_point(x, y) for collider in self.colliders),
+            key=lambda point: distance(point[0], point[1], x, y),
+        )
 
     def __contains__(self, item: tuple[int, int]) -> bool:
         return any(item in collider for collider in self.colliders)
