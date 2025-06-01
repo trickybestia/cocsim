@@ -40,8 +40,16 @@ class Game:
     def stars(self) -> int:
         return (
             int(self._townhall_destroyed)
-            + int(self._destroyed_buildings_count / len(self.buildings) >= 0.5)
-            + int(self._destroyed_buildings_count == len(self.buildings))
+            + int(
+                round(
+                    self._destroyed_buildings_count
+                    / self._total_buildings_count
+                )
+                >= 50
+            )
+            + int(
+                self._destroyed_buildings_count == self._total_buildings_count
+            )
         )
 
     def __init__(self, map: Map, base_image: PIL.Image.Image | None):
@@ -125,7 +133,7 @@ class Game:
         minutes = seconds // 60
         seconds %= 60
 
-        text = f"{int(self._destroyed_buildings_count / len(self.buildings) * 100.0)} % | {self.stars} star |"
+        text = f"{round(self._destroyed_buildings_count / self._total_buildings_count * 100.0)} % | {self.stars} star |"
 
         if minutes != 0:
             text += f" {minutes} min"
