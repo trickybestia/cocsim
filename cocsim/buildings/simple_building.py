@@ -20,7 +20,7 @@ class SimpleBuilding(Building):
         self.health = health
         self.collider = collider
 
-        self.on_destroyed.append(self.update_collision)
+        self.on_destroyed.add(lambda *args: self.update_collision())
 
     def apply_damage(self, damage: int):
         assert not self.destroyed
@@ -31,7 +31,7 @@ class SimpleBuilding(Building):
             for handler in self.on_destroyed:
                 handler(self)
 
-    def update_collision(self, *args):
+    def update_collision(self):
         for x in range(self.width() * COLLISION_TILES_PER_MAP_TILE):
             for y in range(self.height() * COLLISION_TILES_PER_MAP_TILE):
                 abs_x = self.x * COLLISION_TILES_PER_MAP_TILE + x

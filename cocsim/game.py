@@ -83,14 +83,14 @@ class Game:
                 building_dto["y"],
                 building_dto["level"],
             )
-            building.on_destroyed.append(self._on_building_destroyed)
+            building.on_destroyed.add(self._on_building_destroyed)
 
             self.buildings.append(building)
 
         self.compute_buildings_count()
-        self.compute_collision()
         self.compute_occupied_tiles()
         self.compute_drop_zone()
+        self.compute_collision()
 
     def is_border(self, x: int, y: int) -> bool:
         return (
@@ -99,6 +99,9 @@ class Game:
             or y >= self.base_size + self.border_size
             or x >= self.base_size + self.border_size
         )
+
+    def is_inside_map(self, x: int, y: int) -> bool:
+        return 0 <= x < self.total_size and 0 <= y < self.total_size
 
     def tick(self, delta_t: float):
         assert not self.done
@@ -219,10 +222,7 @@ class Game:
 
             for neighbor_x in range(x - 1, x + 2):
                 for neighbor_y in range(y - 1, y + 2):
-                    if (
-                        0 <= neighbor_x < self.total_size
-                        and 0 <= neighbor_y < self.total_size
-                    ):
+                    if self.is_inside_map(neighbor_x, neighbor_y):
                         result.append((neighbor_x, neighbor_y))
 
             return result
@@ -233,6 +233,6 @@ class Game:
 
         for x in range(self.total_size):
             for y in range(self.total_size):
-                if self.buildings_grid[x][y]:
+                if self.buildings_grid[x][y] is not None:
                     for neighbor_x, neighbor_y in get_neighbors(x, y):
                         self.drop_zone[neighbor_x][neighbor_y] = False

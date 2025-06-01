@@ -13,7 +13,7 @@ class Building:
     x: int
     y: int
 
-    on_destroyed: list[Callable[["Building"], None]]
+    on_destroyed: set[Callable[["Building"], None]]
 
     @classmethod
     def width(cls) -> int: ...
@@ -35,7 +35,7 @@ class Building:
         self.x = 0
         self.y = 0
 
-        self.on_destroyed = []
+        self.on_destroyed = set()
 
     def tick(self, delta_t: float): ...
 
