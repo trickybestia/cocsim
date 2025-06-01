@@ -54,7 +54,7 @@ def normalize(x: float, y: float) -> tuple[float, float]:
 
 
 def check_intersection(
-    x1: int, y1: int, x2: int, y2: int, field: list[list[bool]]
+    x1: int, y1: int, x2: int, y2: int, field: list[list[object | None]]
 ) -> bool:
     """Check if line intersects at least one True value in field."""
 
@@ -63,13 +63,13 @@ def check_intersection(
 
     if x1 == x2:
         for y in range(y_min, y_max + 1):
-            if field[x1][y]:
+            if field[x1][y] is not None:
                 return True
 
         return False
     if y1 == y2:
         for x in range(x_min, x_max + 1):
-            if field[x][y1]:
+            if field[x][y1] is not None:
                 return True
 
         return False
@@ -82,7 +82,7 @@ def check_intersection(
 
         # ignore case when y is almost integer so (x, y) is almost at four tiles intersection
 
-        if field[x][int(y)]:
+        if field[x][int(y)] is not None:
             return True
 
     for y in range(y_min, y_max + 1):
@@ -90,7 +90,7 @@ def check_intersection(
 
         # ignore case when x is almost integer so (x, y) is almost at four tiles intersection
 
-        if field[int(x)][y]:
+        if field[int(x)][y] is not None:
             return True
 
     return False

@@ -14,9 +14,9 @@ class Game:
     border_size: int
 
     buildings: list["buildings.Building"]
-    occupied_tiles: list[list[bool]]
+    buildings_grid: list[list[Union["buildings.Building", None]]]
     drop_zone: list[list[bool]]
-    collision: list[list[bool]]
+    collision_grid: list[list[Union["buildings.Building", None]]]
     units: list["units.Unit"]
 
     time_left: float
@@ -138,11 +138,6 @@ class Game:
 
         return text
 
-    def get_building(self, x: int, y: int) -> Union["buildings.Building", None]:
-        for building in self.buildings:
-            if building.x == x and building.y == y:
-                return building
-
     def _draw_grid(self):
         for x in range(self.total_size):
             for y in range(self.total_size):
@@ -152,7 +147,7 @@ class Game:
                         (y ^ x) & 1,
                         self.is_border(x, y),
                         self.drop_zone[x][y],
-                        self.occupied_tiles[x][y],
+                        self.buildings_grid[x][y] is not None,
                     ),
                     (
                         x * PIXELS_PER_TILE,
@@ -173,7 +168,7 @@ class Game:
 
         for x in range(self.total_size * COLLISION_TILES_PER_MAP_TILE):
             for y in range(self.total_size * COLLISION_TILES_PER_MAP_TILE):
-                if self.collision[x][y]:
+                if self.collision_grid[x][y] is not None:
                     pygame.draw.rect(
                         collision_surface,
                         COLLISION_TILE_COLOR,
@@ -202,8 +197,8 @@ class Game:
                 self._total_buildings_count += 1
 
     def compute_collision(self):
-        self.collision = [
-            [False] * self.total_size * COLLISION_TILES_PER_MAP_TILE
+        self.collision_grid = [
+            [None] * self.total_size * COLLISION_TILES_PER_MAP_TILE
             for _ in range(self.total_size * COLLISION_TILES_PER_MAP_TILE)
         ]
 
@@ -211,8 +206,8 @@ class Game:
             building.update_collision()
 
     def compute_occupied_tiles(self):
-        self.occupied_tiles = [
-            [False] * self.total_size for _ in range(self.total_size)
+        self.buildings_grid = [
+            [None] * self.total_size for _ in range(self.total_size)
         ]
 
         for building in self.buildings:
@@ -238,6 +233,6 @@ class Game:
 
         for x in range(self.total_size):
             for y in range(self.total_size):
-                if self.occupied_tiles[x][y]:
+                if self.buildings_grid[x][y]:
                     for neighbor_x, neighbor_y in get_neighbors(x, y):
                         self.drop_zone[neighbor_x][neighbor_y] = False

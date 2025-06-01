@@ -130,7 +130,7 @@ class Barbarian(Unit):
                     and 0
                     <= neighbor_y
                     < self.game.total_size * COLLISION_TILES_PER_MAP_TILE
-                    and not self.game.collision[neighbor_x][neighbor_y]
+                    and self.game.collision_grid[neighbor_x][neighbor_y] is None
                 ):
                     result.append((neighbor_x, neighbor_y))
 
@@ -219,7 +219,7 @@ class Barbarian(Unit):
                 result[-1][1],
                 waypoint[0],
                 waypoint[1],
-                self.game.collision,
+                self.game.collision_grid,
             ):
                 result.append(waypoints[i - 1])
 

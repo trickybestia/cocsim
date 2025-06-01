@@ -31,21 +31,20 @@ class SimpleBuilding(Building):
             for handler in self.on_destroyed:
                 handler(self)
 
-    def occupy_tiles(self):
-        for x in range(self.x, self.x + self.width()):
-            for y in range(self.y, self.y + self.height()):
-                self.game.occupied_tiles[x][y] = True
-
     def update_collision(self, *args):
         for x in range(self.width() * COLLISION_TILES_PER_MAP_TILE):
             for y in range(self.height() * COLLISION_TILES_PER_MAP_TILE):
                 abs_x = self.x * COLLISION_TILES_PER_MAP_TILE + x
                 abs_y = self.y * COLLISION_TILES_PER_MAP_TILE + y
 
-                if self.destroyed:
-                    self.game.collision[abs_x][abs_y] = False
-                else:
-                    self.game.collision[abs_x][abs_y] = (
+                if (
+                    self.destroyed
+                    or (
                         abs_x / COLLISION_TILES_PER_MAP_TILE,
                         abs_y / COLLISION_TILES_PER_MAP_TILE,
-                    ) in self.collider
+                    )
+                    not in self.collider
+                ):
+                    self.game.collision_grid[abs_x][abs_y] = None
+                else:
+                    self.game.collision_grid[abs_x][abs_y] = self

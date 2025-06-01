@@ -47,6 +47,10 @@ class Building:
     def occupy_tiles(self):
         """Occupy tiles for troops drop zone calculation. Called once."""
 
+        for x in range(self.x, self.x + self.width()):
+            for y in range(self.y, self.y + self.height()):
+                self.game.buildings_grid[x][y] = self
+
     def update_collision(self):
         """Update collision for this building. Can be called multiple times.
         Need check for self.destroyed."""

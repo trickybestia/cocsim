@@ -10,9 +10,9 @@ def single_player_goblin_gauntlet_0():
     map, base_image = load_test_map("single_player/goblin_gauntlet")
     game = Game(map, base_image)
 
-    left_cannon = game.get_building(7, 7)
-    right_cannon = game.get_building(19, 16)
-    bottom_goblin_hut = game.get_building(12, 18)
+    left_cannon = game.buildings_grid[7][7]
+    right_cannon = game.buildings_grid[19][16]
+    bottom_goblin_hut = game.buildings_grid[12][18]
 
     left_cannon_units = []
     right_cannon_units = []
