@@ -76,12 +76,16 @@ class Game:
         else:
             self._base_image = None
 
-        for building in map["buildings"]:
-            self.buildings.append(
-                buildings.BUILDINGS_DICT[building["name"]](
-                    self, building["x"], building["y"], building["level"]
-                )
+        for building_dto in map["buildings"]:
+            building = buildings.BUILDINGS_DICT[building_dto["name"]](
+                self,
+                building_dto["x"],
+                building_dto["y"],
+                building_dto["level"],
             )
+            building.on_destroyed.append(self._on_building_destroyed)
+
+            self.buildings.append(building)
 
         self.compute_buildings_count()
         self.compute_collision()
@@ -119,14 +123,6 @@ class Game:
 
         for unit in self.units:
             unit.draw()
-
-    def building_destroyed(self, building: "buildings.Building"):
-        """Called once by every Building when it gets destroyed."""
-
-        if isinstance(building, buildings.TownHall):
-            self._townhall_destroyed = True
-
-        self._destroyed_buildings_count += 1
 
     def progress_info(self):
         seconds = int(self.time_left)
@@ -190,6 +186,13 @@ class Game:
                     )
 
         self.screen.blit(collision_surface, (0, 0))
+
+    def _on_building_destroyed(self, building: "buildings.Building"):
+        if isinstance(building, buildings.TownHall):
+            self._townhall_destroyed = True
+
+        if not isinstance(building, buildings.Wall):
+            self._destroyed_buildings_count += 1
 
     def compute_buildings_count(self):
         self._total_buildings_count = 0

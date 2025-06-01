@@ -1,4 +1,4 @@
-from typing import Type
+from typing import Callable, Type
 
 from .. import game
 from .colliders import Collider
@@ -12,6 +12,8 @@ class Building:
     collider: Collider | None
     x: int
     y: int
+
+    on_destroyed: list[Callable[["Building"], None]]
 
     @classmethod
     def width(cls) -> int: ...
@@ -32,6 +34,8 @@ class Building:
         self.collider = None
         self.x = 0
         self.y = 0
+
+        self.on_destroyed = []
 
     def tick(self, delta_t: float): ...
 

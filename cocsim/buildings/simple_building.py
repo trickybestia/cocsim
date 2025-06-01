@@ -20,21 +20,23 @@ class SimpleBuilding(Building):
         self.health = health
         self.collider = collider
 
+        self.on_destroyed.append(self.update_collision)
+
     def apply_damage(self, damage: int):
         assert not self.destroyed
 
         self.health = max(0, self.health - damage)
 
         if self.destroyed:
-            self.game.building_destroyed(self)
-            self.update_collision()
+            for handler in self.on_destroyed:
+                handler(self)
 
     def occupy_tiles(self):
         for x in range(self.x, self.x + self.width()):
             for y in range(self.y, self.y + self.height()):
                 self.game.occupied_tiles[x][y] = True
 
-    def update_collision(self):
+    def update_collision(self, *args):
         for x in range(self.width() * COLLISION_TILES_PER_MAP_TILE):
             for y in range(self.height() * COLLISION_TILES_PER_MAP_TILE):
                 abs_x = self.x * COLLISION_TILES_PER_MAP_TILE + x
