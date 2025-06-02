@@ -21,10 +21,24 @@ def main():
 
     game.screen = screen
 
-    bb1 = Barbarian(game, 1.0, 1.0)
-    bb2 = Barbarian(game, 11.0, 1.0)
+    game.units = []
 
-    game.units = [bb1, bb2]
+    for y in range(19):
+        game.units.append(Barbarian(game, 0.5, y + 0.5))
+    for x in range(1, 25):
+        game.units.append(Barbarian(game, x + 0.5, 0.5))
+
+    for x in range(25, 32):
+        game.units.append(Barbarian(game, x + 0.5, 0.5))
+    for y in range(1, 32):
+        game.units.append(Barbarian(game, 31.5, y + 0.5))
+    for x in range(18, 31):
+        game.units.append(Barbarian(game, x + 0.5, 31.5))
+
+    for x in range(7, 18):
+        game.units.append(Barbarian(game, x + 0.5, 31.5))
+    for y in range(19, 32):
+        game.units.append(Barbarian(game, 0.5, y + 0.5))
 
     timer = SpinTimer(1 / FPS)
 
