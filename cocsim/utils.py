@@ -53,6 +53,10 @@ def normalize(x: float, y: float) -> tuple[float, float]:
     return x / length, y / length
 
 
+def clamp(min_, value, max_):
+    return max(min_, min(value, max_))
+
+
 def check_intersection(
     x1: int, y1: int, x2: int, y2: int, field: list[list[object | None]]
 ) -> bool:
@@ -78,7 +82,7 @@ def check_intersection(
     b = (x1 * y2 - y1 * x2) / (x1 - x2)
 
     for x in range(x_min, x_max + 1):
-        y = k * x + b
+        y = clamp(y_min, k * x + b, y_max)
 
         # ignore case when y is almost integer so (x, y) is almost at four tiles intersection
 
@@ -86,7 +90,7 @@ def check_intersection(
             return True
 
     for y in range(y_min, y_max + 1):
-        x = (y - b) / k
+        x = clamp(x_min, (y - b) / k, x_max)
 
         # ignore case when x is almost integer so (x, y) is almost at four tiles intersection
 
