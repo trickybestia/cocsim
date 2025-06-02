@@ -43,6 +43,7 @@ class Game:
             + int(
                 round(
                     self._destroyed_buildings_count
+                    * 100.0
                     / self._total_buildings_count
                 )
                 >= 50
@@ -132,7 +133,7 @@ class Game:
         minutes = seconds // 60
         seconds %= 60
 
-        text = f"{round(self._destroyed_buildings_count / self._total_buildings_count * 100.0)} % | {self.stars} star |"
+        text = f"{round(self._destroyed_buildings_count * 100.0 / self._total_buildings_count )} % | {self.stars} star |"
 
         if minutes != 0:
             text += f" {minutes} min"
