@@ -59,28 +59,6 @@ class Pathfinder:
     def find_path(
         self, unit: "units.Unit", target: Building
     ) -> tuple[Building, list[tuple[float, float]]]:
-        def get_neighbors(x: int, y: int) -> list[tuple[int, int]]:
-            result = []
-
-            for neighbor_x, neighbor_y in (
-                (x, y - 1),
-                (x + 1, y),
-                (x, y + 1),
-                (x - 1, y),
-            ):
-                if (
-                    0
-                    <= neighbor_x
-                    < self.game.total_size * COLLISION_TILES_PER_MAP_TILE
-                    and 0
-                    <= neighbor_y
-                    < self.game.total_size * COLLISION_TILES_PER_MAP_TILE
-                    and self.game.collision_grid[neighbor_x][neighbor_y] is None
-                ):
-                    result.append((neighbor_x, neighbor_y))
-
-            return result
-
         nearest_point = target.collider.get_attack_area(
             unit.attack_range
         ).get_nearest_point(unit.x, unit.y)
@@ -116,9 +94,11 @@ class Pathfinder:
         ):
             _, x, y = heapq.heappop(tiles_to_check)
 
-            for neighbor_x, neighbor_y in get_neighbors(x, y):
+            for neighbor_x, neighbor_y in self._get_neighbors(x, y):
                 distances[neighbor_x][neighbor_y] = min(
-                    distances[neighbor_x][neighbor_y], distances[x][y] + 1
+                    distances[neighbor_x][neighbor_y],
+                    distances[x][y]
+                    + self._get_tile_penalty(neighbor_x, neighbor_y),
                 )
 
                 if not checked_tiles[neighbor_x][neighbor_y]:
@@ -138,20 +118,85 @@ class Pathfinder:
         while collision_waypoints[-1] != (start_x, start_y):
             x, y = collision_waypoints[-1]
 
-            for neighbor_x, neighbor_y in get_neighbors(x, y):
-                if distances[neighbor_x][neighbor_y] == distances[x][y] - 1:
-                    collision_waypoints.append((neighbor_x, neighbor_y))
+            min_distance_neighbor = None
+            min_distance_neighbor_distance = None
 
-                    break
+            for neighbor_x, neighbor_y in self._get_neighbors(x, y):
+                neighbor_distance = distances[neighbor_x][neighbor_y]
+
+                if (
+                    min_distance_neighbor_distance is None
+                    or neighbor_distance < min_distance_neighbor_distance
+                ):
+                    min_distance_neighbor = (neighbor_x, neighbor_y)
+                    min_distance_neighbor_distance = neighbor_distance
+
+            collision_waypoints.append(min_distance_neighbor)
+
+        collision_waypoints = collision_waypoints[::-1]
+
+        for i in range(len(collision_waypoints)):
+            waypoint_x, waypoint_y = collision_waypoints[i]
+
+            building = self.game.collision_grid[waypoint_x][waypoint_y]
+
+            if building is not None:
+                target = building
+                collision_waypoints = collision_waypoints[:i]
+
+                break
+
+        if len(collision_waypoints) == 0:
+            collision_waypoints = [
+                (
+                    int(unit.x * COLLISION_TILES_PER_MAP_TILE),
+                    int(unit.y * COLLISION_TILES_PER_MAP_TILE),
+                )
+            ]
 
         collision_waypoints = self.game.pathfinder._simplify_path(
-            collision_waypoints[::-1]
+            collision_waypoints
         )
 
         return target, [
             (x / COLLISION_TILES_PER_MAP_TILE, y / COLLISION_TILES_PER_MAP_TILE)
             for x, y in collision_waypoints
         ]
+
+    def _get_tile_penalty(self, x: int, y: int) -> int:
+        BIG_NUMBER = 1000000000
+
+        building = self.game.collision_grid[x][y]
+
+        if building is None:
+            return 1
+        if isinstance(building, Wall):
+            return 2
+
+        return BIG_NUMBER
+
+    def _get_neighbors(self, x: int, y: int) -> list[tuple[int, int]]:
+        """Returns list of neighbor tiles on Game.collision_grid."""
+
+        result = []
+
+        for neighbor_x, neighbor_y in (
+            (x, y - 1),
+            (x + 1, y),
+            (x, y + 1),
+            (x - 1, y),
+        ):
+            if (
+                0
+                <= neighbor_x
+                < self.game.total_size * COLLISION_TILES_PER_MAP_TILE
+                and 0
+                <= neighbor_y
+                < self.game.total_size * COLLISION_TILES_PER_MAP_TILE
+            ):
+                result.append((neighbor_x, neighbor_y))
+
+        return result
 
     def _simplify_path(
         self, path: list[tuple[int, int]]
