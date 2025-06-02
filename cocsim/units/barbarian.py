@@ -14,10 +14,13 @@ class Barbarian(Unit):
     ATTACK_DAMAGE = 8
     ATTACK_COOLDOWN = 1.0
     SPEED = 2.0
-    RANGE = 0.4
 
     waypoints: Union[list[tuple[float, float]], None]
     attack_cooldown: Union[float, None]
+
+    @property
+    def attack_range(self) -> float:
+        return 0.4
 
     def __init__(self, game: "game.Game", x: float, y: float):
         super().__init__(game, x, y)
@@ -40,7 +43,7 @@ class Barbarian(Unit):
             self.waypoints = None
             self.attack_cooldown = None
 
-            self._find_target()
+            self.target = self.game.pathfinder.find_target(self, None)
 
             if self.target is not None:
                 self._find_path(self.target)
@@ -88,31 +91,6 @@ class Barbarian(Unit):
         self.x += direction_x * self.SPEED * delta_t
         self.y += direction_y * self.SPEED * delta_t
 
-    def _find_target(self):
-        nearest_target = None
-        nearest_target_distance = None
-
-        for building in self.game.buildings:
-            if not building.destroyed and building.collider is not None:
-                nearest_point = building.collider.get_attack_area(
-                    self.RANGE
-                ).get_nearest_point(self.x, self.y)
-                distance_to_building = distance(
-                    self.x,
-                    self.y,
-                    nearest_point[0],
-                    nearest_point[1],
-                )
-
-                if (
-                    nearest_target is None
-                    or distance_to_building < nearest_target_distance
-                ):
-                    nearest_target = building
-                    nearest_target_distance = distance_to_building
-
-        self.target = nearest_target
-
     def _find_path(self, building: "buildings.Building"):
         def get_neighbors(x: int, y: int) -> list[tuple[int, int]]:
             result = []
@@ -137,7 +115,7 @@ class Barbarian(Unit):
             return result
 
         nearest_point = building.collider.get_attack_area(
-            self.RANGE
+            self.attack_range
         ).get_nearest_point(self.x, self.y)
         nearest_point_x = int(nearest_point[0] * COLLISION_TILES_PER_MAP_TILE)
         nearest_point_y = int(nearest_point[1] * COLLISION_TILES_PER_MAP_TILE)
@@ -199,28 +177,11 @@ class Barbarian(Unit):
 
                     break
 
-        collision_waypoints = self._simplify_waypoints(collision_waypoints)
+        collision_waypoints = self.game.pathfinder._simplify_path(
+            collision_waypoints[::-1]
+        )
 
         self.waypoints = [
             (x / COLLISION_TILES_PER_MAP_TILE, y / COLLISION_TILES_PER_MAP_TILE)
             for x, y in collision_waypoints
-        ][::-1]
-
-    def _simplify_waypoints(
-        self, waypoints: list[tuple[int, int]]
-    ) -> list[tuple[int, int]]:
-        result = [waypoints[0]]
-
-        for i in range(1, len(waypoints)):
-            waypoint = waypoints[i]
-
-            if check_intersection(
-                result[-1][0],
-                result[-1][1],
-                waypoint[0],
-                waypoint[1],
-                self.game.collision_grid,
-            ):
-                result.append(waypoints[i - 1])
-
-        return result
+        ]

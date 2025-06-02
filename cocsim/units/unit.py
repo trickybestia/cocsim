@@ -11,6 +11,9 @@ class Unit:
 
     target: Union["buildings.Building", None]
 
+    @property
+    def attack_range(self) -> float: ...
+
     def __init__(self, game: "game.Game", x: float, y: float):
         self.game = game
         self.dead = False

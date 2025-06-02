@@ -6,6 +6,7 @@ import PIL.Image
 from .consts import *
 from .utils import get_tile_color
 from .map import Map
+from .pathfinder import Pathfinder
 from . import buildings, units
 
 
@@ -18,6 +19,8 @@ class Game:
     drop_zone: list[list[bool]]
     collision_grid: list[list[Union["buildings.Building", None]]]
     units: list["units.Unit"]
+
+    pathfinder: Pathfinder
 
     time_left: float
 
@@ -62,6 +65,8 @@ class Game:
         self._townhall_destroyed = False
         self._destroyed_buildings_count = 0
         self._total_buildings_count = 0
+
+        self.pathfinder = Pathfinder(self)
 
         if base_image is not None:
             base_image = base_image.resize(
