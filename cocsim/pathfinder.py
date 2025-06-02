@@ -1,6 +1,7 @@
 import heapq
 from typing import Type
 from itertools import takewhile
+from math import inf
 
 from .consts import *
 from .utils import check_intersection, distance
@@ -68,10 +69,8 @@ class Pathfinder:
         def get_tile_to_check_priority(x: int, y: int) -> int:
             return abs(x - nearest_point_x) + abs(y - nearest_point_y)
 
-        BIG_NUMBER = 1000000000
-
         distances = [
-            [BIG_NUMBER] * self.game.total_size * COLLISION_TILES_PER_MAP_TILE
+            [inf] * self.game.total_size * COLLISION_TILES_PER_MAP_TILE
             for _ in range(self.game.total_size * COLLISION_TILES_PER_MAP_TILE)
         ]
         checked_tiles = [
@@ -90,7 +89,7 @@ class Pathfinder:
 
         while (
             len(tiles_to_check) != 0
-            and distances[nearest_point_x][nearest_point_y] == BIG_NUMBER
+            and distances[nearest_point_x][nearest_point_y] == inf
         ):
             _, x, y = heapq.heappop(tiles_to_check)
 
@@ -163,17 +162,15 @@ class Pathfinder:
             for x, y in collision_waypoints
         ]
 
-    def _get_tile_penalty(self, x: int, y: int) -> int:
-        BIG_NUMBER = 1000000000
-
+    def _get_tile_penalty(self, x: int, y: int) -> float:
         building = self.game.collision_grid[x][y]
 
         if building is None:
-            return 1
+            return 1.0
         if isinstance(building, Wall):
-            return 2
+            return 1.1
 
-        return BIG_NUMBER
+        return inf
 
     def _get_neighbors(self, x: int, y: int) -> list[tuple[int, int]]:
         """Returns list of neighbor tiles on Game.collision_grid."""
