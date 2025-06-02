@@ -1,6 +1,8 @@
+import heapq
 from typing import Type
 from itertools import takewhile
 
+from .consts import *
 from .utils import check_intersection, distance
 from .buildings import Building, Wall
 from . import game, units
@@ -56,7 +58,100 @@ class Pathfinder:
 
     def find_path(
         self, unit: "units.Unit", target: Building
-    ) -> tuple[Building, list[tuple[float, float]]]: ...
+    ) -> tuple[Building, list[tuple[float, float]]]:
+        def get_neighbors(x: int, y: int) -> list[tuple[int, int]]:
+            result = []
+
+            for neighbor_x, neighbor_y in (
+                (x, y - 1),
+                (x + 1, y),
+                (x, y + 1),
+                (x - 1, y),
+            ):
+                if (
+                    0
+                    <= neighbor_x
+                    < self.game.total_size * COLLISION_TILES_PER_MAP_TILE
+                    and 0
+                    <= neighbor_y
+                    < self.game.total_size * COLLISION_TILES_PER_MAP_TILE
+                    and self.game.collision_grid[neighbor_x][neighbor_y] is None
+                ):
+                    result.append((neighbor_x, neighbor_y))
+
+            return result
+
+        nearest_point = target.collider.get_attack_area(
+            unit.attack_range
+        ).get_nearest_point(unit.x, unit.y)
+        nearest_point_x = int(nearest_point[0] * COLLISION_TILES_PER_MAP_TILE)
+        nearest_point_y = int(nearest_point[1] * COLLISION_TILES_PER_MAP_TILE)
+
+        def get_tile_to_check_priority(x: int, y: int) -> int:
+            return abs(x - nearest_point_x) + abs(y - nearest_point_y)
+
+        BIG_NUMBER = 1000000000
+
+        distances = [
+            [BIG_NUMBER] * self.game.total_size * COLLISION_TILES_PER_MAP_TILE
+            for _ in range(self.game.total_size * COLLISION_TILES_PER_MAP_TILE)
+        ]
+        checked_tiles = [
+            [False] * self.game.total_size * COLLISION_TILES_PER_MAP_TILE
+            for _ in range(self.game.total_size * COLLISION_TILES_PER_MAP_TILE)
+        ]
+
+        start_x = int(unit.x * COLLISION_TILES_PER_MAP_TILE)
+        start_y = int(unit.y * COLLISION_TILES_PER_MAP_TILE)
+
+        tiles_to_check = []  # heapq's heap
+        heapq.heappush(tiles_to_check, (0, start_x, start_y))
+
+        distances[start_x][start_y] = 0
+        checked_tiles[start_x][start_y] = True
+
+        while (
+            len(tiles_to_check) != 0
+            and distances[nearest_point_x][nearest_point_y] == BIG_NUMBER
+        ):
+            _, x, y = heapq.heappop(tiles_to_check)
+
+            for neighbor_x, neighbor_y in get_neighbors(x, y):
+                distances[neighbor_x][neighbor_y] = min(
+                    distances[neighbor_x][neighbor_y], distances[x][y] + 1
+                )
+
+                if not checked_tiles[neighbor_x][neighbor_y]:
+                    heapq.heappush(
+                        tiles_to_check,
+                        (
+                            get_tile_to_check_priority(neighbor_x, neighbor_y),
+                            neighbor_x,
+                            neighbor_y,
+                        ),
+                    )
+
+                    checked_tiles[neighbor_x][neighbor_y] = True
+
+        collision_waypoints = [(nearest_point_x, nearest_point_y)]
+
+        while collision_waypoints[-1] != (start_x, start_y):
+            x, y = collision_waypoints[-1]
+
+            for neighbor_x, neighbor_y in get_neighbors(x, y):
+                if distances[neighbor_x][neighbor_y] == distances[x][y] - 1:
+                    collision_waypoints.append((neighbor_x, neighbor_y))
+
+                    break
+
+        collision_waypoints = self.game.pathfinder._simplify_path(
+            collision_waypoints[::-1]
+        )
+
+        return target, [
+            (x / COLLISION_TILES_PER_MAP_TILE, y / COLLISION_TILES_PER_MAP_TILE)
+            for x, y in collision_waypoints
+        ]
 
     def _simplify_path(
         self, path: list[tuple[int, int]]
