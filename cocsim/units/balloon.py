@@ -9,26 +9,27 @@ from .. import game, buildings
 from cocsim.utils import distance, normalize
 from cocsim.consts import *
 
-BarbarianLevel = namedtuple("BarbarianLevel", ("health", "attack_damage"))
+BalloonLevel = namedtuple(
+    "BalloonLevel", ("health", "attack_damage", "death_damage")
+)
 
 
-class Barbarian(Unit):
-    ATTACK_COOLDOWN = 1.0
-    SPEED = 2.0
+class Balloon(Unit):
+    ATTACK_COOLDOWN = 3.0
+    SPEED = 1.3
 
     LEVELS = (
-        BarbarianLevel(45, 8),
-        BarbarianLevel(54, 11),
-        BarbarianLevel(65, 14),
-        BarbarianLevel(85, 18),
-        BarbarianLevel(105, 23),
-        BarbarianLevel(125, 26),
-        BarbarianLevel(160, 30),
-        BarbarianLevel(205, 34),
-        BarbarianLevel(230, 38),
-        BarbarianLevel(250, 42),
-        BarbarianLevel(270, 45),
-        BarbarianLevel(290, 48),
+        BalloonLevel(150, 75, 25),
+        BalloonLevel(180, 96, 32),
+        BalloonLevel(216, 144, 48),
+        BalloonLevel(280, 216, 72),
+        BalloonLevel(390, 324, 108),
+        BalloonLevel(545, 486, 162),
+        BalloonLevel(690, 594, 214),
+        BalloonLevel(840, 708, 268),
+        BalloonLevel(940, 768, 322),
+        BalloonLevel(1040, 828, 352),
+        BalloonLevel(1140, 870, 375),
     )
 
     level: int
@@ -42,7 +43,7 @@ class Barbarian(Unit):
 
     @property
     def attack_range(self) -> float:
-        return 0.4
+        return -0.5
 
     def __init__(self, game: "game.Game", level: int, x: float, y: float):
         super().__init__(game, x, y)
@@ -56,7 +57,7 @@ class Barbarian(Unit):
         if not self.dead:
             pygame.draw.circle(
                 self.game.screen,
-                pygame.Color(255, 255, 255),
+                pygame.Color(0, 0, 0),
                 (self.x * PIXELS_PER_TILE, self.y * PIXELS_PER_TILE),
                 5,
             )
@@ -68,7 +69,9 @@ class Barbarian(Unit):
             self.attack_cooldown = None
 
             self.target, self.waypoints = (
-                self.game.pathfinder.find_best_ground_path(self, None)
+                self.game.pathfinder.find_best_air_path(
+                    self, buildings.ActiveBuilding
+                )
             )
 
         if self.target is not None:

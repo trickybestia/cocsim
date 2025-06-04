@@ -19,21 +19,21 @@ def single_player_goblin_gauntlet_0():
     bottom_goblin_hut_units = []
 
     for y in range(19):
-        left_cannon_units.append(Barbarian(game, 0.5, y + 0.5))
+        left_cannon_units.append(Barbarian(game, 0, 0.5, y + 0.5))
     for x in range(1, 25):
-        left_cannon_units.append(Barbarian(game, x + 0.5, 0.5))
+        left_cannon_units.append(Barbarian(game, 0, x + 0.5, 0.5))
 
     for x in range(25, 32):
-        right_cannon_units.append(Barbarian(game, x + 0.5, 0.5))
+        right_cannon_units.append(Barbarian(game, 0, x + 0.5, 0.5))
     for y in range(1, 32):
-        right_cannon_units.append(Barbarian(game, 31.5, y + 0.5))
+        right_cannon_units.append(Barbarian(game, 0, 31.5, y + 0.5))
     for x in range(18, 31):
-        right_cannon_units.append(Barbarian(game, x + 0.5, 31.5))
+        right_cannon_units.append(Barbarian(game, 0, x + 0.5, 31.5))
 
     for x in range(7, 18):
-        bottom_goblin_hut_units.append(Barbarian(game, x + 0.5, 31.5))
+        bottom_goblin_hut_units.append(Barbarian(game, 0, x + 0.5, 31.5))
     for y in range(19, 32):
-        bottom_goblin_hut_units.append(Barbarian(game, 0.5, y + 0.5))
+        bottom_goblin_hut_units.append(Barbarian(game, 0, 0.5, y + 0.5))
 
     game.units = [
         *left_cannon_units,

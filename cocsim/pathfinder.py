@@ -19,7 +19,10 @@ class Pathfinder:
         self, unit: "units.Unit", preferred_building: Type[Building] | None
     ) -> list[Building]:
         if preferred_building is not None:
-            priority_func = lambda b: isinstance(b, preferred_building)
+            priority_func = lambda b: (
+                isinstance(b, preferred_building),
+                not isinstance(b, Wall),
+            )
         else:
             priority_func = lambda b: not isinstance(b, Wall)
 
@@ -55,6 +58,22 @@ class Pathfinder:
         targets.sort(key=lambda t: t[0])
 
         return [t[1] for t in targets]
+
+    def find_best_air_path(
+        self, unit: "units.Unit", preferred_building: Type[Building] | None
+    ) -> tuple[Building, list[tuple[float, float]]]:
+        targets = self.get_targets(unit, preferred_building)
+
+        return targets[0], self.find_air_path(unit, targets[0])
+
+    def find_air_path(
+        self, unit: "units.Unit", target: Building
+    ) -> list[tuple[float, float]]:
+        nearest_point = target.collider.get_attack_area(
+            unit.attack_range
+        ).get_nearest_point(unit.x, unit.y)
+
+        return [nearest_point]
 
     def find_best_ground_path(
         self, unit: "units.Unit", preferred_building: Type[Building] | None

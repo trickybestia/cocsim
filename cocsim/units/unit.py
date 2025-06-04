@@ -11,6 +11,10 @@ class Unit:
 
     target: Union["buildings.Building", None]
 
+    @classmethod
+    def levels(cls) -> int:
+        """Returns levels count."""
+
     @property
     def attack_range(self) -> float: ...
 
