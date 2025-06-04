@@ -28,7 +28,7 @@ def main():
     for x in range(1, 25):
         game.units.append(Barbarian(game, x + 0.5, 0.5))
 
-    for x in range(25, 32):
+    """for x in range(25, 32):
         game.units.append(Barbarian(game, x + 0.5, 0.5))
     for y in range(1, 32):
         game.units.append(Barbarian(game, 31.5, y + 0.5))
@@ -38,7 +38,7 @@ def main():
     for x in range(7, 18):
         game.units.append(Barbarian(game, x + 0.5, 31.5))
     for y in range(19, 32):
-        game.units.append(Barbarian(game, 0.5, y + 0.5))
+        game.units.append(Barbarian(game, 0.5, y + 0.5))"""
 
     timer = SpinTimer(1 / FPS)
 
@@ -52,6 +52,7 @@ def main():
         game.draw()
 
         if not game.done and delta_t is not None:
+            delta_t = min(delta_t, 2 * 1 / FPS)
             game.tick(delta_t)
             pygame.display.set_caption(f"cocsim | {game.progress_info()}")
 
