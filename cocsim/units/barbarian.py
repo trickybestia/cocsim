@@ -41,8 +41,8 @@ class Barbarian(Unit):
             self.waypoints = None
             self.attack_cooldown = None
 
-            self.target, self.waypoints = self.game.pathfinder.find_best_path(
-                self, None
+            self.target, self.waypoints = (
+                self.game.pathfinder.find_best_ground_path(self, None)
             )
 
         if self.target is not None:

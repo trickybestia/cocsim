@@ -56,17 +56,17 @@ class Pathfinder:
 
         return [t[1] for t in targets]
 
-    def find_best_path(
+    def find_best_ground_path(
         self, unit: "units.Unit", preferred_building: Type[Building] | None
     ) -> tuple[Building, list[tuple[float, float]]]:
         targets = self.get_targets(unit, preferred_building)[:2]
 
-        paths = [self.find_path(unit, target) for target in targets]
+        paths = [self.find_ground_path(unit, target) for target in targets]
         best_path = min(paths, key=lambda t: t[0])
 
         return best_path[2]()
 
-    def find_path(self, unit: "units.Unit", target: Building) -> tuple[
+    def find_ground_path(self, unit: "units.Unit", target: Building) -> tuple[
         float,
         Building,
         Callable[[], tuple[Building, list[tuple[float, float]]]],
