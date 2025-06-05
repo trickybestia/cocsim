@@ -2,7 +2,7 @@ import pygame
 
 from .utils import load_test_map
 from .spin_timer import SpinTimer
-from .units import Balloon
+from .units import Dragon
 from .consts import *
 from .game import Game
 
@@ -23,22 +23,7 @@ def main():
 
     game.units = []
 
-    for y in range(19):
-        game.units.append(Balloon(game, 0, 0.5, y + 0.5))
-    for x in range(1, 25):
-        game.units.append(Balloon(game, 0, x + 0.5, 0.5))
-
-    """for x in range(25, 32):
-        game.units.append(Balloon(game, 0, x + 0.5, 0.5))
-    for y in range(1, 32):
-        game.units.append(Balloon(game, 0, 31.5, y + 0.5))
-    for x in range(18, 31):
-        game.units.append(Balloon(game, 0, x + 0.5, 31.5))
-
-    for x in range(7, 18):
-        game.units.append(Balloon(game, 0, x + 0.5, 31.5))
-    for y in range(19, 32):
-        game.units.append(Balloon(game, 0, 0.5, y + 0.5))"""
+    game.units.append(Dragon(game, 0, 31.5, 31.5))
 
     timer = SpinTimer(1 / FPS)
 
