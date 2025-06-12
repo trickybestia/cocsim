@@ -1,4 +1,4 @@
-from collections import namedtuple
+from dataclasses import dataclass
 from typing import Union
 
 import pygame
@@ -9,7 +9,11 @@ from .. import game, buildings
 from cocsim.utils import distance, normalize
 from cocsim.consts import *
 
-BarbarianLevel = namedtuple("BarbarianLevel", ("health", "attack_damage"))
+
+@dataclass(frozen=True)
+class BarbarianLevel:
+    health: float
+    attack_damage: float
 
 
 class Barbarian(GroundUnit):
