@@ -17,18 +17,18 @@ class Dragon(AirUnit):
     SPEED = 2.0
 
     LEVELS = (
-        DragonLevel(1900, 175),
-        DragonLevel(2100, 200),
-        DragonLevel(2300, 225),
-        DragonLevel(2700, 262.5),
-        DragonLevel(3100, 300),
-        DragonLevel(3400, 337.5),
-        DragonLevel(3900, 387.5),
-        DragonLevel(4200, 412.5),
-        DragonLevel(4500, 437.5),
-        DragonLevel(4900, 462.5),
-        DragonLevel(5300, 487.5),
-        DragonLevel(5700, 512.5),
+        DragonLevel(1900.0, 175.0),
+        DragonLevel(2100.0, 200.0),
+        DragonLevel(2300.0, 225.0),
+        DragonLevel(2700.0, 262.5),
+        DragonLevel(3100.0, 300.0),
+        DragonLevel(3400.0, 337.5),
+        DragonLevel(3900.0, 387.5),
+        DragonLevel(4200.0, 412.5),
+        DragonLevel(4500.0, 437.5),
+        DragonLevel(4900.0, 462.5),
+        DragonLevel(5300.0, 487.5),
+        DragonLevel(5700.0, 512.5),
     )
 
     level: int

@@ -5,7 +5,15 @@ from .colliders import RectCollider
 
 
 class BuildersHut(PassiveBuilding):
-    HEALTH = [250, 1000, 1300, 1600, 1800, 1900, 2000]
+    HEALTH = [
+        250.0,
+        1000.0,
+        1300.0,
+        1600.0,
+        1800.0,
+        1900.0,
+        2000.0,
+    ]
 
     @classmethod
     def width(cls) -> int:

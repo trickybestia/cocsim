@@ -8,7 +8,7 @@ BUILDINGS: list[Type["Building"]] = []
 
 class Building:
     game: "game.Game"
-    health: int
+    health: float
     collider: Collider | None
     x: int
     y: int
@@ -27,7 +27,7 @@ class Building:
 
     @property
     def destroyed(self) -> bool:
-        return self.health == 0
+        return self.health == 0.0
 
     def __init__(self, game: "game.Game"):
         self.game = game
@@ -41,7 +41,7 @@ class Building:
 
     def draw(self): ...
 
-    def apply_damage(self, damage: int):
+    def apply_damage(self, damage: float):
         """Apply damage to this building. Called by units when they attack."""
 
     def occupy_tiles(self):

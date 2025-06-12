@@ -10,7 +10,7 @@ class SimpleBuilding(Building):
         game: "game.Game",
         x: int,
         y: int,
-        health: int,
+        health: float,
         collider: Collider,
     ):
         super().__init__(game)
@@ -22,10 +22,10 @@ class SimpleBuilding(Building):
 
         self.on_destroyed.add(lambda *args: self.update_collision())
 
-    def apply_damage(self, damage: int):
+    def apply_damage(self, damage: float):
         assert not self.destroyed
 
-        self.health = max(0, self.health - damage)
+        self.health = max(0.0, self.health - damage)
 
         if self.destroyed:
             for handler in self.on_destroyed:

@@ -5,7 +5,7 @@ from .colliders import RectCollider
 
 
 class GoblinHut(PassiveBuilding):
-    HEALTH = [250]
+    HEALTH = [250.0]
 
     @classmethod
     def width(cls) -> int:

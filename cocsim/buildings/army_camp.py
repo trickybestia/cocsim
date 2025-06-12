@@ -5,7 +5,21 @@ from .colliders import RectCollider
 
 
 class ArmyCamp(PassiveBuilding):
-    HEALTH = [250, 270, 290, 310, 330, 350, 400, 500, 600, 700, 800, 850, 900]
+    HEALTH = [
+        250.0,
+        270.0,
+        290.0,
+        310.0,
+        330.0,
+        350.0,
+        400.0,
+        500.0,
+        600.0,
+        700.0,
+        800.0,
+        850.0,
+        900.0,
+    ]
 
     @classmethod
     def width(cls) -> int:

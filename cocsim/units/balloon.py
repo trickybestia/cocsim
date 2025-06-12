@@ -19,17 +19,17 @@ class Balloon(AirUnit):
     SPEED = 1.3
 
     LEVELS = (
-        BalloonLevel(150, 75, 25),
-        BalloonLevel(180, 96, 32),
-        BalloonLevel(216, 144, 48),
-        BalloonLevel(280, 216, 72),
-        BalloonLevel(390, 324, 108),
-        BalloonLevel(545, 486, 162),
-        BalloonLevel(690, 594, 214),
-        BalloonLevel(840, 708, 268),
-        BalloonLevel(940, 768, 322),
-        BalloonLevel(1040, 828, 352),
-        BalloonLevel(1140, 870, 375),
+        BalloonLevel(150.0, 75.0, 25.0),
+        BalloonLevel(180.0, 96.0, 32.0),
+        BalloonLevel(216.0, 144.0, 48.0),
+        BalloonLevel(280.0, 216.0, 72.0),
+        BalloonLevel(390.0, 324.0, 108.0),
+        BalloonLevel(545.0, 486.0, 162.0),
+        BalloonLevel(690.0, 594.0, 214.0),
+        BalloonLevel(840.0, 708.0, 268.0),
+        BalloonLevel(940.0, 768.0, 322.0),
+        BalloonLevel(1040.0, 828.0, 352.0),
+        BalloonLevel(1140.0, 870.0, 375.0),
     )
 
     level: int

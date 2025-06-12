@@ -17,18 +17,18 @@ class Barbarian(GroundUnit):
     SPEED = 2.0
 
     LEVELS = (
-        BarbarianLevel(45, 8),
-        BarbarianLevel(54, 11),
-        BarbarianLevel(65, 14),
-        BarbarianLevel(85, 18),
-        BarbarianLevel(105, 23),
-        BarbarianLevel(125, 26),
-        BarbarianLevel(160, 30),
-        BarbarianLevel(205, 34),
-        BarbarianLevel(230, 38),
-        BarbarianLevel(250, 42),
-        BarbarianLevel(270, 45),
-        BarbarianLevel(290, 48),
+        BarbarianLevel(45.0, 8.0),
+        BarbarianLevel(54.0, 11.0),
+        BarbarianLevel(65.0, 14.0),
+        BarbarianLevel(85.0, 18.0),
+        BarbarianLevel(105.0, 23.0),
+        BarbarianLevel(125.0, 26.0),
+        BarbarianLevel(160.0, 30.0),
+        BarbarianLevel(205.0, 34.0),
+        BarbarianLevel(230.0, 38.0),
+        BarbarianLevel(250.0, 42.0),
+        BarbarianLevel(270.0, 45.0),
+        BarbarianLevel(290.0, 48.0),
     )
 
     level: int

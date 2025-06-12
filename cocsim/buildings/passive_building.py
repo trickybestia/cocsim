@@ -10,7 +10,7 @@ class PassiveBuilding(SimpleBuilding):
         game: "game.Game",
         x: int,
         y: int,
-        health: int,
+        health: float,
         collider: Collider,
     ):
         super().__init__(game, x, y, health, collider)
