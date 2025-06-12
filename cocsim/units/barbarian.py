@@ -3,7 +3,7 @@ from typing import Union
 
 import pygame
 
-from .unit import Unit
+from .ground_unit import GroundUnit
 from .. import game, buildings
 
 from cocsim.utils import distance, normalize
@@ -12,7 +12,7 @@ from cocsim.consts import *
 BarbarianLevel = namedtuple("BarbarianLevel", ("health", "attack_damage"))
 
 
-class Barbarian(Unit):
+class Barbarian(GroundUnit):
     ATTACK_COOLDOWN = 1.0
     SPEED = 2.0
 

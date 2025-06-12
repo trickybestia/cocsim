@@ -3,7 +3,7 @@ from typing import Union
 
 import pygame
 
-from .unit import Unit
+from .air_unit import AirUnit
 from .. import game, buildings
 
 from cocsim.utils import distance, normalize
@@ -12,7 +12,7 @@ from cocsim.consts import *
 DragonLevel = namedtuple("DragonLevel", ("health", "attack_damage"))
 
 
-class Dragon(Unit):
+class Dragon(AirUnit):
     ATTACK_COOLDOWN = 1.25
     SPEED = 2.0
 

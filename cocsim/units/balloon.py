@@ -3,7 +3,7 @@ from typing import Union
 
 import pygame
 
-from .unit import Unit
+from .air_unit import AirUnit
 from .. import game, buildings
 
 from cocsim.utils import distance, normalize
@@ -14,7 +14,7 @@ BalloonLevel = namedtuple(
 )
 
 
-class Balloon(Unit):
+class Balloon(AirUnit):
     ATTACK_COOLDOWN = 3.0
     SPEED = 1.3
 
