@@ -26,6 +26,10 @@ class Building:
         """Returns levels count."""
 
     @property
+    def center(self) -> tuple[float, float]:
+        return self.x + self.width() / 2, self.y + self.height() / 2
+
+    @property
     def destroyed(self) -> bool:
         return self.health == 0.0
 

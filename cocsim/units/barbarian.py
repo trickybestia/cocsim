@@ -45,7 +45,7 @@ class Barbarian(GroundUnit):
         return 0.4
 
     def __init__(self, game: "game.Game", level: int, x: float, y: float):
-        super().__init__(game, x, y)
+        super().__init__(game, x, y, self.LEVELS[level].health)
 
         self.level = level
 
@@ -62,9 +62,14 @@ class Barbarian(GroundUnit):
             )
 
     def tick(self, delta_t: float):
-        if self.target is None or self.target.destroyed:
+        if self.dead:
             self.target = None
             self.waypoints = None
+            self.attack_cooldown = None
+
+            return
+
+        if self.target is None or self.target.destroyed:
             self.attack_cooldown = None
 
             self.target, self.waypoints = (

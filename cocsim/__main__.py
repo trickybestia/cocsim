@@ -2,7 +2,7 @@ import pygame
 
 from .utils import load_test_map
 from .spin_timer import SpinTimer
-from .units import Dragon
+from .units import Dragon, Barbarian
 from .consts import *
 from .game import Game
 
@@ -23,7 +23,10 @@ def main():
 
     game.units = []
 
-    game.units.append(Dragon(game, 0, 31.5, 31.5))
+    for y in range(19):
+        game.units.append(Barbarian(game, 1, 0.5, y + 0.5))
+    for x in range(1, 25):
+        game.units.append(Barbarian(game, 1, x + 0.5, 0.5))
 
     timer = SpinTimer(1 / FPS)
 

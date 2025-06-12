@@ -5,11 +5,15 @@ from .. import game, buildings
 
 class Unit:
     game: "game.Game"
-    dead: bool
+    health: float
     x: float
     y: float
 
     target: Union["buildings.Building", None]
+
+    @property
+    def dead(self) -> bool:
+        return self.health == 0.0
 
     @classmethod
     def levels(cls) -> int:
@@ -18,13 +22,18 @@ class Unit:
     @property
     def attack_range(self) -> float: ...
 
-    def __init__(self, game: "game.Game", x: float, y: float):
+    def __init__(self, game: "game.Game", x: float, y: float, health: float):
         self.game = game
-        self.dead = False
+        self.health = health
         self.x = x
         self.y = y
 
         self.target = None
+
+    def apply_damage(self, damage: float):
+        assert not self.dead
+
+        self.health = max(0.0, self.health - damage)
 
     def tick(self, delta_t: float): ...
 
