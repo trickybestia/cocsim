@@ -1,7 +1,8 @@
-from .building import Building, BUILDINGS
-from .simple_building import SimpleBuilding
-from .passive_building import PassiveBuilding
 from .active_building import ActiveBuilding
+from .building import Building, BUILDINGS
+from .passive_building import PassiveBuilding
+from .projectile_active_building import ProjectileActiveBuilding
+from .simple_building import SimpleBuilding
 
 from .air_defense import AirDefense
 from .archer_tower import ArcherTower
