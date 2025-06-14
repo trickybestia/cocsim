@@ -5,7 +5,6 @@ from .building import BUILDINGS
 from .projectile_active_building import ProjectileActiveBuilding
 from .. import game, units
 from .colliders import RectCollider
-from cocsim.consts import *
 
 
 @dataclass(frozen=True)
@@ -62,7 +61,7 @@ class Cannon(ProjectileActiveBuilding):
         return 0.8
 
     @classmethod
-    def projectile_speed(cls):
+    def projectile_speed(cls) -> float:
         return 15.5
 
     @classmethod
