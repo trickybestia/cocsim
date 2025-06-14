@@ -62,7 +62,7 @@ class ArcherTower(ProjectileActiveBuilding):
 
     @classmethod
     def projectile_speed(cls) -> float:
-        return 25.0
+        return 20.6
 
     @classmethod
     def target_type(cls) -> Type["units.Unit"] | None:
