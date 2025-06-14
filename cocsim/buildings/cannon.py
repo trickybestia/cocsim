@@ -63,7 +63,7 @@ class Cannon(ProjectileActiveBuilding):
 
     @classmethod
     def projectile_speed(cls):
-        return 13.3
+        return 15.5
 
     @classmethod
     def target_type(cls) -> Type["units.Unit"] | None:
