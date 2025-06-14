@@ -41,7 +41,7 @@ class ClanCastle(PassiveBuilding):
             self.HEALTH[level],
             RectCollider.from_center(
                 x + self.width() / 2,
-                y + self.width() / 2,
+                y + self.height() / 2,
                 self.width() * 0.65,
                 self.height() * 0.65,
             ),
