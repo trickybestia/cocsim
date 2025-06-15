@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Type
 
+from ..utils import compute_projectile_speed
 from .building import BUILDINGS
 from .projectile_active_building import ProjectileActiveBuilding
 from .. import game, units
@@ -62,7 +63,13 @@ class ArcherTower(ProjectileActiveBuilding):
 
     @classmethod
     def projectile_speed(cls) -> float:
-        return 20.6
+        return compute_projectile_speed(
+            12.448,
+            12.931,
+            cls.attack_range(),
+            cls.attack_cooldown(),
+            1.5,  # checked with giant
+        )
 
     @classmethod
     def target_type(cls) -> Type["units.Unit"] | None:

@@ -98,3 +98,15 @@ def check_intersection(
             return True
 
     return False
+
+
+def compute_projectile_speed(
+    projectile_shot_time: float,
+    projectile_hit_time: float,
+    building_attack_range: float,
+    building_attack_cooldown: float,
+    unit_speed: float,
+):
+    return (building_attack_range - building_attack_cooldown * unit_speed) / (
+        projectile_hit_time - projectile_shot_time
+    )
