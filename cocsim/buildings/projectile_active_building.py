@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from typing import Type, Union
 
 import pygame
@@ -10,12 +9,64 @@ from ..utils import distance, normalize
 from cocsim.consts import *
 
 
-@dataclass
 class Projectile:
+    building: "ProjectileActiveBuilding"
     time_left: float
+
+    movement_completed: bool
+
+    def __init__(self, building: "ProjectileActiveBuilding", time_left: float):
+        self.building = building
+        self.time_left = time_left
+
+        self.movement_completed = False
+
+    def tick(self, delta_t: float): ...
+
+
+class TargetProjectile(Projectile):
     target: "units.Unit"
     rel_position: tuple[float, float]  # position relative to target
     rel_speed: tuple[float, float]
+
+    def __init__(
+        self,
+        building: "ProjectileActiveBuilding",
+        time_left: float,
+        target: "units.Unit",
+    ):
+        super().__init__(building, time_left)
+
+        self.target = target
+
+        speed_normalized = normalize(
+            self.target.x - building.center[0],
+            self.target.y - building.center[1],
+        )
+
+        self.rel_position = (
+            building.center[0] - self.target.x,
+            building.center[1] - self.target.y,
+        )
+        self.rel_speed = (
+            speed_normalized[0] * building.projectile_speed(),
+            speed_normalized[1] * building.projectile_speed(),
+        )
+
+    def tick(self, delta_t: float):
+        assert not self.movement_completed
+
+        self.time_left = max(0.0, self.time_left - delta_t)
+        self.rel_position = (
+            self.rel_position[0] + self.rel_speed[0] * delta_t,
+            self.rel_position[1] + self.rel_speed[1] * delta_t,
+        )
+
+        if self.time_left == 0.0:
+            self.movement_completed = True
+
+            if not self.target.dead:
+                self.target.apply_damage(self.building.attack_damage())
 
 
 class ProjectileActiveBuilding(ActiveBuilding):
@@ -49,26 +100,18 @@ class ProjectileActiveBuilding(ActiveBuilding):
     @classmethod
     def target_type(cls) -> Type["units.Unit"] | None: ...
 
+    @classmethod
+    def projectile_type(cls) -> Type[Projectile]: ...
+
     def attack_damage(self) -> float: ...
 
     def tick(self, delta_t: float):
         i = 0
 
         while i != len(self.projectiles):
-            projectile = self.projectiles[i]
+            self.projectiles[i].tick(delta_t)
 
-            projectile.time_left = max(0.0, projectile.time_left - delta_t)
-            projectile.rel_position = (
-                projectile.rel_position[0] + projectile.rel_speed[0] * delta_t,
-                projectile.rel_position[1] + projectile.rel_speed[1] * delta_t,
-            )
-
-            if projectile.time_left == 0.0:
-                target = projectile.target
-
-                if not target.dead:
-                    target.apply_damage(self.attack_damage())
-
+            if self.projectiles[i].movement_completed:
                 del self.projectiles[i]
             else:
                 i += 1
@@ -103,22 +146,12 @@ class ProjectileActiveBuilding(ActiveBuilding):
                 target_distance = distance(
                     self.center[0], self.center[1], self.target.x, self.target.y
                 )
-                speed_normalized = normalize(
-                    self.target.x - self.center[0],
-                    self.target.y - self.center[1],
-                )
+
                 self.projectiles.append(
-                    Projectile(
+                    self.projectile_type()(
+                        self,
                         target_distance / self.projectile_speed(),
                         self.target,
-                        (
-                            self.center[0] - self.target.x,
-                            self.center[1] - self.target.y,
-                        ),
-                        (
-                            speed_normalized[0] * self.projectile_speed(),
-                            speed_normalized[1] * self.projectile_speed(),
-                        ),
                     )
                 )
                 self.remaining_attack_cooldown = self.attack_cooldown()
