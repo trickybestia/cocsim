@@ -58,7 +58,7 @@ class ArcherTower(ProjectileActiveBuilding):
         return len(cls.LEVELS)
 
     @classmethod
-    def attack_range(cls) -> float:
+    def max_attack_distance(cls) -> float:
         return 10.0
 
     @classmethod
@@ -70,7 +70,7 @@ class ArcherTower(ProjectileActiveBuilding):
         return compute_projectile_speed(
             12.448,
             12.931,
-            cls.attack_range(),
+            cls.max_attack_distance(),
             cls.attack_cooldown(),
             1.5,  # checked with giant
         )

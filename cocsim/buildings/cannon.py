@@ -58,7 +58,7 @@ class Cannon(ProjectileActiveBuilding):
         return len(cls.LEVELS)
 
     @classmethod
-    def attack_range(cls) -> float:
+    def max_attack_distance(cls) -> float:
         return 9.0
 
     @classmethod
@@ -70,7 +70,7 @@ class Cannon(ProjectileActiveBuilding):
         return compute_projectile_speed(
             17.178,
             17.726,
-            cls.attack_range(),
+            cls.max_attack_distance(),
             cls.attack_cooldown(),
             2.0,  # checked with barbarian
         )

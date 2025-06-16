@@ -95,7 +95,11 @@ class ProjectileActiveBuilding(ActiveBuilding):
     def attack_cooldown(cls) -> float: ...
 
     @classmethod
-    def attack_range(cls) -> float: ...
+    def min_attack_distance(cls) -> float:
+        return 0.0
+
+    @classmethod
+    def max_attack_distance(cls) -> float: ...
 
     @classmethod
     def target_type(cls) -> Type["units.Unit"] | None: ...
@@ -127,8 +131,11 @@ class ProjectileActiveBuilding(ActiveBuilding):
         if (
             self.target is None
             or self.target.dead
-            or distance(center_x, center_y, self.target.x, self.target.y)
-            > self.attack_range()
+            or not (
+                self.min_attack_distance()
+                <= distance(center_x, center_y, self.target.x, self.target.y)
+                <= self.max_attack_distance()
+            )
         ):
             self.target = self._find_target()
 
@@ -201,7 +208,11 @@ class ProjectileActiveBuilding(ActiveBuilding):
 
             current_distance = distance(center_x, center_y, unit.x, unit.y)
 
-            if current_distance > self.attack_range():
+            if not (
+                self.min_attack_distance()
+                <= current_distance
+                <= self.max_attack_distance()
+            ):
                 continue
 
             if min_distance is None or current_distance < min_distance:

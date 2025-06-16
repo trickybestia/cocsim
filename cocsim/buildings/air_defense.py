@@ -52,7 +52,7 @@ class AirDefense(ProjectileActiveBuilding):
         return len(cls.LEVELS)
 
     @classmethod
-    def attack_range(cls) -> float:
+    def max_attack_distance(cls) -> float:
         return 10.0
 
     @classmethod
@@ -64,7 +64,7 @@ class AirDefense(ProjectileActiveBuilding):
         return compute_projectile_speed(
             30.837,
             31.536,
-            cls.attack_range(AirDefense),
+            cls.max_attack_distance(AirDefense),
             cls.attack_cooldown(),
             2.5,  # checked with lava hound
         )
