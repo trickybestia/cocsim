@@ -19,6 +19,10 @@ class Unit:
     def levels(cls) -> int:
         """Returns levels count."""
 
+    @classmethod
+    def housing_space(cls) -> int:
+        """Returns unit Housing Space."""
+
     @property
     def attack_range(self) -> float: ...
 

@@ -44,6 +44,10 @@ class Dragon(AirUnit):
     def levels(cls):
         return len(cls.LEVELS)
 
+    @classmethod
+    def housing_space(cls):
+        return 20
+
     @property
     def attack_range(self) -> float:
         return 1.0

@@ -44,6 +44,10 @@ class Barbarian(GroundUnit):
     def levels(cls):
         return len(cls.LEVELS)
 
+    @classmethod
+    def housing_space(cls):
+        return 1
+
     @property
     def attack_range(self) -> float:
         return 0.4
