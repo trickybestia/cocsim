@@ -71,53 +71,6 @@ class TargetProjectile(Projectile):
                 self.target.apply_damage(self.building.attack_damage())
 
 
-class SplashProjectile(Projectile):
-    SPLASH_ATTACK_RADIUS = 1.5  # now hardcoded for Mortar
-
-    target: tuple[float, float]
-    position: tuple[float, float]
-    speed: tuple[float, float]
-
-    def __init__(
-        self,
-        building: "ProjectileActiveBuilding",
-        time_left: float,
-        target: "units.Unit",
-    ):
-        super().__init__(building, time_left)
-
-        self.target = (target.x, target.y)
-
-        speed_normalized = normalize(
-            target.x - building.center[0],
-            target.y - building.center[1],
-        )
-
-        self.position = building.center
-        self.speed = (
-            speed_normalized[0] * building.projectile_speed(),
-            speed_normalized[1] * building.projectile_speed(),
-        )
-
-    def tick(self, delta_t: float):
-        super().tick(delta_t)
-
-        self.position = (
-            self.position[0] + self.speed[0] * delta_t,
-            self.position[1] + self.speed[1] * delta_t,
-        )
-
-        if self.time_left == 0.0:
-            self.movement_completed = True
-
-            self.building.splash_attack(
-                self.target[0],
-                self.target[1],
-                self.SPLASH_ATTACK_RADIUS,
-                self.building.attack_damage(),
-            )
-
-
 class ProjectileActiveBuilding(ActiveBuilding):
     target: Union["units.Unit", None]
     remaining_attack_cooldown: Union[float, None]
