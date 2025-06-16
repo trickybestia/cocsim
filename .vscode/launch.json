@@ -29,10 +29,10 @@
             ]
         },
         {
-            "name": "cocsim",
+            "name": "cocsim.showcase",
             "type": "debugpy",
             "request": "launch",
-            "module": "cocsim"
+            "module": "cocsim.showcase"
         }
     ]
 }

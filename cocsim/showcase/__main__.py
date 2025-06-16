@@ -1,10 +1,10 @@
 import pygame
 
-from .utils import load_test_map
-from .spin_timer import SpinTimer
-from .units import Dragon, Barbarian
-from .consts import *
-from .game import Game
+from cocsim.utils import load_test_map
+from cocsim.spin_timer import SpinTimer
+from cocsim.units import Dragon, Barbarian
+from cocsim.consts import *
+from cocsim.game import Game
 
 
 def main():
