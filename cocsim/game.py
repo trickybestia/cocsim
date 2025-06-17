@@ -15,10 +15,11 @@ class Game:
     border_size: int
 
     buildings: list["buildings.Building"]
+    units: list["units.Unit"]
+
     buildings_grid: list[list[Union["buildings.Building", None]]]
     drop_zone: list[list[bool]]
     collision_grid: list[list[Union["buildings.Building", None]]]
-    units: list["units.Unit"]
 
     pathfinder: Pathfinder
 
@@ -65,12 +66,15 @@ class Game:
         self.border_size = map["border_size"]
 
         self.buildings = []
+        self.units = []
+
+        self.pathfinder = Pathfinder(self)
+
         self.time_elapsed = 0.0
+
         self._townhall_destroyed = False
         self._destroyed_buildings_count = 0
         self._total_buildings_count = 0
-
-        self.pathfinder = Pathfinder(self)
 
         if base_image is not None:
             base_image = base_image.resize(

@@ -9,8 +9,6 @@ def main():
 
     game = Game(map, base_image)
 
-    game.units = []
-
     for y in range(19):
         game.units.append(Barbarian(game, 1, 0.5, y + 0.5))
     for x in range(1, 25):
