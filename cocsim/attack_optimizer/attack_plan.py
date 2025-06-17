@@ -3,10 +3,10 @@ from dataclasses import dataclass
 from random import random
 from math import pi
 
-import sympy
-
 from cocsim.units import Unit
 from cocsim.consts import *
+
+from .geometry import Ray, Point, Square
 
 
 @dataclass
@@ -20,21 +20,17 @@ class AttackPlanUnit:
     def cartesian_pos(
         self, base_size: int, border_size: int
     ) -> tuple[float, float]:
-        ray = sympy.Ray((0, 0), angle=self.angle)
-        base_square = sympy.Polygon((0, 0), base_size / 2, n=4)
-        border_square = sympy.Polygon(
-            (0, 0), (base_size + border_size) / 2, n=4
-        )
+        ray = Ray(Point(0.0, 0.0), self.angle)
+        base_square = Square(Point(0.0, 0.0), base_size)
+        border_square = Square(Point(0.0, 0.0), base_size + border_size)
 
-        start_point = sympy.intersection(ray, base_square)[0]
-        stop_point = sympy.intersection(ray, border_square)[0]
+        start_point = ray.intersection_with_square(base_square)
+        stop_point = ray.intersection_with_square(border_square)
 
-        result = (
-            start_point + (stop_point - start_point) * self.distance
-        ).evalf()
+        result = start_point + (stop_point - start_point) * self.distance
         offset = (base_size + border_size) / 2
 
-        return result[0] + offset, result[1] + offset
+        return result.x + offset, result.y + offset
 
 
 class AttackPlan:
