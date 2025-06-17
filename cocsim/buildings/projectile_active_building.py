@@ -10,13 +10,11 @@ from cocsim.consts import *
 
 
 class Projectile:
-    building: "ProjectileActiveBuilding"
     time_left: float
 
     movement_completed: bool
 
-    def __init__(self, building: "ProjectileActiveBuilding", time_left: float):
-        self.building = building
+    def __init__(self, time_left: float):
         self.time_left = time_left
 
         self.movement_completed = False
@@ -26,8 +24,11 @@ class Projectile:
 
         self.time_left = max(0.0, self.time_left - delta_t)
 
+    def draw(self): ...
+
 
 class TargetProjectile(Projectile):
+    building: "ProjectileActiveBuilding"
     target: "units.Unit"
     rel_position: tuple[float, float]  # position relative to target
     rel_speed: tuple[float, float]
@@ -38,8 +39,9 @@ class TargetProjectile(Projectile):
         time_left: float,
         target: "units.Unit",
     ):
-        super().__init__(building, time_left)
+        super().__init__(time_left)
 
+        self.building = building
         self.target = target
 
         speed_normalized = normalize(
@@ -69,6 +71,17 @@ class TargetProjectile(Projectile):
 
             if not self.target.dead:
                 self.target.apply_damage(self.building.attack_damage())
+
+    def draw(self):
+        pygame.draw.circle(
+            self.building.game.screen,
+            pygame.Color(255, 0, 0),
+            (
+                (self.target.x + self.rel_position[0]) * PIXELS_PER_TILE,
+                (self.target.y + self.rel_position[1]) * PIXELS_PER_TILE,
+            ),
+            2,
+        )
 
 
 class ProjectileActiveBuilding(ActiveBuilding):
@@ -107,7 +120,8 @@ class ProjectileActiveBuilding(ActiveBuilding):
     def target_type(cls) -> Type["units.Unit"] | None: ...
 
     @classmethod
-    def projectile_type(cls) -> Type[Projectile]: ...
+    def projectile_type(cls) -> Type[Projectile]:
+        return TargetProjectile
 
     def attack_damage(self) -> float: ...
 
@@ -168,17 +182,7 @@ class ProjectileActiveBuilding(ActiveBuilding):
     def draw(self):
         if not self.destroyed and self.target is not None:
             for projectile in self.projectiles:
-                pygame.draw.circle(
-                    self.game.screen,
-                    pygame.Color(255, 0, 0),
-                    (
-                        (projectile.target.x + projectile.rel_position[0])
-                        * PIXELS_PER_TILE,
-                        (projectile.target.y + projectile.rel_position[1])
-                        * PIXELS_PER_TILE,
-                    ),
-                    2,
-                )
+                projectile.draw()
 
             pygame.draw.line(
                 self.game.screen,

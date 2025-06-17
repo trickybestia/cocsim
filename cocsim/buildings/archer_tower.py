@@ -3,11 +3,7 @@ from typing import Type
 
 from ..utils import compute_projectile_speed
 from .building import BUILDINGS
-from .projectile_active_building import (
-    ProjectileActiveBuilding,
-    Projectile,
-    TargetProjectile,
-)
+from .projectile_active_building import ProjectileActiveBuilding
 from .. import game, units
 from .colliders import RectCollider
 
@@ -78,10 +74,6 @@ class ArcherTower(ProjectileActiveBuilding):
     @classmethod
     def target_type(cls) -> Type["units.Unit"] | None:
         return None
-
-    @classmethod
-    def projectile_type(cls) -> Type[Projectile]:
-        return TargetProjectile
 
     def attack_damage(self):
         return self.LEVELS[self.level].attack_damage

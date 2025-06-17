@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 from typing import Type
 
-from ..utils import compute_projectile_speed, normalize
+from ..utils import compute_projectile_speed
 from .building import BUILDINGS
-from .projectile_active_building import ProjectileActiveBuilding, Projectile
+from .splash_projectile_active_building import SplashProjectileActiveBuilding
 from .. import game, units
 from .colliders import RectCollider
 
@@ -14,54 +14,7 @@ class MortarLevel:
     attack_damage: float
 
 
-class MortarProjectile(Projectile):
-    SPLASH_ATTACK_RADIUS = 1.5
-
-    target: tuple[float, float]
-    position: tuple[float, float]
-    speed: tuple[float, float]
-
-    def __init__(
-        self,
-        building: "ProjectileActiveBuilding",
-        time_left: float,
-        target: "units.Unit",
-    ):
-        super().__init__(building, time_left)
-
-        self.target = (target.x, target.y)
-
-        speed_normalized = normalize(
-            target.x - building.center[0],
-            target.y - building.center[1],
-        )
-
-        self.position = building.center
-        self.speed = (
-            speed_normalized[0] * building.projectile_speed(),
-            speed_normalized[1] * building.projectile_speed(),
-        )
-
-    def tick(self, delta_t: float):
-        super().tick(delta_t)
-
-        self.position = (
-            self.position[0] + self.speed[0] * delta_t,
-            self.position[1] + self.speed[1] * delta_t,
-        )
-
-        if self.time_left == 0.0:
-            self.movement_completed = True
-
-            self.building.splash_attack(
-                self.target[0],
-                self.target[1],
-                self.SPLASH_ATTACK_RADIUS,
-                self.building.attack_damage(),
-            )
-
-
-class Mortar(ProjectileActiveBuilding):
+class Mortar(SplashProjectileActiveBuilding):
     LEVELS = (
         MortarLevel(400.0, 20.0),
         MortarLevel(450.0, 25.0),
@@ -123,8 +76,8 @@ class Mortar(ProjectileActiveBuilding):
         return units.GroundUnit
 
     @classmethod
-    def projectile_type(cls) -> Type[Projectile]:
-        return MortarProjectile
+    def splash_attack_radius(cls):
+        return 1.5
 
     def attack_damage(self):
         return self.LEVELS[self.level].attack_damage
