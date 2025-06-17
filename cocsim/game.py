@@ -22,7 +22,7 @@ class Game:
 
     pathfinder: Pathfinder
 
-    time_left: float
+    time_elapsed: float
 
     screen: pygame.Surface
     _base_image: pygame.Surface
@@ -32,12 +32,16 @@ class Game:
     _total_buildings_count: int
 
     @property
+    def time_left(self) -> float:
+        return MAX_ATTACK_DURATION - self.time_elapsed
+
+    @property
     def total_size(self) -> int:
         return self.base_size + 2 * self.border_size
 
     @property
     def done(self) -> bool:
-        return self.time_left == 0.0 or self.stars == 3
+        return self.time_elapsed == MAX_ATTACK_DURATION or self.stars == 3
 
     @property
     def stars(self) -> int:
@@ -61,7 +65,7 @@ class Game:
         self.border_size = map["border_size"]
 
         self.buildings = []
-        self.time_left = 180.0
+        self.time_elapsed = 0.0
         self._townhall_destroyed = False
         self._destroyed_buildings_count = 0
         self._total_buildings_count = 0
@@ -118,7 +122,9 @@ class Game:
         for unit in self.units:
             unit.tick(delta_t)
 
-        self.time_left = max(0.0, self.time_left - delta_t)
+        self.time_elapsed = min(
+            MAX_ATTACK_DURATION, self.time_elapsed + delta_t
+        )
 
     def draw(self):
         self._draw_grid()
