@@ -28,6 +28,10 @@ class AttackPlanUnit:
         stop_point = ray.intersection_with_square(border_square)
 
         result = start_point + (stop_point - start_point) * self.distance
+        result -= (
+            result * 0.01
+        )  # for unit to not spawn on right or bottom border
+
         offset = (base_size + border_size) / 2
 
         return result.x + offset, result.y + offset

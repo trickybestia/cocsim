@@ -4,7 +4,7 @@ from cocsim.map import Map
 from cocsim.units import Unit
 
 
-class AttackOptimizer:
+class ArmyOptimizer:
     map: Map
     housing_space: int
     units: list[tuple[Type[Unit], int]]

@@ -1,3 +1,5 @@
+from typing import Callable
+
 import pygame
 
 from cocsim.spin_timer import SpinTimer
@@ -6,6 +8,7 @@ from cocsim.game import Game
 
 
 class GameGui:
+    before_tick: Callable[[], None] | None
     game: Game
 
     def __init__(
@@ -40,8 +43,13 @@ class GameGui:
             self.game.draw()
 
             if not self.game.done and delta_t is not None:
+                if self.before_tick is not None:
+                    self.before_tick()
+
                 delta_t = min(delta_t, 2 * 1 / FPS)
+
                 self.game.tick(delta_t)
+
                 pygame.display.set_caption(
                     f"cocsim | {self.game.progress_info()}"
                 )
