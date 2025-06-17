@@ -15,6 +15,7 @@ class GameGui:
         self,
         game: Game,
     ):
+        self.before_tick = None
         self.game = game
 
     def run(self):
