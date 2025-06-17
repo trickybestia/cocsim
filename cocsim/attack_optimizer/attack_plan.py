@@ -74,7 +74,9 @@ class AttackPlan:
 
         for unit in self.units:
             angle = unit.angle * (1 + (random() - 0.5) * 0.2)
-            distance = unit.distance * (1 + (random() - 0.5) * 0.2)
+            distance = max(
+                0.0, min(unit.distance * (1 + (random() - 0.5) * 0.2), 1.0)
+            )
             drop_time = unit.drop_time * (1 + (random() - 0.8) * 0.2)
 
             result.units.append(
