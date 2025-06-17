@@ -33,6 +33,12 @@
             "type": "debugpy",
             "request": "launch",
             "module": "cocsim.showcase"
+        },
+        {
+            "name": "cocsim.attack_optimizer",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "cocsim.attack_optimizer"
         }
     ]
 }
