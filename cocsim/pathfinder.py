@@ -5,8 +5,7 @@ from math import inf
 
 from .consts import *
 from .utils import check_intersection, distance
-from .buildings import Building, Wall
-from . import game, units
+from . import game, units, buildings
 
 
 class Pathfinder:
@@ -16,17 +15,19 @@ class Pathfinder:
         self.game = game
 
     def get_targets(
-        self, unit: "units.Unit", preferred_building: Type[Building] | None
-    ) -> list[Building]:
+        self,
+        unit: "units.Unit",
+        preferred_building: Type["buildings.Building"] | None,
+    ) -> list["buildings.Building"]:
         if preferred_building is not None:
             priority_func = lambda b: (
                 isinstance(b, preferred_building),
-                not isinstance(b, Wall),
+                not isinstance(b, buildings.Wall),
             )
         else:
-            priority_func = lambda b: not isinstance(b, Wall)
+            priority_func = lambda b: not isinstance(b, buildings.Wall)
 
-        buildings: list[tuple[object, Building]] = sorted(
+        buildings_: list[tuple[object, buildings.Building]] = sorted(
             (
                 (priority_func(b), b)
                 for b in self.game.buildings
@@ -36,13 +37,13 @@ class Pathfinder:
             reverse=True,
         )
 
-        buildings = list(
-            takewhile(lambda t: t[0] == buildings[0][0], buildings)
+        buildings_ = list(
+            takewhile(lambda t: t[0] == buildings_[0][0], buildings_)
         )
 
-        targets: list[tuple[float, Building]] = []
+        targets: list[tuple[float, buildings.Building]] = []
 
-        for _, building in buildings:
+        for _, building in buildings_:
             nearest_point = building.collider.get_attack_area(
                 unit.attack_range
             ).get_nearest_point(unit.x, unit.y)
@@ -60,14 +61,16 @@ class Pathfinder:
         return [t[1] for t in targets]
 
     def find_best_air_path(
-        self, unit: "units.Unit", preferred_building: Type[Building] | None
-    ) -> tuple[Building, list[tuple[float, float]]]:
+        self,
+        unit: "units.Unit",
+        preferred_building: Type["buildings.Building"] | None,
+    ) -> tuple["buildings.Building", list[tuple[float, float]]]:
         targets = self.get_targets(unit, preferred_building)
 
         return targets[0], self.find_air_path(unit, targets[0])
 
     def find_air_path(
-        self, unit: "units.Unit", target: Building
+        self, unit: "units.Unit", target: "buildings.Building"
     ) -> list[tuple[float, float]]:
         nearest_point = target.collider.get_attack_area(
             unit.attack_range
@@ -76,8 +79,10 @@ class Pathfinder:
         return [nearest_point]
 
     def find_best_ground_path(
-        self, unit: "units.Unit", preferred_building: Type[Building] | None
-    ) -> tuple[Building, list[tuple[float, float]]]:
+        self,
+        unit: "units.Unit",
+        preferred_building: Type["buildings.Building"] | None,
+    ) -> tuple["buildings.Building", list[tuple[float, float]]]:
         targets = self.get_targets(unit, preferred_building)[:2]
 
         paths = [self.find_ground_path(unit, target) for target in targets]
@@ -85,10 +90,12 @@ class Pathfinder:
 
         return best_path[2]()
 
-    def find_ground_path(self, unit: "units.Unit", target: Building) -> tuple[
+    def find_ground_path(
+        self, unit: "units.Unit", target: "buildings.Building"
+    ) -> tuple[
         float,
-        Building,
-        Callable[[], tuple[Building, list[tuple[float, float]]]],
+        "buildings.Building",
+        Callable[[], tuple["buildings.Building", list[tuple[float, float]]]],
     ]:
         nearest_point = target.collider.get_attack_area(
             unit.attack_range
@@ -209,7 +216,7 @@ class Pathfinder:
 
         if building is None:
             return 1.0
-        if isinstance(building, Wall):
+        if isinstance(building, buildings.Wall):
             return 200.0
 
         return inf
