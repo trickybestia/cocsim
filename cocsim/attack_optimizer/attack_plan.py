@@ -1,12 +1,14 @@
 from typing import Type
 from dataclasses import dataclass
-from random import random
+from random import random, choice
 from math import pi
 
 from cocsim.units import Unit
 from cocsim.consts import *
 
 from .geometry import Ray, Point, Square
+
+MAX_UNIT_DROP_TIME = 20
 
 
 @dataclass
@@ -47,7 +49,7 @@ class AttackPlan:
         for unit in units:
             angle = random() * 2 * pi
             distance = random()
-            drop_time = random() * MAX_ATTACK_DURATION
+            drop_time = random() * MAX_UNIT_DROP_TIME
 
             result.units.append(
                 AttackPlanUnit(unit[0], unit[1], angle, distance, drop_time)
@@ -55,5 +57,30 @@ class AttackPlan:
 
         return result
 
+    @classmethod
+    def merge(cls, a: "AttackPlan", b: "AttackPlan") -> "AttackPlan":
+        result = AttackPlan([])
+
+        for i in range(len(a.units)):
+            result.units.append(choice((a.units[i], b.units[i])))
+
+        return result
+
     def __init__(self, units: list[AttackPlanUnit]):
         self.units = units
+
+    def mutate(self) -> "AttackPlan":
+        result = AttackPlan([])
+
+        for unit in self.units:
+            angle = unit.angle * (1 + (random() - 0.5) * 0.2)
+            distance = unit.distance * (1 + (random() - 0.5) * 0.2)
+            drop_time = unit.drop_time * (1 + (random() - 0.8) * 0.2)
+
+            result.units.append(
+                AttackPlanUnit(
+                    unit.unit, unit.level, angle, distance, drop_time
+                )
+            )
+
+        return result
