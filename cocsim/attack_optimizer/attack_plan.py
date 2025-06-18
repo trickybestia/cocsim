@@ -3,10 +3,12 @@ from dataclasses import dataclass
 from random import random, choice
 from math import pi
 
+from cocsim.game import Game
 from cocsim.units import Unit
+from cocsim.utils import clamp
 from cocsim.consts import *
 
-from .geometry import Ray, Point, Square
+from .geometry import Ray, Point, Square, Segment
 
 MAX_UNIT_DROP_TIME = 20
 
@@ -19,24 +21,74 @@ class AttackPlanUnit:
     distance: float  # from 0 to 1
     drop_time: float
 
-    def cartesian_pos(
-        self, base_size: int, border_size: int
-    ) -> tuple[float, float]:
-        ray = Ray(Point(0.0, 0.0), self.angle)
-        base_square = Square(Point(0.0, 0.0), base_size)
-        border_square = Square(Point(0.0, 0.0), base_size + border_size)
+    def cartesian_pos(self, game: Game) -> tuple[float, float]:
+        offset = (game.base_size + game.border_size) / 2
+        center = Point(offset, offset)
 
-        start_point = ray.intersection_with_square(base_square)
+        ray = Ray(center, self.angle)
+        border_square = Square(center, game.base_size + game.border_size)
+
+        start_point = None
         stop_point = ray.intersection_with_square(border_square)
+        segment_length = (stop_point - ray.start).length()
 
-        result = start_point + (stop_point - start_point) * self.distance
-        result -= (
-            result * 0.01
-        )  # for unit to not spawn on right or bottom border
+        for t in range(100):
+            distance = segment_length * t / 100
+            tile_pos = stop_point - ray.direction * distance
+            x = clamp(0, int(tile_pos.x), game.total_size - 1)
+            y = clamp(0, int(tile_pos.y), game.total_size - 1)
 
-        offset = (base_size + border_size) / 2
+            if (
+                game.is_inside_map(x + 1, y)
+                and game.drop_zone[x][y] != game.drop_zone[x + 1][y]
+            ):  # right tile border
+                start_point = ray.intersection_with_segment(
+                    Segment(Point(x + 1, y), Point(x + 1, y + 1))
+                )
 
-        return result.x + offset, result.y + offset
+                if start_point is not None:
+                    break
+
+            if (
+                game.is_inside_map(x, y + 1)
+                and game.drop_zone[x][y] != game.drop_zone[x][y + 1]
+            ):  # down tile border
+                start_point = ray.intersection_with_segment(
+                    Segment(Point(x, y + 1), Point(x + 1, y + 1))
+                )
+
+                if start_point is not None:
+                    break
+
+            if (
+                game.is_inside_map(x - 1, y)
+                and game.drop_zone[x][y] != game.drop_zone[x - 1][y]
+            ):  # left tile border
+                start_point = ray.intersection_with_segment(
+                    Segment(Point(x, y), Point(x, y + 1))
+                )
+
+                if start_point is not None:
+                    break
+
+            if (
+                game.is_inside_map(x, y - 1)
+                and game.drop_zone[x][y] != game.drop_zone[x][y - 1]
+            ):  # up tile border
+                start_point = ray.intersection_with_segment(
+                    Segment(Point(x, y), Point(x + 1, y))
+                )
+
+                if start_point is not None:
+                    break
+
+        assert start_point is not None
+
+        result = start_point + (stop_point - start_point) * min(
+            0.99, self.distance
+        )  # min for unit to not spawn on right or bottom border
+
+        return result.x, result.y
 
 
 class AttackPlan:
@@ -74,8 +126,8 @@ class AttackPlan:
 
         for unit in self.units:
             angle = unit.angle * (1 + (random() - 0.5) * 0.2)
-            distance = max(
-                0.0, min(unit.distance * (1 + (random() - 0.5) * 0.2), 1.0)
+            distance = clamp(
+                0.0, unit.distance * (1 + (random() - 0.5) * 0.2), 1.0
             )
             drop_time = unit.drop_time * (1 + (random() - 0.8) * 0.2)
 

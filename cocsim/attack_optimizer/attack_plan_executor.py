@@ -19,8 +19,6 @@ class AttackPlanExecutor:
             and self.units[-1].drop_time <= self.game.time_elapsed
         ):
             unit = self.units.pop()
-            x, y = unit.cartesian_pos(
-                self.game.base_size, self.game.border_size
-            )
+            x, y = unit.cartesian_pos(self.game)
 
             self.game.units.append(unit.unit(self.game, unit.level, x, y))

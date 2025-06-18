@@ -7,8 +7,11 @@ class Point:
     x: float
     y: float
 
+    def length(self) -> float:
+        return (self.x**2 + self.y**2) ** 0.5
+
     def normalize(self) -> "Point":
-        length = (self.x**2 + self.y**2) ** 0.5
+        length = self.length()
 
         return Point(self.x / length, self.y / length)
 
