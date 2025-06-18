@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from typing import Type
 
-from ..utils import compute_projectile_speed
 from .building import BUILDINGS
 from .projectile_active_building import ProjectileActiveBuilding
 from .. import game, units
@@ -57,13 +56,7 @@ class AirDefense(ProjectileActiveBuilding):
 
     @classmethod
     def projectile_speed(cls) -> float:
-        return compute_projectile_speed(
-            30.837,
-            31.536,
-            cls.max_attack_distance(AirDefense),
-            cls.attack_cooldown(),
-            2.5,  # checked with lava hound
-        )
+        return 8.0
 
     @classmethod
     def target_type(cls) -> Type["units.Unit"] | None:

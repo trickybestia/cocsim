@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from typing import Type
 
-from ..utils import compute_projectile_speed
 from .building import BUILDINGS
 from .splash_projectile_active_building import SplashProjectileActiveBuilding
 from .. import game, units
@@ -63,13 +62,7 @@ class Mortar(SplashProjectileActiveBuilding):
 
     @classmethod
     def projectile_speed(cls) -> float:
-        return compute_projectile_speed(
-            16.839,
-            18.614,
-            cls.max_attack_distance(),
-            cls.attack_cooldown(),
-            1.5,  # checked with giant
-        )
+        return 5.0
 
     @classmethod
     def target_type(cls) -> Type["units.Unit"] | None:

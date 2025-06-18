@@ -2,7 +2,7 @@ from typing import Type
 
 import pygame
 
-from ..utils import compute_projectile_speed, normalize
+from ..utils import normalize
 from .projectile_active_building import ProjectileActiveBuilding, Projectile
 from .. import game, units
 from .colliders import Collider
