@@ -9,6 +9,7 @@ from .air_defense import AirDefense
 from .archer_tower import ArcherTower
 from .army_camp import ArmyCamp
 from .barracks import Barracks
+from .bomb_tower import BombTower
 from .builders_hut import BuildersHut
 from .cannon import Cannon
 from .clan_castle import ClanCastle
