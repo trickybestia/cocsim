@@ -61,10 +61,6 @@ class Mortar(SplashProjectileActiveBuilding):
         return 5.0
 
     @classmethod
-    def projectile_speed(cls) -> float:
-        return 5.0
-
-    @classmethod
     def target_type(cls) -> Type["units.Unit"] | None:
         return units.GroundUnit
 
@@ -74,6 +70,9 @@ class Mortar(SplashProjectileActiveBuilding):
 
     def attack_damage(self):
         return self.LEVELS[self.level].attack_damage
+
+    def projectile_speed(self) -> float:
+        return 5.0
 
     def __init__(self, game: "game.Game", x: float, y: float, level: int):
         super().__init__(

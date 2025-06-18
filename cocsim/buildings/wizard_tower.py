@@ -57,10 +57,6 @@ class WizardTower(SplashProjectileActiveBuilding):
         return 1.3
 
     @classmethod
-    def projectile_speed(cls) -> float:
-        return 5.0
-
-    @classmethod
     def target_type(cls) -> Type["units.Unit"] | None:
         return None
 
@@ -70,6 +66,12 @@ class WizardTower(SplashProjectileActiveBuilding):
 
     def attack_damage(self):
         return self.LEVELS[self.level].attack_damage
+
+    def projectile_speed(self) -> float:
+        if self.level >= 4:
+            return 9.0
+
+        return 5.0
 
     def __init__(self, game: "game.Game", x: float, y: float, level: int):
         super().__init__(

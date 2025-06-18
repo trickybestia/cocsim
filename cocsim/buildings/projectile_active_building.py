@@ -104,9 +104,6 @@ class ProjectileActiveBuilding(ActiveBuilding):
         self.projectiles = []
 
     @classmethod
-    def projectile_speed(cls) -> float: ...
-
-    @classmethod
     def attack_cooldown(cls) -> float: ...
 
     @classmethod
@@ -124,6 +121,8 @@ class ProjectileActiveBuilding(ActiveBuilding):
         return TargetProjectile
 
     def attack_damage(self) -> float: ...
+
+    def projectile_speed(self) -> float: ...
 
     def tick(self, delta_t: float):
         i = 0
