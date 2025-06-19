@@ -6,7 +6,9 @@
 		"ms-python.black-formatter",
 		"ms-python.vscode-pylance",
 		"ms-python.python",
-		"ms-python.debugpy"
+		"ms-python.debugpy",
+		"esbenp.prettier-vscode",
+		"dbaeumer.vscode-eslint"
 	],
 	// List of extensions recommended by VS Code that should not be recommended for users of this workspace.
 	"unwantedRecommendations": []
