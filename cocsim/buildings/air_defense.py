@@ -47,15 +47,13 @@ class AirDefense(ProjectileActiveBuilding):
         return len(cls.LEVELS)
 
     @classmethod
-    def max_attack_distance(cls) -> float:
-        return 10.0
-
-    @classmethod
     def attack_cooldown(cls) -> float:
         return 1.0
 
-    @classmethod
-    def target_type(cls) -> Type["units.Unit"] | None:
+    def max_attack_distance(self) -> float:
+        return 10.0
+
+    def target_type(self) -> Type["units.Unit"] | None:
         return units.AirUnit
 
     def attack_damage(self):

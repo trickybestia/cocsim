@@ -49,20 +49,18 @@ class BombTower(SplashProjectileActiveBuilding):
         return len(cls.LEVELS)
 
     @classmethod
-    def max_attack_distance(cls):
-        return 6.0
-
-    @classmethod
     def attack_cooldown(cls) -> float:
         return 1.1
 
     @classmethod
-    def target_type(cls) -> Type["units.Unit"] | None:
-        return units.GroundUnit
-
-    @classmethod
     def splash_attack_radius(cls):
         return 1.5
+
+    def max_attack_distance(self):
+        return 6.0
+
+    def target_type(self) -> Type["units.Unit"] | None:
+        return units.GroundUnit
 
     def attack_damage(self):
         return self.LEVELS[self.level].attack_damage

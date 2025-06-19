@@ -107,18 +107,15 @@ class ProjectileActiveBuilding(ActiveBuilding):
     def attack_cooldown(cls) -> float: ...
 
     @classmethod
-    def min_attack_distance(cls) -> float:
-        return 0.0
-
-    @classmethod
-    def max_attack_distance(cls) -> float: ...
-
-    @classmethod
-    def target_type(cls) -> Type["units.Unit"] | None: ...
-
-    @classmethod
     def projectile_type(cls) -> Type[Projectile]:
         return TargetProjectile
+
+    def min_attack_distance(self) -> float:
+        return 0.0
+
+    def max_attack_distance(self) -> float: ...
+
+    def target_type(self) -> Type["units.Unit"] | None: ...
 
     def attack_damage(self) -> float: ...
 

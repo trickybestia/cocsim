@@ -49,20 +49,18 @@ class WizardTower(SplashProjectileActiveBuilding):
         return len(cls.LEVELS)
 
     @classmethod
-    def max_attack_distance(cls):
-        return 7.0
-
-    @classmethod
     def attack_cooldown(cls) -> float:
         return 1.3
 
     @classmethod
-    def target_type(cls) -> Type["units.Unit"] | None:
-        return None
-
-    @classmethod
     def splash_attack_radius(cls):
         return 1.0
+
+    def max_attack_distance(self):
+        return 7.0
+
+    def target_type(self) -> Type["units.Unit"] | None:
+        return None
 
     def attack_damage(self):
         return self.LEVELS[self.level].attack_damage
