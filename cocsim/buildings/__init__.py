@@ -6,6 +6,7 @@ from .simple_building import SimpleBuilding
 from .splash_projectile_active_building import SplashProjectileActiveBuilding
 
 from .air_defense import AirDefense
+from .air_sweeper import AirSweeper
 from .archer_tower import ArcherTower
 from .army_camp import ArmyCamp
 from .barracks import Barracks

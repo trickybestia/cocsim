@@ -1,0 +1,195 @@
+from typing import Union
+from dataclasses import dataclass
+
+import pygame
+
+from .building import BUILDINGS
+from .active_building import ActiveBuilding
+from .. import game, units
+from .colliders import RectCollider
+from ..utils import distance, normalize
+from .option import Option
+from cocsim.consts import *
+
+
+@dataclass
+class AirSweeperLevel:
+    health: float
+    push_strength: float
+
+
+class AirSweeper(ActiveBuilding):
+    MIN_ATTACK_DISTANCE = 1.0
+    MAX_ATTACK_DISTANCE = 15.0
+    ATTACK_COOLDOWN = 5.0
+
+    LEVELS = (
+        AirSweeperLevel(750.0, 1.6),
+        AirSweeperLevel(800.0, 2.0),
+        AirSweeperLevel(850.0, 2.4),
+        AirSweeperLevel(900.0, 2.8),
+        AirSweeperLevel(950.0, 3.2),
+        AirSweeperLevel(1000.0, 3.6),
+        AirSweeperLevel(1050.0, 4.0),
+    )
+
+    ROTATION_OPTION = Option(
+        "rotation",
+        [
+            "right",
+            "right-up",
+            "up",
+            "left-up",
+            "left",
+            "left-down",
+            "down",
+            "right-down",
+        ],
+    )
+
+    target: Union["units.Unit", None]
+    remaining_attack_cooldown: Union[float, None]
+
+    level: int
+    rotation: str  # See ROTATION_OPTION
+
+    @classmethod
+    def width(cls) -> int:
+        return 3
+
+    @classmethod
+    def height(cls) -> int:
+        return 3
+
+    @classmethod
+    def levels(cls) -> int:
+        return len(cls.LEVELS)
+
+    @classmethod
+    def options(cls) -> list[Option]:
+        return super().options() + [cls.ROTATION_OPTION]
+
+    def __init__(
+        self, game: "game.Game", x: float, y: float, level: int, rotation: str
+    ):
+        super().__init__(
+            game,
+            x,
+            y,
+            self.LEVELS[level].health,
+            RectCollider.from_center(
+                x + self.width() / 2,
+                y + self.height() / 2,
+                self.width() * 0.65,
+                self.height() * 0.65,
+            ),
+        )
+
+        self.level = level
+        self.rotation = rotation
+
+        self.target = None
+        self.remaining_attack_cooldown = None
+
+    def tick(self, delta_t: float):
+        i = 0
+
+        while i != len(self.projectiles):
+            self.projectiles[i].tick(delta_t)
+
+            if self.projectiles[i].movement_completed:
+                del self.projectiles[i]
+            else:
+                i += 1
+
+        if self.destroyed:
+            self.target = None
+            self.remaining_attack_cooldown = None
+
+            return
+
+        center_x, center_y = self.center
+
+        if (
+            self.target is None
+            or self.target.dead
+            or not (
+                self.MIN_ATTACK_DISTANCE
+                <= distance(center_x, center_y, self.target.x, self.target.y)
+                <= self.MAX_ATTACK_DISTANCE
+            )
+        ):
+            self.target = self._find_target()
+
+            if self.target is None:
+                self.remaining_attack_cooldown = None
+            else:
+                self.remaining_attack_cooldown = self.ATTACK_COOLDOWN
+
+        if self.target is not None:
+            self.remaining_attack_cooldown = max(
+                0.0, self.remaining_attack_cooldown - delta_t
+            )
+
+            if self.remaining_attack_cooldown == 0.0:
+                target_distance = distance(
+                    self.center[0], self.center[1], self.target.x, self.target.y
+                )
+
+                self.projectiles.append(
+                    self.projectile_type()(
+                        self,
+                        target_distance / self.projectile_speed(),
+                        self.target,
+                    )
+                )
+                self.remaining_attack_cooldown = self.ATTACK_COOLDOWN
+
+    def draw(self):
+        if not self.destroyed and self.target is not None:
+            for projectile in self.projectiles:
+                projectile.draw()
+
+            pygame.draw.line(
+                self.game.screen,
+                pygame.Color(255, 0, 0),
+                (
+                    self.center[0] * PIXELS_PER_TILE,
+                    self.center[1] * PIXELS_PER_TILE,
+                ),
+                (
+                    self.target.x * PIXELS_PER_TILE,
+                    self.target.y * PIXELS_PER_TILE,
+                ),
+            )
+
+    def _find_target(self) -> Union["units.Unit", None]:
+        center_x, center_y = self.center
+
+        min_distance = None
+        min_distance_target = None
+
+        for unit in self.game.units:
+            if unit.dead:
+                continue
+
+            if not isinstance(unit, units.AirUnit):
+                continue
+
+            current_distance = distance(center_x, center_y, unit.x, unit.y)
+
+            if not (
+                self.MIN_ATTACK_DISTANCE
+                <= current_distance
+                <= self.MAX_ATTACK_DISTANCE
+            ):
+                continue
+
+            if min_distance is None or current_distance < min_distance:
+                min_distance = current_distance
+                min_distance_target = unit
+
+        return min_distance_target
+
+
+BUILDINGS.append(AirSweeper)
