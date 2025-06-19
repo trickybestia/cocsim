@@ -93,7 +93,8 @@ class Game:
         for building_dto in map["buildings"]:
             building_type = buildings.BUILDINGS_DICT[building_dto["name"]]
             options = [
-                building_dto[option.name] for option in building_type.options()
+                building_dto["options"][option.name]
+                for option in building_type.options()
             ]
             building = building_type(
                 self,

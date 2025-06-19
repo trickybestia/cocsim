@@ -1,4 +1,4 @@
-from typing import TypedDict
+from typing import NotRequired, TypedDict
 
 
 class Map(TypedDict):
@@ -15,3 +15,4 @@ class MapBuilding(TypedDict):
     level: int
     x: int
     y: int
+    options: NotRequired[dict[str, object]]
