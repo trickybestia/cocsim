@@ -13,6 +13,7 @@ from .bomb_tower import BombTower
 from .builders_hut import BuildersHut
 from .cannon import Cannon
 from .clan_castle import ClanCastle
+from .dark_elixir_storage import DarkElixirStorage
 from .elixir_collector import ElixirCollector
 from .elixir_storage import ElixirStorage
 from .goblin_hut import GoblinHut
