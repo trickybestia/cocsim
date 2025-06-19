@@ -2,6 +2,7 @@ from typing import Callable, Type
 
 from .. import game
 from .colliders import Collider
+from .option import Option
 
 BUILDINGS: list[Type["Building"]] = []
 
@@ -24,6 +25,10 @@ class Building:
     @classmethod
     def levels(cls) -> int:
         """Returns levels count."""
+
+    @classmethod
+    def options(cls) -> list[Option]:
+        return []
 
     @property
     def center(self) -> tuple[float, float]:

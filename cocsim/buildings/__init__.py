@@ -25,5 +25,8 @@ from .mortar import Mortar
 from .townhall import TownHall
 from .wall import Wall
 from .wizard_tower import WizardTower
+from .x_bow import XBow
+
+from .option import Option
 
 BUILDINGS_DICT = dict((building.__name__, building) for building in BUILDINGS)

@@ -91,11 +91,16 @@ class Game:
             self._base_image = None
 
         for building_dto in map["buildings"]:
-            building = buildings.BUILDINGS_DICT[building_dto["name"]](
+            building_type = buildings.BUILDINGS_DICT[building_dto["name"]]
+            options = [
+                building_dto[option.name] for option in building_type.options()
+            ]
+            building = building_type(
                 self,
                 building_dto["x"],
                 building_dto["y"],
                 building_dto["level"],
+                *options,
             )
             building.on_destroyed.add(self._on_building_destroyed)
 
