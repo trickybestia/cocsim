@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { twMerge } from "tailwind-merge";
 
 import composeBaseImages from "../../utils/compose-base-images";
 import readFiles from "../../utils/read-files";
@@ -6,7 +7,9 @@ import GridImage from "./GridImage";
 
 type URLBlob = { blob: Blob; url: string };
 
-type Props = { onComposed: (image: Blob) => void };
+type Props = React.HTMLAttributes<HTMLDivElement> & {
+  onComposed?: (image: Blob) => void;
+};
 
 const Foo: React.FC<Props> = (props: Props) => {
   const [leftImages, setLeftImages] = useState<URLBlob[]>([]);
@@ -90,7 +93,7 @@ const Foo: React.FC<Props> = (props: Props) => {
   }
 
   const onComposeButtonClick = () => {
-    props.onComposed(
+    props.onComposed?.(
       composeBaseImages(
         leftImages.map((image) => image.blob),
         rightImages.map((image) => image.blob)
@@ -99,7 +102,13 @@ const Foo: React.FC<Props> = (props: Props) => {
   };
 
   return (
-    <div className="flex flex-col gap-2 items-end">
+    <div
+      {...props}
+      className={twMerge(
+        "flex flex-col gap-2 items-end overflow-y-scroll",
+        props.className
+      )}
+    >
       <button
         className="cursor-pointer font-bold text-base bg-blue-400 hover:bg-blue-600 text-white px-2 py-1"
         onClick={onComposeButtonClick}
