@@ -3,7 +3,6 @@ import { useState } from "react";
 import composeBaseImages from "../../utils/compose-base-images";
 import readFiles from "../../utils/read-files";
 import GridImage from "./GridImage";
-import styles from "./index.module.scss";
 
 type URLBlob = { blob: Blob; url: string };
 
@@ -91,9 +90,9 @@ const Foo: React.FC<Props> = (props: Props) => {
   }
 
   return (
-    <div className={styles["compose-base-images"]}>
+    <div>
       <button
-        className={styles["compose-button"]}
+        className="float-right cursor-pointer ml-2 bg-blue-400 hover:bg-blue-600 text-white text-sm font-bold rounded px-2 py-1"
         onClick={() => {
           props.onComposed(
             composeBaseImages(
@@ -105,9 +104,9 @@ const Foo: React.FC<Props> = (props: Props) => {
       >
         Compose
       </button>
-      <div className={styles["images"]}>
-        <div className={styles["column"]}>{leftColumn}</div>
-        <div className={styles["column"]}>{rightColumn}</div>
+      <div>
+        <div>{leftColumn}</div>
+        <div>{rightColumn}</div>
       </div>
     </div>
   );

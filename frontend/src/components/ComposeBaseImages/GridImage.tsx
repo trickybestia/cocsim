@@ -1,7 +1,5 @@
 import React from "react";
 
-import styles from "./index.module.scss";
-
 type Props = {
   src: string;
   sideText: string;
@@ -14,7 +12,7 @@ type Props = {
 
 const GridImage: React.FC<Props> = (props: Props) => {
   return (
-    <div className={styles["grid-image"]}>
+    <div>
       <img src={props.src} />
     </div>
   );

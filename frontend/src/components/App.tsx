@@ -1,5 +1,4 @@
-import ComposeBaseImages from "../ComposeBaseImages";
-import styles from "./index.module.scss";
+import ComposeBaseImages from "./ComposeBaseImages";
 
 function App() {
   return (
