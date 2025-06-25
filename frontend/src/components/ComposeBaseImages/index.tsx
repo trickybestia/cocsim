@@ -35,7 +35,7 @@ const Foo: React.FC<Props> = (props: Props) => {
 
   const leftColumn = [
     <button
-      className="cursor-pointer font-bold text-base bg-blue-400 hover:bg-blue-600 text-white px-2 py-1"
+      className="cursor-pointer bg-blue-400 px-2 py-1 text-base font-bold text-white hover:bg-blue-600"
       key="0"
       onClick={() => addImages(leftImages, setLeftImages, 0)}
     >
@@ -44,7 +44,7 @@ const Foo: React.FC<Props> = (props: Props) => {
   ];
   const rightColumn = [
     <button
-      className="cursor-pointer font-bold text-base bg-blue-400 hover:bg-blue-600 text-white px-2 py-1"
+      className="cursor-pointer bg-blue-400 px-2 py-1 text-base font-bold text-white hover:bg-blue-600"
       key="0"
       onClick={() => addImages(rightImages, setRightImages, 0)}
     >
@@ -63,7 +63,7 @@ const Foo: React.FC<Props> = (props: Props) => {
     );
     leftColumn.push(
       <button
-        className="cursor-pointer font-bold text-base bg-blue-400 hover:bg-blue-600 text-white px-2 py-1"
+        className="cursor-pointer bg-blue-400 px-2 py-1 text-base font-bold text-white hover:bg-blue-600"
         key={url + "_btn"}
         onClick={onAddImagesButtonClick}
       >
@@ -83,7 +83,7 @@ const Foo: React.FC<Props> = (props: Props) => {
     );
     rightColumn.push(
       <button
-        className="cursor-pointer font-bold text-base bg-blue-400 hover:bg-blue-600 text-white px-2 py-1"
+        className="cursor-pointer bg-blue-400 px-2 py-1 text-base font-bold text-white hover:bg-blue-600"
         key={url + "_btn"}
         onClick={onAddImagesButtonClick}
       >
@@ -105,19 +105,19 @@ const Foo: React.FC<Props> = (props: Props) => {
     <div
       {...props}
       className={twMerge(
-        "flex flex-col gap-2 items-end overflow-y-scroll",
+        "flex flex-col items-end gap-2 overflow-y-scroll",
         props.className
       )}
     >
       <button
-        className="cursor-pointer font-bold text-base bg-blue-400 hover:bg-blue-600 text-white px-2 py-1"
+        className="cursor-pointer bg-blue-400 px-2 py-1 text-base font-bold text-white hover:bg-blue-600"
         onClick={onComposeButtonClick}
       >
         Compose
       </button>
-      <div className="flex gap-2 w-full">
-        <div className="flex flex-col gap-2 flex-1">{leftColumn}</div>
-        <div className="flex flex-col gap-2 flex-1">{rightColumn}</div>
+      <div className="flex w-full gap-2">
+        <div className="flex flex-1 flex-col gap-2">{leftColumn}</div>
+        <div className="flex flex-1 flex-col gap-2">{rightColumn}</div>
       </div>
     </div>
   );
