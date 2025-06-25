@@ -2,7 +2,7 @@ import ComposeBaseImages from "./ComposeBaseImages";
 
 function App() {
   return (
-    <div style={{ width: "1000px", height: "600px" }}>
+    <div className="p-4 w-[800px] h-[600px]">
       <ComposeBaseImages onComposed={(image) => console.log(image)} />
     </div>
   );

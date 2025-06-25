@@ -31,12 +31,20 @@ const Foo: React.FC<Props> = (props: Props) => {
   };
 
   const leftColumn = [
-    <button key="0" onClick={() => addImages(leftImages, setLeftImages, 0)}>
+    <button
+      className="cursor-pointer font-bold text-base bg-blue-400 hover:bg-blue-600 text-white px-2 py-1"
+      key="0"
+      onClick={() => addImages(leftImages, setLeftImages, 0)}
+    >
       +
     </button>
   ];
   const rightColumn = [
-    <button key="0" onClick={() => addImages(rightImages, setRightImages, 0)}>
+    <button
+      className="cursor-pointer font-bold text-base bg-blue-400 hover:bg-blue-600 text-white px-2 py-1"
+      key="0"
+      onClick={() => addImages(rightImages, setRightImages, 0)}
+    >
       +
     </button>
   ];
@@ -44,21 +52,17 @@ const Foo: React.FC<Props> = (props: Props) => {
   for (let i = 0; i != leftImages.length; i++) {
     const url = leftImages[i].url;
 
+    const onAddImagesButtonClick = () =>
+      addImages(leftImages, setLeftImages, i + 1);
+
     leftColumn.push(
-      <GridImage
-        key={url + "_img"}
-        src={url}
-        sideText="to right"
-        onClose={() => {}}
-        onUp={() => {}}
-        onDown={() => {}}
-        onSide={() => {}}
-      />
+      <GridImage key={url + "_img"} src={url} sideText="to right" />
     );
     leftColumn.push(
       <button
+        className="cursor-pointer font-bold text-base bg-blue-400 hover:bg-blue-600 text-white px-2 py-1"
         key={url + "_btn"}
-        onClick={() => addImages(leftImages, setLeftImages, i + 1)}
+        onClick={onAddImagesButtonClick}
       >
         +
       </button>
@@ -68,45 +72,43 @@ const Foo: React.FC<Props> = (props: Props) => {
   for (let i = 0; i != rightImages.length; i++) {
     const url = rightImages[i].url;
 
+    const onAddImagesButtonClick = () =>
+      addImages(rightImages, setRightImages, i + 1);
+
     rightColumn.push(
-      <GridImage
-        key={url + "_img"}
-        src={url}
-        sideText="to left"
-        onClose={() => {}}
-        onUp={() => {}}
-        onDown={() => {}}
-        onSide={() => {}}
-      />
+      <GridImage key={url + "_img"} src={url} sideText="to left" />
     );
     rightColumn.push(
       <button
+        className="cursor-pointer font-bold text-base bg-blue-400 hover:bg-blue-600 text-white px-2 py-1"
         key={url + "_btn"}
-        onClick={() => addImages(rightImages, setRightImages, i + 1)}
+        onClick={onAddImagesButtonClick}
       >
         +
       </button>
     );
   }
 
+  const onComposeButtonClick = () => {
+    props.onComposed(
+      composeBaseImages(
+        leftImages.map((image) => image.blob),
+        rightImages.map((image) => image.blob)
+      )
+    );
+  };
+
   return (
-    <div>
+    <div className="flex flex-col gap-2 items-end">
       <button
-        className="float-right cursor-pointer ml-2 bg-blue-400 hover:bg-blue-600 text-white text-sm font-bold rounded px-2 py-1"
-        onClick={() => {
-          props.onComposed(
-            composeBaseImages(
-              leftImages.map((image) => image.blob),
-              rightImages.map((image) => image.blob)
-            )
-          );
-        }}
+        className="cursor-pointer font-bold text-base bg-blue-400 hover:bg-blue-600 text-white px-2 py-1"
+        onClick={onComposeButtonClick}
       >
         Compose
       </button>
-      <div>
-        <div>{leftColumn}</div>
-        <div>{rightColumn}</div>
+      <div className="flex gap-2 w-full">
+        <div className="flex flex-col gap-2 flex-1">{leftColumn}</div>
+        <div className="flex flex-col gap-2 flex-1">{rightColumn}</div>
       </div>
     </div>
   );
