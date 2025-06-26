@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { twMerge } from "tailwind-merge";
 
-import composeBaseImages from "../../utils/compose-base-images";
+import { composeBaseImages } from "../../api";
 import readFiles from "../../utils/read-files";
 import GridImage from "./GridImage";
 
@@ -190,12 +190,10 @@ const ComposeBaseImages: React.FC<Props> = ({
   }
 
   const onComposeButtonClick = () => {
-    onComposed?.(
-      composeBaseImages(
-        leftImages.map((image) => image.blob),
-        rightImages.map((image) => image.blob)
-      )
-    );
+    composeBaseImages(
+      leftImages.map((image) => image.blob),
+      rightImages.map((image) => image.blob)
+    ).then(console.log);
   };
 
   return (
