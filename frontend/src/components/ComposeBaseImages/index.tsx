@@ -11,7 +11,13 @@ type Props = React.HTMLAttributes<HTMLDivElement> & {
   onComposed?: (image: Blob) => void;
 };
 
-const Foo: React.FC<Props> = (props: Props) => {
+const ComposeBaseImages: React.FC<Props> = ({
+  className,
+
+  onComposed,
+
+  ...props
+}: Props) => {
   const [leftImages, setLeftImages] = useState<URLBlob[]>([]);
   const [rightImages, setRightImages] = useState<URLBlob[]>([]);
 
@@ -31,6 +37,65 @@ const Foo: React.FC<Props> = (props: Props) => {
 
       setImages(newImages);
     }, "image/*");
+  };
+
+  const removeImage = (
+    images: URLBlob[],
+    setImages: React.Dispatch<React.SetStateAction<URLBlob[]>>,
+    index: number
+  ) => {
+    const newImages = images.slice();
+
+    newImages.splice(index, 1);
+
+    setImages(newImages);
+  };
+
+  const moveImageUp = (
+    images: URLBlob[],
+    setImages: React.Dispatch<React.SetStateAction<URLBlob[]>>,
+    index: number
+  ) => {
+    if (index === 0) return;
+
+    const newImages = images.slice();
+
+    newImages.splice(index, 1);
+    newImages.splice(index - 1, 0, images[index]);
+
+    setImages(newImages);
+  };
+
+  const moveImageDown = (
+    images: URLBlob[],
+    setImages: React.Dispatch<React.SetStateAction<URLBlob[]>>,
+    index: number
+  ) => {
+    if (index === images.length - 1) return;
+
+    const newImages = images.slice();
+
+    newImages.splice(index, 1);
+    newImages.splice(index + 1, 0, images[index]);
+
+    setImages(newImages);
+  };
+
+  const moveImageSide = (
+    images: URLBlob[],
+    setImages: React.Dispatch<React.SetStateAction<URLBlob[]>>,
+    otherImages: URLBlob[],
+    setOtherImages: React.Dispatch<React.SetStateAction<URLBlob[]>>,
+    index: number
+  ) => {
+    const newOtherImages = otherImages.slice();
+    newOtherImages.splice(index, 0, images[index]);
+
+    const newImages = images.slice();
+    newImages.splice(index, 1);
+
+    setImages(newImages);
+    setOtherImages(newOtherImages);
   };
 
   const leftColumn = [
@@ -59,7 +124,23 @@ const Foo: React.FC<Props> = (props: Props) => {
       addImages(leftImages, setLeftImages, i + 1);
 
     leftColumn.push(
-      <GridImage key={url + "_img"} src={url} sideText="to right" />
+      <GridImage
+        key={url + "_img"}
+        src={url}
+        sideDirection="right"
+        onClose={() => removeImage(leftImages, setLeftImages, i)}
+        onUp={() => moveImageUp(leftImages, setLeftImages, i)}
+        onDown={() => moveImageDown(leftImages, setLeftImages, i)}
+        onSide={() =>
+          moveImageSide(
+            leftImages,
+            setLeftImages,
+            rightImages,
+            setRightImages,
+            i
+          )
+        }
+      />
     );
     leftColumn.push(
       <button
@@ -79,7 +160,23 @@ const Foo: React.FC<Props> = (props: Props) => {
       addImages(rightImages, setRightImages, i + 1);
 
     rightColumn.push(
-      <GridImage key={url + "_img"} src={url} sideText="to left" />
+      <GridImage
+        key={url + "_img"}
+        src={url}
+        sideDirection="left"
+        onClose={() => removeImage(rightImages, setRightImages, i)}
+        onUp={() => moveImageUp(rightImages, setRightImages, i)}
+        onDown={() => moveImageDown(rightImages, setRightImages, i)}
+        onSide={() =>
+          moveImageSide(
+            rightImages,
+            setRightImages,
+            leftImages,
+            setLeftImages,
+            i
+          )
+        }
+      />
     );
     rightColumn.push(
       <button
@@ -93,7 +190,7 @@ const Foo: React.FC<Props> = (props: Props) => {
   }
 
   const onComposeButtonClick = () => {
-    props.onComposed?.(
+    onComposed?.(
       composeBaseImages(
         leftImages.map((image) => image.blob),
         rightImages.map((image) => image.blob)
@@ -103,11 +200,11 @@ const Foo: React.FC<Props> = (props: Props) => {
 
   return (
     <div
-      {...props}
       className={twMerge(
-        "flex flex-col items-end gap-2 overflow-y-scroll",
-        props.className
+        className,
+        "flex flex-col items-end gap-2 overflow-y-scroll"
       )}
+      {...props}
     >
       <button
         className="cursor-pointer bg-blue-400 px-2 py-1 text-base font-bold text-white hover:bg-blue-600"
@@ -123,5 +220,5 @@ const Foo: React.FC<Props> = (props: Props) => {
   );
 };
 
-export default Foo;
+export default ComposeBaseImages;
 export type { Props };

@@ -1,6 +1,8 @@
+import { twMerge } from "tailwind-merge";
+
 type Props = React.HTMLAttributes<HTMLDivElement> & {
   src: string;
-  sideText: string;
+  sideDirection: "right" | "left";
 
   onClose?: () => void;
   onUp?: () => void;
@@ -8,10 +10,51 @@ type Props = React.HTMLAttributes<HTMLDivElement> & {
   onSide?: () => void;
 };
 
-const GridImage: React.FC<Props> = (props: Props) => {
+const GridImage: React.FC<Props> = ({
+  className,
+
+  src,
+  sideDirection,
+
+  onClose,
+  onUp,
+  onDown,
+  onSide,
+
+  ...props
+}: Props) => {
   return (
-    <div {...props}>
-      <img src={props.src} />
+    <div className={twMerge(className, "relative")} {...props}>
+      <img src={src} />
+      <div className="absolute top-0 right-0 flex flex-col gap-1 p-1">
+        <button
+          className="block size-6 cursor-pointer bg-red-500 font-mono text-sm font-bold text-white hover:bg-red-700"
+          onClick={onClose}
+        >
+          X
+        </button>
+        <button
+          className="block size-6 cursor-pointer bg-blue-400 font-mono text-sm font-bold text-white hover:bg-blue-600"
+          onClick={onUp}
+        >
+          ⋀
+        </button>
+        <button
+          className="block size-6 cursor-pointer bg-blue-400 font-mono text-sm font-bold text-white hover:bg-blue-600"
+          onClick={onDown}
+        >
+          ⋁
+        </button>
+        <button
+          className={twMerge(
+            sideDirection === "left" ? "rotate-90" : "-rotate-90",
+            "block size-6 cursor-pointer bg-blue-400 font-mono text-sm font-bold text-white hover:bg-blue-600"
+          )}
+          onClick={onSide}
+        >
+          ⋁
+        </button>
+      </div>
     </div>
   );
 };
