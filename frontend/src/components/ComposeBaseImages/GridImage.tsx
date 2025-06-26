@@ -1,5 +1,7 @@
 import { twMerge } from "tailwind-merge";
 
+import MaximizableImage from "../MaximizableImage";
+
 type Props = React.HTMLAttributes<HTMLDivElement> & {
   src: string;
   sideDirection: "right" | "left";
@@ -25,7 +27,7 @@ const GridImage: React.FC<Props> = ({
 }: Props) => {
   return (
     <div className={twMerge(className, "relative")} {...props}>
-      <img src={src} />
+      <MaximizableImage src={src} />
       <div className="absolute top-0 right-0 flex flex-col gap-1 p-1">
         <button
           className="block size-6 cursor-pointer bg-red-500 font-mono text-sm font-bold text-white hover:bg-red-700"
