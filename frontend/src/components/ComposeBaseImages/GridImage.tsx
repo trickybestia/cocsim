@@ -4,9 +4,10 @@ import MaximizableImage from "../MaximizableImage";
 
 type Props = React.HTMLAttributes<HTMLDivElement> & {
   src: string;
-  sideDirection: "right" | "left";
+  sideDirection?: "right" | "left";
 
   onClose?: () => void;
+  onOk?: () => void;
   onUp?: () => void;
   onDown?: () => void;
   onSide?: () => void;
@@ -19,6 +20,7 @@ const GridImage: React.FC<Props> = ({
   sideDirection,
 
   onClose,
+  onOk,
   onUp,
   onDown,
   onSide,
@@ -29,33 +31,49 @@ const GridImage: React.FC<Props> = ({
     <div className={twMerge(className, "relative")} {...props}>
       <MaximizableImage src={src} />
       <div className="absolute top-0 right-0 flex flex-col gap-1 p-1">
-        <button
-          className="block size-6 cursor-pointer bg-red-500 font-mono text-sm font-bold text-white hover:bg-red-700"
-          onClick={onClose}
-        >
-          X
-        </button>
-        <button
-          className="block size-6 cursor-pointer bg-blue-400 font-mono text-sm font-bold text-white hover:bg-blue-600"
-          onClick={onUp}
-        >
-          ⋀
-        </button>
-        <button
-          className="block size-6 cursor-pointer bg-blue-400 font-mono text-sm font-bold text-white hover:bg-blue-600"
-          onClick={onDown}
-        >
-          ⋁
-        </button>
-        <button
-          className={twMerge(
-            sideDirection === "left" ? "rotate-90" : "-rotate-90",
-            "block size-6 cursor-pointer bg-blue-400 font-mono text-sm font-bold text-white hover:bg-blue-600"
-          )}
-          onClick={onSide}
-        >
-          ⋁
-        </button>
+        {onClose !== undefined && (
+          <button
+            className="block size-6 cursor-pointer bg-red-500 font-mono text-sm font-bold text-white hover:bg-red-700"
+            onClick={onClose}
+          >
+            X
+          </button>
+        )}
+        {onOk !== undefined && (
+          <button
+            className="block size-6 cursor-pointer bg-blue-400 font-mono text-sm font-bold text-white hover:bg-blue-600"
+            onClick={onOk}
+          >
+            OK
+          </button>
+        )}
+        {onUp !== undefined && (
+          <button
+            className="block size-6 cursor-pointer bg-blue-400 font-mono text-sm font-bold text-white hover:bg-blue-600"
+            onClick={onUp}
+          >
+            ⋀
+          </button>
+        )}
+        {onDown !== undefined && (
+          <button
+            className="block size-6 cursor-pointer bg-blue-400 font-mono text-sm font-bold text-white hover:bg-blue-600"
+            onClick={onDown}
+          >
+            ⋁
+          </button>
+        )}
+        {onSide !== undefined && (
+          <button
+            className={twMerge(
+              sideDirection === "left" ? "rotate-90" : "-rotate-90",
+              "block size-6 cursor-pointer bg-blue-400 font-mono text-sm font-bold text-white hover:bg-blue-600"
+            )}
+            onClick={onSide}
+          >
+            ⋁
+          </button>
+        )}
       </div>
     </div>
   );

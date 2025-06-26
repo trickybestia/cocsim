@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { twMerge } from "tailwind-merge";
+import { twJoin, twMerge } from "tailwind-merge";
 
 import { composeBaseImages } from "../../api";
 import readFiles from "../../utils/read-files";
@@ -20,6 +20,10 @@ const ComposeBaseImages: React.FC<Props> = ({
 }: Props) => {
   const [leftImages, setLeftImages] = useState<URLBlob[]>([]);
   const [rightImages, setRightImages] = useState<URLBlob[]>([]);
+  const [composedImage, setComposedImage] = useState<URLBlob | undefined>(
+    undefined
+  );
+  const [isComposing, setIsComposing] = useState(false);
 
   const addImages = (
     images: URLBlob[],
@@ -190,10 +194,18 @@ const ComposeBaseImages: React.FC<Props> = ({
   }
 
   const onComposeButtonClick = () => {
+    if (isComposing) return;
+
+    setIsComposing(true);
+
     composeBaseImages(
       leftImages.map((image) => image.blob),
       rightImages.map((image) => image.blob)
-    ).then(console.log);
+    )
+      .then((image) =>
+        setComposedImage({ blob: image, url: URL.createObjectURL(image) })
+      )
+      .finally(() => setIsComposing(false));
   };
 
   return (
@@ -204,11 +216,28 @@ const ComposeBaseImages: React.FC<Props> = ({
       )}
       {...props}
     >
+      {composedImage !== undefined && (
+        <GridImage
+          src={composedImage.url}
+          onClose={() => setComposedImage(undefined)}
+          onOk={() => onComposed?.(composedImage.blob)}
+        />
+      )}
       <button
-        className="cursor-pointer bg-blue-400 px-2 py-1 text-base font-bold text-white hover:bg-blue-600"
+        className={twJoin(
+          !isComposing && "cursor-pointer hover:bg-blue-600",
+          "bg-blue-400 px-2 py-1 text-base font-bold text-white"
+        )}
         onClick={onComposeButtonClick}
       >
-        Compose
+        {isComposing ? (
+          <div
+            className="text-surface inline-block h-6 w-6 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-middle motion-reduce:animate-[spin_1.5s_linear_infinite] dark:text-white"
+            role="status"
+          ></div>
+        ) : (
+          <>Compose</>
+        )}
       </button>
       <div className="flex w-full gap-2">
         <div className="flex flex-1 flex-col gap-2">{leftColumn}</div>
