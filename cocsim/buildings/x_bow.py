@@ -76,7 +76,7 @@ class XBow(ProjectileActiveBuilding):
         return 25.0
 
     def __init__(
-        self, game: "game.Game", x: float, y: float, level: int, target: str
+        self, game: "game.Game", x: int, y: int, level: int, target: str
     ):
         super().__init__(
             game,

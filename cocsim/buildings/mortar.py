@@ -72,7 +72,7 @@ class Mortar(SplashProjectileActiveBuilding):
     def projectile_speed(self) -> float:
         return 5.0
 
-    def __init__(self, game: "game.Game", x: float, y: float, level: int):
+    def __init__(self, game: "game.Game", x: int, y: int, level: int):
         super().__init__(
             game,
             x,

@@ -36,7 +36,7 @@ class ElixirCollector(PassiveBuilding):
     def levels(cls) -> int:
         return len(cls.HEALTH)
 
-    def __init__(self, game: "game.Game", x: float, y: float, level: int):
+    def __init__(self, game: "game.Game", x: int, y: int, level: int):
         super().__init__(
             game,
             x,

@@ -70,7 +70,7 @@ class AirSweeper(ActiveBuilding):
         return super().options() + [cls.ROTATION_OPTION]
 
     def __init__(
-        self, game: "game.Game", x: float, y: float, level: int, rotation: str
+        self, game: "game.Game", x: int, y: int, level: int, rotation: str
     ):
         super().__init__(
             game,
