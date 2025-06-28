@@ -226,42 +226,57 @@ const ComposeBaseImages: React.FC<Props> = ({
 
   return (
     <div
-      className={twMerge(
-        className,
-        "flex flex-col items-end gap-2 overflow-y-scroll"
-      )}
+      className={twMerge(className, "flex flex-col gap-2 overflow-y-scroll")}
       {...props}
     >
-      {reversedImage !== undefined && (
-        <GridImage
-          src={reversedImage.url}
-          onClose={() => setReversedImage(undefined)}
-          onOk={() => onDone?.(reversedImage.blob)}
-        />
-      )}
-      {composedImage !== undefined && (
-        <GridImage
-          src={composedImage.url}
-          onClose={() => setComposedImage(undefined)}
-          onOk={onComposedImageOk}
-        />
-      )}
-      <button
-        className={twJoin(
-          !isComposing && "cursor-pointer hover:bg-blue-600",
-          "bg-blue-400 px-2 py-1 text-base font-bold text-white"
+      <div className="flex gap-2">
+        {composedImage !== undefined && (
+          <div className="flex shrink grow basis-0 flex-col gap-2">
+            <h3 className="inline-block bg-yellow-300 px-1 text-lg">
+              🔍️ Step 2: Check if composed image looks good
+            </h3>
+            <GridImage
+              src={composedImage.url}
+              onClose={() => setComposedImage(undefined)}
+              onOk={onComposedImageOk}
+            />
+          </div>
         )}
-        onClick={onComposeButtonClick}
-      >
-        {isComposing ? (
-          <div
-            className="text-surface inline-block h-6 w-6 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-middle motion-reduce:animate-[spin_1.5s_linear_infinite] dark:text-white"
-            role="status"
-          ></div>
-        ) : (
-          <>Compose</>
+        {reversedImage !== undefined && (
+          <div className="flex shrink grow basis-0 flex-col gap-2">
+            <h3 className="inline-block bg-yellow-300 px-1 text-lg">
+              🔍️ Step 3: Check if rotated image looks good
+            </h3>
+            <GridImage
+              src={reversedImage.url}
+              onClose={() => setReversedImage(undefined)}
+              onOk={() => onDone?.(reversedImage.blob)}
+            />
+          </div>
         )}
-      </button>
+      </div>
+      <div className="flex items-baseline justify-between">
+        <h3 className="inline-block bg-yellow-300 px-1 text-lg">
+          🔍️ Step 1: Select images to compose
+        </h3>
+        <button
+          className={twJoin(
+            !isComposing && "cursor-pointer hover:bg-blue-600",
+            "bg-blue-400 px-2 py-1 text-base font-bold text-white"
+          )}
+          onClick={onComposeButtonClick}
+        >
+          {isComposing ? (
+            <div
+              className="text-surface inline-block h-6 w-6 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-middle motion-reduce:animate-[spin_1.5s_linear_infinite] dark:text-white"
+              role="status"
+            ></div>
+          ) : (
+            <>Compose</>
+          )}
+        </button>
+      </div>
+
       <div className="flex w-full gap-2">
         <div className="flex flex-1 flex-col gap-2">{leftColumn}</div>
         <div className="flex flex-1 flex-col gap-2">{rightColumn}</div>
