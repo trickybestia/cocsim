@@ -1,10 +1,19 @@
 from dataclasses import dataclass
-from typing import Type
+from typing import Literal, Type
+
+from pydantic import BaseModel
 
 from .building import BUILDINGS
 from .splash_projectile_active_building import SplashProjectileActiveBuilding
 from .. import game, units
 from .colliders import RectCollider
+
+
+class WizardTowerModel(BaseModel):
+    name: Literal["WizardTower"]
+    x: int
+    y: int
+    level: int
 
 
 @dataclass(frozen=True)
@@ -49,6 +58,10 @@ class WizardTower(SplashProjectileActiveBuilding):
         return len(cls.LEVELS)
 
     @classmethod
+    def model(cls) -> Type[WizardTowerModel]:
+        return WizardTowerModel
+
+    @classmethod
     def attack_cooldown(cls) -> float:
         return 1.3
 
@@ -86,6 +99,12 @@ class WizardTower(SplashProjectileActiveBuilding):
         )
 
         self.level = level
+
+    @classmethod
+    def from_model(
+        cls, game: "game.Game", model: WizardTowerModel
+    ) -> "WizardTower":
+        return cls(game, model.x, model.y, model.level)
 
 
 BUILDINGS.append(WizardTower)

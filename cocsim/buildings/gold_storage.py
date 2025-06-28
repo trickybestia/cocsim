@@ -1,7 +1,18 @@
+from typing import Literal, Type
+
+from pydantic import BaseModel
+
 from .building import BUILDINGS
 from .passive_building import PassiveBuilding
 from .. import game
 from .colliders import RectCollider
+
+
+class GoldStorageModel(BaseModel):
+    name: Literal["GoldStorage"]
+    x: int
+    y: int
+    level: int
 
 
 class GoldStorage(PassiveBuilding):
@@ -38,6 +49,10 @@ class GoldStorage(PassiveBuilding):
     def levels(cls) -> int:
         return len(cls.HEALTH)
 
+    @classmethod
+    def model(cls) -> Type[GoldStorageModel]:
+        return GoldStorageModel
+
     def __init__(self, game: "game.Game", x: int, y: int, level: int):
         super().__init__(
             game,
@@ -51,6 +66,12 @@ class GoldStorage(PassiveBuilding):
                 self.height() * 0.65,
             ),
         )
+
+    @classmethod
+    def from_model(
+        cls, game: "game.Game", model: GoldStorageModel
+    ) -> "GoldStorage":
+        return cls(game, model.x, model.y, model.level)
 
 
 BUILDINGS.append(GoldStorage)

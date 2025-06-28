@@ -1,11 +1,27 @@
 from dataclasses import dataclass
-from typing import Type
+from enum import StrEnum
+from typing import Literal, Type
+
+from pydantic import BaseModel
 
 from .building import BUILDINGS
 from .projectile_active_building import ProjectileActiveBuilding
 from .. import game, units
 from .colliders import RectCollider
 from .option import Option
+
+
+class XBowTargetType(StrEnum):
+    Ground = "Ground"
+    AirGround = "Air & Ground"
+
+
+class XBowModel(BaseModel):
+    name: Literal["XBow"]
+    x: int
+    y: int
+    level: int
+    target: XBowTargetType
 
 
 @dataclass(frozen=True)
@@ -30,7 +46,9 @@ class XBow(ProjectileActiveBuilding):
         XBowLevel(4800.0, 30.08),
     )
 
-    TARGET_TYPE_OPTION = Option("target", ["Ground", "Air & Ground"])
+    TARGET_TYPE_OPTION = Option(
+        "target", [member.value for member in XBowTargetType]
+    )
 
     target_type_: Type["units.Unit"] | None
     level: int
@@ -50,6 +68,10 @@ class XBow(ProjectileActiveBuilding):
     @classmethod
     def options(cls) -> list[Option]:
         return super().options() + [cls.TARGET_TYPE_OPTION]
+
+    @classmethod
+    def model(cls) -> Type[XBowModel]:
+        return XBowModel
 
     @classmethod
     def attack_cooldown(cls) -> float:
@@ -76,7 +98,12 @@ class XBow(ProjectileActiveBuilding):
         return 25.0
 
     def __init__(
-        self, game: "game.Game", x: int, y: int, level: int, target: str
+        self,
+        game: "game.Game",
+        x: int,
+        y: int,
+        level: int,
+        target: XBowTargetType,
     ):
         super().__init__(
             game,
@@ -94,12 +121,14 @@ class XBow(ProjectileActiveBuilding):
         self.level = level
 
         match target:
-            case "Ground":
+            case XBowTargetType.Ground:
                 self.target_type_ = units.GroundUnit
-            case "Air & Ground":
+            case XBowTargetType.AirGround:
                 self.target_type_ = None
-            case _:
-                raise ValueError()
+
+    @classmethod
+    def from_model(cls, game: "game.Game", model: XBowModel) -> "XBow":
+        return cls(game, model.x, model.y, model.level, model.target)
 
 
 BUILDINGS.append(XBow)

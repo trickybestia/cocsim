@@ -1,10 +1,19 @@
 from dataclasses import dataclass
-from typing import Type
+from typing import Literal, Type
+
+from pydantic import BaseModel
 
 from .building import BUILDINGS
 from .splash_projectile_active_building import SplashProjectileActiveBuilding
 from .. import game, units
 from .colliders import RectCollider
+
+
+class BombTowerModel(BaseModel):
+    name: Literal["BombTower"]
+    x: int
+    y: int
+    level: int
 
 
 @dataclass(frozen=True)
@@ -49,6 +58,10 @@ class BombTower(SplashProjectileActiveBuilding):
         return len(cls.LEVELS)
 
     @classmethod
+    def model(cls) -> Type[BombTowerModel]:
+        return BombTowerModel
+
+    @classmethod
     def attack_cooldown(cls) -> float:
         return 1.1
 
@@ -85,6 +98,12 @@ class BombTower(SplashProjectileActiveBuilding):
         self.level = level
         self.death_damage_cooldown = 1.0
         self.death_damage_apllied = False
+
+    @classmethod
+    def from_model(
+        cls, game: "game.Game", model: BombTowerModel
+    ) -> "BombTower":
+        return cls(game, model.x, model.y, model.level)
 
     def tick(self, delta_t):
         super().tick(delta_t)

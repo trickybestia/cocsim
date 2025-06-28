@@ -1,10 +1,19 @@
 from dataclasses import dataclass
-from typing import Type
+from typing import Literal, Type
+
+from pydantic import BaseModel
 
 from .building import BUILDINGS
 from .splash_projectile_active_building import SplashProjectileActiveBuilding
 from .. import game, units
 from .colliders import RectCollider
+
+
+class MortarModel(BaseModel):
+    name: Literal["Mortar"]
+    x: int
+    y: int
+    level: int
 
 
 @dataclass(frozen=True)
@@ -49,6 +58,10 @@ class Mortar(SplashProjectileActiveBuilding):
         return len(cls.LEVELS)
 
     @classmethod
+    def model(cls) -> Type[MortarModel]:
+        return MortarModel
+
+    @classmethod
     def min_attack_distance(cls):
         return 4.0
 
@@ -87,6 +100,10 @@ class Mortar(SplashProjectileActiveBuilding):
         )
 
         self.level = level
+
+    @classmethod
+    def from_model(cls, game: "game.Game", model: MortarModel) -> "Mortar":
+        return cls(game, model.x, model.y, model.level)
 
 
 BUILDINGS.append(Mortar)

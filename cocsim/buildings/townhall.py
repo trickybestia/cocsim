@@ -1,7 +1,18 @@
+from typing import Literal, Type
+
+from pydantic import BaseModel
+
 from .building import BUILDINGS
 from .passive_building import PassiveBuilding
 from .. import game
 from .colliders import RectCollider
+
+
+class TownHallModel(BaseModel):
+    name: Literal["TownHall"]
+    x: int
+    y: int
+    level: int
 
 
 class TownHall(PassiveBuilding):
@@ -37,6 +48,10 @@ class TownHall(PassiveBuilding):
     def levels(cls) -> int:
         return len(cls.HEALTH)
 
+    @classmethod
+    def model(cls) -> Type[TownHallModel]:
+        return TownHallModel
+
     def __init__(self, game: "game.Game", x: int, y: int, level: int):
         super().__init__(
             game,
@@ -50,6 +65,10 @@ class TownHall(PassiveBuilding):
                 self.height() * 0.8,
             ),
         )
+
+    @classmethod
+    def from_model(cls, game: "game.Game", model: TownHallModel) -> "TownHall":
+        return cls(game, model.x, model.y, model.level)
 
 
 BUILDINGS.append(TownHall)

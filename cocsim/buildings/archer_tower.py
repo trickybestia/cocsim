@@ -1,10 +1,19 @@
 from dataclasses import dataclass
-from typing import Type
+from typing import Literal, Type
+
+from pydantic import BaseModel
 
 from .building import BUILDINGS
 from .projectile_active_building import ProjectileActiveBuilding
 from .. import game, units
 from .colliders import RectCollider
+
+
+class ArcherTowerModel(BaseModel):
+    name: Literal["ArcherTower"]
+    x: int
+    y: int
+    level: int
 
 
 @dataclass(frozen=True)
@@ -53,6 +62,10 @@ class ArcherTower(ProjectileActiveBuilding):
         return len(cls.LEVELS)
 
     @classmethod
+    def model(cls) -> Type[ArcherTowerModel]:
+        return ArcherTowerModel
+
+    @classmethod
     def attack_cooldown(cls) -> float:
         return 0.5
 
@@ -83,6 +96,12 @@ class ArcherTower(ProjectileActiveBuilding):
         )
 
         self.level = level
+
+    @classmethod
+    def from_model(
+        cls, game: "game.Game", model: ArcherTowerModel
+    ) -> "ArcherTower":
+        return cls(game, model.x, model.y, model.level)
 
 
 BUILDINGS.append(ArcherTower)

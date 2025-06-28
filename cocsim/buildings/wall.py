@@ -1,7 +1,18 @@
+from typing import Literal, Type
+
+from pydantic import BaseModel
+
 from .building import BUILDINGS
 from .passive_building import PassiveBuilding
 from .. import game
 from .colliders import RectCollider, ListCollider
+
+
+class WallModel(BaseModel):
+    name: Literal["Wall"]
+    x: int
+    y: int
+    level: int
 
 
 class Wall(PassiveBuilding):
@@ -38,6 +49,10 @@ class Wall(PassiveBuilding):
     def levels(cls) -> int:
         return len(cls.HEALTH)
 
+    @classmethod
+    def model(cls) -> Type[WallModel]:
+        return WallModel
+
     def __init__(self, game: "game.Game", x: int, y: int, level: int):
         super().__init__(
             game,
@@ -51,6 +66,10 @@ class Wall(PassiveBuilding):
                 self.height() * 0.65,
             ),
         )
+
+    @classmethod
+    def from_model(cls, game: "game.Game", model: WallModel) -> "Wall":
+        return cls(game, model.x, model.y, model.level)
 
     def update_collision(self):
         self.collider = self._get_collider()

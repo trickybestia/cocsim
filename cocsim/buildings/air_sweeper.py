@@ -1,6 +1,8 @@
-from typing import Union
+from enum import StrEnum
+from typing import Literal, Type, Union
 from dataclasses import dataclass
 
+from pydantic import BaseModel
 import pygame
 
 from .building import BUILDINGS
@@ -10,6 +12,25 @@ from .colliders import RectCollider
 from ..utils import distance, normalize
 from .option import Option
 from cocsim.consts import *
+
+
+class AirSweeperRotation(StrEnum):
+    Right = "right"
+    RightUp = "right-up"
+    Up = "up"
+    LeftUp = "left-up"
+    Left = "left"
+    LeftDown = "left-down"
+    Down = "down"
+    RightDown = "right-down"
+
+
+class AirSweeperModel(BaseModel):
+    name: Literal["AirSweeper"]
+    x: int
+    y: int
+    level: int
+    rotation: AirSweeperRotation
 
 
 @dataclass
@@ -35,23 +56,14 @@ class AirSweeper(ActiveBuilding):
 
     ROTATION_OPTION = Option(
         "rotation",
-        [
-            "right",
-            "right-up",
-            "up",
-            "left-up",
-            "left",
-            "left-down",
-            "down",
-            "right-down",
-        ],
+        [member.value for member in AirSweeperRotation],
     )
 
     target: Union["units.Unit", None]
     remaining_attack_cooldown: Union[float, None]
 
     level: int
-    rotation: str  # See ROTATION_OPTION
+    rotation: AirSweeperRotation
 
     @classmethod
     def width(cls) -> int:
@@ -69,8 +81,17 @@ class AirSweeper(ActiveBuilding):
     def options(cls) -> list[Option]:
         return super().options() + [cls.ROTATION_OPTION]
 
+    @classmethod
+    def model(cls) -> Type[AirSweeperModel]:
+        return AirSweeperModel
+
     def __init__(
-        self, game: "game.Game", x: int, y: int, level: int, rotation: str
+        self,
+        game: "game.Game",
+        x: int,
+        y: int,
+        level: int,
+        rotation: AirSweeperRotation,
     ):
         super().__init__(
             game,
@@ -90,6 +111,12 @@ class AirSweeper(ActiveBuilding):
 
         self.target = None
         self.remaining_attack_cooldown = None
+
+    @classmethod
+    def from_model(
+        cls, game: "game.Game", model: AirSweeperModel
+    ) -> "AirSweeper":
+        return cls(game, model.x, model.y, model.level, model.rotation)
 
     def tick(self, delta_t: float):
         i = 0

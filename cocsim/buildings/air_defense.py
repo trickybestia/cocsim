@@ -1,10 +1,19 @@
 from dataclasses import dataclass
-from typing import Type
+from typing import Literal, Type
+
+from pydantic import BaseModel
 
 from .building import BUILDINGS
 from .projectile_active_building import ProjectileActiveBuilding
 from .. import game, units
 from .colliders import RectCollider
+
+
+class AirDefenseModel(BaseModel):
+    name: Literal["AirDefense"]
+    x: int
+    y: int
+    level: int
 
 
 @dataclass(frozen=True)
@@ -47,6 +56,10 @@ class AirDefense(ProjectileActiveBuilding):
         return len(cls.LEVELS)
 
     @classmethod
+    def model(cls) -> Type[AirDefenseModel]:
+        return AirDefenseModel
+
+    @classmethod
     def attack_cooldown(cls) -> float:
         return 1.0
 
@@ -77,6 +90,12 @@ class AirDefense(ProjectileActiveBuilding):
         )
 
         self.level = level
+
+    @classmethod
+    def from_model(
+        cls, game: "game.Game", model: AirDefenseModel
+    ) -> "AirDefense":
+        return cls(game, model.x, model.y, model.level)
 
 
 BUILDINGS.append(AirDefense)

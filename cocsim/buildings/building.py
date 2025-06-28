@@ -1,5 +1,7 @@
 from typing import Callable, Type
 
+from pydantic import BaseModel
+
 from .. import game
 from .colliders import Collider
 from .option import Option
@@ -29,6 +31,10 @@ class Building:
     @classmethod
     def options(cls) -> list[Option]:
         return []
+
+    @classmethod
+    def model(cls) -> Type[BaseModel]:
+        raise NotImplementedError()
 
     @property
     def center(self) -> tuple[float, float]:

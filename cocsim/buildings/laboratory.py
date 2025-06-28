@@ -1,7 +1,18 @@
+from typing import Literal, Type
+
+from pydantic import BaseModel
+
 from .building import BUILDINGS
 from .passive_building import PassiveBuilding
 from .. import game
 from .colliders import RectCollider
+
+
+class LaboratoryModel(BaseModel):
+    name: Literal["Laboratory"]
+    x: int
+    y: int
+    level: int
 
 
 class Laboratory(PassiveBuilding):
@@ -34,6 +45,10 @@ class Laboratory(PassiveBuilding):
     def levels(cls) -> int:
         return len(cls.HEALTH)
 
+    @classmethod
+    def model(cls) -> Type[LaboratoryModel]:
+        return LaboratoryModel
+
     def __init__(self, game: "game.Game", x: int, y: int, level: int):
         super().__init__(
             game,
@@ -47,6 +62,12 @@ class Laboratory(PassiveBuilding):
                 self.height() * 0.65,
             ),
         )
+
+    @classmethod
+    def from_model(
+        cls, game: "game.Game", model: LaboratoryModel
+    ) -> "Laboratory":
+        return cls(game, model.x, model.y, model.level)
 
 
 BUILDINGS.append(Laboratory)
