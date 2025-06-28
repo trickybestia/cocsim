@@ -1,20 +1,20 @@
 import { useState } from "react";
 import { twJoin, twMerge } from "tailwind-merge";
 
-import { composeBaseImages } from "../../api";
+import { composeBaseImages, reverseProjection } from "../../api";
 import readFiles from "../../utils/read-files";
 import GridImage from "./GridImage";
 
 type URLBlob = { blob: Blob; url: string };
 
 type Props = React.HTMLAttributes<HTMLDivElement> & {
-  onComposed?: (image: Blob) => void;
+  onDone?: (image: Blob) => void;
 };
 
 const ComposeBaseImages: React.FC<Props> = ({
   className,
 
-  onComposed,
+  onDone,
 
   ...props
 }: Props) => {
@@ -24,6 +24,10 @@ const ComposeBaseImages: React.FC<Props> = ({
     undefined
   );
   const [isComposing, setIsComposing] = useState(false);
+  const [reversedImage, setReversedImage] = useState<URLBlob | undefined>(
+    undefined
+  );
+  const [isReversing, setIsReversing] = useState(false);
 
   const addImages = (
     images: URLBlob[],
@@ -193,6 +197,18 @@ const ComposeBaseImages: React.FC<Props> = ({
     );
   }
 
+  const onComposedImageOk = () => {
+    if (isReversing) return;
+
+    setIsReversing(true);
+
+    reverseProjection(composedImage!.blob)
+      .then((image) =>
+        setReversedImage({ blob: image, url: URL.createObjectURL(image) })
+      )
+      .finally(() => setIsReversing(false));
+  };
+
   const onComposeButtonClick = () => {
     if (isComposing) return;
 
@@ -216,11 +232,18 @@ const ComposeBaseImages: React.FC<Props> = ({
       )}
       {...props}
     >
+      {reversedImage !== undefined && (
+        <GridImage
+          src={reversedImage.url}
+          onClose={() => setReversedImage(undefined)}
+          onOk={() => onDone?.(reversedImage.blob)}
+        />
+      )}
       {composedImage !== undefined && (
         <GridImage
           src={composedImage.url}
           onClose={() => setComposedImage(undefined)}
-          onOk={() => onComposed?.(composedImage.blob)}
+          onOk={onComposedImageOk}
         />
       )}
       <button

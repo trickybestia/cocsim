@@ -1,13 +1,15 @@
-from typing import Annotated, List
 from io import BytesIO
 
-from fastapi import FastAPI, Form, UploadFile
+from fastapi import FastAPI, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
-from pydantic import BaseModel
 from PIL import Image
 
-from cocsim.map_editor_gui.compose_base_images import compose_base_images
+from cocsim.buildings.building import BUILDINGS
+from cocsim.map_editor_gui.compose_base_images import (
+    compose_base_images,
+    reverse_projection,
+)
 
 app = FastAPI()
 
@@ -24,7 +26,6 @@ app.add_middleware(
 async def compose_base_images_api(
     left: list[UploadFile], right: list[UploadFile]
 ):
-    print(left, right)
     left_images = []
 
     for image in left:
@@ -40,3 +41,35 @@ async def compose_base_images_api(
     compose_base_images(left_images, right_images).save(result, "jpeg")
 
     return Response(result.getvalue(), media_type="image/jpeg")
+
+
+@app.post("/api/reverse-projection")
+async def reverse_projection_api(image: UploadFile):
+    pil_image = Image.open(BytesIO(await image.read()))
+
+    result = BytesIO()
+
+    reverse_projection(pil_image).save(result, "jpeg")
+
+    return Response(result.getvalue(), media_type="image/jpeg")
+
+
+@app.get("/api/get-buildings")
+async def get_buildings():
+    result = []
+
+    for building in BUILDINGS:
+        building_dto = {
+            "name": building.__name__,
+            "width": building.width(),
+            "height": building.height(),
+            "levels": building.levels(),
+            "options": [
+                {"name": option.name, "values": option.values}
+                for option in building.options()
+            ],
+        }
+
+        result.append(building_dto)
+
+    return result

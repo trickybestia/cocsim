@@ -26,4 +26,18 @@ const composeBaseImages = async (
   ).data;
 };
 
-export { composeBaseImages };
+const reverseProjection = async (image: Blob): Promise<Blob> => {
+  return (
+    await axiosInstance.postForm(
+      "/reverse-projection",
+      {
+        image: image
+      },
+      {
+        responseType: "blob"
+      }
+    )
+  ).data;
+};
+
+export { composeBaseImages, reverseProjection };
