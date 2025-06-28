@@ -3,14 +3,18 @@ import { createRoot } from "react-dom/client";
 import { Route, Switch } from "wouter";
 
 import "./index.css";
-import Index from "./pages/index";
-import NotFound from "./pages/not-found";
+import ComposeBaseImagesPage from "./pages/compose-base-images";
+import IndexPage from "./pages/index";
+import MapEditorPage from "./pages/map-editor";
+import NotFoundPage from "./pages/not-found";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Switch>
-      <Route path="/" component={Index} />
-      <Route component={NotFound} />
+      <Route path="/" component={IndexPage} />
+      <Route path="compose-base-images" component={ComposeBaseImagesPage} />
+      <Route path="map-editor" component={MapEditorPage} />
+      <Route component={NotFoundPage} />
     </Switch>
   </StrictMode>
 );
