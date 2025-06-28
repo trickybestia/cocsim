@@ -3,10 +3,10 @@ from typing import Literal, Type
 
 from pydantic import BaseModel
 
-from .building import BUILDINGS
-from .splash_projectile_active_building import SplashProjectileActiveBuilding
 from .. import game, units
+from .building import BUILDINGS
 from .colliders import RectCollider
+from .splash_projectile_active_building import SplashProjectileActiveBuilding
 
 
 class MortarModel(BaseModel):

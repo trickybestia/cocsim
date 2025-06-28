@@ -1,15 +1,16 @@
 from dataclasses import dataclass
+from tkinter import *
 from typing import Type
 
-from tkinter import *
 import PIL.Image
 import PIL.ImageTk
 
-from .named_spinbox import NamedSpinbox
-from ..buildings import Building, Wall, BUILDINGS_DICT
-from ..map import Map
 from cocsim.consts import *
+
+from ..buildings import BUILDINGS_DICT, Building, Wall
+from ..map import Map
 from .building_selection_window import BuildingSelectionWindow
+from .named_spinbox import NamedSpinbox
 
 
 @dataclass

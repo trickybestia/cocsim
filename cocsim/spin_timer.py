@@ -1,5 +1,5 @@
-from typing import Callable
 from time import time
+from typing import Callable
 
 
 class SpinTimer:

@@ -2,9 +2,9 @@ from typing import Callable
 
 import pygame
 
-from cocsim.spin_timer import SpinTimer
 from cocsim.consts import *
 from cocsim.game import Game
+from cocsim.spin_timer import SpinTimer
 
 
 class GameGui:

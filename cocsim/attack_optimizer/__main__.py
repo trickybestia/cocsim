@@ -1,14 +1,14 @@
 from typing import Type
 
-from cocsim.units import Unit, Balloon, Dragon, Barbarian
-from cocsim.utils import load_test_map
-from cocsim.game_gui import GameGui
 from cocsim.game import Game
+from cocsim.game_gui import GameGui
+from cocsim.units import Balloon, Barbarian, Dragon, Unit
+from cocsim.utils import load_test_map
 
 from .army import Army
 from .army_optimizer import ArmyOptimizer
-from .attack_plan_optimizer import AttackPlanOptimizer
 from .attack_plan_executor import AttackPlanExecutor
+from .attack_plan_optimizer import AttackPlanOptimizer
 
 MAP_PATH = "single_player/goblin_gauntlet"
 HOUSING_SPACE = 20

@@ -1,6 +1,5 @@
 from tkinter import *
 
-
 INVALID_SPINBOX_BACKGROUND = "red"
 
 

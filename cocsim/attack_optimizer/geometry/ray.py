@@ -1,8 +1,8 @@
-from math import sin, cos
+from math import cos, sin
 
 from .point import Point
-from .square import Square
 from .segment import Segment
+from .square import Square
 
 
 class Ray:

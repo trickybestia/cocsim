@@ -1,7 +1,7 @@
-from cocsim.utils import load_test_map
-from cocsim.game import Game
 from cocsim.consts import *
+from cocsim.game import Game
 from cocsim.units import Barbarian
+from cocsim.utils import load_test_map
 
 
 def single_player_goblin_gauntlet_0():

@@ -3,8 +3,8 @@ from pathlib import Path
 
 import PIL.Image
 
-from .map import Map
 from .consts import *
+from .map import Map
 
 
 def load_test_map(name: str) -> tuple[Map, PIL.Image.Image]:

@@ -1,11 +1,11 @@
 import heapq
-from typing import Callable, Type
 from itertools import takewhile
 from math import inf
+from typing import Callable, Type
 
+from . import buildings, game, units
 from .consts import *
 from .utils import check_intersection, distance
-from . import game, units, buildings
 
 
 class Pathfinder:

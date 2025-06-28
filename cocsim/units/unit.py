@@ -1,6 +1,6 @@
 from typing import Union
 
-from .. import game, buildings
+from .. import buildings, game
 
 
 class Unit:

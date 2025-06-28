@@ -3,15 +3,16 @@ from pathlib import Path
 from sys import argv
 
 import PIL.Image
+
 from cocsim.consts import *
 from cocsim.map import Map
 
-from .main_window import MainWindow
 from .compose_base_images import (
     compose_base_images,
-    reverse_projection,
     load_base_images,
+    reverse_projection,
 )
+from .main_window import MainWindow
 
 
 def get_map(name: str) -> tuple[Map | None, PIL.Image.Image]:

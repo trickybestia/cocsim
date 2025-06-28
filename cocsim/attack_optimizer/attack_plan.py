@@ -1,14 +1,14 @@
-from typing import Type
 from dataclasses import dataclass
-from random import random, choice
 from math import pi
+from random import choice, random
+from typing import Type
 
+from cocsim.consts import *
 from cocsim.game import Game
 from cocsim.units import Unit
 from cocsim.utils import clamp
-from cocsim.consts import *
 
-from .geometry import Ray, Point, Square, Segment
+from .geometry import Point, Ray, Segment, Square
 
 MAX_UNIT_DROP_TIME = 20
 

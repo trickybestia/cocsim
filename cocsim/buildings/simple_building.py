@@ -1,7 +1,8 @@
-from .building import Building
-from .. import game
-from .colliders import Collider
 from cocsim.consts import *
+
+from .. import game
+from .building import Building
+from .colliders import Collider
 
 
 class SimpleBuilding(Building):

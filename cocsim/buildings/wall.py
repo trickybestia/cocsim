@@ -2,10 +2,10 @@ from typing import Literal, Type
 
 from pydantic import BaseModel
 
-from .building import BUILDINGS
-from .passive_building import PassiveBuilding
 from .. import game
-from .colliders import RectCollider, ListCollider
+from .building import BUILDINGS
+from .colliders import ListCollider, RectCollider
+from .passive_building import PassiveBuilding
 
 
 class WallModel(BaseModel):

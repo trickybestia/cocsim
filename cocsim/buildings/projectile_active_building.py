@@ -2,11 +2,12 @@ from typing import Type, Union
 
 import pygame
 
-from .active_building import ActiveBuilding
-from .. import game, units
-from .colliders import Collider
-from ..utils import distance, normalize
 from cocsim.consts import *
+
+from .. import game, units
+from ..utils import distance, normalize
+from .active_building import ActiveBuilding
+from .colliders import Collider
 
 
 class Projectile:

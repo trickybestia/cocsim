@@ -2,11 +2,12 @@ from typing import Type
 
 import pygame
 
-from ..utils import normalize
-from .projectile_active_building import ProjectileActiveBuilding, Projectile
-from .. import game, units
-from .colliders import Collider
 from cocsim.consts import *
+
+from .. import game, units
+from ..utils import normalize
+from .colliders import Collider
+from .projectile_active_building import Projectile, ProjectileActiveBuilding
 
 
 class SplashProjectile(Projectile):

@@ -1,9 +1,9 @@
-from typing import Generator
 from random import choice
+from typing import Generator
 
-from cocsim.map import Map
-from cocsim.game import Game
 from cocsim.consts import *
+from cocsim.game import Game
+from cocsim.map import Map
 
 from .army import Army
 from .attack_plan import AttackPlan

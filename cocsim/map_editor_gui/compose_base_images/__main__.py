@@ -3,7 +3,7 @@ from sys import argv
 
 from cocsim.consts import *
 
-from . import compose_base_images, reverse_projection, load_base_images
+from . import compose_base_images, load_base_images, reverse_projection
 
 
 def main():

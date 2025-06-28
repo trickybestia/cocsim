@@ -3,8 +3,8 @@ from typing import Callable, Type
 from rapidfuzz import fuzz
 from rapidfuzz.utils import default_process
 
-from cocsim.consts import *
 from cocsim.buildings import BUILDINGS, Building, Wall
+from cocsim.consts import *
 
 
 def get_buildings_with_size(size: tuple[int, int]) -> list[Type[Building]]:

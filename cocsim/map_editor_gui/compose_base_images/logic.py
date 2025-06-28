@@ -1,9 +1,9 @@
 from io import BytesIO
 
+import numpy as np
 import PIL
 import PIL.Image
 import wand.image
-import numpy as np
 
 from cocsim.consts import *
 

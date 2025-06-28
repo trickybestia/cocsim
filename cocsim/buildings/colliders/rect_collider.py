@@ -1,5 +1,6 @@
-from .collider import Collider
 from cocsim.consts import *
+
+from .collider import Collider
 
 
 class RectCollider(Collider):

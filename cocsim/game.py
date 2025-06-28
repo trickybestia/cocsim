@@ -1,13 +1,13 @@
 from typing import Union
 
-import pygame
 import PIL.Image
+import pygame
 
+from . import buildings, units
 from .consts import *
-from .utils import get_tile_color
 from .map import Map
 from .pathfinder import Pathfinder
-from . import buildings, units
+from .utils import get_tile_color
 
 
 class Game:

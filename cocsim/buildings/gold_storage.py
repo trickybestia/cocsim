@@ -2,10 +2,10 @@ from typing import Literal, Type
 
 from pydantic import BaseModel
 
-from .building import BUILDINGS
-from .passive_building import PassiveBuilding
 from .. import game
+from .building import BUILDINGS
 from .colliders import RectCollider
+from .passive_building import PassiveBuilding
 
 
 class GoldStorageModel(BaseModel):

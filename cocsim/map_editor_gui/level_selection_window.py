@@ -1,8 +1,9 @@
 from tkinter import *
 from typing import Callable, Type
 
-from cocsim.consts import *
 from cocsim.buildings import Building
+from cocsim.consts import *
+
 from .utils import fuzzy_sort
 
 

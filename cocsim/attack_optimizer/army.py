@@ -1,5 +1,5 @@
-from typing import Type
 from random import choice
+from typing import Type
 
 from cocsim.units import Unit
 

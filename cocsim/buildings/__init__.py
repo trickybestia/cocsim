@@ -1,10 +1,4 @@
 from .active_building import ActiveBuilding
-from .building import Building, BUILDINGS
-from .passive_building import PassiveBuilding
-from .projectile_active_building import ProjectileActiveBuilding
-from .simple_building import SimpleBuilding
-from .splash_projectile_active_building import SplashProjectileActiveBuilding
-
 from .air_defense import AirDefense
 from .air_sweeper import AirSweeper
 from .archer_tower import ArcherTower
@@ -12,6 +6,7 @@ from .army_camp import ArmyCamp
 from .barracks import Barracks
 from .bomb_tower import BombTower
 from .builders_hut import BuildersHut
+from .building import BUILDINGS, Building
 from .cannon import Cannon
 from .clan_castle import ClanCastle
 from .dark_elixir_drill import DarkElixirDrill
@@ -23,11 +18,14 @@ from .gold_mine import GoldMine
 from .gold_storage import GoldStorage
 from .laboratory import Laboratory
 from .mortar import Mortar
+from .option import Option
+from .passive_building import PassiveBuilding
+from .projectile_active_building import ProjectileActiveBuilding
+from .simple_building import SimpleBuilding
+from .splash_projectile_active_building import SplashProjectileActiveBuilding
 from .townhall import TownHall
 from .wall import Wall
 from .wizard_tower import WizardTower
 from .x_bow import XBow
-
-from .option import Option
 
 BUILDINGS_DICT = dict((building.__name__, building) for building in BUILDINGS)

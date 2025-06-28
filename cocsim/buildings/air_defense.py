@@ -3,10 +3,10 @@ from typing import Literal, Type
 
 from pydantic import BaseModel
 
-from .building import BUILDINGS
-from .projectile_active_building import ProjectileActiveBuilding
 from .. import game, units
+from .building import BUILDINGS
 from .colliders import RectCollider
+from .projectile_active_building import ProjectileActiveBuilding
 
 
 class AirDefenseModel(BaseModel):

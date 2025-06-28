@@ -1,8 +1,9 @@
-from .simple_building import SimpleBuilding
+from cocsim.consts import *
+from cocsim.utils import distance
+
 from .. import game
 from .colliders import Collider
-from cocsim.utils import distance
-from cocsim.consts import *
+from .simple_building import SimpleBuilding
 
 
 class ActiveBuilding(SimpleBuilding):

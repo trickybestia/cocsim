@@ -1,5 +1,6 @@
+from cocsim.utils import distance
+
 from .collider import Collider
-from ...utils import distance
 
 
 class ListCollider(Collider):

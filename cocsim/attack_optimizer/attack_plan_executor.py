@@ -1,6 +1,6 @@
 from cocsim.game import Game
 
-from .attack_plan import AttackPlanUnit, AttackPlan
+from .attack_plan import AttackPlan, AttackPlanUnit
 
 
 class AttackPlanExecutor:

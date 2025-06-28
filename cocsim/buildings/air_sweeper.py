@@ -1,17 +1,18 @@
+from dataclasses import dataclass
 from enum import StrEnum
 from typing import Literal, Type, Union
-from dataclasses import dataclass
 
-from pydantic import BaseModel
 import pygame
+from pydantic import BaseModel
 
-from .building import BUILDINGS
-from .active_building import ActiveBuilding
-from .. import game, units
-from .colliders import RectCollider
-from ..utils import distance, normalize
-from .option import Option
 from cocsim.consts import *
+
+from .. import game, units
+from ..utils import distance, normalize
+from .active_building import ActiveBuilding
+from .building import BUILDINGS
+from .colliders import RectCollider
+from .option import Option
 
 
 class AirSweeperRotation(StrEnum):

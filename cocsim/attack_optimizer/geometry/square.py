@@ -1,5 +1,5 @@
-from .segment import Segment
 from .point import Point
+from .segment import Segment
 
 
 class Square:

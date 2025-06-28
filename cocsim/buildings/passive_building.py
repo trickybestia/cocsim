@@ -1,7 +1,8 @@
-from .simple_building import SimpleBuilding
+from cocsim.consts import *
+
 from .. import game
 from .colliders import Collider
-from cocsim.consts import *
+from .simple_building import SimpleBuilding
 
 
 class PassiveBuilding(SimpleBuilding):

@@ -1,2 +1,2 @@
-from .logic import reverse_projection, compose_base_images
+from .logic import compose_base_images, reverse_projection
 from .utils import load_base_images

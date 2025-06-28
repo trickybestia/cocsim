@@ -1,7 +1,7 @@
-from cocsim.utils import load_test_map
-from cocsim.game_gui import GameGui
-from cocsim.units import Dragon, Barbarian
 from cocsim.game import Game
+from cocsim.game_gui import GameGui
+from cocsim.units import Barbarian, Dragon
+from cocsim.utils import load_test_map
 
 
 def main():

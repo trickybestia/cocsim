@@ -1,10 +1,11 @@
 from tkinter import *
 from typing import Callable, Type
 
-from cocsim.consts import *
 from cocsim.buildings import Building
-from .utils import get_buildings_with_size, fuzzy_sort
+from cocsim.consts import *
+
 from .level_selection_window import LevelSelectionWindow
+from .utils import fuzzy_sort, get_buildings_with_size
 
 
 class BuildingSelectionWindow:

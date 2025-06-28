@@ -3,11 +3,11 @@ from typing import Union
 
 import pygame
 
-from .ground_unit import GroundUnit
-from .. import game, buildings
-
-from cocsim.utils import distance, normalize
 from cocsim.consts import *
+from cocsim.utils import distance, normalize
+
+from .. import buildings, game
+from .ground_unit import GroundUnit
 
 
 @dataclass(frozen=True)
