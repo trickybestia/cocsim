@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import Header from "../components/Header";
 import MapEditor from "../components/MapEditor";
@@ -19,6 +19,21 @@ const MapEditorPage: React.FC = () => {
       false
     );
   };
+
+  useEffect(() => {
+    if (image === undefined) return;
+
+    const onBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = "";
+    };
+
+    window.addEventListener("beforeunload", onBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", onBeforeUnload);
+    };
+  }, [image]);
 
   return (
     <>
