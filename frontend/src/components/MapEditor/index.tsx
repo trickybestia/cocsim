@@ -4,6 +4,7 @@ import { Image, Layer, Rect, Stage } from "react-konva";
 import { twMerge } from "tailwind-merge";
 
 import clamp from "../../utils/clamp";
+import sortSelection from "../../utils/sort-selection";
 import DrawCoordsLayer from "./DrawCoordsLayer";
 import DrawGridLayer from "./DrawGridLayer";
 import NumberInput from "./NumberInput";
@@ -50,8 +51,12 @@ const MapEditor: React.FC<Props> = ({
   const [cursorPosition, setCursorPosition] = useState<
     { x: number; y: number } | undefined
   >(undefined);
+  const [selectionStartPosition, setSelectionStartPosition] = useState<
+    { x: number; y: number } | undefined
+  >(undefined);
 
   const pixelsPerTile = canvasSize / (baseSize + borderSize);
+  const selection = sortSelection(cursorPosition, selectionStartPosition);
 
   const canvasOnWheel = (e: KonvaEventObject<WheelEvent>) => {
     const stage = e.target.getStage();
@@ -131,6 +136,26 @@ const MapEditor: React.FC<Props> = ({
     }
   };
 
+  const canvasOnClick = (e: KonvaEventObject<MouseEvent>) => {
+    if (e.evt.button === 0) {
+      if (selectionStartPosition === undefined) {
+        setSelectionStartPosition(cursorPosition);
+      } else {
+        // open building creation dialog
+      }
+
+      return;
+    }
+
+    if (e.evt.button === 2) {
+      if (selectionStartPosition !== undefined) {
+        setSelectionStartPosition(undefined);
+      } else {
+        // remove selected building
+      }
+    }
+  };
+
   return (
     <div
       className={twMerge(className, "flex h-full w-full justify-between gap-2")}
@@ -201,6 +226,8 @@ const MapEditor: React.FC<Props> = ({
           height={canvasSize}
           onWheel={canvasOnWheel}
           onPointerMove={canvasOnPointerMove}
+          onClick={canvasOnClick}
+          onContextMenu={(e) => e.evt.preventDefault()}
           listening={false}
         >
           <Layer>
@@ -235,6 +262,22 @@ const MapEditor: React.FC<Props> = ({
                 y={cursorPosition.y * pixelsPerTile}
                 width={pixelsPerTile}
                 height={pixelsPerTile}
+                stroke="black"
+                strokeWidth={1}
+              />
+            )}
+            {selection !== undefined && (
+              <Rect
+                x={selection.leftTop.x * pixelsPerTile}
+                y={selection.leftTop.y * pixelsPerTile}
+                width={
+                  (selection.rightBottom.x - selection.leftTop.x + 1) *
+                  pixelsPerTile
+                }
+                height={
+                  (selection.rightBottom.y - selection.leftTop.y + 1) *
+                  pixelsPerTile
+                }
                 stroke="black"
                 strokeWidth={1}
               />
