@@ -1,7 +1,9 @@
+import type { KonvaEventObject } from "konva/lib/Node";
 import { useEffect, useRef, useState } from "react";
 import { Image, Layer, Stage } from "react-konva";
 import { twMerge } from "tailwind-merge";
 
+import clamp from "../../utils/clamp";
 import DrawCoordsLayer from "./DrawCoordsLayer";
 import DrawGridLayer from "./DrawGridLayer";
 import NumberInput from "./NumberInput";
@@ -9,6 +11,8 @@ import NumberInput from "./NumberInput";
 type Props = React.HTMLAttributes<HTMLDivElement> & {
   image: HTMLImageElement;
 };
+
+const STAGE_SCALE_FACTOR = 1.1;
 
 const MapEditor: React.FC<Props> = ({
   className,
@@ -40,10 +44,56 @@ const MapEditor: React.FC<Props> = ({
   const [drawCoords, setDrawCoords] = useState(false);
   const [baseSize, setBaseSize] = useState(44);
   const [borderSize, setBorderSize] = useState(4);
-  const [startX, setStartX] = useState(0);
-  const [startY, setStartY] = useState(0);
-  const [endX, setEndX] = useState(image.width - 1);
-  const [endY, setEndY] = useState(image.height - 1);
+
+  const canvasOnWheel = (e: KonvaEventObject<WheelEvent>) => {
+    const stage = e.target.getStage();
+
+    if (stage === null) return;
+
+    e.evt.preventDefault();
+
+    const oldScale = stage.scaleX();
+    const pointer = stage.getPointerPosition()!;
+
+    const mousePointTo = {
+      x: (pointer.x - stage.x()) / oldScale,
+      y: (pointer.y - stage.y()) / oldScale
+    };
+
+    // how to scale? Zoom in? Or zoom out?
+    const direction = e.evt.deltaY > 0 ? -1 : 1;
+
+    const newScale = clamp(
+      0.5,
+      direction > 0
+        ? oldScale * STAGE_SCALE_FACTOR
+        : oldScale / STAGE_SCALE_FACTOR,
+      10
+    );
+    stage.scale({ x: newScale, y: newScale });
+
+    const newPos = {
+      x: pointer.x - mousePointTo.x * newScale,
+      y: pointer.y - mousePointTo.y * newScale
+    };
+
+    stage.position(newPos);
+  };
+
+  const canvasOnPointerMove = (e: KonvaEventObject<PointerEvent>) => {
+    const stage = e.target.getStage();
+
+    if (stage === null || (e.evt.buttons & 0x1) === 0) return;
+
+    e.evt.preventDefault();
+
+    const position = stage.getPosition();
+
+    stage.position({
+      x: position.x + e.evt.movementX,
+      y: position.y + e.evt.movementY
+    });
+  };
 
   return (
     <div
@@ -109,8 +159,13 @@ const MapEditor: React.FC<Props> = ({
         </div>
       </div>
 
-      <div ref={canvasWrapperRef} className="aspect-square bg-red-500">
-        <Stage width={canvasSize} height={canvasSize}>
+      <div ref={canvasWrapperRef} className="aspect-square bg-green-900">
+        <Stage
+          width={canvasSize}
+          height={canvasSize}
+          onWheel={canvasOnWheel}
+          onPointerMove={canvasOnPointerMove}
+        >
           <Layer>
             <Image
               scaleX={canvasSize / image.width}
