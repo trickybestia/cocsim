@@ -109,6 +109,8 @@ const MapEditor: React.FC<Props> = ({
         pointer.y >= canvasSize
       ) {
         setCursorPosition(undefined);
+
+        return;
       }
 
       const tileX = Math.floor(pointer.x / pixelsPerTile);
@@ -234,6 +236,8 @@ const MapEditor: React.FC<Props> = ({
                 y={cursorPosition.y * pixelsPerTile}
                 width={pixelsPerTile}
                 height={pixelsPerTile}
+                stroke="black"
+                strokeWidth={1}
               />
             )}
           </Layer>
