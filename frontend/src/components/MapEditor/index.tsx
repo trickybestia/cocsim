@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { Image, Layer, Stage } from "react-konva";
 import { twMerge } from "tailwind-merge";
 
+import DrawCoordsLayer from "./DrawCoordsLayer";
+import DrawGridLayer from "./DrawGridLayer";
 import NumberInput from "./NumberInput";
 
 type Props = React.HTMLAttributes<HTMLDivElement> & {
@@ -122,6 +124,18 @@ const MapEditor: React.FC<Props> = ({
               image={image}
             />
           </Layer>
+          {drawGrid && (
+            <DrawGridLayer
+              totalSize={baseSize + borderSize}
+              canvasSize={canvasSize}
+            />
+          )}
+          {drawCoords && (
+            <DrawCoordsLayer
+              totalSize={baseSize + borderSize}
+              canvasSize={canvasSize}
+            />
+          )}
         </Stage>
       </div>
     </div>
