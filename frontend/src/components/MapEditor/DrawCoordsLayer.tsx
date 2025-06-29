@@ -12,8 +12,8 @@ const DrawCoordsLayer: React.FC<Props> = ({ totalSize, canvasSize }: Props) => {
 
   const coords = [];
 
-  for (let tile_x = 0; tile_x != totalSize + 1; tile_x++) {
-    for (let tile_y = 0; tile_y != totalSize + 1; tile_y++) {
+  for (let tile_x = 0; tile_x != totalSize; tile_x++) {
+    for (let tile_y = 0; tile_y != totalSize; tile_y++) {
       const text = `${tile_x},${tile_y}`;
 
       coords.push(
