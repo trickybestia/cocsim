@@ -1,6 +1,6 @@
 import type { KonvaEventObject } from "konva/lib/Node";
 import { useEffect, useRef, useState } from "react";
-import { Image, Layer, Stage } from "react-konva";
+import { Image, Layer, Rect, Stage } from "react-konva";
 import { twMerge } from "tailwind-merge";
 
 import clamp from "../../utils/clamp";
@@ -12,8 +12,6 @@ type Props = React.HTMLAttributes<HTMLDivElement> & {
   image: HTMLImageElement;
 };
 
-const STAGE_SCALE_FACTOR = 1.1;
-
 const MapEditor: React.FC<Props> = ({
   className,
 
@@ -22,7 +20,7 @@ const MapEditor: React.FC<Props> = ({
   ...props
 }: Props) => {
   const canvasWrapperRef = useRef<HTMLDivElement | null>(null);
-  const [canvasSize, setCanvasSize] = useState(0);
+  const [canvasSize, setCanvasSize] = useState(1);
 
   useEffect(() => {
     const onResize = () => {
@@ -44,6 +42,18 @@ const MapEditor: React.FC<Props> = ({
   const [drawCoords, setDrawCoords] = useState(false);
   const [baseSize, setBaseSize] = useState(44);
   const [borderSize, setBorderSize] = useState(4);
+  const [startX, setStartX] = useState(317);
+  const [startY, setStartY] = useState(460);
+  const [endX, setEndX] = useState(1337);
+  const [endY, setEndY] = useState(1488);
+
+  const [cursorPosition, setCursorPosition] = useState<
+    { x: number; y: number } | undefined
+  >(undefined);
+
+  console.log(cursorPosition);
+
+  const pixelsPerTile = canvasSize / (baseSize + borderSize);
 
   const canvasOnWheel = (e: KonvaEventObject<WheelEvent>) => {
     const stage = e.target.getStage();
@@ -62,6 +72,8 @@ const MapEditor: React.FC<Props> = ({
 
     // how to scale? Zoom in? Or zoom out?
     const direction = e.evt.deltaY > 0 ? -1 : 1;
+
+    const STAGE_SCALE_FACTOR = 1.1;
 
     const newScale = clamp(
       0.5,
@@ -83,16 +95,40 @@ const MapEditor: React.FC<Props> = ({
   const canvasOnPointerMove = (e: KonvaEventObject<PointerEvent>) => {
     const stage = e.target.getStage();
 
-    if (stage === null || (e.evt.buttons & 0x1) === 0) return;
+    if (stage === null) return;
 
-    e.evt.preventDefault();
+    if (e.evt.buttons === 0) {
+      const pointer = stage.getRelativePointerPosition();
 
-    const position = stage.getPosition();
+      if (pointer === null) return;
 
-    stage.position({
-      x: position.x + e.evt.movementX,
-      y: position.y + e.evt.movementY
-    });
+      if (
+        pointer.x < 0 ||
+        pointer.y >= canvasSize ||
+        pointer.y < 0 ||
+        pointer.y >= canvasSize
+      ) {
+        setCursorPosition(undefined);
+      }
+
+      const tileX = Math.floor(pointer.x / pixelsPerTile);
+      const tileY = Math.floor(pointer.y / pixelsPerTile);
+
+      setCursorPosition({ x: tileX, y: tileY });
+
+      return;
+    }
+
+    if ((e.evt.buttons & 0x1) !== 0) {
+      e.evt.preventDefault();
+
+      const position = stage.getPosition();
+
+      stage.position({
+        x: position.x + e.evt.movementX,
+        y: position.y + e.evt.movementY
+      });
+    }
   };
 
   return (
@@ -191,6 +227,16 @@ const MapEditor: React.FC<Props> = ({
               canvasSize={canvasSize}
             />
           )}
+          <Layer>
+            {cursorPosition !== undefined && (
+              <Rect
+                x={cursorPosition.x * pixelsPerTile}
+                y={cursorPosition.y * pixelsPerTile}
+                width={pixelsPerTile}
+                height={pixelsPerTile}
+              />
+            )}
+          </Layer>
         </Stage>
       </div>
     </div>
