@@ -51,8 +51,6 @@ const MapEditor: React.FC<Props> = ({
     { x: number; y: number } | undefined
   >(undefined);
 
-  console.log(cursorPosition);
-
   const pixelsPerTile = canvasSize / (baseSize + borderSize);
 
   const canvasOnWheel = (e: KonvaEventObject<WheelEvent>) => {
@@ -203,6 +201,7 @@ const MapEditor: React.FC<Props> = ({
           height={canvasSize}
           onWheel={canvasOnWheel}
           onPointerMove={canvasOnPointerMove}
+          listening={false}
         >
           <Layer>
             <Image
