@@ -1,3 +1,4 @@
+import Konva from "konva";
 import type { KonvaEventObject } from "konva/lib/Node";
 import { useEffect, useRef, useState } from "react";
 import { Image, Layer, Rect, Stage } from "react-konva";
@@ -21,6 +22,7 @@ const MapEditor: React.FC<Props> = ({
   ...props
 }: Props) => {
   const canvasWrapperRef = useRef<HTMLDivElement | null>(null);
+  const canvasRef = useRef<Konva.Stage>(null);
   const [canvasSize, setCanvasSize] = useState(1);
 
   useEffect(() => {
@@ -156,6 +158,13 @@ const MapEditor: React.FC<Props> = ({
     }
   };
 
+  const onResetCameraButtonClick = () => {
+    if (canvasRef.current === null) return;
+
+    canvasRef.current.scale({ x: 1, y: 1 });
+    canvasRef.current.setPosition({ x: 0, y: 0 });
+  };
+
   return (
     <div
       className={twMerge(className, "flex h-full w-full justify-between gap-2")}
@@ -217,11 +226,18 @@ const MapEditor: React.FC<Props> = ({
             defaultValue={endY}
             onChange={setEndY}
           />
+          <button
+            className="col-span-2 cursor-pointer bg-blue-400 px-2 py-1 text-base font-bold text-white hover:bg-blue-600"
+            onClick={onResetCameraButtonClick}
+          >
+            Reset camera
+          </button>
         </div>
       </div>
 
       <div ref={canvasWrapperRef} className="aspect-square bg-green-900">
         <Stage
+          ref={canvasRef}
           width={canvasSize}
           height={canvasSize}
           onWheel={canvasOnWheel}
