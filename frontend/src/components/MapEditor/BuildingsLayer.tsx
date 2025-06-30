@@ -26,10 +26,10 @@ const BuildingsLayer: React.FC<Props> = memo(
           key={`${building.x}:${building.y}`}
           x={building.x * pixelsPerTile}
           y={building.y * pixelsPerTile}
-          width={(building.x + buildingType.width) * pixelsPerTile}
-          height={(building.y + buildingType.height) * pixelsPerTile}
+          width={buildingType.width * pixelsPerTile}
+          height={buildingType.height * pixelsPerTile}
           stroke="yellow"
-          strokeWidth={2}
+          strokeWidth={3}
         />
       );
     });

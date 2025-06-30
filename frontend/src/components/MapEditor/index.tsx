@@ -4,30 +4,30 @@ import { useEffect, useRef, useState } from "react";
 import { Image, Layer, Rect, Stage } from "react-konva";
 import { twMerge } from "tailwind-merge";
 
-import type { Building } from "../../types";
+import type { Building, BuildingType } from "../../types";
 import clamp from "../../utils/clamp";
 import sortSelection from "../../utils/sort-selection";
 import BuildingSelectionModal from "./BuildingSelectionModal";
+import BuildingsLayer from "./BuildingsLayer";
 import DrawCoordsLayer from "./DrawCoordsLayer";
 import DrawGridLayer from "./DrawGridLayer";
 import NumberInput from "./NumberInput";
 
 type Props = React.HTMLAttributes<HTMLDivElement> & {
   image: HTMLImageElement;
+  buildingTypes: BuildingType[];
 };
 
 const MapEditor: React.FC<Props> = ({
   className,
 
   image,
+  buildingTypes,
 
   ...props
 }: Props) => {
   const canvasWrapperRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<Konva.Stage>(null);
-  const openBuildingSelectionModalRef = useRef<
-    ((selectionWidth: number, selectionHeight: number) => void) | undefined
-  >(undefined);
   const [canvasSize, setCanvasSize] = useState(1);
 
   useEffect(() => {
@@ -50,8 +50,8 @@ const MapEditor: React.FC<Props> = ({
 
   const [drawGrid, setDrawGrid] = useState(false);
   const [drawCoords, setDrawCoords] = useState(false);
-  const [baseSize, setBaseSize] = useState(44);
-  const [borderSize, setBorderSize] = useState(4);
+  const [baseSize, setBaseSize] = useState(32);
+  const [borderSize, setBorderSize] = useState(0);
   const [startX, setStartX] = useState(317);
   const [startY, setStartY] = useState(460);
   const [endX, setEndX] = useState(1337);
@@ -63,6 +63,8 @@ const MapEditor: React.FC<Props> = ({
   const [selectionStartPosition, setSelectionStartPosition] = useState<
     { x: number; y: number } | undefined
   >(undefined);
+  const [isBuildingSelectionModalOpen, setIsBuildingSelectionModalOpen] =
+    useState(false);
 
   const pixelsPerTile = canvasSize / (baseSize + borderSize);
   const selection = sortSelection(cursorPosition, selectionStartPosition);
@@ -154,12 +156,7 @@ const MapEditor: React.FC<Props> = ({
       if (selectionStartPosition === undefined) {
         setSelectionStartPosition(cursorPosition);
       } else {
-        openBuildingSelectionModalRef.current?.(
-          selection!.rightBottom.x - selection!.leftTop.x,
-          selection!.rightBottom.y - selection!.leftTop.y
-        );
-
-        setSelectionStartPosition(undefined);
+        setIsBuildingSelectionModalOpen(true);
       }
 
       return;
@@ -184,10 +181,36 @@ const MapEditor: React.FC<Props> = ({
   /**
    * BuildingSelectionModal callback
    */
-  const onBuildingSelected = (building: Building) => {
+  const onBuildingTypeSelected = (buildingType: BuildingType) => {
     const newBuildings = buildings.slice();
 
-    newBuildings.push(building);
+    if (buildingType.name === "Wall") {
+      for (
+        let tileX = selection!.leftTop.x;
+        tileX != selection!.rightBottom.x + 1;
+        tileX++
+      ) {
+        for (
+          let tileY = selection!.leftTop.y;
+          tileY != selection!.rightBottom.y + 1;
+          tileY++
+        ) {
+          newBuildings.push({
+            name: "Wall",
+            x: tileX,
+            y: tileY,
+            level: 0
+          });
+        }
+      }
+    } else {
+      newBuildings.push({
+        name: buildingType.name,
+        x: selection!.leftTop.x,
+        y: selection!.leftTop.y,
+        level: 0
+      });
+    }
 
     setBuildings(newBuildings);
   };
@@ -298,6 +321,12 @@ const MapEditor: React.FC<Props> = ({
               canvasSize={canvasSize}
             />
           )}
+          <BuildingsLayer
+            totalSize={baseSize + borderSize}
+            canvasSize={canvasSize}
+            buildings={buildings}
+            buildingTypes={buildingTypes}
+          />
           <Layer>
             {cursorPosition !== undefined && (
               <Rect
@@ -330,9 +359,24 @@ const MapEditor: React.FC<Props> = ({
       </div>
 
       <BuildingSelectionModal
-        buildingTypes={[]}
-        openRef={openBuildingSelectionModalRef}
-        onBuildingSelected={onBuildingSelected}
+        isOpen={isBuildingSelectionModalOpen}
+        buildingTypes={buildingTypes}
+        selection={
+          selection === undefined
+            ? undefined
+            : {
+                width: selection.rightBottom.x - selection.leftTop.x + 1,
+                height: selection.rightBottom.y - selection.leftTop.y + 1
+              }
+        }
+        onClose={(buildingType: BuildingType | undefined) => {
+          if (buildingType !== undefined) {
+            onBuildingTypeSelected(buildingType);
+          }
+
+          setIsBuildingSelectionModalOpen(false);
+          setSelectionStartPosition(undefined);
+        }}
       />
     </div>
   );

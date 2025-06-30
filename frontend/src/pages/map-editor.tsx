@@ -2,10 +2,12 @@ import { useEffect, useState } from "react";
 
 import Header from "../components/Header";
 import MapEditor from "../components/MapEditor";
+import { useBuildingTypes } from "../hooks";
 import readFiles from "../utils/read-files";
 
 const MapEditorPage: React.FC = () => {
   const [image, setImage] = useState<HTMLImageElement | undefined>(undefined);
+  const buildingTypes = useBuildingTypes();
 
   const onCreateNewButtonClick = () => {
     readFiles(
@@ -58,11 +60,13 @@ const MapEditorPage: React.FC = () => {
             </div>
           </div>
         ) : (
-          <div className="flex h-full flex-col items-center">
-            <div className="w-full grow lg:max-w-[var(--breakpoint-lg)]">
-              <MapEditor image={image} />
+          buildingTypes !== undefined && (
+            <div className="flex h-full flex-col items-center">
+              <div className="w-full grow lg:max-w-[var(--breakpoint-lg)]">
+                <MapEditor image={image} buildingTypes={buildingTypes} />
+              </div>
             </div>
-          </div>
+          )
         )}
       </main>
     </>
