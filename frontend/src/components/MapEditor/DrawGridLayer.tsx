@@ -9,13 +9,13 @@ const DrawGridLayer: React.FC<Props> = memo(
 
     const dots = [];
 
-    for (let tile_x = 0; tile_x != totalSize + 1; tile_x++) {
-      for (let tile_y = 0; tile_y != totalSize + 1; tile_y++) {
+    for (let tileX = 0; tileX != totalSize + 1; tileX++) {
+      for (let tileY = 0; tileY != totalSize + 1; tileY++) {
         dots.push(
           <Circle
-            key={`${tile_x}:${tile_y}`}
-            x={tile_x * pixelsPerTile}
-            y={tile_y * pixelsPerTile}
+            key={`${tileX}:${tileY}`}
+            x={tileX * pixelsPerTile}
+            y={tileY * pixelsPerTile}
             radius={2}
             fill="white"
           />

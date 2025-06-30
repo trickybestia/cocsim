@@ -14,15 +14,15 @@ const DrawCoordsLayer: React.FC<Props> = memo(
 
     const coords = [];
 
-    for (let tile_x = 0; tile_x != totalSize; tile_x++) {
-      for (let tile_y = 0; tile_y != totalSize; tile_y++) {
-        const text = `${tile_x},${tile_y}`;
+    for (let tileX = 0; tileX != totalSize; tileX++) {
+      for (let tileY = 0; tileY != totalSize; tileY++) {
+        const text = `${tileX},${tileY}`;
 
         coords.push(
           <Text
             key={text}
-            x={(tile_x + TEXT_OFFSET_X) * pixelsPerTile}
-            y={(tile_y + TEXT_OFFSET_Y) * pixelsPerTile}
+            x={(tileX + TEXT_OFFSET_X) * pixelsPerTile}
+            y={(tileY + TEXT_OFFSET_Y) * pixelsPerTile}
             width={TEXT_SIZE * pixelsPerTile}
             height={TEXT_SIZE * pixelsPerTile}
             align="center"
