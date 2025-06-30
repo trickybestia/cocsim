@@ -126,7 +126,7 @@ const MapEditor: React.FC<Props> = ({
       return;
     }
 
-    if ((e.evt.buttons & 0x1) !== 0) {
+    if ((e.evt.buttons & 0x4) !== 0) {
       e.evt.preventDefault();
 
       const position = stage.getPosition();
