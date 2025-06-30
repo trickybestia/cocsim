@@ -4,8 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import { Image, Layer, Rect, Stage } from "react-konva";
 import { twMerge } from "tailwind-merge";
 
+import type { Building } from "../../types";
 import clamp from "../../utils/clamp";
 import sortSelection from "../../utils/sort-selection";
+import BuildingSelectionModal from "./BuildingSelectionModal";
 import DrawCoordsLayer from "./DrawCoordsLayer";
 import DrawGridLayer from "./DrawGridLayer";
 import NumberInput from "./NumberInput";
@@ -23,6 +25,9 @@ const MapEditor: React.FC<Props> = ({
 }: Props) => {
   const canvasWrapperRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<Konva.Stage>(null);
+  const openBuildingSelectionModalRef = useRef<
+    ((selectionWidth: number, selectionHeight: number) => void) | undefined
+  >(undefined);
   const [canvasSize, setCanvasSize] = useState(1);
 
   useEffect(() => {
@@ -40,6 +45,8 @@ const MapEditor: React.FC<Props> = ({
       window.removeEventListener("resize", onResize);
     };
   }, []);
+
+  const [buildings, setBuildings] = useState<Building[]>([]);
 
   const [drawGrid, setDrawGrid] = useState(false);
   const [drawCoords, setDrawCoords] = useState(false);
@@ -147,7 +154,12 @@ const MapEditor: React.FC<Props> = ({
       if (selectionStartPosition === undefined) {
         setSelectionStartPosition(cursorPosition);
       } else {
-        // open building creation dialog
+        openBuildingSelectionModalRef.current?.(
+          selection!.rightBottom.x - selection!.leftTop.x,
+          selection!.rightBottom.y - selection!.leftTop.y
+        );
+
+        setSelectionStartPosition(undefined);
       }
 
       return;
@@ -167,6 +179,17 @@ const MapEditor: React.FC<Props> = ({
 
     canvasRef.current.scale({ x: 1, y: 1 });
     canvasRef.current.setPosition({ x: 0, y: 0 });
+  };
+
+  /**
+   * BuildingSelectionModal callback
+   */
+  const onBuildingSelected = (building: Building) => {
+    const newBuildings = buildings.slice();
+
+    newBuildings.push(building);
+
+    setBuildings(newBuildings);
   };
 
   return (
@@ -305,6 +328,12 @@ const MapEditor: React.FC<Props> = ({
           </Layer>
         </Stage>
       </div>
+
+      <BuildingSelectionModal
+        buildingTypes={[]}
+        openRef={openBuildingSelectionModalRef}
+        onBuildingSelected={onBuildingSelected}
+      />
     </div>
   );
 };
