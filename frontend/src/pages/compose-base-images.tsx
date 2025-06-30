@@ -5,18 +5,21 @@ import ComposeBaseImages from "../components/ComposeBaseImages";
 import Header from "../components/Header";
 
 const ComposeBaseImagesPage: React.FC = () => {
-  useEffect(() => {
-    const onBeforeUnload = (e: BeforeUnloadEvent) => {
-      e.preventDefault();
-      e.returnValue = "";
-    };
+  if (import.meta.env.PROD) {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    useEffect(() => {
+      const onBeforeUnload = (e: BeforeUnloadEvent) => {
+        e.preventDefault();
+        e.returnValue = "";
+      };
 
-    window.addEventListener("beforeunload", onBeforeUnload);
+      window.addEventListener("beforeunload", onBeforeUnload);
 
-    return () => {
-      window.removeEventListener("beforeunload", onBeforeUnload);
-    };
-  });
+      return () => {
+        window.removeEventListener("beforeunload", onBeforeUnload);
+      };
+    });
+  }
 
   return (
     <>

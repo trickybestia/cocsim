@@ -20,20 +20,23 @@ const MapEditorPage: React.FC = () => {
     );
   };
 
-  useEffect(() => {
-    if (image === undefined) return;
+  if (import.meta.env.PROD) {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    useEffect(() => {
+      if (image === undefined) return;
 
-    const onBeforeUnload = (e: BeforeUnloadEvent) => {
-      e.preventDefault();
-      e.returnValue = "";
-    };
+      const onBeforeUnload = (e: BeforeUnloadEvent) => {
+        e.preventDefault();
+        e.returnValue = "";
+      };
 
-    window.addEventListener("beforeunload", onBeforeUnload);
+      window.addEventListener("beforeunload", onBeforeUnload);
 
-    return () => {
-      window.removeEventListener("beforeunload", onBeforeUnload);
-    };
-  }, [image]);
+      return () => {
+        window.removeEventListener("beforeunload", onBeforeUnload);
+      };
+    }, [image]);
+  }
 
   return (
     <>
