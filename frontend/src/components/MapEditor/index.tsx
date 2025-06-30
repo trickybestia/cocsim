@@ -109,7 +109,7 @@ const MapEditor: React.FC<Props> = ({
 
       if (
         pointer.x < 0 ||
-        pointer.y >= canvasSize ||
+        pointer.x >= canvasSize ||
         pointer.y < 0 ||
         pointer.y >= canvasSize
       ) {
@@ -140,6 +140,10 @@ const MapEditor: React.FC<Props> = ({
 
   const canvasOnClick = (e: KonvaEventObject<MouseEvent>) => {
     if (e.evt.button === 0) {
+      if (cursorPosition === undefined)
+        // clicked on map background
+        return;
+
       if (selectionStartPosition === undefined) {
         setSelectionStartPosition(cursorPosition);
       } else {
