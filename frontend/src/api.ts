@@ -1,5 +1,7 @@
 import axios from "axios";
 
+import type { BuildingType } from "./types";
+
 const axiosInstance = axios.create({
   baseURL: "http://localhost:8000/api"
 });
@@ -39,4 +41,8 @@ const reverseProjection = async (image: Blob): Promise<Blob> => {
   ).data;
 };
 
-export { composeBaseImages, reverseProjection };
+const getBuildingTypes = async (): Promise<BuildingType[]> => {
+  return (await axiosInstance.get("/get-building-types")).data;
+};
+
+export { composeBaseImages, reverseProjection, getBuildingTypes };

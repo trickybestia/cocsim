@@ -54,8 +54,8 @@ async def reverse_projection_api(image: UploadFile):
     return Response(result.getvalue(), media_type="image/jpeg")
 
 
-@app.get("/api/get-buildings")
-async def get_buildings():
+@app.get("/api/get-building-types")
+async def get_building_types():
     result = []
 
     for building in BUILDINGS:
