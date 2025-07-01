@@ -1,4 +1,6 @@
-import type { Building, BuildingType } from "../types";
+import { BlobReader, BlobWriter, TextReader, ZipWriter } from "@zip.js/zip.js";
+
+import type { Building, BuildingType, Map } from "../types";
 
 const createBuildingsGrid = (
   buildings: Building[],
@@ -69,4 +71,40 @@ const resizeBuildings = (
   });
 };
 
-export { createBuildingsGrid, checkIntersection, resizeBuildings };
+const cropImage = async (
+  image: HTMLImageElement,
+  x: number,
+  y: number,
+  width: number,
+  height: number
+): Promise<Blob> => {
+  const canvas = new OffscreenCanvas(width, height);
+
+  canvas
+    .getContext("2d")!
+    .drawImage(image, x, y, width, height, 0, 0, width, height);
+
+  return await canvas.convertToBlob({ type: "image/jpeg", quality: 0.8 });
+};
+
+const exportToZip = async (map: Map, image: Blob): Promise<Blob> => {
+  const zipWriter = new ZipWriter(new BlobWriter("application/zip"), {
+    level: 0,
+    compressionMethod: 0
+  });
+
+  console.log(image);
+
+  await zipWriter.add("map.json", new TextReader(JSON.stringify(map)));
+  await zipWriter.add("map.jpg", new BlobReader(image));
+
+  return await zipWriter.close();
+};
+
+export {
+  createBuildingsGrid,
+  checkIntersection,
+  resizeBuildings,
+  cropImage,
+  exportToZip
+};

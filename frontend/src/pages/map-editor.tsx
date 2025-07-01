@@ -1,12 +1,16 @@
+import { saveAs } from "file-saver";
 import { useEffect, useState } from "react";
 
 import Header from "../components/Header";
 import MapEditor from "../components/MapEditor";
 import { useBuildingTypes } from "../hooks";
+import { exportToZip } from "../utils/map-editor";
 import readFiles from "../utils/read-files";
 
 const MapEditorPage: React.FC = () => {
-  const [image, setImage] = useState<HTMLImageElement | undefined>(undefined);
+  const [image, setImage] = useState<
+    { image: HTMLImageElement; imageBlob: Blob } | undefined
+  >(undefined);
   const buildingTypes = useBuildingTypes();
 
   const onCreateNewButtonClick = () => {
@@ -15,7 +19,9 @@ const MapEditorPage: React.FC = () => {
         const image = new Image();
 
         image.src = URL.createObjectURL(images[0]);
-        image.addEventListener("load", () => setImage(image));
+        image.addEventListener("load", () =>
+          setImage({ image: image, imageBlob: images[0] })
+        );
       },
       "image/*",
       false
@@ -63,7 +69,16 @@ const MapEditorPage: React.FC = () => {
           buildingTypes !== undefined && (
             <div className="flex h-full flex-col items-center">
               <div className="w-full grow lg:max-w-[var(--breakpoint-lg)]">
-                <MapEditor image={image} buildingTypes={buildingTypes} />
+                <MapEditor
+                  image={image.image}
+                  imageBlob={image.imageBlob}
+                  buildingTypes={buildingTypes}
+                  onExport={(map, imageUrl) =>
+                    exportToZip(map, imageUrl).then((zip) => {
+                      saveAs(zip, `cocsim-map-${new Date().toISOString()}.zip`);
+                    })
+                  }
+                />
               </div>
             </div>
           )

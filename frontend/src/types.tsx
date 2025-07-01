@@ -1,3 +1,9 @@
+type Map = {
+  baseSize: number;
+  borderSize: number;
+  buildings: Building[];
+};
+
 /**
  * Building instance type.
  */
@@ -21,4 +27,4 @@ type BuildingType = {
   options: { name: string; values: (string | number)[] }[];
 };
 
-export type { BuildingType, Building };
+export type { Map, BuildingType, Building };

@@ -4,9 +4,13 @@ import { useEffect, useRef, useState } from "react";
 import { Image, Layer, Rect, Stage } from "react-konva";
 import { twMerge } from "tailwind-merge";
 
-import type { Building, BuildingType } from "../../types";
+import type { Building, BuildingType, Map } from "../../types";
 import clamp from "../../utils/clamp";
-import { checkIntersection, createBuildingsGrid } from "../../utils/map-editor";
+import {
+  checkIntersection,
+  createBuildingsGrid,
+  cropImage
+} from "../../utils/map-editor";
 import sortSelection from "../../utils/sort-selection";
 import BuildingCreationModal from "./BuildingCreationModal";
 import BuildingsLayer from "./BuildingsLayer";
@@ -16,14 +20,20 @@ import NumberInput from "./NumberInput";
 
 type Props = React.HTMLAttributes<HTMLDivElement> & {
   image: HTMLImageElement;
+  imageBlob: Blob;
+  map?: Map;
   buildingTypes: BuildingType[];
+  onExport: (map: Map, image: Blob) => void;
 };
 
 const MapEditor: React.FC<Props> = ({
   className,
 
   image,
+  imageBlob,
+  map,
   buildingTypes,
+  onExport,
 
   ...props
 }: Props) => {
@@ -47,16 +57,22 @@ const MapEditor: React.FC<Props> = ({
     };
   }, []);
 
-  const [buildings, setBuildings] = useState<Building[]>([]);
+  const [buildings, setBuildings] = useState<Building[]>(
+    map === undefined ? [] : map.buildings
+  );
 
   const [drawGrid, setDrawGrid] = useState(false);
   const [drawCoords, setDrawCoords] = useState(false);
-  const [baseSize, setBaseSize] = useState(32);
-  const [borderSize, setBorderSize] = useState(0);
-  const [startX, setStartX] = useState(317);
-  const [startY, setStartY] = useState(460);
-  const [endX, setEndX] = useState(1337);
-  const [endY, setEndY] = useState(1488);
+  const [baseSize, setBaseSize] = useState(
+    map === undefined ? 32 : map.baseSize
+  );
+  const [borderSize, setBorderSize] = useState(
+    map === undefined ? 0 : map.borderSize
+  );
+  const [startX, setStartX] = useState(map === undefined ? 317 : 0);
+  const [startY, setStartY] = useState(map === undefined ? 460 : 0);
+  const [endX, setEndX] = useState(map === undefined ? 1337 : image.width - 1);
+  const [endY, setEndY] = useState(map === undefined ? 1488 : image.height - 1);
 
   const [cursorPosition, setCursorPosition] = useState<
     { x: number; y: number } | undefined
@@ -203,6 +219,36 @@ const MapEditor: React.FC<Props> = ({
     canvasRef.current.setPosition({ x: 0, y: 0 });
   };
 
+  const onExportButtonClick = async () => {
+    let exportImageBlob;
+
+    if (
+      startX === 0 &&
+      startY === 0 &&
+      endX === image.width - 1 &&
+      endY === image.height - 1
+    ) {
+      exportImageBlob = imageBlob;
+    } else {
+      exportImageBlob = await cropImage(
+        image,
+        startX,
+        startY,
+        endX - startX + 1,
+        endY - startY + 1
+      );
+    }
+
+    onExport(
+      {
+        baseSize: baseSize,
+        borderSize: borderSize,
+        buildings: buildings
+      },
+      exportImageBlob
+    );
+  };
+
   /**
    * BuildingSelectionModal callback
    */
@@ -313,6 +359,12 @@ const MapEditor: React.FC<Props> = ({
             onClick={onResetCameraButtonClick}
           >
             Reset camera
+          </button>
+          <button
+            className="col-span-2 cursor-pointer bg-blue-400 px-2 py-1 text-base font-bold text-white hover:bg-blue-600"
+            onClick={onExportButtonClick}
+          >
+            Export
           </button>
         </div>
       </div>
