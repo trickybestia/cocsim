@@ -6,9 +6,14 @@ import fuzzySearch from "../../../utils/fuzzy-search";
 type Props = {
   values: string[];
   onSelected: (value: string) => void;
+  inputPlaceholder: string;
 };
 
-const StringSelector: React.FC<Props> = ({ values, onSelected }: Props) => {
+const StringSelector: React.FC<Props> = ({
+  values,
+  onSelected,
+  inputPlaceholder
+}: Props) => {
   const [selectedValue, setSelectedValue] = useState<string>(values[0]);
   const [inputValue, setInputValue] = useState("");
 
@@ -51,7 +56,7 @@ const StringSelector: React.FC<Props> = ({ values, onSelected }: Props) => {
         <input
           className="border border-gray-300 px-2"
           type="text"
-          placeholder="search for a building"
+          placeholder={inputPlaceholder}
           value={inputValue}
           onChange={onInputValueChange}
           onKeyDown={onInputKeyDown}

@@ -181,10 +181,17 @@ const MapEditor: React.FC<Props> = ({
   /**
    * BuildingSelectionModal callback
    */
-  const onBuildingTypeSelected = (buildingType: BuildingType) => {
+  const onBuildingCreationModalClose = (
+    building: { buildingType: BuildingType; level: number } | undefined
+  ) => {
+    setIsBuildingSelectionModalOpen(false);
+    setSelectionStartPosition(undefined);
+
+    if (building === undefined) return;
+
     const newBuildings = buildings.slice();
 
-    if (buildingType.name === "Wall") {
+    if (building.buildingType.name === "Wall") {
       for (
         let tileX = selection!.leftTop.x;
         tileX != selection!.rightBottom.x + 1;
@@ -199,16 +206,16 @@ const MapEditor: React.FC<Props> = ({
             name: "Wall",
             x: tileX,
             y: tileY,
-            level: 0
+            level: building.level
           });
         }
       }
     } else {
       newBuildings.push({
-        name: buildingType.name,
+        name: building.buildingType.name,
         x: selection!.leftTop.x,
         y: selection!.leftTop.y,
-        level: 0
+        level: building.level
       });
     }
 
@@ -369,14 +376,7 @@ const MapEditor: React.FC<Props> = ({
                 height: selection.rightBottom.y - selection.leftTop.y + 1
               }
         }
-        onClose={(buildingType: BuildingType | undefined) => {
-          if (buildingType !== undefined) {
-            onBuildingTypeSelected(buildingType);
-          }
-
-          setIsBuildingSelectionModalOpen(false);
-          setSelectionStartPosition(undefined);
-        }}
+        onClose={onBuildingCreationModalClose}
       />
     </div>
   );

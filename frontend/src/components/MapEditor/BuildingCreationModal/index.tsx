@@ -1,3 +1,4 @@
+import { useState } from "react";
 import Modal from "react-modal";
 
 import type { BuildingType } from "../../../types";
@@ -8,7 +9,9 @@ type Props = {
   isOpen: boolean;
   buildingTypes: BuildingType[];
   selection: { width: number; height: number } | undefined;
-  onClose: (buildingType: BuildingType | undefined) => void;
+  onClose: (
+    building: { buildingType: BuildingType; level: number } | undefined
+  ) => void;
 };
 
 const BuildingCreationModal: React.FC<Props> = ({
@@ -17,6 +20,14 @@ const BuildingCreationModal: React.FC<Props> = ({
   selection,
   onClose
 }: Props) => {
+  const [selectedBuildingType, setSelectedBuildingType] = useState<
+    BuildingType | undefined
+  >(undefined);
+
+  if (!isOpen && selectedBuildingType !== undefined) {
+    setSelectedBuildingType(undefined);
+  }
+
   const availableBuildingTypes =
     selection === undefined
       ? []
@@ -43,18 +54,33 @@ const BuildingCreationModal: React.FC<Props> = ({
         }
       }}
     >
-      {isOpen && (
+      {isOpen && selectedBuildingType === undefined && (
         <StringSelector
           values={availableBuildingTypes.map(
             (buildingType) => buildingType.name
           )}
           onSelected={(value) =>
-            onClose(
+            setSelectedBuildingType(
               availableBuildingTypes.find(
                 (buildingType) => buildingType.name === value
               )!
             )
           }
+          inputPlaceholder="search for a building"
+        />
+      )}
+      {isOpen && selectedBuildingType !== undefined && (
+        <StringSelector
+          values={Array(selectedBuildingType.levels)
+            .fill(0)
+            .map((_, index) => (index + 1).toString())}
+          onSelected={(value) =>
+            onClose({
+              buildingType: selectedBuildingType,
+              level: parseInt(value) - 1
+            })
+          }
+          inputPlaceholder="select level"
         />
       )}
     </Modal>
