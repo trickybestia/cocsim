@@ -7,7 +7,7 @@ import { twMerge } from "tailwind-merge";
 import type { Building, BuildingType } from "../../types";
 import clamp from "../../utils/clamp";
 import sortSelection from "../../utils/sort-selection";
-import BuildingSelectionModal from "./BuildingSelectionModal";
+import BuildingCreationModal from "./BuildingCreationModal";
 import BuildingsLayer from "./BuildingsLayer";
 import DrawCoordsLayer from "./DrawCoordsLayer";
 import DrawGridLayer from "./DrawGridLayer";
@@ -358,7 +358,7 @@ const MapEditor: React.FC<Props> = ({
         </Stage>
       </div>
 
-      <BuildingSelectionModal
+      <BuildingCreationModal
         isOpen={isBuildingSelectionModalOpen}
         buildingTypes={buildingTypes}
         selection={
