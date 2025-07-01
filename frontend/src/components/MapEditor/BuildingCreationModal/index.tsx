@@ -2,7 +2,7 @@ import Modal from "react-modal";
 
 import type { BuildingType } from "../../../types";
 import getBuildingTypesWithSize from "../../../utils/get-building-types-with-size";
-import BuildingSelector from "./BuildingSelector";
+import StringSelector from "./StringSelector";
 
 type Props = {
   isOpen: boolean;
@@ -44,9 +44,17 @@ const BuildingCreationModal: React.FC<Props> = ({
       }}
     >
       {isOpen && (
-        <BuildingSelector
-          buildingTypes={availableBuildingTypes}
-          onSelected={onClose}
+        <StringSelector
+          values={availableBuildingTypes.map(
+            (buildingType) => buildingType.name
+          )}
+          onSelected={(value) =>
+            onClose(
+              availableBuildingTypes.find(
+                (buildingType) => buildingType.name === value
+              )!
+            )
+          }
         />
       )}
     </Modal>
