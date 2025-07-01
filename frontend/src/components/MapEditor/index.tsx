@@ -6,6 +6,7 @@ import { twMerge } from "tailwind-merge";
 
 import type { Building, BuildingType } from "../../types";
 import clamp from "../../utils/clamp";
+import { checkIntersection, createBuildingsGrid } from "../../utils/map-editor";
 import sortSelection from "../../utils/sort-selection";
 import BuildingCreationModal from "./BuildingCreationModal";
 import BuildingsLayer from "./BuildingsLayer";
@@ -67,7 +68,16 @@ const MapEditor: React.FC<Props> = ({
     useState(false);
 
   const pixelsPerTile = canvasSize / (baseSize + borderSize);
+  const buildingsGrid = createBuildingsGrid(
+    buildings,
+    buildingTypes,
+    baseSize + borderSize
+  );
   const selection = sortSelection(cursorPosition, selectionStartPosition);
+  const selectionIntersectsBuilding =
+    selection === undefined
+      ? false
+      : checkIntersection(buildingsGrid, selection);
 
   const canvasOnWheel = (e: KonvaEventObject<WheelEvent>) => {
     const stage = e.target.getStage();
@@ -148,14 +158,16 @@ const MapEditor: React.FC<Props> = ({
   };
 
   const canvasOnClick = (e: KonvaEventObject<MouseEvent>) => {
-    if (e.evt.button === 0) {
-      if (cursorPosition === undefined)
-        // clicked on map background
-        return;
+    if (cursorPosition === undefined)
+      // clicked on map background
+      return;
 
+    if (e.evt.button === 0) {
       if (selectionStartPosition === undefined) {
         setSelectionStartPosition(cursorPosition);
-      } else {
+      } else if (!selectionIntersectsBuilding) {
+        // create new building
+
         setIsBuildingSelectionModalOpen(true);
       }
 
@@ -167,6 +179,19 @@ const MapEditor: React.FC<Props> = ({
         setSelectionStartPosition(undefined);
       } else {
         // remove selected building
+
+        const building = buildingsGrid[cursorPosition.x][cursorPosition.y];
+
+        if (building === undefined) return;
+
+        const newBuildings = buildings.slice();
+
+        newBuildings.splice(
+          buildings.findIndex((b) => b.x === building.x && b.y === building.y)!,
+          1
+        );
+
+        setBuildings(newBuildings);
       }
     }
   };
@@ -357,7 +382,7 @@ const MapEditor: React.FC<Props> = ({
                   (selection.rightBottom.y - selection.leftTop.y + 1) *
                   pixelsPerTile
                 }
-                stroke="black"
+                stroke={selectionIntersectsBuilding ? "red" : "black"}
                 strokeWidth={1}
               />
             )}
