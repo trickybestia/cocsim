@@ -43,10 +43,12 @@ const BuildingCreationModal: React.FC<Props> = ({
         }
       }}
     >
-      <BuildingSelector
-        buildingTypes={availableBuildingTypes}
-        onSelected={onClose}
-      />
+      {isOpen && (
+        <BuildingSelector
+          buildingTypes={availableBuildingTypes}
+          onSelected={onClose}
+        />
+      )}
     </Modal>
   );
 };
