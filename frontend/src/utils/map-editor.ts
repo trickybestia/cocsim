@@ -93,8 +93,6 @@ const exportToZip = async (map: Map, image: Blob): Promise<Blob> => {
     compressionMethod: 0
   });
 
-  console.log(image);
-
   await zipWriter.add("map.json", new TextReader(JSON.stringify(map)));
   await zipWriter.add("map.jpg", new BlobReader(image));
 
