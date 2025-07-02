@@ -13,6 +13,7 @@ import {
 } from "../../utils/map-editor";
 import sortSelection from "../../utils/sort-selection";
 import BuildingCreationModal from "./BuildingCreationModal";
+import BuildingOptionsEditor from "./BuildingOptionsEditor";
 import BuildingsLayer from "./BuildingsLayer";
 import DrawCoordsLayer from "./DrawCoordsLayer";
 import DrawGridLayer from "./DrawGridLayer";
@@ -80,6 +81,9 @@ const MapEditor: React.FC<Props> = ({
   const [selectionStartPosition, setSelectionStartPosition] = useState<
     { x: number; y: number } | undefined
   >(undefined);
+  const [selectedBuildingPosition, setSelectedBuildingPosition] = useState<
+    { x: number; y: number } | undefined
+  >(undefined);
   const [isBuildingSelectionModalOpen, setIsBuildingSelectionModalOpen] =
     useState(false);
 
@@ -89,11 +93,34 @@ const MapEditor: React.FC<Props> = ({
     buildingTypes,
     baseSize + borderSize
   );
+  const highlightedBuilding =
+    cursorPosition === undefined
+      ? undefined
+      : buildingsGrid[cursorPosition.x][cursorPosition.y];
+  const selectedBuilding =
+    selectedBuildingPosition === undefined
+      ? undefined
+      : buildingsGrid[selectedBuildingPosition.x][selectedBuildingPosition.y];
+  const selectedBuildingIndex =
+    selectedBuilding === undefined
+      ? undefined
+      : buildings.indexOf(selectedBuilding);
+  const selectedBuildingType =
+    selectedBuilding === undefined
+      ? undefined
+      : buildingTypes.find((value) => value.name == selectedBuilding.name)!;
   const selection = sortSelection(cursorPosition, selectionStartPosition);
   const selectionIntersectsBuilding =
     selection === undefined
       ? false
       : checkIntersection(buildingsGrid, selection);
+
+  if (
+    selectedBuilding === undefined &&
+    selectedBuildingPosition !== undefined
+  ) {
+    setSelectedBuildingPosition(undefined);
+  }
 
   const canvasOnWheel = (e: KonvaEventObject<WheelEvent>) => {
     const stage = e.target.getStage();
@@ -180,7 +207,14 @@ const MapEditor: React.FC<Props> = ({
 
     if (e.evt.button === 0) {
       if (selectionStartPosition === undefined) {
-        setSelectionStartPosition(cursorPosition);
+        if (highlightedBuilding !== undefined) {
+          setSelectedBuildingPosition({
+            x: highlightedBuilding.x,
+            y: highlightedBuilding.y
+          });
+        } else {
+          setSelectionStartPosition(cursorPosition);
+        }
       } else if (!selectionIntersectsBuilding) {
         // create new building
 
@@ -291,11 +325,19 @@ const MapEditor: React.FC<Props> = ({
     }
 
     setBuildings(newBuildings);
+    setSelectedBuildingPosition({
+      x: selection!.leftTop.x,
+      y: selection!.leftTop.y
+    });
   };
 
   return (
     <div
-      className={twMerge(className, "flex h-full w-full justify-between gap-2")}
+      className={twMerge(
+        className,
+        "flex h-full w-full justify-between gap-2",
+        highlightedBuilding !== undefined && "cursor-pointer"
+      )}
       {...props}
     >
       <div>
@@ -366,6 +408,20 @@ const MapEditor: React.FC<Props> = ({
           >
             Export
           </button>
+          {selectedBuilding !== undefined && (
+            <BuildingOptionsEditor
+              key={`${selectedBuilding.x},${selectedBuilding.y}`}
+              building={selectedBuilding}
+              buildingType={selectedBuildingType!}
+              onChange={(value) => {
+                const newBuildings = buildings.slice();
+
+                newBuildings[selectedBuildingIndex!] = value;
+
+                setBuildings(newBuildings);
+              }}
+            />
+          )}
         </div>
       </div>
 
@@ -410,6 +466,7 @@ const MapEditor: React.FC<Props> = ({
             canvasSize={canvasSize}
             buildings={buildings}
             buildingTypes={buildingTypes}
+            selectedBuilding={selectedBuilding}
           />
           <Layer>
             {cursorPosition !== undefined && (

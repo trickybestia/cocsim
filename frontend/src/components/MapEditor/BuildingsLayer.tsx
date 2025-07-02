@@ -8,15 +8,26 @@ type Props = {
   canvasSize: number;
   buildings: Building[];
   buildingTypes: BuildingType[];
+  selectedBuilding: Building | undefined;
 };
 
 const BuildingsLayer: React.FC<Props> = memo(
-  ({ totalSize, canvasSize, buildings, buildingTypes }: Props) => {
+  ({
+    totalSize,
+    canvasSize,
+    buildings,
+    buildingTypes,
+    selectedBuilding
+  }: Props) => {
     const pixelsPerTile = canvasSize / totalSize;
 
     const shapes: ReactNode[] = [];
 
     buildings.forEach((building) => {
+      if (building === selectedBuilding)
+        // handle later
+        return;
+
       const buildingType = buildingTypes.find(
         (value) => value.name == building.name
       )!;
@@ -34,7 +45,28 @@ const BuildingsLayer: React.FC<Props> = memo(
       );
     });
 
-    return <Layer>{shapes}</Layer>;
+    return (
+      <Layer>
+        {shapes}
+        {selectedBuilding !== undefined &&
+          (() => {
+            const selectedBuildingType = buildingTypes.find(
+              (value) => value.name == selectedBuilding.name
+            )!;
+
+            return (
+              <Rect
+                x={selectedBuilding.x * pixelsPerTile}
+                y={selectedBuilding.y * pixelsPerTile}
+                width={selectedBuildingType.width * pixelsPerTile}
+                height={selectedBuildingType.height * pixelsPerTile}
+                stroke="red"
+                strokeWidth={3}
+              />
+            );
+          })()}
+      </Layer>
+    );
   }
 );
 
