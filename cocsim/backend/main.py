@@ -6,10 +6,7 @@ from fastapi.responses import Response
 from PIL import Image
 
 from cocsim.buildings.building import BUILDINGS
-from cocsim.map_editor_gui.compose_base_images import (
-    compose_base_images,
-    reverse_projection,
-)
+from cocsim.compose_base_images import compose_base_images, reverse_projection
 
 app = FastAPI()
 
