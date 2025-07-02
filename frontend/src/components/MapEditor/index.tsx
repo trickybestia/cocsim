@@ -65,15 +65,15 @@ const MapEditor: React.FC<Props> = ({
   const [drawGrid, setDrawGrid] = useState(false);
   const [drawCoords, setDrawCoords] = useState(false);
   const [baseSize, setBaseSize] = useState(
-    map === undefined ? 32 : map.baseSize
+    map === undefined ? 44 : map.baseSize
   );
   const [borderSize, setBorderSize] = useState(
-    map === undefined ? 0 : map.borderSize
+    map === undefined ? 4 : map.borderSize
   );
-  const [startX, setStartX] = useState(map === undefined ? 317 : 0);
-  const [startY, setStartY] = useState(map === undefined ? 460 : 0);
-  const [endX, setEndX] = useState(map === undefined ? 1337 : image.width - 1);
-  const [endY, setEndY] = useState(map === undefined ? 1488 : image.height - 1);
+  const [startX, setStartX] = useState(0);
+  const [startY, setStartY] = useState(0);
+  const [endX, setEndX] = useState(image.width - 1);
+  const [endY, setEndY] = useState(image.height - 1);
 
   const [cursorPosition, setCursorPosition] = useState<
     { x: number; y: number } | undefined

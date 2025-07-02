@@ -1,4 +1,11 @@
-import { BlobReader, BlobWriter, TextReader, ZipWriter } from "@zip.js/zip.js";
+import {
+  BlobReader,
+  BlobWriter,
+  TextReader,
+  TextWriter,
+  ZipReader,
+  ZipWriter
+} from "@zip.js/zip.js";
 
 import type { Building, BuildingType, Map } from "../types";
 
@@ -99,10 +106,47 @@ const exportToZip = async (map: Map, image: Blob): Promise<Blob> => {
   return await zipWriter.close();
 };
 
+const parseMap = (json: string): Map => {
+  // Maybe validate map using zod
+
+  return JSON.parse(json);
+};
+
+const importFromZip = async (zip: Blob): Promise<{ map: Map; image: Blob }> => {
+  const zipReader = new ZipReader(new BlobReader(zip));
+  let image: Blob | undefined = undefined;
+  let map: Map | undefined = undefined;
+
+  for await (const entry of zipReader.getEntriesGenerator()) {
+    console.log(entry.filename);
+
+    if (entry.filename === "map.jpg") {
+      const imageBlobWriter = new BlobWriter("image/jpeg");
+
+      await entry.getData!(imageBlobWriter);
+
+      image = await imageBlobWriter.getData();
+    } else if (entry.filename === "map.json") {
+      const mapTextWriter = new TextWriter();
+
+      await entry.getData!(mapTextWriter);
+
+      map = parseMap(await mapTextWriter.getData());
+    }
+  }
+
+  if (image === undefined || map === undefined) {
+    throw new Error("importFromZip failed");
+  }
+
+  return { map, image };
+};
+
 export {
   createBuildingsGrid,
   checkIntersection,
   resizeBuildings,
   cropImage,
-  exportToZip
+  exportToZip,
+  importFromZip
 };

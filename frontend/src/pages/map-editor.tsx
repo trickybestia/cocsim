@@ -5,12 +5,14 @@ import Header from "../components/Header";
 import MapEditor from "../components/MapEditor";
 import { BuildingTypesContext } from "../hooks/use-building-types";
 import useBuildingTypesSWR from "../hooks/use-building-types-swr";
-import { exportToZip } from "../utils/map-editor";
+import type { Map } from "../types";
+import { exportToZip, importFromZip } from "../utils/map-editor";
 import readFiles from "../utils/read-files";
 
 const MapEditorPage: React.FC = () => {
-  const [image, setImage] = useState<
-    { image: HTMLImageElement; imageBlob: Blob } | undefined
+  const [loadedData, setLoadedData] = useState<
+    | { image: HTMLImageElement; imageBlob: Blob; map: Map | undefined }
+    | undefined
   >(undefined);
   const buildingTypes = useBuildingTypesSWR();
 
@@ -21,7 +23,7 @@ const MapEditorPage: React.FC = () => {
 
         image.src = URL.createObjectURL(images[0]);
         image.addEventListener("load", () =>
-          setImage({ image: image, imageBlob: images[0] })
+          setLoadedData({ image: image, imageBlob: images[0], map: undefined })
         );
       },
       "image/*",
@@ -29,10 +31,31 @@ const MapEditorPage: React.FC = () => {
     );
   };
 
+  const onOpenExistingButtonClick = () => {
+    readFiles(
+      (files) => {
+        importFromZip(files[0]).then((data) => {
+          const image = new Image();
+
+          image.src = URL.createObjectURL(data.image);
+          image.addEventListener("load", () =>
+            setLoadedData({
+              image: image,
+              imageBlob: data.image,
+              map: data.map
+            })
+          );
+        });
+      },
+      "application/zip",
+      false
+    );
+  };
+
   if (import.meta.env.PROD) {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     useEffect(() => {
-      if (image === undefined) return;
+      if (loadedData === undefined) return;
 
       const onBeforeUnload = (e: BeforeUnloadEvent) => {
         e.preventDefault();
@@ -44,14 +67,14 @@ const MapEditorPage: React.FC = () => {
       return () => {
         window.removeEventListener("beforeunload", onBeforeUnload);
       };
-    }, [image]);
+    }, [loadedData]);
   }
 
   return (
     <>
       <Header />
       <main className="grow p-4">
-        {image === undefined ? (
+        {loadedData === undefined ? (
           <div className="absolute top-0 left-0 h-full w-full">
             <div className="relative top-[40%] left-1/2 flex -translate-1/2 flex-col items-center gap-2 text-center">
               <h1 className="text-3xl font-semibold">Map editor</h1>
@@ -61,7 +84,10 @@ const MapEditorPage: React.FC = () => {
               >
                 Create new
               </button>
-              <button className="cursor-pointer bg-blue-400 px-2 py-1 text-base font-bold text-white hover:bg-blue-600">
+              <button
+                className="cursor-pointer bg-blue-400 px-2 py-1 text-base font-bold text-white hover:bg-blue-600"
+                onClick={onOpenExistingButtonClick}
+              >
                 Open existing
               </button>
             </div>
@@ -72,8 +98,9 @@ const MapEditorPage: React.FC = () => {
               <div className="w-full grow lg:max-w-[var(--breakpoint-lg)]">
                 <BuildingTypesContext value={buildingTypes}>
                   <MapEditor
-                    image={image.image}
-                    imageBlob={image.imageBlob}
+                    image={loadedData.image}
+                    imageBlob={loadedData.imageBlob}
+                    map={loadedData.map}
                     onExport={(map, imageUrl) =>
                       exportToZip(map, imageUrl).then((zip) => {
                         saveAs(
