@@ -1,3 +1,5 @@
+import { create } from "mutative";
+
 import useBuildingTypes from "../../hooks/use-building-types";
 import type { Building } from "../../types";
 import NumberInput from "./NumberInput";
@@ -22,13 +24,13 @@ const BuildingOptionsEditor: React.FC<Props> = ({
         min={1}
         max={buildingType!.levels}
         defaultValue={building.level + 1}
-        onChange={(value) => {
-          const newBuilding = structuredClone(building);
-
-          newBuilding.level = value - 1;
-
-          onChange(newBuilding);
-        }}
+        onChange={(value) =>
+          onChange(
+            create(building, (draft) => {
+              draft.level = value - 1;
+            })
+          )
+        }
       />
     </>
   );

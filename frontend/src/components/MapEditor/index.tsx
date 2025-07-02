@@ -1,5 +1,6 @@
 import Konva from "konva";
 import type { KonvaEventObject } from "konva/lib/Node";
+import { create } from "mutative";
 import { useContext, useEffect, useRef, useState } from "react";
 import { Image, Layer, Rect, Stage } from "react-konva";
 import { twMerge } from "tailwind-merge";
@@ -401,13 +402,13 @@ const MapEditor: React.FC<Props> = ({
             <BuildingOptionsEditor
               key={`${selectedBuilding.x},${selectedBuilding.y}`}
               building={selectedBuilding}
-              onChange={(value) => {
-                const newBuildings = buildings.slice();
-
-                newBuildings[selectedBuildingIndex!] = value;
-
-                setBuildings(newBuildings);
-              }}
+              onChange={(value) =>
+                setBuildings(
+                  create(buildings, (draft) => {
+                    draft[selectedBuildingIndex!] = value;
+                  })
+                )
+              }
             />
           )}
         </div>
