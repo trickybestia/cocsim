@@ -111,13 +111,6 @@ const MapEditor: React.FC<Props> = ({
       ? false
       : checkIntersection(buildingsGrid, selection);
 
-  if (
-    selectedBuilding === undefined &&
-    selectedBuildingPosition !== undefined
-  ) {
-    setSelectedBuildingPosition(undefined);
-  }
-
   const canvasOnWheel = (e: KonvaEventObject<WheelEvent>) => {
     const stage = e.target.getStage();
 
