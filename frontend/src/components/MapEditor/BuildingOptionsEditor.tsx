@@ -1,4 +1,5 @@
 import { create } from "mutative";
+import { Fragment } from "react";
 
 import useBuildingTypes from "../../hooks/use-building-types";
 import type { Building } from "../../types";
@@ -22,7 +23,7 @@ const BuildingOptionsEditor: React.FC<Props> = ({
       <NumberInput
         text="Level:"
         min={1}
-        max={buildingType!.levels}
+        max={buildingType.levels}
         defaultValue={building.level + 1}
         onChange={(value) =>
           onChange(
@@ -32,6 +33,27 @@ const BuildingOptionsEditor: React.FC<Props> = ({
           )
         }
       />
+      {buildingType.options.map(({ name, values }) => (
+        <Fragment key={name}>
+          <p>{name}:</p>
+          <select
+            value={building[name]}
+            onChange={(e) =>
+              onChange(
+                create(building, (draft) => {
+                  draft[name] = e.target.value;
+                })
+              )
+            }
+          >
+            {values.map((value) => (
+              <option key={value} value={value}>
+                {value}
+              </option>
+            ))}
+          </select>
+        </Fragment>
+      ))}
     </>
   );
 };

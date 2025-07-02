@@ -306,11 +306,18 @@ const MapEditor: React.FC<Props> = ({
         }
       }
     } else {
+      const options: { [option: string]: string | number } = {};
+
+      building.buildingType.options.forEach(({ name, values }) => {
+        options[name] = values[0];
+      });
+
       newBuildings.push({
         name: building.buildingType.name,
         x: selection!.leftTop.x,
         y: selection!.leftTop.y,
-        level: building.level
+        level: building.level,
+        ...options
       });
     }
 
@@ -400,7 +407,7 @@ const MapEditor: React.FC<Props> = ({
           </button>
           {selectedBuilding !== undefined && (
             <BuildingOptionsEditor
-              key={`${selectedBuilding.x},${selectedBuilding.y}`}
+              key={`${selectedBuilding.x},${selectedBuilding.y}`} // to reset <input/> values on selected building change
               building={selectedBuilding}
               onChange={(value) =>
                 setBuildings(
