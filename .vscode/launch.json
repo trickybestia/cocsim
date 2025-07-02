@@ -11,21 +11,12 @@
             "module": "cocsim.tests",
         },
         {
-            "name": "cocsim.map_editor_gui.compose_base_images",
+            "name": "cocsim.compose_base_images",
             "type": "debugpy",
             "request": "launch",
-            "module": "cocsim.map_editor_gui.compose_base_images",
+            "module": "cocsim.compose_base_images",
             "args": [
-                "0"
-            ]
-        },
-        {
-            "name": "cocsim.map_editor_gui",
-            "type": "debugpy",
-            "request": "launch",
-            "module": "cocsim.map_editor_gui",
-            "args": [
-                "1"
+                "single_player/goblin_gauntlet"
             ]
         },
         {
