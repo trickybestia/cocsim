@@ -1,13 +1,13 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import Modal from "react-modal";
 
+import { BuildingTypesContext } from "../../../hooks/use-building-types";
 import type { BuildingType } from "../../../types";
 import getBuildingTypesWithSize from "../../../utils/get-building-types-with-size";
 import StringSelector from "./StringSelector";
 
 type Props = {
   isOpen: boolean;
-  buildingTypes: BuildingType[];
   selection: { width: number; height: number } | undefined;
   onClose: (
     building: { buildingType: BuildingType; level: number } | undefined
@@ -16,13 +16,13 @@ type Props = {
 
 const BuildingCreationModal: React.FC<Props> = ({
   isOpen,
-  buildingTypes,
   selection,
   onClose
 }: Props) => {
   const [selectedBuildingType, setSelectedBuildingType] = useState<
     BuildingType | undefined
   >(undefined);
+  const buildingTypes = useContext(BuildingTypesContext);
 
   if (!isOpen && selectedBuildingType !== undefined) {
     setSelectedBuildingType(undefined);

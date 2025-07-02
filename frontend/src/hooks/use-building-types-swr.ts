@@ -1,9 +1,9 @@
 import useSWR from "swr";
 
-import { getBuildingTypes } from "./api";
-import type { BuildingType } from "./types";
+import { getBuildingTypes } from "../api";
+import type { BuildingType } from "../types";
 
-const useBuildingTypes = (): BuildingType[] | undefined => {
+const useBuildingTypesSWR = (): BuildingType[] | undefined => {
   const { data } = useSWR("get-building-types", getBuildingTypes, {
     revalidateIfStale: false,
     revalidateOnFocus: false,
@@ -13,4 +13,4 @@ const useBuildingTypes = (): BuildingType[] | undefined => {
   return data;
 };
 
-export { useBuildingTypes };
+export default useBuildingTypesSWR;

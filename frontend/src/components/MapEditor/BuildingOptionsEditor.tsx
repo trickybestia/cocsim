@@ -1,17 +1,18 @@
-import type { Building, BuildingType } from "../../types";
+import useBuildingTypes from "../../hooks/use-building-types";
+import type { Building } from "../../types";
 import NumberInput from "./NumberInput";
 
 type Props = {
   building: Building;
-  buildingType: BuildingType;
   onChange: (newBuilding: Building) => void;
 };
 
 const BuildingOptionsEditor: React.FC<Props> = ({
   building,
-  buildingType,
   onChange
 }: Props) => {
+  const buildingType = useBuildingTypes().getBuildingType(building);
+
   return (
     <>
       <p>Selected:</p>

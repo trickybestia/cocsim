@@ -1,9 +1,10 @@
 import Konva from "konva";
 import type { KonvaEventObject } from "konva/lib/Node";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Image, Layer, Rect, Stage } from "react-konva";
 import { twMerge } from "tailwind-merge";
 
+import { BuildingTypesContext } from "../../hooks/use-building-types";
 import type { Building, BuildingType, Map } from "../../types";
 import clamp from "../../utils/clamp";
 import {
@@ -23,7 +24,6 @@ type Props = React.HTMLAttributes<HTMLDivElement> & {
   image: HTMLImageElement;
   imageBlob: Blob;
   map?: Map;
-  buildingTypes: BuildingType[];
   onExport: (map: Map, image: Blob) => void;
 };
 
@@ -33,7 +33,6 @@ const MapEditor: React.FC<Props> = ({
   image,
   imageBlob,
   map,
-  buildingTypes,
   onExport,
 
   ...props
@@ -87,6 +86,7 @@ const MapEditor: React.FC<Props> = ({
   const [isBuildingSelectionModalOpen, setIsBuildingSelectionModalOpen] =
     useState(false);
 
+  const buildingTypes = useContext(BuildingTypesContext);
   const pixelsPerTile = canvasSize / (baseSize + borderSize);
   const buildingsGrid = createBuildingsGrid(
     buildings,
@@ -105,10 +105,6 @@ const MapEditor: React.FC<Props> = ({
     selectedBuilding === undefined
       ? undefined
       : buildings.indexOf(selectedBuilding);
-  const selectedBuildingType =
-    selectedBuilding === undefined
-      ? undefined
-      : buildingTypes.find((value) => value.name == selectedBuilding.name)!;
   const selection = sortSelection(cursorPosition, selectionStartPosition);
   const selectionIntersectsBuilding =
     selection === undefined
@@ -412,7 +408,6 @@ const MapEditor: React.FC<Props> = ({
             <BuildingOptionsEditor
               key={`${selectedBuilding.x},${selectedBuilding.y}`}
               building={selectedBuilding}
-              buildingType={selectedBuildingType!}
               onChange={(value) => {
                 const newBuildings = buildings.slice();
 
@@ -462,11 +457,9 @@ const MapEditor: React.FC<Props> = ({
             />
           )}
           <BuildingsLayer
-            totalSize={baseSize + borderSize}
-            canvasSize={canvasSize}
             buildings={buildings}
-            buildingTypes={buildingTypes}
             selectedBuilding={selectedBuilding}
+            pixelsPerTile={pixelsPerTile}
           />
           <Layer>
             {cursorPosition !== undefined && (
@@ -501,7 +494,6 @@ const MapEditor: React.FC<Props> = ({
 
       <BuildingCreationModal
         isOpen={isBuildingSelectionModalOpen}
-        buildingTypes={buildingTypes}
         selection={
           selection === undefined
             ? undefined

@@ -1,25 +1,18 @@
 import { type ReactNode, memo } from "react";
 import { Layer, Rect } from "react-konva";
 
-import type { Building, BuildingType } from "../../types";
+import useBuildingTypes from "../../hooks/use-building-types";
+import type { Building } from "../../types";
 
 type Props = {
-  totalSize: number;
-  canvasSize: number;
   buildings: Building[];
-  buildingTypes: BuildingType[];
   selectedBuilding: Building | undefined;
+  pixelsPerTile: number;
 };
 
 const BuildingsLayer: React.FC<Props> = memo(
-  ({
-    totalSize,
-    canvasSize,
-    buildings,
-    buildingTypes,
-    selectedBuilding
-  }: Props) => {
-    const pixelsPerTile = canvasSize / totalSize;
+  ({ buildings, selectedBuilding, pixelsPerTile }: Props) => {
+    const { getBuildingType } = useBuildingTypes();
 
     const shapes: ReactNode[] = [];
 
@@ -28,9 +21,7 @@ const BuildingsLayer: React.FC<Props> = memo(
         // handle later
         return;
 
-      const buildingType = buildingTypes.find(
-        (value) => value.name == building.name
-      )!;
+      const buildingType = getBuildingType(building);
 
       shapes.push(
         <Rect
@@ -50,9 +41,7 @@ const BuildingsLayer: React.FC<Props> = memo(
         {shapes}
         {selectedBuilding !== undefined &&
           (() => {
-            const selectedBuildingType = buildingTypes.find(
-              (value) => value.name == selectedBuilding.name
-            )!;
+            const selectedBuildingType = getBuildingType(selectedBuilding);
 
             return (
               <Rect

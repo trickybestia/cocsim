@@ -3,7 +3,8 @@ import { useEffect, useState } from "react";
 
 import Header from "../components/Header";
 import MapEditor from "../components/MapEditor";
-import { useBuildingTypes } from "../hooks";
+import { BuildingTypesContext } from "../hooks/use-building-types";
+import useBuildingTypesSWR from "../hooks/use-building-types-swr";
 import { exportToZip } from "../utils/map-editor";
 import readFiles from "../utils/read-files";
 
@@ -11,7 +12,7 @@ const MapEditorPage: React.FC = () => {
   const [image, setImage] = useState<
     { image: HTMLImageElement; imageBlob: Blob } | undefined
   >(undefined);
-  const buildingTypes = useBuildingTypes();
+  const buildingTypes = useBuildingTypesSWR();
 
   const onCreateNewButtonClick = () => {
     readFiles(
@@ -69,16 +70,20 @@ const MapEditorPage: React.FC = () => {
           buildingTypes !== undefined && (
             <div className="flex h-full flex-col items-center">
               <div className="w-full grow lg:max-w-[var(--breakpoint-lg)]">
-                <MapEditor
-                  image={image.image}
-                  imageBlob={image.imageBlob}
-                  buildingTypes={buildingTypes}
-                  onExport={(map, imageUrl) =>
-                    exportToZip(map, imageUrl).then((zip) => {
-                      saveAs(zip, `cocsim-map-${new Date().toISOString()}.zip`);
-                    })
-                  }
-                />
+                <BuildingTypesContext value={buildingTypes}>
+                  <MapEditor
+                    image={image.image}
+                    imageBlob={image.imageBlob}
+                    onExport={(map, imageUrl) =>
+                      exportToZip(map, imageUrl).then((zip) => {
+                        saveAs(
+                          zip,
+                          `cocsim-map-${new Date().toISOString()}.zip`
+                        );
+                      })
+                    }
+                  />
+                </BuildingTypesContext>
               </div>
             </div>
           )
