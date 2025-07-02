@@ -68,11 +68,11 @@ class AirSweeper(ActiveBuilding):
 
     @classmethod
     def width(cls) -> int:
-        return 3
+        return 2
 
     @classmethod
     def height(cls) -> int:
-        return 3
+        return 2
 
     @classmethod
     def levels(cls) -> int:
