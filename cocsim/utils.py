@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+from zipfile import ZipFile
 
 import PIL.Image
 
@@ -8,12 +9,16 @@ from .map import Map
 
 
 def load_test_map(name: str) -> tuple[Map, PIL.Image.Image]:
-    map_dir_path = Path(TEST_MAPS_PATH) / name
+    zip_path = (Path(TEST_MAPS_PATH) / name).with_suffix(".zip")
 
-    map_path = map_dir_path / "map.json"
-    map_image_path = map_dir_path / "map.jpg"
+    with ZipFile(zip_path) as zip_file:
+        with zip_file.open("map.jpg") as map_image_file:
+            map_image = PIL.Image.open(map_image_file)
+            map_image.load()
+        with zip_file.open("map.json") as map_json_file:
+            map_dict = json.load(map_json_file)
 
-    return json.loads(map_path.read_text()), PIL.Image.open(map_image_path)
+    return map_dict, map_image
 
 
 def get_tile_color(
