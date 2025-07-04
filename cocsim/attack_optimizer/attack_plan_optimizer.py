@@ -3,7 +3,7 @@ from typing import Generator
 
 from cocsim.consts import *
 from cocsim.game import Game
-from cocsim.map import Map
+from cocsim.map_model import MapModel
 
 from .army import Army
 from .attack_plan import AttackPlan
@@ -15,10 +15,10 @@ NEW_RANDOM_PLANS = 5
 
 
 class AttackPlanOptimizer:
-    map: Map
+    map: MapModel
     army: Army
 
-    def __init__(self, map: Map, army: Army):
+    def __init__(self, map: MapModel, army: Army):
         self.map = map
         self.army = army
 

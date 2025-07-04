@@ -5,7 +5,7 @@ import pygame
 
 from . import buildings, pygame_shape_renderer, units
 from .consts import *
-from .map import Map
+from .map_model import MapModel
 from .pathfinder import Pathfinder
 from .utils import get_tile_color
 
@@ -61,9 +61,9 @@ class Game:
             )
         )
 
-    def __init__(self, map: Map, base_image: PIL.Image.Image | None):
-        self.base_size = map["baseSize"]
-        self.border_size = map["borderSize"]
+    def __init__(self, map: MapModel, base_image: PIL.Image.Image | None):
+        self.base_size = map.base_size
+        self.border_size = map.border_size
 
         self.buildings = []
         self.units = []
@@ -90,10 +90,10 @@ class Game:
         else:
             self._base_image = None
 
-        for building_dto in map["buildings"]:
-            building_type = buildings.BUILDINGS_DICT[building_dto["name"]]
+        for building_model in map.buildings:
+            building_type = buildings.BUILDINGS_DICT[building_model.name]
             building: buildings.Building = building_type.from_model(
-                self, building_type.model()(**building_dto)
+                self, building_model
             )
             building.on_destroyed.add(self._on_building_destroyed)
 

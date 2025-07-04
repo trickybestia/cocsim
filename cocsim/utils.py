@@ -5,10 +5,10 @@ from zipfile import ZipFile
 import PIL.Image
 
 from .consts import *
-from .map import Map
+from .map_model import MapModel, create_map_model
 
 
-def load_test_map(name: str) -> tuple[Map, PIL.Image.Image]:
+def load_test_map(name: str) -> tuple[MapModel, PIL.Image.Image]:
     zip_path = (Path(TEST_MAPS_PATH) / name).with_suffix(".zip")
 
     with ZipFile(zip_path) as zip_file:
@@ -18,7 +18,9 @@ def load_test_map(name: str) -> tuple[Map, PIL.Image.Image]:
         with zip_file.open("map.json") as map_json_file:
             map_dict = json.load(map_json_file)
 
-    return map_dict, map_image
+    map = create_map_model()(**map_dict)
+
+    return map, map_image
 
 
 def get_tile_color(

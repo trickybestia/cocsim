@@ -1,7 +1,6 @@
 # TODO
 
 - Add attack optimizer (finally).
-- Add Pydantic model for Map. [map.py](../../cocsim/map.py)
 - Make Balloon apply damage to buildings on death. [balloon.py](../../cocsim/units/balloon.py)
 - Add Ctrl+S shortcut to [cocsim.map_editor_gui](../../cocsim/map_editor_gui/). Or simple terminal text prompt to ask if user wants to save changed map.
 - Add other buildings.
