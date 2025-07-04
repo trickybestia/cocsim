@@ -2,12 +2,10 @@ from dataclasses import dataclass
 from enum import StrEnum
 from typing import Literal, Type, Union
 
-import pygame
 from pydantic import BaseModel
 
-from cocsim.consts import *
-
 from .. import game, units
+from ..shapes import *
 from ..utils import distance, normalize
 from .active_building import ActiveBuilding
 from .building import BUILDINGS
@@ -173,23 +171,7 @@ class AirSweeper(ActiveBuilding):
                 )
                 self.remaining_attack_cooldown = self.ATTACK_COOLDOWN
 
-    def draw(self):
-        if not self.destroyed and self.target is not None:
-            for projectile in self.projectiles:
-                projectile.draw()
-
-            pygame.draw.line(
-                self.game.screen,
-                pygame.Color(255, 0, 0),
-                (
-                    self.center[0] * PIXELS_PER_TILE,
-                    self.center[1] * PIXELS_PER_TILE,
-                ),
-                (
-                    self.target.x * PIXELS_PER_TILE,
-                    self.target.y * PIXELS_PER_TILE,
-                ),
-            )
+    def draw(self, shapes: list[Shape]): ...
 
     def _find_target(self) -> Union["units.Unit", None]:
         center_x, center_y = self.center

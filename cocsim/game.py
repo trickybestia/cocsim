@@ -3,7 +3,7 @@ from typing import Union
 import PIL.Image
 import pygame
 
-from . import buildings, units
+from . import buildings, pygame_shape_renderer, units
 from .consts import *
 from .map import Map
 from .pathfinder import Pathfinder
@@ -62,8 +62,8 @@ class Game:
         )
 
     def __init__(self, map: Map, base_image: PIL.Image.Image | None):
-        self.base_size = map["base_size"]
-        self.border_size = map["border_size"]
+        self.base_size = map["baseSize"]
+        self.border_size = map["borderSize"]
 
         self.buildings = []
         self.units = []
@@ -92,16 +92,8 @@ class Game:
 
         for building_dto in map["buildings"]:
             building_type = buildings.BUILDINGS_DICT[building_dto["name"]]
-            options = [
-                building_dto["options"][option.name]
-                for option in building_type.options()
-            ]
-            building = building_type(
-                self,
-                building_dto["x"],
-                building_dto["y"],
-                building_dto["level"],
-                *options,
+            building: buildings.Building = building_type.from_model(
+                self, building_type.model()(**building_dto)
             )
             building.on_destroyed.add(self._on_building_destroyed)
 
@@ -143,8 +135,12 @@ class Game:
         if self._base_image is not None:
             self.screen.blit(self._base_image, (0, 0))
 
+        shapes = []
+
         for building in self.buildings:
-            building.draw()
+            building.draw(shapes)
+
+        pygame_shape_renderer.render(self.screen, shapes)
 
         for unit in self.units:
             unit.draw()

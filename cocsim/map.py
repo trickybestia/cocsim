@@ -1,11 +1,11 @@
-from typing import NotRequired, TypedDict
+from typing import TypedDict
 
 
 class Map(TypedDict):
-    """Map information DTO."""
+    """Map information DTO. Naming as in TypeScript code."""
 
-    base_size: int
-    border_size: int
+    baseSize: int
+    borderSize: int
 
     buildings: list["MapBuilding"]
 
@@ -15,4 +15,3 @@ class MapBuilding(TypedDict):
     level: int
     x: int
     y: int
-    options: NotRequired[dict[str, object]]

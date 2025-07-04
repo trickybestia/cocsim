@@ -1,10 +1,7 @@
 from typing import Type, Union
 
-import pygame
-
-from cocsim.consts import *
-
 from .. import game, units
+from ..shapes import *
 from ..utils import distance, normalize
 from .active_building import ActiveBuilding
 from .colliders import Collider
@@ -25,7 +22,7 @@ class Projectile:
 
         self.time_left = max(0.0, self.time_left - delta_t)
 
-    def draw(self): ...
+    def draw(self, shapes: list[Shape]): ...
 
 
 class TargetProjectile(Projectile):
@@ -73,15 +70,14 @@ class TargetProjectile(Projectile):
             if not self.target.dead:
                 self.target.apply_damage(self.building.attack_damage())
 
-    def draw(self):
-        pygame.draw.circle(
-            self.building.game.screen,
-            pygame.Color(255, 0, 0),
-            (
-                (self.target.x + self.rel_position[0]) * PIXELS_PER_TILE,
-                (self.target.y + self.rel_position[1]) * PIXELS_PER_TILE,
-            ),
-            2,
+    def draw(self, shapes: list[Shape]):
+        shapes.append(
+            circle(
+                self.target.x + self.rel_position[0],
+                self.target.y + self.rel_position[1],
+                0.15,
+                "red",
+            )
         )
 
 
@@ -176,22 +172,20 @@ class ProjectileActiveBuilding(ActiveBuilding):
                 )
                 self.remaining_attack_cooldown = self.attack_cooldown()
 
-    def draw(self):
+    def draw(self, shapes: list[Shape]):
         if not self.destroyed and self.target is not None:
             for projectile in self.projectiles:
-                projectile.draw()
+                projectile.draw(shapes)
 
-            pygame.draw.line(
-                self.game.screen,
-                pygame.Color(255, 0, 0),
-                (
-                    self.center[0] * PIXELS_PER_TILE,
-                    self.center[1] * PIXELS_PER_TILE,
-                ),
-                (
-                    self.target.x * PIXELS_PER_TILE,
-                    self.target.y * PIXELS_PER_TILE,
-                ),
+            shapes.append(
+                line(
+                    self.center[0],
+                    self.center[1],
+                    self.target.x,
+                    self.target.y,
+                    0.05,
+                    "red",
+                )
             )
 
     def _find_target(self) -> Union["units.Unit", None]:

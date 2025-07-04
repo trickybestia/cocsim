@@ -3,6 +3,7 @@ from typing import Callable, Type
 from pydantic import BaseModel
 
 from .. import game
+from ..shapes import Shape
 from .colliders import Collider
 from .option import Option
 
@@ -54,7 +55,7 @@ class Building:
 
     def tick(self, delta_t: float): ...
 
-    def draw(self): ...
+    def draw(self, shapes: list[Shape]): ...
 
     def apply_damage(self, damage: float):
         """Apply damage to this building. Called by units when they attack."""

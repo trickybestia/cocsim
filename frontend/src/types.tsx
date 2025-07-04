@@ -27,4 +27,27 @@ type BuildingType = {
   options: { name: string; values: (string | number)[] }[];
 };
 
-export type { Map, BuildingType, Building };
+/**
+ * Shape type. Represents shape possible to get from backend and draw on canvas.
+ */
+type Shape =
+  | [
+      name: "rect",
+      x: number,
+      y: number,
+      width: number,
+      height: number,
+      color: string
+    ]
+  | [name: "circle", x: number, y: number, radius: number, color: string]
+  | [
+      name: "line",
+      x1: number,
+      y1: number,
+      x2: number,
+      y2: number,
+      width: number,
+      color: string
+    ];
+
+export type { Map, BuildingType, Building, Shape };
