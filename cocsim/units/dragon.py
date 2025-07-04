@@ -1,9 +1,8 @@
 from dataclasses import dataclass
 from typing import Union
 
-import pygame
-
 from cocsim.consts import *
+from cocsim.shapes import *
 from cocsim.utils import distance, normalize
 
 from .. import buildings, game
@@ -60,14 +59,9 @@ class Dragon(AirUnit):
         self.waypoints = None
         self.attack_cooldown = None
 
-    def draw(self):
+    def draw(self, shapes: list[Shape]):
         if not self.dead:
-            pygame.draw.circle(
-                self.game.screen,
-                pygame.Color(255, 0, 0),
-                (self.x * PIXELS_PER_TILE, self.y * PIXELS_PER_TILE),
-                5,
-            )
+            shapes.append(circle(self.x, self.y, 0.25, "red"))
 
     def tick(self, delta_t: float):
         if self.dead:

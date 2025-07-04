@@ -1,6 +1,7 @@
 from typing import Union
 
 from .. import buildings, game
+from ..shapes import Shape
 
 
 class Unit:
@@ -41,4 +42,4 @@ class Unit:
 
     def tick(self, delta_t: float): ...
 
-    def draw(self): ...
+    def draw(self, shapes: list[Shape]): ...

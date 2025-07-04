@@ -140,10 +140,10 @@ class Game:
         for building in self.buildings:
             building.draw(shapes)
 
-        pygame_shape_renderer.render(self.screen, shapes)
-
         for unit in self.units:
-            unit.draw()
+            unit.draw(shapes)
+
+            pygame_shape_renderer.render(self.screen, shapes)
 
     def progress_info(self):
         seconds = int(self.time_left)
