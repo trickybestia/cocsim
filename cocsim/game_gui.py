@@ -1,22 +1,29 @@
 from typing import Callable
 
+import PIL.Image
 import pygame
 
 from cocsim.consts import *
 from cocsim.game import Game
+from cocsim.pygame_shape_renderer import PygameShapeRenderer
 from cocsim.spin_timer import SpinTimer
 
 
 class GameGui:
     before_tick: Callable[[], None] | None
     game: Game
+    base_image: pygame.Surface | None
 
-    def __init__(
-        self,
-        game: Game,
-    ):
+    def __init__(self, game: Game, image: PIL.Image.Image | None):
         self.before_tick = None
         self.game = game
+
+        if image is not None:
+            self.base_image = PygameShapeRenderer.preprocess_base_image(
+                image, game.total_size
+            )
+        else:
+            self.base_image = None
 
     def run(self):
         pygame.init()
@@ -28,8 +35,7 @@ class GameGui:
                 self.game.total_size * PIXELS_PER_TILE,
             )
         )
-
-        self.game.screen = screen
+        renderer = PygameShapeRenderer(screen, self.base_image)
 
         timer = SpinTimer(1 / FPS)
 
@@ -41,7 +47,7 @@ class GameGui:
 
                     return
 
-            self.game.draw()
+            renderer.draw(self.game)
 
             if not self.game.done and delta_t is not None:
                 if self.before_tick is not None:

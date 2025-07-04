@@ -1,12 +1,10 @@
 from typing import Union
 
-import PIL.Image
-import pygame
-
-from . import buildings, pygame_shape_renderer, units
+from . import buildings, units
 from .consts import *
 from .map_model import MapModel
 from .pathfinder import Pathfinder
+from .shapes import *
 from .utils import get_tile_color
 
 
@@ -25,12 +23,10 @@ class Game:
 
     time_elapsed: float
 
-    screen: pygame.Surface
-    _base_image: pygame.Surface
-
     _townhall_destroyed: bool
     _destroyed_buildings_count: int
     _total_buildings_count: int
+    _need_redraw_collision: bool
 
     @property
     def time_left(self) -> float:
@@ -61,7 +57,7 @@ class Game:
             )
         )
 
-    def __init__(self, map: MapModel, base_image: PIL.Image.Image | None):
+    def __init__(self, map: MapModel):
         self.base_size = map.base_size
         self.border_size = map.border_size
 
@@ -75,20 +71,7 @@ class Game:
         self._townhall_destroyed = False
         self._destroyed_buildings_count = 0
         self._total_buildings_count = 0
-
-        if base_image is not None:
-            base_image = base_image.resize(
-                (
-                    self.total_size * PIXELS_PER_TILE,
-                    self.total_size * PIXELS_PER_TILE,
-                )
-            )
-            self._base_image = pygame.image.frombytes(
-                base_image.tobytes(), base_image.size, base_image.mode
-            )
-            self._base_image.set_alpha(100)
-        else:
-            self._base_image = None
+        self._need_redraw_collision = True
 
         for building_model in map.buildings:
             building_type = buildings.BUILDINGS_DICT[building_model.name]
@@ -128,23 +111,6 @@ class Game:
             MAX_ATTACK_DURATION, self.time_elapsed + delta_t
         )
 
-    def draw(self):
-        self._draw_grid()
-        self._draw_collision()
-
-        if self._base_image is not None:
-            self.screen.blit(self._base_image, (0, 0))
-
-        shapes = []
-
-        for building in self.buildings:
-            building.draw(shapes)
-
-        for unit in self.units:
-            unit.draw(shapes)
-
-            pygame_shape_renderer.render(self.screen, shapes)
-
     def progress_info(self):
         seconds = int(self.time_left)
         minutes = seconds // 60
@@ -159,51 +125,67 @@ class Game:
 
         return text
 
-    def _draw_grid(self):
+    def draw_entities(self) -> list[Shape]:
+        result = []
+
+        for building in self.buildings:
+            building.draw(result)
+
+        for unit in self.units:
+            unit.draw(result)
+
+        return result
+
+    def draw_grid(self) -> list[Shape]:
+        result = []
+
         for x in range(self.total_size):
             for y in range(self.total_size):
-                pygame.draw.rect(
-                    self.screen,
-                    get_tile_color(
-                        (y ^ x) & 1,
-                        self.is_border(x, y),
-                        self.drop_zone[x][y],
-                        self.buildings_grid[x][y] is not None,
-                    ),
-                    (
-                        x * PIXELS_PER_TILE,
-                        y * PIXELS_PER_TILE,
-                        PIXELS_PER_TILE,
-                        PIXELS_PER_TILE,
-                    ),
+                result.append(
+                    rect(
+                        x,
+                        y,
+                        1,
+                        1,
+                        get_tile_color(
+                            (y ^ x) & 1,
+                            self.is_border(x, y),
+                            self.drop_zone[x][y],
+                            self.buildings_grid[x][y] is not None,
+                        ),
+                    )
                 )
 
-    def _draw_collision(self):
-        PIXELS_PER_COLLISION_TILE = (
-            PIXELS_PER_TILE / COLLISION_TILES_PER_MAP_TILE
-        )
+        return result
 
-        collision_surface = pygame.Surface(self.screen.get_size())
+    def need_redraw_collision(self) -> bool:
+        return self._need_redraw_collision
 
-        collision_surface.set_alpha(150)
+    def draw_collision(self) -> list[Shape]:
+        self._need_redraw_collision = False
+
+        COLLISION_TILE_SIZE = 1.0 / COLLISION_TILES_PER_MAP_TILE
+
+        result = []
 
         for x in range(self.total_size * COLLISION_TILES_PER_MAP_TILE):
             for y in range(self.total_size * COLLISION_TILES_PER_MAP_TILE):
                 if self.collision_grid[x][y] is not None:
-                    pygame.draw.rect(
-                        collision_surface,
-                        COLLISION_TILE_COLOR,
-                        (
-                            x * PIXELS_PER_COLLISION_TILE,
-                            y * PIXELS_PER_COLLISION_TILE,
-                            PIXELS_PER_COLLISION_TILE,
-                            PIXELS_PER_COLLISION_TILE,
-                        ),
+                    result.append(
+                        rect(
+                            x / COLLISION_TILES_PER_MAP_TILE,
+                            y / COLLISION_TILES_PER_MAP_TILE,
+                            COLLISION_TILE_SIZE,
+                            COLLISION_TILE_SIZE,
+                            COLLISION_TILE_COLOR,
+                        )
                     )
 
-        self.screen.blit(collision_surface, (0, 0))
+        return result
 
     def _on_building_destroyed(self, building: "buildings.Building"):
+        self._need_redraw_collision = True
+
         if isinstance(building, buildings.TownHall):
             self._townhall_destroyed = True
 

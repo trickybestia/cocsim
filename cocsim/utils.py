@@ -25,7 +25,7 @@ def load_test_map(name: str) -> tuple[MapModel, PIL.Image.Image]:
 
 def get_tile_color(
     even: bool, border: bool, drop_zone: bool, occupied: bool
-) -> Color:
+) -> str:
     if occupied:
         return BUILDING_TILE_EVEN_COLOR if even else BUILDING_TILE_ODD_COLOR
     if drop_zone:
