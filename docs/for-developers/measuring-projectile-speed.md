@@ -1,3 +1,0 @@
-# Measuring projectile speed
-
-
