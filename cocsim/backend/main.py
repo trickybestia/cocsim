@@ -7,6 +7,11 @@ from PIL import Image
 
 from cocsim.buildings.building import BUILDINGS
 from cocsim.compose_base_images import compose_base_images, reverse_projection
+from cocsim.consts import *
+from cocsim.dto_game_renderer import DTOGameRenderer
+from cocsim.game import Game
+from cocsim.units import Barbarian
+from cocsim.utils import load_test_map, load_test_map_raw
 
 app = FastAPI()
 
@@ -70,3 +75,34 @@ async def get_building_types():
         result.append(building_dto)
 
     return result
+
+
+@app.get("/api/get-showcase-attack-base-image")
+def get_showcase_attack_base_image():
+    map, base_image = load_test_map_raw("single_player/goblin_gauntlet")
+
+    return Response(base_image, media_type="image/jpeg")
+
+
+@app.get("/api/get-showcase-attack")
+def get_showcase_attack():
+    map, base_image = load_test_map("single_player/goblin_gauntlet")
+
+    game = Game(map)
+
+    for y in range(19):
+        game.units.append(Barbarian(game, 1, 0.5, y + 0.5))
+    for x in range(1, 25):
+        game.units.append(Barbarian(game, 1, x + 0.5, 0.5))
+
+    renderer = DTOGameRenderer(10)
+
+    renderer.draw(game)
+
+    while not game.done:
+        game.tick(1 / FPS)
+        renderer.draw(game)
+
+    renderer.finish(game)
+
+    return renderer.result

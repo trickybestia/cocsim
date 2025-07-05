@@ -1,4 +1,5 @@
 import json
+from io import BytesIO
 from pathlib import Path
 from zipfile import ZipFile
 
@@ -8,17 +9,23 @@ from .consts import *
 from .map_model import MapModel, create_map_model
 
 
-def load_test_map(name: str) -> tuple[MapModel, PIL.Image.Image]:
+def load_test_map_raw(name: str) -> tuple[str, bytes]:
     zip_path = (Path(TEST_MAPS_PATH) / name).with_suffix(".zip")
 
     with ZipFile(zip_path) as zip_file:
         with zip_file.open("map.jpg") as map_image_file:
-            map_image = PIL.Image.open(map_image_file)
-            map_image.load()
+            map_image = map_image_file.read()
         with zip_file.open("map.json") as map_json_file:
-            map_dict = json.load(map_json_file)
+            map = map_json_file.read()
 
-    map = create_map_model()(**map_dict)
+    return map, map_image
+
+
+def load_test_map(name: str) -> tuple[MapModel, PIL.Image.Image]:
+    map, map_image = load_test_map_raw(name)
+
+    map = create_map_model()(**json.loads(map))
+    map_image = PIL.Image.open(BytesIO(map_image))
 
     return map, map_image
 
