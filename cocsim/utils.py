@@ -23,6 +23,21 @@ def load_test_map(name: str) -> tuple[MapModel, PIL.Image.Image]:
     return map, map_image
 
 
+def round_floats(obj: object, ndigits: int | None) -> object:
+    """Round floats in dict to ndigits."""
+
+    if isinstance(obj, float):
+        return round(obj, ndigits)
+    if isinstance(obj, dict):
+        return {key: round_floats(value, ndigits) for key, value in obj.items()}
+    if isinstance(obj, list):
+        return [round_floats(item, ndigits) for item in obj]
+    if isinstance(obj, tuple):
+        return tuple(round_floats(item, ndigits) for item in obj)
+
+    return obj
+
+
 def get_tile_color(
     even: bool, border: bool, drop_zone: bool, occupied: bool
 ) -> str:
