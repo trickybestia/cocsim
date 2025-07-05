@@ -1,8 +1,7 @@
 from typing import Type
 
-import pygame
-
 from cocsim.consts import *
+from cocsim.shapes import *
 
 from .. import game, units
 from ..utils import normalize
@@ -56,16 +55,8 @@ class SplashProjectile(Projectile):
                 self.building.attack_damage(),
             )
 
-    def draw(self):
-        pygame.draw.circle(
-            self.building.game.screen,
-            pygame.Color(255, 0, 0),
-            (
-                self.position[0] * PIXELS_PER_TILE,
-                self.position[1] * PIXELS_PER_TILE,
-            ),
-            3,
-        )
+    def draw(self, shapes: list[Shape]):
+        shapes.append(circle(self.position[0], self.position[1], 0, 2, "red"))
 
 
 class SplashProjectileActiveBuilding(ProjectileActiveBuilding):
