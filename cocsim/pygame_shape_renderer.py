@@ -12,37 +12,44 @@ BASE_IMAGE_LAYER_ALPHA = 150
 class PygameShapeRenderer:
     surface: pygame.Surface
     base_image: pygame.Surface | None
-    background: pygame.Surface | None  # grid + base image
-    collision: pygame.Surface | None
+    grid: pygame.Surface | None
+    grid_collision_base_image: pygame.Surface | None
 
     def __init__(
         self, surface: pygame.Surface, base_image: pygame.Surface | None
     ):
         self.surface = surface
         self.base_image = base_image
-        self.background = None
-        self.collision = None
+        self.grid = None
+        self.grid_collision_base_image = None
 
     def draw(self, game: "game.Game"):
-        if self.background is None:
-            self.background = pygame.Surface(self.surface.get_size())
+        if self.grid is None:
+            self.grid = pygame.Surface(self.surface.get_size())
 
-            self._render_layer(self.background, game.draw_grid())
+            self._render_layer(self.grid, game.draw_grid())
+
+        if (
+            self.grid_collision_base_image is None
+            or game.need_redraw_collision()
+        ):
+            self.grid_collision_base_image = pygame.Surface(
+                self.surface.get_size()
+            )
+
+            self.grid_collision_base_image.blit(self.grid, (0, 0))
+
+            collision = pygame.Surface(self.surface.get_size())
+            collision.set_alpha(150)
+
+            self._render_layer(collision, game.draw_collision())
+
+            self.grid_collision_base_image.blit(collision, (0, 0))
 
             if self.base_image is not None:
-                self.background.blit(self.base_image, (0, 0))
+                self.grid_collision_base_image.blit(self.base_image, (0, 0))
 
-        self.surface.blit(self.background, (0, 0))
-
-        if self.collision is None or game.need_redraw_collision():
-            self.collision = pygame.Surface(
-                self.surface.get_size(), pygame.SRCALPHA, 32
-            )
-            self.collision.set_alpha(150)
-
-            self._render_layer(self.collision, game.draw_collision())
-
-        self.surface.blit(self.collision, (0, 0))
+        self.surface.blit(self.grid_collision_base_image, (0, 0))
 
         self._render_layer(self.surface, game.draw_entities())
 
