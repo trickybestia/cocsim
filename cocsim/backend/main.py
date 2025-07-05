@@ -25,18 +25,16 @@ app.add_middleware(
 
 
 @app.post("/api/compose-base-images")
-async def compose_base_images_api(
-    left: list[UploadFile], right: list[UploadFile]
-):
+def compose_base_images_api(left: list[UploadFile], right: list[UploadFile]):
     left_images = []
 
     for image in left:
-        left_images.append(Image.open(BytesIO(await image.read())))
+        left_images.append(Image.open(BytesIO(image.file.read())))
 
     right_images = []
 
     for image in right:
-        right_images.append(Image.open(BytesIO(await image.read())))
+        right_images.append(Image.open(BytesIO(image.file.read())))
 
     result = BytesIO()
 
@@ -46,8 +44,8 @@ async def compose_base_images_api(
 
 
 @app.post("/api/reverse-projection")
-async def reverse_projection_api(image: UploadFile):
-    pil_image = Image.open(BytesIO(await image.read()))
+def reverse_projection_api(image: UploadFile):
+    pil_image = Image.open(BytesIO(image.file.read()))
 
     result = BytesIO()
 
@@ -57,7 +55,7 @@ async def reverse_projection_api(image: UploadFile):
 
 
 @app.get("/api/get-building-types")
-async def get_building_types():
+def get_building_types():
     result = []
 
     for building in BUILDINGS:
