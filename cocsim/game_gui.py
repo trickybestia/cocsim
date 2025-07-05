@@ -5,7 +5,7 @@ import pygame
 
 from cocsim.consts import *
 from cocsim.game import Game
-from cocsim.pygame_shape_renderer import PygameShapeRenderer
+from cocsim.pygame_shape_renderer import PygameGameRenderer
 from cocsim.spin_timer import SpinTimer
 
 
@@ -19,7 +19,7 @@ class GameGui:
         self.game = game
 
         if image is not None:
-            self.base_image = PygameShapeRenderer.preprocess_base_image(
+            self.base_image = PygameGameRenderer.preprocess_base_image(
                 image, game.total_size
             )
         else:
@@ -35,7 +35,7 @@ class GameGui:
                 self.game.total_size * PIXELS_PER_TILE,
             )
         )
-        renderer = PygameShapeRenderer(screen, self.base_image)
+        renderer = PygameGameRenderer(screen, self.base_image)
 
         timer = SpinTimer(1 / FPS)
 

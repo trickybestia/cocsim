@@ -9,7 +9,7 @@ BASE_IMAGE_LAYER_INDEX = 2
 BASE_IMAGE_LAYER_ALPHA = 150
 
 
-class PygameShapeRenderer:
+class PygameGameRenderer:
     surface: pygame.Surface
     base_image: pygame.Surface | None
     grid: pygame.Surface | None
