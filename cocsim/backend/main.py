@@ -11,7 +11,7 @@ from cocsim.consts import *
 from cocsim.dto_game_renderer import DTOGameRenderer
 from cocsim.game import Game
 from cocsim.units import Barbarian
-from cocsim.utils import load_test_map, load_test_map_raw
+from cocsim.utils import load_test_map, load_test_map_raw, round_floats
 
 app = FastAPI()
 
@@ -103,4 +103,4 @@ def get_showcase_attack():
 
     renderer.finish(game)
 
-    return renderer.result
+    return round_floats(renderer.result, 2)
