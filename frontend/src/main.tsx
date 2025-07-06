@@ -8,6 +8,7 @@ import ComposeBaseImagesPage from "./pages/compose-base-images";
 import IndexPage from "./pages/index";
 import MapEditorPage from "./pages/map-editor";
 import NotFoundPage from "./pages/not-found";
+import ShowcasePage from "./pages/showcase";
 
 Modal.setAppElement("#root");
 
@@ -17,6 +18,7 @@ createRoot(document.getElementById("root")!).render(
       <Route path="/" component={IndexPage} />
       <Route path="compose-base-images" component={ComposeBaseImagesPage} />
       <Route path="map-editor" component={MapEditorPage} />
+      <Route path="showcase" component={ShowcasePage} />
       <Route component={NotFoundPage} />
     </Switch>
   </StrictMode>

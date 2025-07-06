@@ -93,7 +93,7 @@ def get_showcase_attack():
     for x in range(1, 25):
         game.units.append(Barbarian(game, 1, x + 0.5, 0.5))
 
-    renderer = DTOGameRenderer(10)
+    renderer = DTOGameRenderer(1)
 
     renderer.draw(game)
 

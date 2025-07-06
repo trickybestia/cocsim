@@ -45,12 +45,20 @@ const getBuildingTypes = async (): Promise<BuildingType[]> => {
   return (await axiosInstance.get("/get-building-types")).data;
 };
 
-const getShowcaseAttackBaseImage = async (): Promise<Blob> => {
-  return (
-    await axiosInstance.get("/get-showcase-attack-base-image", {
-      responseType: "blob"
-    })
-  ).data;
+const getShowcaseAttackBaseImage = (): Promise<HTMLImageElement> => {
+  const imageUrl = axiosInstance.getUri({
+    url: "/get-showcase-attack-base-image"
+  });
+
+  const image = new Image();
+
+  image.src = imageUrl;
+
+  return new Promise((resolve) => {
+    image.addEventListener("load", () => {
+      resolve(image);
+    });
+  });
 };
 
 const getShowcaseAttack = async (): Promise<Frame[]> => {
