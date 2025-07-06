@@ -54,8 +54,9 @@ type Shape =
  * Frame type. Represents single game drawed frame.
  */
 type Frame = {
-  time: number;
-  info: string;
+  timeElapsed: number;
+  progressInfo: string;
+  totalBaseSize: number;
   grid: Shape[] | undefined;
   collision: Shape[] | undefined;
   entities: Shape[];

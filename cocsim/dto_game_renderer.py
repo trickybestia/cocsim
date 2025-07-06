@@ -5,8 +5,9 @@ from .shapes import Shape
 
 
 class Frame(TypedDict):
-    time: float
-    info: str
+    timeElapsed: float
+    progressInfo: str
+    totalBaseSize: int
     grid: list[Shape] | None  # None if not changed
     collision: list[Shape] | None  # None if not changed
     entities: list[Shape]
@@ -35,14 +36,15 @@ class DTOGameRenderer:
         self._ticks_since_last_draw += 1
 
     def finish(self, game: "game.Game"):
-        if self.result[-1]["time"] != game.time_elapsed:
+        if self.result[-1]["timeElapsed"] != game.time_elapsed:
             self._draw(game)
 
     def _draw(self, game: "game.Game"):
         frame: Frame = {
-            "time": game.time_elapsed,
-            "progress": game.progress_info(),
+            "timeElapsed": game.time_elapsed,
+            "progressInfo": game.progress_info(),
             "entities": game.draw_entities(),
+            "totalBaseSize": game.total_size,
         }
 
         if len(self.result) == 0:
