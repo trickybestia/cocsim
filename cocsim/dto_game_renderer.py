@@ -53,6 +53,6 @@ class DTOGameRenderer:
         if game.need_redraw_collision():
             frame["collision"] = game.draw_collision()
         else:
-            frame["grid"] = None
+            frame["collision"] = None
 
         self.result.append(frame)
