@@ -5,7 +5,7 @@ from .consts import *
 from .map_model import MapModel
 from .pathfinder import Pathfinder
 from .shapes import *
-from .utils import get_tile_color
+from .utils import draw_bool_grid, get_tile_color
 
 
 class Game:
@@ -164,24 +164,19 @@ class Game:
     def draw_collision(self) -> list[Shape]:
         self._need_redraw_collision = False
 
-        COLLISION_TILE_SIZE = 1.0 / COLLISION_TILES_PER_MAP_TILE
-
-        result = []
-
-        for x in range(self.total_size * COLLISION_TILES_PER_MAP_TILE):
-            for y in range(self.total_size * COLLISION_TILES_PER_MAP_TILE):
-                if self.collision_grid[x][y] is not None:
-                    result.append(
-                        rect(
-                            x / COLLISION_TILES_PER_MAP_TILE,
-                            y / COLLISION_TILES_PER_MAP_TILE,
-                            COLLISION_TILE_SIZE,
-                            COLLISION_TILE_SIZE,
-                            COLLISION_TILE_COLOR,
-                        )
+        return draw_bool_grid(
+            [
+                [
+                    self.collision_grid[x][y] is not None
+                    for y in range(
+                        self.total_size * COLLISION_TILES_PER_MAP_TILE
                     )
-
-        return result
+                ]
+                for x in range(self.total_size * COLLISION_TILES_PER_MAP_TILE)
+            ],
+            COLLISION_TILE_SIZE,
+            COLLISION_TILE_COLOR,
+        )
 
     def _on_building_destroyed(self, building: "buildings.Building"):
         self._need_redraw_collision = True

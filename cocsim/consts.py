@@ -4,6 +4,7 @@ TEST_MAPS_PATH = "test_maps"
 PIXELS_PER_TILE = 20
 
 COLLISION_TILES_PER_MAP_TILE = 10  # used for pathfinding
+COLLISION_TILE_SIZE = 1.0 / COLLISION_TILES_PER_MAP_TILE
 
 DISTANCE_TO_WAYPOINT_EPS = (
     0.1  # unit distance to waypoint to consider it visited

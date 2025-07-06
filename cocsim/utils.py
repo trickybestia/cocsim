@@ -1,12 +1,14 @@
 import json
 from io import BytesIO
 from pathlib import Path
+from typing import Generator
 from zipfile import ZipFile
 
 import PIL.Image
 
 from .consts import *
 from .map_model import MapModel, create_map_model
+from .shapes import *
 
 
 def load_test_map_raw(name: str) -> tuple[str, bytes]:
@@ -28,6 +30,60 @@ def load_test_map(name: str) -> tuple[MapModel, PIL.Image.Image]:
     map_image = PIL.Image.open(BytesIO(map_image))
 
     return map, map_image
+
+
+def draw_bool_grid(
+    grid: list[list[bool]], tile_size: float, color: str
+) -> list[Shape]:
+    for col in grid:
+        assert len(col) == len(grid), "grid must be square"
+
+    result = []
+
+    def get_true_tiles() -> Generator[tuple[int, int]]:
+        for y in range(len(grid)):
+            for x in range(len(grid)):
+                if grid[x][y]:
+                    yield x, y
+
+    def is_true_line(x: int, y: int, width: int) -> bool:
+        for x in range(x, x + width):
+            if not grid[x][y]:
+                return False
+
+        return True
+
+    for start_x, start_y in get_true_tiles():
+        width = 1
+        height = 1
+
+        for x in range(start_x + 1, len(grid)):
+            if grid[x][start_y]:
+                width += 1
+            else:
+                break
+
+        for y in range(start_y + 1, len(grid)):
+            if is_true_line(start_x, y, width):
+                height += 1
+            else:
+                break
+
+        result.append(
+            rect(
+                start_x * tile_size,
+                start_y * tile_size,
+                width * tile_size,
+                height * tile_size,
+                color,
+            )
+        )
+
+        for x in range(start_x, start_x + width):
+            for y in range(start_y, start_y + height):
+                grid[x][y] = False
+
+    return result
 
 
 def round_floats(obj: object, ndigits: int | None) -> object:
