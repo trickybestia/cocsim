@@ -57,8 +57,8 @@ type Frame = {
   timeElapsed: number;
   progressInfo: string;
   totalBaseSize: number;
-  grid: Shape[] | undefined;
-  collision: Shape[] | undefined;
+  grid: Shape[] | null;
+  collision: Shape[] | null;
   entities: Shape[];
 };
 
