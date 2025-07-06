@@ -50,4 +50,15 @@ type Shape =
       color: string
     ];
 
-export type { Map, BuildingType, Building, Shape };
+/**
+ * Frame type. Represents single game drawed frame.
+ */
+type Frame = {
+  time: number;
+  info: string;
+  grid: Shape[] | undefined;
+  collision: Shape[] | undefined;
+  entities: Shape[];
+};
+
+export type { Map, BuildingType, Building, Shape, Frame };

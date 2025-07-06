@@ -1,6 +1,6 @@
 import axios from "axios";
 
-import type { BuildingType } from "./types";
+import type { BuildingType, Frame } from "./types";
 
 const axiosInstance = axios.create({
   baseURL: "http://localhost:8000/api"
@@ -45,4 +45,24 @@ const getBuildingTypes = async (): Promise<BuildingType[]> => {
   return (await axiosInstance.get("/get-building-types")).data;
 };
 
-export { composeBaseImages, reverseProjection, getBuildingTypes };
+const getShowcaseAttackBaseImage = async (): Promise<Blob> => {
+  return (
+    await axiosInstance.get("/get-showcase-attack-base-image", {
+      responseType: "blob"
+    })
+  ).data;
+};
+
+const getShowcaseAttack = async (): Promise<Frame[]> => {
+  return (await axiosInstance.get("/get-showcase-attack")).data;
+};
+
+getShowcaseAttack().then(console.log);
+
+export {
+  composeBaseImages,
+  reverseProjection,
+  getBuildingTypes,
+  getShowcaseAttackBaseImage,
+  getShowcaseAttack
+};
