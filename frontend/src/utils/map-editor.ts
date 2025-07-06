@@ -118,8 +118,6 @@ const importFromZip = async (zip: Blob): Promise<{ map: Map; image: Blob }> => {
   let map: Map | undefined = undefined;
 
   for await (const entry of zipReader.getEntriesGenerator()) {
-    console.log(entry.filename);
-
     if (entry.filename === "map.jpg") {
       const imageBlobWriter = new BlobWriter("image/jpeg");
 

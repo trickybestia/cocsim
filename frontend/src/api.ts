@@ -57,8 +57,6 @@ const getShowcaseAttack = async (): Promise<Frame[]> => {
   return (await axiosInstance.get("/get-showcase-attack")).data;
 };
 
-getShowcaseAttack().then(console.log);
-
 export {
   composeBaseImages,
   reverseProjection,
