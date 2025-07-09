@@ -1,5 +1,7 @@
 from dataclasses import dataclass
-from typing import Union
+from typing import Literal, Type, Union
+
+from pydantic import BaseModel
 
 from cocsim.consts import *
 from cocsim.shapes import *
@@ -7,6 +9,12 @@ from cocsim.utils import distance, normalize
 
 from .. import buildings, game
 from .air_unit import AirUnit
+from .unit import UNITS
+
+
+class BalloonModel(BaseModel):
+    name: Literal["Balloon"]
+    level: int
 
 
 @dataclass(frozen=True)
@@ -44,6 +52,10 @@ class Balloon(AirUnit):
         return len(cls.LEVELS)
 
     @classmethod
+    def model(cls) -> Type[BalloonModel]:
+        return BalloonModel
+
+    @classmethod
     def housing_space(cls):
         return 5
 
@@ -58,6 +70,12 @@ class Balloon(AirUnit):
 
         self.waypoints = None
         self.attack_cooldown = None
+
+    @classmethod
+    def from_model(
+        cls, game: "game.Game", model: BalloonModel, x: float, y: float
+    ) -> "Balloon":
+        return cls(game, model.level, x, y)
 
     def draw(self, shapes: list[Shape]):
         if not self.dead:
@@ -120,3 +138,6 @@ class Balloon(AirUnit):
 
         self.x += direction_x * self.SPEED * delta_t
         self.y += direction_y * self.SPEED * delta_t
+
+
+UNITS.append(Balloon)

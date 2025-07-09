@@ -1,5 +1,7 @@
 from dataclasses import dataclass
-from typing import Union
+from typing import Literal, Type, Union
+
+from pydantic import BaseModel
 
 from cocsim.consts import *
 from cocsim.shapes import *
@@ -7,6 +9,12 @@ from cocsim.utils import distance, normalize
 
 from .. import buildings, game
 from .ground_unit import GroundUnit
+from .unit import UNITS
+
+
+class BarbarianModel(BaseModel):
+    name: Literal["Barbarian"]
+    level: int
 
 
 @dataclass(frozen=True)
@@ -44,6 +52,10 @@ class Barbarian(GroundUnit):
         return len(cls.LEVELS)
 
     @classmethod
+    def model(cls) -> Type[BarbarianModel]:
+        return BarbarianModel
+
+    @classmethod
     def housing_space(cls):
         return 1
 
@@ -58,6 +70,12 @@ class Barbarian(GroundUnit):
 
         self.waypoints = None
         self.attack_cooldown = None
+
+    @classmethod
+    def from_model(
+        cls, game: "game.Game", model: BarbarianModel, x: float, y: float
+    ) -> "Barbarian":
+        return cls(game, model.level, x, y)
 
     def draw(self, shapes: list[Shape]):
         if not self.dead:
@@ -120,3 +138,6 @@ class Barbarian(GroundUnit):
 
         self.x += direction_x * self.SPEED * delta_t
         self.y += direction_y * self.SPEED * delta_t
+
+
+UNITS.append(Barbarian)
