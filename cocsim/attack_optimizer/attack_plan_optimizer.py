@@ -1,11 +1,11 @@
 from random import choice
-from typing import Generator
+from typing import Generator, Type
 
 from cocsim.consts import *
 from cocsim.game import Game
 from cocsim.map_model import MapModel
+from cocsim.units import Unit
 
-from .army import Army
 from .attack_plan import AttackPlan
 from .attack_plan_executor import AttackPlanExecutor
 
@@ -16,16 +16,15 @@ NEW_RANDOM_PLANS = 5
 
 class AttackPlanOptimizer:
     map: MapModel
-    army: Army
+    units: list[tuple[Type[Unit], int]]
 
-    def __init__(self, map: MapModel, army: Army):
+    def __init__(self, map: MapModel, units: list[tuple[Type[Unit], int]]):
         self.map = map
-        self.army = army
+        self.units = units
 
     def run(self) -> Generator[tuple[int, float, AttackPlan], None, None]:
         population = [
-            AttackPlan.randomize(self.army.units)
-            for _ in range(POPULATION_SIZE)
+            AttackPlan.randomize(self.units) for _ in range(POPULATION_SIZE)
         ]
 
         i = 0
@@ -35,7 +34,7 @@ class AttackPlanOptimizer:
             new_population = []
 
             for _ in range(NEW_RANDOM_PLANS):
-                new_population.append(AttackPlan.randomize(self.army.units))
+                new_population.append(AttackPlan.randomize(self.units))
 
             while len(new_population) < NEW_POPULATION_SIZE:
                 a = choice(population)
@@ -56,7 +55,7 @@ class AttackPlanOptimizer:
             i += 1
 
     def _score_attack_plan(self, attack_plan: AttackPlan) -> float:
-        game = Game(self.map, None)
+        game = Game(self.map)
         attack_plan_executor = AttackPlanExecutor(game, attack_plan)
 
         while not game.done:

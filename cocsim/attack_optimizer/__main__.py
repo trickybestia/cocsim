@@ -5,8 +5,6 @@ from cocsim.game_gui import GameGui
 from cocsim.units import Balloon, Barbarian, Dragon, Unit
 from cocsim.utils import load_test_map
 
-from .army import Army
-from .army_optimizer import ArmyOptimizer
 from .attack_plan_executor import AttackPlanExecutor
 from .attack_plan_optimizer import AttackPlanOptimizer
 
@@ -22,7 +20,7 @@ UNITS: list[tuple[Type[Unit], int]] = [
 def main():
     map, base_image = load_test_map(MAP_PATH)
 
-    optimizer = AttackPlanOptimizer(map, Army(UNITS))
+    optimizer = AttackPlanOptimizer(map, UNITS)
 
     try:
         for i, score, attack_plan in optimizer.run():
@@ -30,10 +28,10 @@ def main():
     except KeyboardInterrupt:
         ...
 
-    game = Game(map, base_image)
+    game = Game(map)
     attack_plan_executor = AttackPlanExecutor(game, attack_plan)
 
-    gui = GameGui(game)
+    gui = GameGui(game, base_image)
 
     gui.before_tick = attack_plan_executor.tick
 
