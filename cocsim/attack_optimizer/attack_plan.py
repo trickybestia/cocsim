@@ -5,7 +5,7 @@ from typing import Type
 
 from cocsim.consts import *
 from cocsim.game import Game
-from cocsim.units import Unit
+from cocsim.units import UNITS_DICT, Unit, UnitModel, UnitsModel
 from cocsim.utils import clamp
 
 from .geometry import Point, Ray, Segment, Square
@@ -15,8 +15,8 @@ MAX_UNIT_DROP_TIME = 20
 
 @dataclass
 class AttackPlanUnit:
-    unit: Type[Unit]
-    level: int
+    unit_model: UnitModel
+    unit_type: Type[Unit]
     angle: float  # radians
     distance: float  # from 0 to 1
     drop_time: float
@@ -95,16 +95,20 @@ class AttackPlan:
     units: list[AttackPlanUnit]
 
     @classmethod
-    def randomize(cls, units: list[tuple[Type[Unit], int]]) -> "AttackPlan":
+    def randomize(cls, units: UnitsModel) -> "AttackPlan":
         result = AttackPlan([])
 
-        for unit in units:
+        for unit_model in units.units:
+            unit_type = UNITS_DICT[unit_model.name]
+
             angle = random() * 2 * pi
             distance = random()
             drop_time = random() * MAX_UNIT_DROP_TIME
 
             result.units.append(
-                AttackPlanUnit(unit[0], unit[1], angle, distance, drop_time)
+                AttackPlanUnit(
+                    unit_model, unit_type, angle, distance, drop_time
+                )
             )
 
         return result
@@ -133,7 +137,7 @@ class AttackPlan:
 
             result.units.append(
                 AttackPlanUnit(
-                    unit.unit, unit.level, angle, distance, drop_time
+                    unit.unit_model, unit.unit_type, angle, distance, drop_time
                 )
             )
 

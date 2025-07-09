@@ -1,10 +1,10 @@
 from random import choice
-from typing import Generator, Type
+from typing import Generator
 
 from cocsim.consts import *
 from cocsim.game import Game
 from cocsim.map_model import MapModel
-from cocsim.units import Unit
+from cocsim.units import UnitsModel
 
 from .attack_plan import AttackPlan
 from .attack_plan_executor import AttackPlanExecutor
@@ -16,9 +16,9 @@ NEW_RANDOM_PLANS = 5
 
 class AttackPlanOptimizer:
     map: MapModel
-    units: list[tuple[Type[Unit], int]]
+    units: UnitsModel
 
-    def __init__(self, map: MapModel, units: list[tuple[Type[Unit], int]]):
+    def __init__(self, map: MapModel, units: UnitsModel):
         self.map = map
         self.units = units
 

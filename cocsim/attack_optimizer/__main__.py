@@ -1,8 +1,6 @@
-from typing import Type
-
 from cocsim.game import Game
 from cocsim.game_gui import GameGui
-from cocsim.units import Balloon, Barbarian, Dragon, Unit
+from cocsim.units import UnitsModel, create_units_model
 from cocsim.utils import load_test_map
 
 from .attack_plan_executor import AttackPlanExecutor
@@ -10,11 +8,15 @@ from .attack_plan_optimizer import AttackPlanOptimizer
 
 MAP_PATH = "single_player/goblin_gauntlet"
 HOUSING_SPACE = 20
-UNITS: list[tuple[Type[Unit], int]] = [
-    (Balloon, 1),
-    (Dragon, 1),
-    (Barbarian, 1),
-]
+UNITS: UnitsModel = create_units_model()(
+    **{
+        "units": [
+            {"name": "Balloon", "level": 1},
+            {"name": "Dragon", "level": 1},
+            {"name": "Barbarian", "level": 1},
+        ]
+    }
+)
 
 
 def main():

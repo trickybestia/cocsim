@@ -21,4 +21,6 @@ class AttackPlanExecutor:
             unit = self.units.pop()
             x, y = unit.cartesian_pos(self.game)
 
-            self.game.units.append(unit.unit(self.game, unit.level, x, y))
+            self.game.units.append(
+                unit.unit_type.from_model(self.game, unit.unit_model, x, y)
+            )
