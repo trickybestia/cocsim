@@ -19,7 +19,7 @@ import BuildingOptionsEditor from "./BuildingOptionsEditor";
 import BuildingsLayer from "./BuildingsLayer";
 import DrawCoordsLayer from "./DrawCoordsLayer";
 import DrawGridLayer from "./DrawGridLayer";
-import NumberInput from "./NumberInput";
+import IntegerNumberInput from "./IntegerNumberInput";
 
 type Props = React.HTMLAttributes<HTMLDivElement> & {
   image: HTMLImageElement;
@@ -351,42 +351,42 @@ const MapEditor: React.FC<Props> = ({
             checked={drawCoords}
             onChange={(e) => setDrawCoords(e.target.checked)}
           />
-          <NumberInput
+          <IntegerNumberInput
             text="Base size:"
             min={1}
             max={44}
             defaultValue={baseSize}
             onChange={setBaseSize}
           />
-          <NumberInput
+          <IntegerNumberInput
             text="Border size:"
             min={0}
             max={4}
             defaultValue={borderSize}
             onChange={setBorderSize}
           />
-          <NumberInput
+          <IntegerNumberInput
             text="Start X:"
             min={0}
             max={image.width - 1}
             defaultValue={startX}
             onChange={setStartX}
           />
-          <NumberInput
+          <IntegerNumberInput
             text="Start Y:"
             min={0}
             max={image.width - 1}
             defaultValue={startY}
             onChange={setStartY}
           />
-          <NumberInput
+          <IntegerNumberInput
             text="End X:"
             min={0}
             max={image.width - 1}
             defaultValue={endX}
             onChange={setEndX}
           />
-          <NumberInput
+          <IntegerNumberInput
             text="End Y:"
             min={0}
             max={image.width - 1}

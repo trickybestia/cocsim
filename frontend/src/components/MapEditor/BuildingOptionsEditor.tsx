@@ -3,7 +3,7 @@ import { Fragment } from "react";
 
 import useBuildingTypes from "../../hooks/use-building-types";
 import type { Building } from "../../types";
-import NumberInput from "./NumberInput";
+import IntegerNumberInput from "./IntegerNumberInput";
 
 type Props = {
   building: Building;
@@ -20,7 +20,7 @@ const BuildingOptionsEditor: React.FC<Props> = ({
     <>
       <p>Selected:</p>
       <p>{building.name}</p>
-      <NumberInput
+      <IntegerNumberInput
         text="Level:"
         min={1}
         max={buildingType.levels}

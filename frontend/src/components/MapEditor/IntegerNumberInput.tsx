@@ -9,14 +9,14 @@ type Props = {
   onChange: (value: number) => void;
 };
 
-const NumberInput: React.FC<Props> = ({
+const IntegerNumberInput: React.FC<Props> = ({
   text,
-  defaultValue: value,
+  defaultValue,
   min,
   max,
   onChange
 }: Props) => {
-  const [inputValue, setInputValue] = useState(value.toString());
+  const [inputValue, setInputValue] = useState(defaultValue.toString());
   const [invalidInput, setInvalidInput] = useState(false);
 
   const onInputChange: ChangeEventHandler<HTMLInputElement> = (e) => {
@@ -53,5 +53,5 @@ const NumberInput: React.FC<Props> = ({
   );
 };
 
-export default NumberInput;
+export default IntegerNumberInput;
 export type { Props };
