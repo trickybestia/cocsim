@@ -2,7 +2,6 @@
 
 - Add attack optimizer (finally).
 - Make Balloon apply damage to buildings on death. [balloon.py](../../cocsim/units/balloon.py)
-- Add Ctrl+S shortcut to [cocsim.map_editor_gui](../../cocsim/map_editor_gui/). Or simple terminal text prompt to ask if user wants to save changed map.
 - Add other buildings.
 - Add other units.
 - Implement X-Bow running out of ammo. [x_bow.py](../../cocsim/buildings/x_bow.py)
