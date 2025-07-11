@@ -8,6 +8,7 @@ const IndexPage: React.FC = () => {
         <p>The following tools are available:</p>
         <PageLink href="compose-base-images">Compose base images</PageLink>
         <PageLink href="map-editor">Map editor</PageLink>
+        <PageLink href="attack-optimizer">Attack optimizer</PageLink>
         <PageLink href="showcase">Attack showcase</PageLink>
       </div>
     </main>

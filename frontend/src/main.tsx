@@ -4,6 +4,7 @@ import Modal from "react-modal";
 import { Route, Switch } from "wouter";
 
 import "./index.css";
+import AttackOptimizerPage from "./pages/attack-optimizer";
 import ComposeBaseImagesPage from "./pages/compose-base-images";
 import IndexPage from "./pages/index";
 import MapEditorPage from "./pages/map-editor";
@@ -19,6 +20,7 @@ createRoot(document.getElementById("root")!).render(
       <Route path="compose-base-images" component={ComposeBaseImagesPage} />
       <Route path="map-editor" component={MapEditorPage} />
       <Route path="showcase" component={ShowcasePage} />
+      <Route path="attack-optimizer" component={AttackOptimizerPage} />
       <Route component={NotFoundPage} />
     </Switch>
   </StrictMode>
