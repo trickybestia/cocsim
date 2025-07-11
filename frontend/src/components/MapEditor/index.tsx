@@ -14,12 +14,12 @@ import {
   cropImage
 } from "../../utils/map-editor";
 import sortSelection from "../../utils/sort-selection";
+import IntegerNumberInput from "../IntegerNumberInput";
 import BuildingCreationModal from "./BuildingCreationModal";
 import BuildingOptionsEditor from "./BuildingOptionsEditor";
 import BuildingsLayer from "./BuildingsLayer";
 import DrawCoordsLayer from "./DrawCoordsLayer";
 import DrawGridLayer from "./DrawGridLayer";
-import IntegerNumberInput from "./IntegerNumberInput";
 
 type Props = React.HTMLAttributes<HTMLDivElement> & {
   image: HTMLImageElement;

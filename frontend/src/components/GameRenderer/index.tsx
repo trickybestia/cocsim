@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import { Stage } from "react-konva";
 
 import type { Frame } from "../../types";
+import FloatNumberInput from "../FloatNumberInput";
 import BackgroundLayer from "./BackgroundLayer";
 import CollisionLayer from "./CollisionLayer";
 import EntitiesLayer from "./EntitiesLayer";
-import FloatNumberInput from "./FloatNumberInput";
 
 type Props = {
   frames: Frame[];

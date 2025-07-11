@@ -3,7 +3,7 @@ import { Fragment } from "react";
 
 import useBuildingTypes from "../../hooks/use-building-types";
 import type { Building } from "../../types";
-import IntegerNumberInput from "./IntegerNumberInput";
+import IntegerNumberInput from "../IntegerNumberInput";
 
 type Props = {
   building: Building;
