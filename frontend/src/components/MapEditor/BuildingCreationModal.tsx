@@ -1,10 +1,10 @@
 import { useContext, useState } from "react";
 import Modal from "react-modal";
 
-import { BuildingTypesContext } from "../../../hooks/use-building-types";
-import type { BuildingType } from "../../../types";
-import getBuildingTypesWithSize from "../../../utils/get-building-types-with-size";
-import StringSelector from "./StringSelector";
+import { BuildingTypesContext } from "../../hooks/use-building-types";
+import type { BuildingType } from "../../types";
+import getBuildingTypesWithSize from "../../utils/get-building-types-with-size";
+import StringSelector from "../StringSelector";
 
 type Props = {
   isOpen: boolean;

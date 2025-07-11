@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { twJoin } from "tailwind-merge";
 
-import fuzzySearch from "../../../utils/fuzzy-search";
+import fuzzySearch from "../utils/fuzzy-search";
 
 type Props = {
   values: string[];
