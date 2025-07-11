@@ -10,7 +10,7 @@ from cocsim.compose_base_images import compose_base_images, reverse_projection
 from cocsim.consts import *
 from cocsim.dto_game_renderer import DTOGameRenderer
 from cocsim.game import Game
-from cocsim.units import Barbarian
+from cocsim.units import UNITS, Barbarian
 from cocsim.utils import load_test_map, load_test_map_raw, round_floats
 
 app = FastAPI()
@@ -71,6 +71,22 @@ def get_building_types():
         }
 
         result.append(building_dto)
+
+    return result
+
+
+@app.get("/api/get-unit-types")
+def get_unit_types():
+    result = []
+
+    for unit in UNITS:
+        unit_dto = {
+            "name": unit.__name__,
+            "levels": unit.levels(),
+            "housingSpace": unit.housing_space(),
+        }
+
+        result.append(unit_dto)
 
     return result
 

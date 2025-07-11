@@ -27,6 +27,17 @@ type BuildingType = {
   options: { name: string; values: (string | number)[] }[];
 };
 
+type Unit = {
+  name: string;
+  level: number;
+};
+
+type UnitType = {
+  name: string;
+  levels: number;
+  housingSpace: number;
+};
+
 /**
  * Shape type. Represents shape possible to get from backend and draw on canvas.
  */
@@ -62,4 +73,4 @@ type Frame = {
   entities: Shape[];
 };
 
-export type { Map, BuildingType, Building, Shape, Frame };
+export type { Map, BuildingType, Building, Shape, Frame, Unit, UnitType };
