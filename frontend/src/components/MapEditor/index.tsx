@@ -84,7 +84,7 @@ const MapEditor: React.FC<Props> = ({
   const [selectedBuildingPosition, setSelectedBuildingPosition] = useState<
     { x: number; y: number } | undefined
   >(undefined);
-  const [isBuildingSelectionModalOpen, setIsBuildingSelectionModalOpen] =
+  const [isBuildingCreationModalOpen, setIsBuildingCreationModalOpen] =
     useState(false);
 
   const buildingTypes = useContext(BuildingTypesContext);
@@ -208,7 +208,7 @@ const MapEditor: React.FC<Props> = ({
       } else if (!selectionIntersectsBuilding) {
         // create new building
 
-        setIsBuildingSelectionModalOpen(true);
+        setIsBuildingCreationModalOpen(true);
       }
 
       return;
@@ -279,7 +279,7 @@ const MapEditor: React.FC<Props> = ({
   const onBuildingCreationModalClose = (
     building: { buildingType: BuildingType; level: number } | undefined
   ) => {
-    setIsBuildingSelectionModalOpen(false);
+    setIsBuildingCreationModalOpen(false);
     setSelectionStartPosition(undefined);
 
     if (building === undefined) return;
@@ -494,7 +494,7 @@ const MapEditor: React.FC<Props> = ({
       </div>
 
       <BuildingCreationModal
-        isOpen={isBuildingSelectionModalOpen}
+        isOpen={isBuildingCreationModalOpen}
         selection={
           selection === undefined
             ? undefined
