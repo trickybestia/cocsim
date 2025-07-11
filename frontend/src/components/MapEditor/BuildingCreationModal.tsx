@@ -1,7 +1,7 @@
-import { useContext, useState } from "react";
+import { useState } from "react";
 import Modal from "react-modal";
 
-import { BuildingTypesContext } from "../../hooks/use-building-types";
+import useBuildingTypes from "../../hooks/use-building-types";
 import type { BuildingType } from "../../types";
 import getBuildingTypesWithSize from "../../utils/get-building-types-with-size";
 import StringSelector from "../StringSelector";
@@ -22,7 +22,7 @@ const BuildingCreationModal: React.FC<Props> = ({
   const [selectedBuildingType, setSelectedBuildingType] = useState<
     BuildingType | undefined
   >(undefined);
-  const buildingTypes = useContext(BuildingTypesContext);
+  const { buildingTypes, getBuildingType } = useBuildingTypes();
 
   if (!isOpen && selectedBuildingType !== undefined) {
     setSelectedBuildingType(undefined);
@@ -60,11 +60,7 @@ const BuildingCreationModal: React.FC<Props> = ({
             (buildingType) => buildingType.name
           )}
           onSelected={(value) =>
-            setSelectedBuildingType(
-              availableBuildingTypes.find(
-                (buildingType) => buildingType.name === value
-              )!
-            )
+            setSelectedBuildingType(getBuildingType(value))
           }
           inputPlaceholder="search for a building"
         />
