@@ -1,6 +1,5 @@
 # TODO
 
-- Add attack optimizer (finally).
 - Make Balloon apply damage to buildings on death. [balloon.py](../../cocsim/units/balloon.py)
 - Add other buildings.
 - Add other units.
