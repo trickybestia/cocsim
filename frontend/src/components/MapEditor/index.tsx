@@ -14,6 +14,7 @@ import {
   cropImage
 } from "../../utils/map-editor";
 import sortSelection from "../../utils/sort-selection";
+import Hint from "../Hint";
 import IntegerNumberInput from "../IntegerNumberInput";
 import BuildingCreationModal from "./BuildingCreationModal";
 import BuildingOptionsEditor from "./BuildingOptionsEditor";
@@ -329,182 +330,191 @@ const MapEditor: React.FC<Props> = ({
   };
 
   return (
-    <div
-      className={twMerge(
-        className,
-        "flex h-full w-full justify-between gap-2",
-        highlightedBuilding !== undefined && "cursor-pointer"
-      )}
-      {...props}
-    >
-      <div>
-        <div className="grid-col grid grid-cols-[auto_min-content] gap-1 text-end text-nowrap">
-          <p>Draw grid:</p>
-          <input
-            type="checkbox"
-            checked={drawGrid}
-            onChange={(e) => setDrawGrid(e.target.checked)}
-          />
-          <p>Draw coords:</p>
-          <input
-            type="checkbox"
-            checked={drawCoords}
-            onChange={(e) => setDrawCoords(e.target.checked)}
-          />
-          <IntegerNumberInput
-            text="Base size:"
-            min={1}
-            max={44}
-            defaultValue={baseSize}
-            onChange={setBaseSize}
-          />
-          <IntegerNumberInput
-            text="Border size:"
-            min={0}
-            max={4}
-            defaultValue={borderSize}
-            onChange={setBorderSize}
-          />
-          <IntegerNumberInput
-            text="Start X:"
-            min={0}
-            max={image.width - 1}
-            defaultValue={startX}
-            onChange={setStartX}
-          />
-          <IntegerNumberInput
-            text="Start Y:"
-            min={0}
-            max={image.width - 1}
-            defaultValue={startY}
-            onChange={setStartY}
-          />
-          <IntegerNumberInput
-            text="End X:"
-            min={0}
-            max={image.width - 1}
-            defaultValue={endX}
-            onChange={setEndX}
-          />
-          <IntegerNumberInput
-            text="End Y:"
-            min={0}
-            max={image.width - 1}
-            defaultValue={endY}
-            onChange={setEndY}
-          />
-          <button
-            className="col-span-2 cursor-pointer bg-blue-400 px-2 py-1 text-base font-bold text-white hover:bg-blue-600"
-            onClick={onResetCameraButtonClick}
-          >
-            Reset camera
-          </button>
-          <button
-            className="col-span-2 cursor-pointer bg-blue-400 px-2 py-1 text-base font-bold text-white hover:bg-blue-600"
-            onClick={onExportButtonClick}
-          >
-            Export
-          </button>
-          {selectedBuilding !== undefined && (
-            <BuildingOptionsEditor
-              key={`${selectedBuilding.x},${selectedBuilding.y}`} // to reset <input/> values on selected building change
-              building={selectedBuilding}
-              onChange={(value) =>
-                setBuildings(
-                  create(buildings, (draft) => {
-                    draft[selectedBuildingIndex!] = value;
-                  })
-                )
-              }
+    <div className="flex h-full w-full flex-col gap-2">
+      <Hint>
+        Click LMB on canvas to create buildings, RMB to remove, drag with mouse
+        wheel pressed to move, scroll mouse wheel to zoom
+      </Hint>
+      <div
+        className={twMerge(
+          className,
+          "flex grow-1 justify-between gap-2",
+          highlightedBuilding !== undefined && "cursor-pointer"
+        )}
+        {...props}
+      >
+        <div>
+          <div className="grid-col grid grid-cols-[auto_min-content] gap-1 text-end text-nowrap">
+            <p>Draw grid:</p>
+            <input
+              type="checkbox"
+              checked={drawGrid}
+              onChange={(e) => setDrawGrid(e.target.checked)}
             />
-          )}
+            <p>Draw coords:</p>
+            <input
+              type="checkbox"
+              checked={drawCoords}
+              onChange={(e) => setDrawCoords(e.target.checked)}
+            />
+            <IntegerNumberInput
+              text="Base size:"
+              min={1}
+              max={44}
+              defaultValue={baseSize}
+              onChange={setBaseSize}
+            />
+            <IntegerNumberInput
+              text="Border size:"
+              min={0}
+              max={4}
+              defaultValue={borderSize}
+              onChange={setBorderSize}
+            />
+            <IntegerNumberInput
+              text="Start X:"
+              min={0}
+              max={image.width - 1}
+              defaultValue={startX}
+              onChange={setStartX}
+            />
+            <IntegerNumberInput
+              text="Start Y:"
+              min={0}
+              max={image.width - 1}
+              defaultValue={startY}
+              onChange={setStartY}
+            />
+            <IntegerNumberInput
+              text="End X:"
+              min={0}
+              max={image.width - 1}
+              defaultValue={endX}
+              onChange={setEndX}
+            />
+            <IntegerNumberInput
+              text="End Y:"
+              min={0}
+              max={image.width - 1}
+              defaultValue={endY}
+              onChange={setEndY}
+            />
+            <button
+              className="col-span-2 cursor-pointer bg-blue-400 px-2 py-1 text-base font-bold text-white hover:bg-blue-600"
+              onClick={onResetCameraButtonClick}
+            >
+              Reset camera
+            </button>
+            <Hint className="col-span-2 text-left text-sm">
+              Click Export to download .zip
+            </Hint>
+            <button
+              className="col-span-2 cursor-pointer bg-blue-400 px-2 py-1 text-base font-bold text-white hover:bg-blue-600"
+              onClick={onExportButtonClick}
+            >
+              Export
+            </button>
+            {selectedBuilding !== undefined && (
+              <BuildingOptionsEditor
+                key={`${selectedBuilding.x},${selectedBuilding.y}`} // to reset <input/> values on selected building change
+                building={selectedBuilding}
+                onChange={(value) =>
+                  setBuildings(
+                    create(buildings, (draft) => {
+                      draft[selectedBuildingIndex!] = value;
+                    })
+                  )
+                }
+              />
+            )}
+          </div>
         </div>
-      </div>
 
-      <div ref={canvasWrapperRef} className="aspect-square bg-green-900">
-        <Stage
-          ref={canvasRef}
-          width={canvasSize}
-          height={canvasSize}
-          onWheel={canvasOnWheel}
-          onPointerMove={canvasOnPointerMove}
-          onClick={canvasOnClick}
-          onContextMenu={(e) => e.evt.preventDefault()}
-          listening={false}
-        >
-          <Layer>
-            <Image
-              scaleX={canvasSize / image.width}
-              scaleY={canvasSize / image.width}
-              crop={{
-                x: startX,
-                y: startY,
-                width: endX - startX + 1,
-                height: endY - startY + 1
-              }}
-              image={image}
-            />
-          </Layer>
-          {drawGrid && (
-            <DrawGridLayer
-              totalSize={baseSize + borderSize}
-              canvasSize={canvasSize}
-            />
-          )}
-          {drawCoords && (
-            <DrawCoordsLayer
-              totalSize={baseSize + borderSize}
-              canvasSize={canvasSize}
-            />
-          )}
-          <BuildingsLayer
-            buildings={buildings}
-            selectedBuilding={selectedBuilding}
-            pixelsPerTile={pixelsPerTile}
-          />
-          <Layer>
-            {cursorPosition !== undefined && (
-              <Rect
-                x={cursorPosition.x * pixelsPerTile}
-                y={cursorPosition.y * pixelsPerTile}
-                width={pixelsPerTile}
-                height={pixelsPerTile}
-                stroke="black"
-                strokeWidth={1}
+        <div ref={canvasWrapperRef} className="aspect-square bg-green-900">
+          <Stage
+            ref={canvasRef}
+            width={canvasSize}
+            height={canvasSize}
+            onWheel={canvasOnWheel}
+            onPointerMove={canvasOnPointerMove}
+            onClick={canvasOnClick}
+            onContextMenu={(e) => e.evt.preventDefault()}
+            listening={false}
+          >
+            <Layer>
+              <Image
+                scaleX={canvasSize / image.width}
+                scaleY={canvasSize / image.width}
+                crop={{
+                  x: startX,
+                  y: startY,
+                  width: endX - startX + 1,
+                  height: endY - startY + 1
+                }}
+                image={image}
+              />
+            </Layer>
+            {drawGrid && (
+              <DrawGridLayer
+                totalSize={baseSize + borderSize}
+                canvasSize={canvasSize}
               />
             )}
-            {selection !== undefined && (
-              <Rect
-                x={selection.leftTop.x * pixelsPerTile}
-                y={selection.leftTop.y * pixelsPerTile}
-                width={
-                  (selection.rightBottom.x - selection.leftTop.x + 1) *
-                  pixelsPerTile
-                }
-                height={
-                  (selection.rightBottom.y - selection.leftTop.y + 1) *
-                  pixelsPerTile
-                }
-                stroke={selectionIntersectsBuilding ? "red" : "black"}
-                strokeWidth={1}
+            {drawCoords && (
+              <DrawCoordsLayer
+                totalSize={baseSize + borderSize}
+                canvasSize={canvasSize}
               />
             )}
-          </Layer>
-        </Stage>
-      </div>
+            <BuildingsLayer
+              buildings={buildings}
+              selectedBuilding={selectedBuilding}
+              pixelsPerTile={pixelsPerTile}
+            />
+            <Layer>
+              {cursorPosition !== undefined && (
+                <Rect
+                  x={cursorPosition.x * pixelsPerTile}
+                  y={cursorPosition.y * pixelsPerTile}
+                  width={pixelsPerTile}
+                  height={pixelsPerTile}
+                  stroke="black"
+                  strokeWidth={1}
+                />
+              )}
+              {selection !== undefined && (
+                <Rect
+                  x={selection.leftTop.x * pixelsPerTile}
+                  y={selection.leftTop.y * pixelsPerTile}
+                  width={
+                    (selection.rightBottom.x - selection.leftTop.x + 1) *
+                    pixelsPerTile
+                  }
+                  height={
+                    (selection.rightBottom.y - selection.leftTop.y + 1) *
+                    pixelsPerTile
+                  }
+                  stroke={selectionIntersectsBuilding ? "red" : "black"}
+                  strokeWidth={1}
+                />
+              )}
+            </Layer>
+          </Stage>
+        </div>
 
-      <BuildingCreationModal
-        isOpen={isBuildingCreationModalOpen}
-        selection={
-          selection === undefined
-            ? undefined
-            : {
-                width: selection.rightBottom.x - selection.leftTop.x + 1,
-                height: selection.rightBottom.y - selection.leftTop.y + 1
-              }
-        }
-        onClose={onBuildingCreationModalClose}
-      />
+        <BuildingCreationModal
+          isOpen={isBuildingCreationModalOpen}
+          selection={
+            selection === undefined
+              ? undefined
+              : {
+                  width: selection.rightBottom.x - selection.leftTop.x + 1,
+                  height: selection.rightBottom.y - selection.leftTop.y + 1
+                }
+          }
+          onClose={onBuildingCreationModalClose}
+        />
+      </div>
     </div>
   );
 };

@@ -24,13 +24,15 @@ const ShowcasePage: React.FC = () => {
     <>
       <Header />
       <main className="grow p-4">
-        {frames !== undefined && baseImage !== undefined && (
-          <div className="flex h-full flex-col items-center">
-            <div className="w-full grow lg:max-w-[var(--breakpoint-lg)]">
+        <div className="flex h-full flex-col items-center">
+          <div className="w-full grow lg:max-w-[var(--breakpoint-lg)]">
+            {frames === undefined || baseImage === undefined ? (
+              <p>Loading...</p>
+            ) : (
               <GameRenderer frames={frames} baseImage={baseImage} />
-            </div>
+            )}
           </div>
-        )}
+        </div>
       </main>
     </>
   );

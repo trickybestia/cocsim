@@ -3,6 +3,7 @@ import { twJoin, twMerge } from "tailwind-merge";
 
 import { composeBaseImages, reverseProjection } from "../../api";
 import readFiles from "../../utils/read-files";
+import Hint from "../Hint";
 import GridImage from "./GridImage";
 
 type URLBlob = { blob: Blob; url: string };
@@ -232,9 +233,7 @@ const ComposeBaseImages: React.FC<Props> = ({
       <div className="flex gap-2">
         {composedImage !== undefined && (
           <div className="flex shrink grow basis-0 flex-col gap-2">
-            <h3 className="inline-block bg-yellow-300 px-1 text-lg">
-              🔍️ Step 2: Check if composed image looks good
-            </h3>
+            <Hint>Step 2: Check if composed image looks good</Hint>
             <GridImage
               src={composedImage.url}
               onClose={() => setComposedImage(undefined)}
@@ -244,9 +243,7 @@ const ComposeBaseImages: React.FC<Props> = ({
         )}
         {reversedImage !== undefined && (
           <div className="flex shrink grow basis-0 flex-col gap-2">
-            <h3 className="inline-block bg-yellow-300 px-1 text-lg">
-              🔍️ Step 3: Check if rotated image looks good
-            </h3>
+            <Hint>Step 3: Check if rotated image looks good</Hint>
             <GridImage
               src={reversedImage.url}
               onClose={() => setReversedImage(undefined)}
@@ -256,9 +253,7 @@ const ComposeBaseImages: React.FC<Props> = ({
         )}
       </div>
       <div className="flex items-baseline justify-between">
-        <h3 className="inline-block bg-yellow-300 px-1 text-lg">
-          🔍️ Step 1: Select images to compose
-        </h3>
+        <Hint>Step 1: Select images to compose</Hint>
         <button
           className={twJoin(
             !isComposing && "cursor-pointer hover:bg-blue-600",

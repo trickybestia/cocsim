@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Stage } from "react-konva";
 
 import type { Frame } from "../../types";
@@ -13,17 +13,39 @@ type Props = {
 };
 
 const GameRenderer: React.FC<Props> = ({ frames, baseImage }: Props) => {
+  const canvasWrapperRef = useRef<HTMLDivElement | null>(null);
+  const [canvasSize, setCanvasSize] = useState(1);
+
   const [frameIndex, setFrameIndex] = useState(0);
   const [speed, setSpeed] = useState(1.0);
   const [isPaused, setIsPaused] = useState(true);
-
-  const canvasSize = 800;
 
   let collision = null;
 
   for (let i = frameIndex; collision === null; i--) {
     collision = frames[i].collision;
   }
+
+  useEffect(() => {
+    const onResize = () => {
+      if (canvasWrapperRef.current === null) return;
+
+      setCanvasSize(
+        Math.min(
+          canvasWrapperRef.current.offsetHeight,
+          canvasWrapperRef.current.offsetWidth
+        )
+      );
+    };
+
+    onResize();
+
+    window.addEventListener("resize", onResize);
+
+    return () => {
+      window.removeEventListener("resize", onResize);
+    };
+  }, []);
 
   useEffect(() => {
     if (isPaused) return;
@@ -55,25 +77,33 @@ const GameRenderer: React.FC<Props> = ({ frames, baseImage }: Props) => {
   };
 
   return (
-    <div className="flex w-[800px] flex-col gap-2">
-      <Stage width={canvasSize} height={canvasSize} listening={false}>
-        <BackgroundLayer
-          totalBaseSize={frames[0].totalBaseSize}
-          grid={frames[0].grid!}
-          baseImage={baseImage}
-          canvasSize={canvasSize}
-        />
-        <CollisionLayer
-          totalBaseSize={frames[frameIndex].totalBaseSize}
-          collision={collision}
-          canvasSize={canvasSize}
-        />
-        <EntitiesLayer
-          totalBaseSize={frames[frameIndex].totalBaseSize}
-          entities={frames[frameIndex].entities}
-          canvasSize={canvasSize}
-        />
-      </Stage>
+    <div className="flex h-full grow flex-col gap-2">
+      <div className="relative flex grow justify-around" ref={canvasWrapperRef}>
+        <Stage
+          className="absolute"
+          width={canvasSize}
+          height={canvasSize}
+          listening={false}
+        >
+          <BackgroundLayer
+            totalBaseSize={frames[0].totalBaseSize}
+            grid={frames[0].grid!}
+            baseImage={baseImage}
+            canvasSize={canvasSize}
+          />
+          <CollisionLayer
+            totalBaseSize={frames[frameIndex].totalBaseSize}
+            collision={collision}
+            canvasSize={canvasSize}
+          />
+          <EntitiesLayer
+            totalBaseSize={frames[frameIndex].totalBaseSize}
+            entities={frames[frameIndex].entities}
+            canvasSize={canvasSize}
+          />
+        </Stage>
+      </div>
+
       <div className="flex justify-between">
         <p>{frames[frameIndex].timeElapsed}</p>
         <p>{frames[frameIndex].progressInfo}</p>

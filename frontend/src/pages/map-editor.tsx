@@ -82,13 +82,13 @@ const MapEditorPage: React.FC = () => {
                 className="cursor-pointer bg-blue-400 px-2 py-1 text-base font-bold text-white hover:bg-blue-600"
                 onClick={onCreateNewButtonClick}
               >
-                Create new
+                Create new (choose base image)
               </button>
               <button
                 className="cursor-pointer bg-blue-400 px-2 py-1 text-base font-bold text-white hover:bg-blue-600"
                 onClick={onOpenExistingButtonClick}
               >
-                Open existing
+                Open existing (choose .zip file)
               </button>
             </div>
           </div>
