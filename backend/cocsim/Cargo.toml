@@ -1,5 +1,5 @@
 [package]
-name = "cocsim_rs"
+name = "cocsim"
 version = "0.1.0"
 edition = "2024"
 
