@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Stage } from "react-konva";
+import { twMerge } from "tailwind-merge";
 
 import type { Frame } from "../../types";
 import FloatNumberInput from "../FloatNumberInput";
@@ -8,11 +9,16 @@ import CollisionLayer from "./CollisionLayer";
 import EntitiesLayer from "./EntitiesLayer";
 
 type Props = {
+  className?: string;
   frames: Frame[];
   baseImage?: HTMLImageElement;
 };
 
-const GameRenderer: React.FC<Props> = ({ frames, baseImage }: Props) => {
+const GameRenderer: React.FC<Props> = ({
+  className,
+  frames,
+  baseImage
+}: Props) => {
   const canvasWrapperRef = useRef<HTMLDivElement | null>(null);
   const [canvasSize, setCanvasSize] = useState(1);
 
@@ -77,33 +83,7 @@ const GameRenderer: React.FC<Props> = ({ frames, baseImage }: Props) => {
   };
 
   return (
-    <div className="flex h-full grow flex-col gap-2">
-      <div className="relative flex grow justify-around" ref={canvasWrapperRef}>
-        <Stage
-          className="absolute"
-          width={canvasSize}
-          height={canvasSize}
-          listening={false}
-        >
-          <BackgroundLayer
-            totalBaseSize={frames[0].totalBaseSize}
-            grid={frames[0].grid!}
-            baseImage={baseImage}
-            canvasSize={canvasSize}
-          />
-          <CollisionLayer
-            totalBaseSize={frames[frameIndex].totalBaseSize}
-            collision={collision}
-            canvasSize={canvasSize}
-          />
-          <EntitiesLayer
-            totalBaseSize={frames[frameIndex].totalBaseSize}
-            entities={frames[frameIndex].entities}
-            canvasSize={canvasSize}
-          />
-        </Stage>
-      </div>
-
+    <div className={twMerge("flex h-full grow flex-col gap-2", className)}>
       <div className="flex justify-between">
         <p>{frames[frameIndex].timeElapsed}</p>
         <p>{frames[frameIndex].progressInfo}</p>
@@ -153,6 +133,32 @@ const GameRenderer: React.FC<Props> = ({ frames, baseImage }: Props) => {
             onChange={setSpeed}
           />
         </div>
+      </div>
+
+      <div className="relative flex grow justify-around" ref={canvasWrapperRef}>
+        <Stage
+          className="absolute"
+          width={canvasSize}
+          height={canvasSize}
+          listening={false}
+        >
+          <BackgroundLayer
+            totalBaseSize={frames[0].totalBaseSize}
+            grid={frames[0].grid!}
+            baseImage={baseImage}
+            canvasSize={canvasSize}
+          />
+          <CollisionLayer
+            totalBaseSize={frames[frameIndex].totalBaseSize}
+            collision={collision}
+            canvasSize={canvasSize}
+          />
+          <EntitiesLayer
+            totalBaseSize={frames[frameIndex].totalBaseSize}
+            entities={frames[frameIndex].entities}
+            canvasSize={canvasSize}
+          />
+        </Stage>
       </div>
     </div>
   );

@@ -32,6 +32,11 @@ type Unit = {
   level: number;
 };
 
+type UnitWithCount = {
+  unit: Unit;
+  count: number;
+};
+
 type UnitType = {
   name: string;
   levels: number;
@@ -90,6 +95,7 @@ export type {
   Shape,
   Frame,
   Unit,
+  UnitWithCount,
   UnitType,
   OptimizeAttackMessage
 };

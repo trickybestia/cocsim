@@ -2,17 +2,12 @@ import { create } from "mutative";
 import { useState } from "react";
 
 import useUnitTypes from "../../hooks/use-unit-types";
-import type { Unit, UnitType } from "../../types";
+import type { UnitType, UnitWithCount } from "../../types";
 import UnitCreationModal from "./UnitCreationModal";
 import UnitView from "./UnitView";
 
 type Props = {
-  onOk: (units: Unit[]) => void;
-};
-
-type UnitWithCount = {
-  unit: Unit;
-  count: number;
+  onOk: (units: UnitWithCount[]) => void;
 };
 
 const ArmyEditor: React.FC<Props> = ({ onOk }: Props) => {
@@ -52,15 +47,7 @@ const ArmyEditor: React.FC<Props> = ({ onOk }: Props) => {
   ));
 
   const onOkButtonClick = () => {
-    const result: Unit[] = [];
-
-    units.forEach((unit) => {
-      for (let i = 0; i != unit.count; i++) {
-        result.push(unit.unit);
-      }
-    });
-
-    onOk(result);
+    onOk(units);
   };
 
   const onAddUnitButtonClick = () => {
