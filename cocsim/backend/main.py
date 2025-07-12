@@ -1,17 +1,21 @@
 from io import BytesIO
 
-from fastapi import FastAPI, UploadFile
+from fastapi import FastAPI, UploadFile, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 from PIL import Image
+from starlette.concurrency import iterate_in_threadpool
 
+from cocsim.attack_optimizer import AttackPlanExecutor, AttackPlanOptimizer
 from cocsim.buildings.building import BUILDINGS
 from cocsim.compose_base_images import compose_base_images, reverse_projection
 from cocsim.consts import *
 from cocsim.dto_game_renderer import DTOGameRenderer
 from cocsim.game import Game
-from cocsim.units import UNITS, Barbarian
+from cocsim.units import UNITS, Barbarian, create_units_model
 from cocsim.utils import load_test_map, load_test_map_raw, round_floats
+
+from ..map_model import create_map_model
 
 app = FastAPI()
 
@@ -120,3 +124,65 @@ def get_showcase_attack():
     renderer.finish(game)
 
     return round_floats(renderer.result, 2)
+
+
+OPTIMIZE_ATTACK_ITERATIONS = 2
+
+
+@app.websocket("/api/optimize-attack")
+async def optimize_attack(websocket: WebSocket):
+    await websocket.accept()
+
+    map_dict = await websocket.receive_json()
+    map = create_map_model()(**map_dict)
+
+    units_dict = await websocket.receive_json()
+    units = create_units_model()(**{"units": units_dict})
+
+    await websocket.send_json(
+        {
+            "type": "progress",
+            "progress": "Attack optimization process started...",
+        }
+    )
+
+    optimizer = AttackPlanOptimizer(map, units)
+
+    async for i, score, attack_plan in iterate_in_threadpool(optimizer.run()):
+        await websocket.send_json(
+            {
+                "type": "progress",
+                "progress": f"Gen. #{i} best plan finished in {MAX_ATTACK_DURATION - score:.2f} seconds",
+            }
+        )
+
+        if i >= OPTIMIZE_ATTACK_ITERATIONS - 1:
+            break
+
+    await websocket.send_json(
+        {
+            "type": "progress",
+            "progress": "Attack optimization done, rendering result...",
+        }
+    )
+
+    game = Game(map)
+    attack_plan_executor = AttackPlanExecutor(game, attack_plan)
+
+    renderer = DTOGameRenderer(1)
+
+    attack_plan_executor.tick()
+    renderer.draw(game)
+
+    while not game.done:
+        attack_plan_executor.tick()  # no problem calling it twice on first loop iteration
+        game.tick(1 / FPS)
+        renderer.draw(game)
+
+    renderer.finish(game)
+
+    await websocket.send_json(
+        {"type": "result", "result": round_floats(renderer.result, 2)}
+    )
+
+    await websocket.close()

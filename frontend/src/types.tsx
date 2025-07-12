@@ -73,4 +73,23 @@ type Frame = {
   entities: Shape[];
 };
 
-export type { Map, BuildingType, Building, Shape, Frame, Unit, UnitType };
+type OptimizeAttackMessage =
+  | {
+      type: "progress";
+      progress: string;
+    }
+  | {
+      type: "result";
+      result: Frame[];
+    };
+
+export type {
+  Map,
+  BuildingType,
+  Building,
+  Shape,
+  Frame,
+  Unit,
+  UnitType,
+  OptimizeAttackMessage
+};

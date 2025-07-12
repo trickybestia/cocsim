@@ -69,11 +69,16 @@ const getShowcaseAttack = async (): Promise<Frame[]> => {
   return (await axiosInstance.get("/get-showcase-attack")).data;
 };
 
+const getOptimizeAttackWebSocketUrl = (): string => {
+  return axiosInstance.getUri({ url: "/optimize-attack" });
+};
+
 export {
   composeBaseImages,
   reverseProjection,
   getBuildingTypes,
   getUnitTypes,
   getShowcaseAttackBaseImage,
-  getShowcaseAttack
+  getShowcaseAttack,
+  getOptimizeAttackWebSocketUrl
 };

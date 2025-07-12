@@ -49,7 +49,7 @@ class AttackPlanOptimizer:
             if best_score is None or score > best_score:
                 best_score = score
 
-                yield i, best_score, new_population[0]
+            yield i, best_score, new_population[0]
 
             population = new_population[:POPULATION_SIZE]
             i += 1
