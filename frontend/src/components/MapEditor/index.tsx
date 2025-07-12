@@ -47,7 +47,12 @@ const MapEditor: React.FC<Props> = ({
     const onResize = () => {
       if (canvasWrapperRef.current === null) return;
 
-      setCanvasSize(canvasWrapperRef.current.offsetHeight);
+      setCanvasSize(
+        Math.min(
+          canvasWrapperRef.current.offsetHeight,
+          canvasWrapperRef.current.offsetWidth
+        )
+      );
     };
 
     onResize();
@@ -338,7 +343,7 @@ const MapEditor: React.FC<Props> = ({
       <div
         className={twMerge(
           className,
-          "flex grow-1 justify-between gap-2",
+          "flex grow justify-between gap-2",
           highlightedBuilding !== undefined && "cursor-pointer"
         )}
         {...props}
@@ -430,8 +435,12 @@ const MapEditor: React.FC<Props> = ({
           </div>
         </div>
 
-        <div ref={canvasWrapperRef} className="aspect-square bg-green-900">
+        <div
+          className="relative flex grow justify-around"
+          ref={canvasWrapperRef}
+        >
           <Stage
+            className="absolute bg-green-900"
             ref={canvasRef}
             width={canvasSize}
             height={canvasSize}
