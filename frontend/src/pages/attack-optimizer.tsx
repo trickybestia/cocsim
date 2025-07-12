@@ -110,6 +110,7 @@ const AttackOptimizerPage: React.FC = () => {
                       <div>
                         {unitsWithCount.map((unitWithCount, index) => (
                           <p
+                            key={index}
                             className={twJoin(
                               index % 2 == 1 ? "bg-gray-200" : "bg-gray-100",
                               "px-1 py-0.5"
