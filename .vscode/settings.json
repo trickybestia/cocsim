@@ -10,4 +10,7 @@
         "--profile",
         "black"
     ],
+    "rust-analyzer.rustfmt.extraArgs": [
+        "+nightly"
+    ],
 }
