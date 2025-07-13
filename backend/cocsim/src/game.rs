@@ -85,7 +85,7 @@ impl Game {
         result
     }
 
-    pub fn new(map: &Map) -> Rc<RefCell<Self>> {
+    pub fn new(map: &Map) -> Self {
         let total_size = map.base_size + 2 * map.border_size;
 
         let buildings = vec![];
@@ -95,7 +95,7 @@ impl Game {
         let drop_zone = Self::compute_drop_zone(total_size, &buildings_grid);
         let total_buildings_count = Self::compute_total_buildings_count(&buildings);
 
-        let result = Rc::new(RefCell::new(Self {
+        let result = Self {
             base_size: map.base_size as i32,
             border_size: map.border_size as i32,
             buildings,
@@ -108,21 +108,13 @@ impl Game {
             destroyed_buildings_count: 0,
             total_buildings_count,
             need_redraw_collision: true,
-        }));
+        };
 
-        for building in &result.borrow().buildings {
-            let game = Rc::downgrade(&result);
-            let on_building_destroyed: Box<dyn Fn(&dyn Building)> = Box::new(|b| {
-                game.upgrade()
-                    .unwrap()
-                    .borrow_mut()
-                    .on_building_destroyed(b);
-            });
-
+        for building in &result.buildings {
             building
                 .borrow_mut()
                 .on_destroyed_mut()
-                .push(on_building_destroyed);
+                .push(Box::new(Game::on_building_destroyed));
         }
 
         result

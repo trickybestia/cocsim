@@ -23,7 +23,7 @@ where
     fn collider(&self) -> Option<&dyn Collider>;
 
     /// Returns [`Vec`] of on_destroyed event handlers.
-    fn on_destroyed_mut(&mut self) -> Vec<Box<dyn Fn(&dyn Building)>>;
+    fn on_destroyed_mut(&mut self) -> Vec<Box<dyn Fn(&mut Game, &dyn Building)>>;
 
     fn center(&self) -> Vector2<f32> {
         self.position().cast() + self.size().cast() / 2.0
