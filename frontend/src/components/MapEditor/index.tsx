@@ -94,11 +94,11 @@ const MapEditor: React.FC<Props> = ({
     useState(false);
 
   const buildingTypes = useContext(BuildingTypesContext);
-  const pixelsPerTile = canvasSize / (baseSize + borderSize);
+  const pixelsPerTile = canvasSize / (baseSize + 2 * borderSize);
   const buildingsGrid = createBuildingsGrid(
     buildings,
     buildingTypes,
-    baseSize + borderSize
+    baseSize + 2 * borderSize
   );
   const highlightedBuilding =
     cursorPosition === undefined
@@ -465,13 +465,13 @@ const MapEditor: React.FC<Props> = ({
             </Layer>
             {drawGrid && (
               <DrawGridLayer
-                totalSize={baseSize + borderSize}
+                totalSize={baseSize + 2 * borderSize}
                 canvasSize={canvasSize}
               />
             )}
             {drawCoords && (
               <DrawCoordsLayer
-                totalSize={baseSize + borderSize}
+                totalSize={baseSize + 2 * borderSize}
                 canvasSize={canvasSize}
               />
             )}
