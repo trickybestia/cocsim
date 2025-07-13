@@ -8,22 +8,19 @@ use nalgebra::{
 use crate::{
     BuildingType,
     Game,
-    Shape,
     colliders::Collider,
 };
 
 pub trait Building
 where
-    Self: Deref<Target = BuildingType>,
+    Self: Deref<Target = &'static BuildingType>,
 {
-    fn id(&self) -> u32;
-
     fn position(&self) -> Vector2<u32>;
     fn health(&self) -> f32;
     fn collider(&self) -> Option<&dyn Collider>;
 
     /// Returns [`Vec`] of on_destroyed event handlers.
-    fn on_destroyed_mut(&mut self) -> Vec<Box<dyn Fn(&mut Game, &dyn Building)>>;
+    fn on_destroyed_mut(&mut self) -> Vec<Box<dyn Fn(&mut Game, u32)>>;
 
     fn center(&self) -> Vector2<f32> {
         self.position().cast() + self.size().cast() / 2.0
@@ -33,23 +30,19 @@ where
         self.health() == 0.0
     }
 
-    fn tick(&mut self, game: &mut Game, delta_t: f32);
-
-    fn draw(&self, game: &Game, shapes: &mut Vec<Shape>);
-
     /// Apply damage to this building. Called by units when they attack.
     fn apply_damage(&mut self, damage: f32);
 
     /// Occupy tiles for troops drop zone calculation. Called once.
-    fn occupy_tiles(&self, buildings_grid: &mut DMatrix<Option<u32>>) {
+    fn occupy_tiles(&self, id: u32, buildings_grid: &mut DMatrix<Option<u32>>) {
         for x in (self.position().x)..(self.position().x + self.size().x) {
             for y in (self.position().y)..(self.position().y + self.size().y) {
-                buildings_grid[(x as usize, y as usize)] = Some(self.id())
+                buildings_grid[(x as usize, y as usize)] = Some(id)
             }
         }
     }
 
     /// Update collision for this building. Can be called multiple times. Need
     /// check for self.destroyed.
-    fn update_collision(&self, collision_grid: &mut DMatrix<Option<u32>>);
+    fn update_collision(&self, id: u32, collision_grid: &mut DMatrix<Option<u32>>);
 }

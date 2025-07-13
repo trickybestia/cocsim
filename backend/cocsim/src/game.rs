@@ -1,8 +1,4 @@
-use std::{
-    borrow::Cow,
-    cell::RefCell,
-    rc::Rc,
-};
+use std::borrow::Cow;
 
 use nalgebra::DMatrix;
 
@@ -23,7 +19,7 @@ pub struct Game {
     base_size: i32,
     border_size: i32,
 
-    buildings: Vec<Rc<RefCell<dyn Building>>>,
+    buildings: Box<[Box<dyn Building>]>,
 
     buildings_grid: DMatrix<Option<u32>>,
     drop_zone: DMatrix<bool>,
@@ -88,14 +84,14 @@ impl Game {
     pub fn new(map: &Map) -> Self {
         let total_size = map.base_size + 2 * map.border_size;
 
-        let buildings = vec![];
+        let buildings = vec![].into_boxed_slice();
 
         let buildings_grid = Self::compute_buildings_grid(total_size, &buildings);
         let collision_grid = Self::compute_collision_grid(total_size, &buildings);
         let drop_zone = Self::compute_drop_zone(total_size, &buildings_grid);
         let total_buildings_count = Self::compute_total_buildings_count(&buildings);
 
-        let result = Self {
+        let mut result = Self {
             base_size: map.base_size as i32,
             border_size: map.border_size as i32,
             buildings,
@@ -110,9 +106,8 @@ impl Game {
             need_redraw_collision: true,
         };
 
-        for building in &result.buildings {
+        for building in &mut result.buildings {
             building
-                .borrow_mut()
                 .on_destroyed_mut()
                 .push(Box::new(Game::on_building_destroyed));
         }
@@ -131,9 +126,7 @@ impl Game {
         assert!(!self.done());
 
         for i in 0..self.buildings.len() {
-            let building = self.buildings[i].clone();
-
-            building.borrow_mut().tick(self, delta_t);
+            self.buildings[i].tick(self, i as u32, delta_t);
         }
 
         self.time_elapsed = MAX_ATTACK_DURATION.min(self.time_elapsed + delta_t)
@@ -143,9 +136,7 @@ impl Game {
         let mut result = Vec::new();
 
         for i in 0..self.buildings.len() {
-            let building = self.buildings[i].clone();
-
-            building.borrow().draw(self, &mut result);
+            self.buildings[i].draw(self, i as u32, &mut result);
         }
 
         result
@@ -184,8 +175,10 @@ impl Game {
         )
     }
 
-    fn on_building_destroyed(&mut self, building: &dyn Building) {
+    fn on_building_destroyed(&mut self, building_id: u32) {
         self.need_redraw_collision = true;
+
+        let building = &self.buildings[building_id as usize];
 
         if building.name() == "TownHall" {
             self.townhall_destroyed = true;
@@ -196,16 +189,16 @@ impl Game {
         }
     }
 
-    fn compute_total_buildings_count(buildings: &[Rc<RefCell<dyn Building>>]) -> usize {
+    fn compute_total_buildings_count(buildings: &[Box<dyn Building>]) -> usize {
         buildings
             .iter()
-            .filter(|building| building.borrow().name() != "Wall")
+            .filter(|building| building.name() != "Wall")
             .count()
     }
 
     fn compute_collision_grid(
         total_size: usize,
-        buildings: &[Rc<RefCell<dyn Building>>],
+        buildings: &[Box<dyn Building>],
     ) -> DMatrix<Option<u32>> {
         let mut result = DMatrix::from_element(
             total_size * COLLISION_TILES_PER_MAP_TILE,
@@ -213,8 +206,8 @@ impl Game {
             None,
         );
 
-        for building in buildings {
-            building.borrow().update_collision(&mut result);
+        for i in 0..buildings.len() {
+            buildings[i].update_collision(i as u32, &mut result);
         }
 
         result
@@ -222,12 +215,12 @@ impl Game {
 
     fn compute_buildings_grid(
         total_size: usize,
-        buildings: &[Rc<RefCell<dyn Building>>],
+        buildings: &[Box<dyn Building>],
     ) -> DMatrix<Option<u32>> {
         let mut result = DMatrix::from_element(total_size, total_size, None);
 
-        for building in buildings {
-            building.borrow().occupy_tiles(&mut result);
+        for i in 0..buildings.len() {
+            buildings[i].occupy_tiles(i as u32, &mut result);
         }
 
         result

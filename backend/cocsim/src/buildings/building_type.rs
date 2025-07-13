@@ -1,17 +1,22 @@
+use std::ops::Deref;
+
 use nalgebra::Vector2;
-use serde::{
-    Deserialize,
-    Serialize,
+use serde::Serialize;
+
+use crate::{
+    BuildingOption,
+    EntityBehaviour,
 };
 
-use crate::BuildingOption;
-
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize)]
 pub struct BuildingType {
     name: String,
     size: Vector2<u32>,
     levels: u32,
     options: Vec<BuildingOption>,
+
+    #[serde(skip)]
+    behaviour: Box<dyn EntityBehaviour>,
 }
 
 impl BuildingType {
@@ -29,5 +34,13 @@ impl BuildingType {
 
     pub fn options(&self) -> &[BuildingOption] {
         &self.options
+    }
+}
+
+impl Deref for BuildingType {
+    type Target = Box<dyn EntityBehaviour>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.behaviour
     }
 }
