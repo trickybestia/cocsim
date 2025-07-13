@@ -1,7 +1,7 @@
 use nalgebra::Vector2;
 
 pub trait Collider {
-    /// Returns attack area `Collider` from which units with given
+    /// Returns attack area [`Collider`] from which units with given
     /// `attack_range` can attack this building.
     fn attack_area(&self, attack_range: f32) -> Box<dyn Collider>;
 
