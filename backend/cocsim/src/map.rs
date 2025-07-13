@@ -5,6 +5,6 @@ use serde::{
 
 #[derive(Serialize, Deserialize)]
 pub struct Map {
-    pub base_size: u32,
-    pub border_size: u32,
+    pub base_size: usize,
+    pub border_size: usize,
 }

@@ -1,6 +1,9 @@
 use std::ops::Deref;
 
-use nalgebra::Vector2;
+use nalgebra::{
+    DMatrix,
+    Vector2,
+};
 
 use crate::{
     BuildingType,
@@ -38,15 +41,15 @@ where
     fn apply_damage(&mut self, damage: f32);
 
     /// Occupy tiles for troops drop zone calculation. Called once.
-    fn occupy_tiles(&self, game: &mut Game) {
+    fn occupy_tiles(&self, buildings_grid: &mut DMatrix<Option<u32>>) {
         for x in (self.position().x)..(self.position().x + self.size().x) {
             for y in (self.position().y)..(self.position().y + self.size().y) {
-                todo!()
+                buildings_grid[(x as usize, y as usize)] = Some(self.id())
             }
         }
     }
 
     /// Update collision for this building. Can be called multiple times. Need
     /// check for self.destroyed.
-    fn update_collision(&self, game: &mut Game);
+    fn update_collision(&self, collision_grid: &mut DMatrix<Option<u32>>);
 }

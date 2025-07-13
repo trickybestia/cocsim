@@ -4,7 +4,7 @@ pub const TEST_MAPS_PATH: &str = "test_maps";
 pub const PIXELS_PER_TILE: u32 = 20;
 
 /// Used for pathfinding.
-pub const COLLISION_TILES_PER_MAP_TILE: u32 = 10;
+pub const COLLISION_TILES_PER_MAP_TILE: usize = 10;
 pub const COLLISION_TILE_SIZE: f32 = 1.0 / COLLISION_TILES_PER_MAP_TILE as f32;
 
 /// Unit distance to waypoint to consider it visited.

@@ -12,7 +12,11 @@ use crate::{
     Pathfinder,
     Shape,
     consts::*,
-    utils::get_tile_color,
+    utils::{
+        draw_bool_grid,
+        get_tile_color,
+        is_inside_map,
+    },
 };
 
 pub struct Game {
@@ -31,9 +35,9 @@ pub struct Game {
 
     townhall_destroyed: bool,
     /// Buildings without walls.
-    destroyed_buildings_count: u32,
+    destroyed_buildings_count: usize,
     /// Buildings without walls.
-    total_buildings_count: u32,
+    total_buildings_count: usize,
     need_redraw_collision: bool,
 }
 
@@ -81,21 +85,47 @@ impl Game {
         result
     }
 
-    pub fn new(map: &Map) -> Self {
-        Self {
+    pub fn new(map: &Map) -> Rc<RefCell<Self>> {
+        let total_size = map.base_size + 2 * map.border_size;
+
+        let buildings = vec![];
+
+        let buildings_grid = Self::compute_buildings_grid(total_size, &buildings);
+        let collision_grid = Self::compute_collision_grid(total_size, &buildings);
+        let drop_zone = Self::compute_drop_zone(total_size, &buildings_grid);
+        let total_buildings_count = Self::compute_total_buildings_count(&buildings);
+
+        let result = Rc::new(RefCell::new(Self {
             base_size: map.base_size as i32,
             border_size: map.border_size as i32,
-            buildings: todo!(),
-            buildings_grid: todo!(),
-            drop_zone: todo!(),
-            collision_grid: todo!(),
+            buildings,
+            buildings_grid,
+            drop_zone,
+            collision_grid,
             pathfinder: Pathfinder,
             time_elapsed: 0.0,
             townhall_destroyed: false,
             destroyed_buildings_count: 0,
-            total_buildings_count: todo!(),
+            total_buildings_count,
             need_redraw_collision: true,
+        }));
+
+        for building in &result.borrow().buildings {
+            let game = Rc::downgrade(&result);
+            let on_building_destroyed: Box<dyn Fn(&dyn Building)> = Box::new(|b| {
+                game.upgrade()
+                    .unwrap()
+                    .borrow_mut()
+                    .on_building_destroyed(b);
+            });
+
+            building
+                .borrow_mut()
+                .on_destroyed_mut()
+                .push(on_building_destroyed);
         }
+
+        result
     }
 
     pub fn is_border(&self, x: i32, y: i32) -> bool {
@@ -103,10 +133,6 @@ impl Game {
             || x < self.border_size
             || y >= self.base_size + self.border_size
             || x >= self.base_size + self.border_size
-    }
-
-    pub fn is_inside_map(&self, x: i32, y: i32) -> bool {
-        0 <= x && x < self.total_size() && 0 <= y && y < self.total_size()
     }
 
     pub fn tick(&mut self, delta_t: f32) {
@@ -150,6 +176,98 @@ impl Game {
                         self.buildings_grid[(x as usize, y as usize)].is_some(),
                     )),
                 });
+            }
+        }
+
+        result
+    }
+
+    pub fn draw_collision(&mut self) -> Vec<Shape> {
+        self.need_redraw_collision = false;
+
+        draw_bool_grid(
+            self.collision_grid.map(|building_id| building_id.is_some()),
+            COLLISION_TILE_SIZE,
+            Cow::Borrowed(COLLISION_TILE_COLOR),
+        )
+    }
+
+    fn on_building_destroyed(&mut self, building: &dyn Building) {
+        self.need_redraw_collision = true;
+
+        if building.name() == "TownHall" {
+            self.townhall_destroyed = true;
+        }
+
+        if building.name() != "Wall" {
+            self.destroyed_buildings_count += 1;
+        }
+    }
+
+    fn compute_total_buildings_count(buildings: &[Rc<RefCell<dyn Building>>]) -> usize {
+        buildings
+            .iter()
+            .filter(|building| building.borrow().name() != "Wall")
+            .count()
+    }
+
+    fn compute_collision_grid(
+        total_size: usize,
+        buildings: &[Rc<RefCell<dyn Building>>],
+    ) -> DMatrix<Option<u32>> {
+        let mut result = DMatrix::from_element(
+            total_size * COLLISION_TILES_PER_MAP_TILE,
+            total_size * COLLISION_TILES_PER_MAP_TILE,
+            None,
+        );
+
+        for building in buildings {
+            building.borrow().update_collision(&mut result);
+        }
+
+        result
+    }
+
+    fn compute_buildings_grid(
+        total_size: usize,
+        buildings: &[Rc<RefCell<dyn Building>>],
+    ) -> DMatrix<Option<u32>> {
+        let mut result = DMatrix::from_element(total_size, total_size, None);
+
+        for building in buildings {
+            building.borrow().occupy_tiles(&mut result);
+        }
+
+        result
+    }
+
+    fn compute_drop_zone(
+        total_size: usize,
+        buildings_grid: &DMatrix<Option<u32>>,
+    ) -> DMatrix<bool> {
+        fn get_neighbors(total_size: i32, x: i32, y: i32) -> Vec<(usize, usize)> {
+            let mut result = Vec::new();
+
+            for neighbor_x in (x - 1)..(x + 2) {
+                for neighbor_y in (y - 1)..(y + 2) {
+                    if is_inside_map(total_size, neighbor_x, neighbor_y) {
+                        result.push((neighbor_x as usize, neighbor_y as usize));
+                    }
+                }
+            }
+
+            result
+        }
+
+        let mut result = DMatrix::from_element(total_size, total_size, true);
+
+        for x in 0..total_size {
+            for y in 0..total_size {
+                if buildings_grid[(x, y)].is_some() {
+                    for neighbor in get_neighbors(total_size as i32, x as i32, y as i32) {
+                        result[neighbor] = false;
+                    }
+                }
             }
         }
 
