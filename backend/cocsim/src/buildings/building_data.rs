@@ -12,7 +12,7 @@ use crate::{
     consts::*,
 };
 
-pub trait Building
+pub trait BuildingData
 where
     Self: Deref<Target = &'static BuildingType>,
 {
@@ -21,7 +21,7 @@ where
     fn collider(&self) -> Option<&dyn Collider>;
 
     /// Returns [`Vec`] of on_destroyed event handlers.
-    fn on_destroyed_mut(&mut self) -> &mut Vec<Box<dyn Fn(&mut Game, u32)>>;
+    fn on_destroyed_mut(&mut self) -> &mut Vec<Box<dyn Fn(&mut Game, usize)>>;
 
     fn center(&self) -> Vector2<f32> {
         self.position().cast() + self.size.cast() / 2.0
@@ -35,7 +35,7 @@ where
     fn apply_damage(&mut self, damage: f32);
 
     /// Occupy tiles for troops drop zone calculation. Called once.
-    fn occupy_tiles(&self, id: u32, buildings_grid: &mut DMatrix<Option<u32>>) {
+    fn occupy_tiles(&self, id: usize, buildings_grid: &mut DMatrix<Option<usize>>) {
         for rel_x in 0..self.size.x {
             let abs_x = self.position().x + rel_x;
 
@@ -49,7 +49,7 @@ where
 
     /// Update collision for this building. Can be called multiple times. Need
     /// check for self.destroyed.
-    fn update_collision(&self, id: u32, collision_grid: &mut DMatrix<Option<u32>>) {
+    fn update_collision(&self, id: usize, collision_grid: &mut DMatrix<Option<usize>>) {
         if let Some(collider) = self.collider() {
             for rel_x in 0..(self.size.x * COLLISION_TILES_PER_MAP_TILE) {
                 let abs_x = self.position().x * COLLISION_TILES_PER_MAP_TILE + rel_x;

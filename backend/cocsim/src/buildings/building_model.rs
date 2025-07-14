@@ -1,8 +1,8 @@
 use enum_dispatch::enum_dispatch;
 
-use crate::Building;
+use crate::BuildingData;
 
 #[enum_dispatch]
 pub trait BuildingModel {
-    fn create_building(&self) -> Box<dyn Building>;
+    fn create_building(&self) -> Box<dyn BuildingData>;
 }

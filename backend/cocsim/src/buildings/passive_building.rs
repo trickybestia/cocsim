@@ -3,7 +3,7 @@ use std::ops::Deref;
 use nalgebra::Vector2;
 
 use crate::{
-    Building,
+    BuildingData,
     BuildingType,
     Game,
     colliders::Collider,
@@ -14,7 +14,7 @@ pub(crate) struct PassiveBuilding {
     pub position: Vector2<usize>,
     pub health: f32,
     pub collider: Option<Box<dyn Collider>>,
-    pub on_destroyed: Vec<Box<dyn Fn(&mut Game, u32)>>,
+    pub on_destroyed: Vec<Box<dyn Fn(&mut Game, usize)>>,
 }
 
 impl Deref for PassiveBuilding {
@@ -25,7 +25,7 @@ impl Deref for PassiveBuilding {
     }
 }
 
-impl Building for PassiveBuilding {
+impl BuildingData for PassiveBuilding {
     fn position(&self) -> Vector2<usize> {
         self.position
     }
@@ -41,7 +41,7 @@ impl Building for PassiveBuilding {
         }
     }
 
-    fn on_destroyed_mut(&mut self) -> &mut Vec<Box<dyn Fn(&mut Game, u32)>> {
+    fn on_destroyed_mut(&mut self) -> &mut Vec<Box<dyn Fn(&mut Game, usize)>> {
         &mut self.on_destroyed
     }
 
@@ -52,7 +52,7 @@ impl Building for PassiveBuilding {
 
         if self.destroyed() {
             for handler in &self.on_destroyed {
-                handler()
+                //handler()
             }
         }
     }

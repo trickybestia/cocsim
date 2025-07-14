@@ -7,9 +7,9 @@ use serde::{
 };
 
 use crate::{
-    Building,
-    BuildingModel,
     BuildingType,
+    BuildingData,
+    BuildingModel,
     colliders::Collider,
 };
 
@@ -33,13 +33,19 @@ const ARMY_CAMP_LEVELS: &[ArmyCampLevel] = &[
     ArmyCampLevel { health: 900.0 },
 ];
 
+pub struct ArmyCampBuildingType{
+    pub base: 
+}
+
+
+
 const ARMY_CAMP: &BuildingType = &BuildingType {
     name: "ArmyCamp",
     size: Vector2::new(4, 4),
     levels: ARMY_CAMP_LEVELS.len(),
     options: vec![],
-    tick_fn: None,
-    draw_fn: None,
+    tick: None,
+    draw: None,
 };
 
 #[derive(Serialize, Deserialize)]
@@ -50,7 +56,7 @@ pub struct ArmyCampModel {
 }
 
 impl BuildingModel for ArmyCampModel {
-    fn create_building(&self) -> Box<dyn Building> {
+    fn create_building(&self) -> Box<dyn BuildingData> {
         Box::new(ArmyCamp::new(self))
     }
 }
@@ -71,7 +77,7 @@ impl Deref for ArmyCamp {
     }
 }
 
-impl Building for ArmyCamp {
+impl BuildingData for ArmyCamp {
     fn position(&self) -> Vector2<usize> {
         todo!()
     }
@@ -84,7 +90,7 @@ impl Building for ArmyCamp {
         todo!()
     }
 
-    fn on_destroyed_mut(&mut self) -> &mut Vec<Box<dyn Fn(&mut crate::Game, u32)>> {
+    fn on_destroyed_mut(&mut self) -> &mut Vec<Box<dyn Fn(&mut crate::Game, usize)>> {
         todo!()
     }
 

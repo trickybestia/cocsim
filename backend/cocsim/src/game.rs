@@ -3,7 +3,7 @@ use std::borrow::Cow;
 use nalgebra::DMatrix;
 
 use crate::{
-    Building,
+    BuildingData,
     Map,
     Pathfinder,
     Shape,
@@ -19,11 +19,11 @@ pub struct Game {
     base_size: i32,
     border_size: i32,
 
-    buildings: Box<[Box<dyn Building>]>,
+    buildings: Box<[Box<dyn BuildingData>]>,
 
-    buildings_grid: DMatrix<Option<u32>>,
+    buildings_grid: DMatrix<Option<usize>>,
     drop_zone: DMatrix<bool>,
-    collision_grid: DMatrix<Option<u32>>,
+    collision_grid: DMatrix<Option<usize>>,
 
     pathfinder: Pathfinder,
 
@@ -126,8 +126,8 @@ impl Game {
         assert!(!self.done());
 
         for i in 0..self.buildings.len() {
-            if let Some(tick_fn) = self.buildings[i].tick_fn {
-                tick_fn(self, i as u32, delta_t);
+            if let Some(tick_fn) = self.buildings[i].tick() {
+                tick_fn(self, i, delta_t);
             }
         }
 
@@ -138,8 +138,8 @@ impl Game {
         let mut result = Vec::new();
 
         for i in 0..self.buildings.len() {
-            if let Some(draw_fn) = self.buildings[i].draw_fn {
-                draw_fn(self, i as u32, &mut result);
+            if let Some(draw_fn) = self.buildings[i].draw() {
+                draw_fn(self, i, &mut result);
             }
         }
 
@@ -179,7 +179,7 @@ impl Game {
         )
     }
 
-    fn on_building_destroyed(&mut self, building_id: u32) {
+    fn on_building_destroyed(&mut self, building_id: usize) {
         self.need_redraw_collision = true;
 
         let building = &self.buildings[building_id as usize];
@@ -193,7 +193,7 @@ impl Game {
         }
     }
 
-    fn compute_total_buildings_count(buildings: &[Box<dyn Building>]) -> usize {
+    fn compute_total_buildings_count(buildings: &[Box<dyn BuildingData>]) -> usize {
         buildings
             .iter()
             .filter(|building| building.name != "Wall")
@@ -202,8 +202,8 @@ impl Game {
 
     fn compute_collision_grid(
         total_size: usize,
-        buildings: &[Box<dyn Building>],
-    ) -> DMatrix<Option<u32>> {
+        buildings: &[Box<dyn BuildingData>],
+    ) -> DMatrix<Option<usize>> {
         let mut result = DMatrix::from_element(
             total_size * COLLISION_TILES_PER_MAP_TILE,
             total_size * COLLISION_TILES_PER_MAP_TILE,
@@ -211,7 +211,7 @@ impl Game {
         );
 
         for i in 0..buildings.len() {
-            buildings[i].update_collision(i as u32, &mut result);
+            buildings[i].update_collision(i, &mut result);
         }
 
         result
@@ -219,12 +219,12 @@ impl Game {
 
     fn compute_buildings_grid(
         total_size: usize,
-        buildings: &[Box<dyn Building>],
-    ) -> DMatrix<Option<u32>> {
+        buildings: &[Box<dyn BuildingData>],
+    ) -> DMatrix<Option<usize>> {
         let mut result = DMatrix::from_element(total_size, total_size, None);
 
         for i in 0..buildings.len() {
-            buildings[i].occupy_tiles(i as u32, &mut result);
+            buildings[i].occupy_tiles(i, &mut result);
         }
 
         result
@@ -232,7 +232,7 @@ impl Game {
 
     fn compute_drop_zone(
         total_size: usize,
-        buildings_grid: &DMatrix<Option<u32>>,
+        buildings_grid: &DMatrix<Option<usize>>,
     ) -> DMatrix<bool> {
         fn get_neighbors(total_size: i32, x: i32, y: i32) -> Vec<(usize, usize)> {
             let mut result = Vec::new();
