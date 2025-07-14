@@ -1,6 +1,7 @@
 use nalgebra::Vector2;
 
 use super::Collider;
+use crate::colliders::ColliderEnum;
 
 pub struct RectCollider {
     position: Vector2<f32>,
@@ -18,8 +19,8 @@ impl RectCollider {
 }
 
 impl Collider for RectCollider {
-    fn attack_area(&self, attack_range: f32) -> Box<dyn Collider> {
-        Box::new(RectCollider {
+    fn attack_area(&self, attack_range: f32) -> ColliderEnum {
+        ColliderEnum::RectCollider(RectCollider {
             position: self.position - Vector2::from_element(attack_range),
             size: self.size + Vector2::from_element(attack_range * 2.0),
         })

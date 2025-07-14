@@ -6,10 +6,6 @@ use crate::{
     consts::*,
 };
 
-pub fn is_inside_map(total_size: i32, x: i32, y: i32) -> bool {
-    0 <= x && x < total_size && 0 <= y && y < total_size
-}
-
 pub fn get_tile_color(even: bool, border: bool, drop_zone: bool, occupied: bool) -> &'static str {
     if occupied {
         if even {

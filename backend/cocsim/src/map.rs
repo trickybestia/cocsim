@@ -3,8 +3,12 @@ use serde::{
     Serialize,
 };
 
+use crate::BuildingModelEnum;
+
 #[derive(Serialize, Deserialize)]
 pub struct Map {
     pub base_size: usize,
     pub border_size: usize,
+
+    pub buildings: Vec<BuildingModelEnum>,
 }

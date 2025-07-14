@@ -1,15 +1,16 @@
 use nalgebra::Vector2;
 
 use super::Collider;
+use crate::colliders::ColliderEnum;
 
 pub struct ListCollider {
-    colliders: Vec<Box<dyn Collider>>,
+    colliders: Vec<ColliderEnum>,
 }
 
 impl ListCollider {
     pub fn new<T>(colliders: T) -> Self
     where
-        T: Into<Vec<Box<dyn Collider>>>,
+        T: Into<Vec<ColliderEnum>>,
     {
         Self {
             colliders: colliders.into(),
@@ -18,8 +19,8 @@ impl ListCollider {
 }
 
 impl Collider for ListCollider {
-    fn attack_area(&self, attack_range: f32) -> Box<dyn Collider> {
-        Box::new(ListCollider::new(
+    fn attack_area(&self, attack_range: f32) -> ColliderEnum {
+        ColliderEnum::ListCollider(ListCollider::new(
             self.colliders
                 .iter()
                 .map(|collider| collider.attack_area(attack_range))
