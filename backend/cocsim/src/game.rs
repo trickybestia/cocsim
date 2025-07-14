@@ -126,7 +126,9 @@ impl Game {
         assert!(!self.done());
 
         for i in 0..self.buildings.len() {
-            self.buildings[i].tick(self, i as u32, delta_t);
+            if let Some(tick_fn) = self.buildings[i].tick_fn() {
+                tick_fn(self, i as u32, delta_t);
+            }
         }
 
         self.time_elapsed = MAX_ATTACK_DURATION.min(self.time_elapsed + delta_t)
@@ -136,7 +138,9 @@ impl Game {
         let mut result = Vec::new();
 
         for i in 0..self.buildings.len() {
-            self.buildings[i].draw(self, i as u32, &mut result);
+            if let Some(draw_fn) = self.buildings[i].draw_fn() {
+                draw_fn(self, i as u32, &mut result);
+            }
         }
 
         result

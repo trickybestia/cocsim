@@ -1,11 +1,10 @@
-use std::ops::Deref;
-
 use nalgebra::Vector2;
 use serde::Serialize;
 
 use crate::{
     BuildingOption,
-    EntityBehaviour,
+    Game,
+    Shape,
 };
 
 #[derive(Serialize)]
@@ -16,7 +15,9 @@ pub struct BuildingType {
     options: Vec<BuildingOption>,
 
     #[serde(skip)]
-    behaviour: Box<dyn EntityBehaviour>,
+    tick_fn: Option<fn(game: &mut Game, id: u32, delta_t: f32)>,
+    #[serde(skip)]
+    draw_fn: Option<fn(game: &Game, id: u32, result: &mut Vec<Shape>)>,
 }
 
 impl BuildingType {
@@ -35,12 +36,12 @@ impl BuildingType {
     pub fn options(&self) -> &[BuildingOption] {
         &self.options
     }
-}
 
-impl Deref for BuildingType {
-    type Target = Box<dyn EntityBehaviour>;
+    pub fn tick_fn(&self) -> Option<fn(game: &mut Game, id: u32, delta_t: f32)> {
+        self.tick_fn
+    }
 
-    fn deref(&self) -> &Self::Target {
-        &self.behaviour
+    pub fn draw_fn(&self) -> Option<fn(game: &Game, id: u32, result: &mut Vec<Shape>)> {
+        self.draw_fn
     }
 }
