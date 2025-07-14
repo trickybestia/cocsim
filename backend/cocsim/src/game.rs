@@ -126,7 +126,7 @@ impl Game {
         assert!(!self.done());
 
         for i in 0..self.buildings.len() {
-            if let Some(tick_fn) = self.buildings[i].tick_fn() {
+            if let Some(tick_fn) = self.buildings[i].tick_fn {
                 tick_fn(self, i as u32, delta_t);
             }
         }
@@ -138,7 +138,7 @@ impl Game {
         let mut result = Vec::new();
 
         for i in 0..self.buildings.len() {
-            if let Some(draw_fn) = self.buildings[i].draw_fn() {
+            if let Some(draw_fn) = self.buildings[i].draw_fn {
                 draw_fn(self, i as u32, &mut result);
             }
         }
@@ -184,11 +184,11 @@ impl Game {
 
         let building = &self.buildings[building_id as usize];
 
-        if building.name() == "TownHall" {
+        if building.name == "TownHall" {
             self.townhall_destroyed = true;
         }
 
-        if building.name() != "Wall" {
+        if building.name != "Wall" {
             self.destroyed_buildings_count += 1;
         }
     }
@@ -196,7 +196,7 @@ impl Game {
     fn compute_total_buildings_count(buildings: &[Box<dyn Building>]) -> usize {
         buildings
             .iter()
-            .filter(|building| building.name() != "Wall")
+            .filter(|building| building.name != "Wall")
             .count()
     }
 
