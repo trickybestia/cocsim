@@ -106,7 +106,10 @@ impl Game {
         world.run(features::buildings::init_buildings_grid);
         world.run(features::buildings::init_drop_zone);
         world.run(features::collision::init_collision_grid);
+
         world.run(features::created::handle_created);
+
+        world.run(features::collision::update_collision);
 
         Self {
             world,
