@@ -9,11 +9,8 @@ use shipyard::{
     EntityId,
     IntoIter,
     Unique,
-    UniqueOrInitViewMut,
-    UniqueView,
     View,
     World,
-    iter::WithId,
 };
 
 use crate::{
@@ -89,6 +86,11 @@ struct CountedBuilding;
 #[derive(Component)]
 struct TownHall;
 
+#[derive(Component)]
+struct Drawable {
+    draw_fn: fn(&World, EntityId, &mut Vec<Shape>),
+}
+
 pub struct Game {
     world: World,
 
@@ -154,6 +156,7 @@ impl Game {
             elapsed: 0.0,
             delta: 0.0,
         });
+        world.add_unique(Pathfinder);
 
         for building in &map.buildings {
             building.create_building(&mut world);
@@ -171,36 +174,46 @@ impl Game {
         }
     }
 
-    /*
     pub fn tick(&mut self, delta_t: f32) {
         assert!(!self.done());
 
-        for i in 0..self.buildings.len() {
-            if let Some(tick_fn) = self.buildings[i].tick() {
-                tick_fn(self, i, delta_t);
-            }
-        }
+        let mut time = self.world.get_unique::<&mut Time>().unwrap();
 
-        self.time_elapsed = MAX_ATTACK_DURATION.min(self.time_elapsed + delta_t)
+        time.delta = delta_t;
+
+        drop(time);
+
+        // run systems here
+
+        let mut time = self.world.get_unique::<&mut Time>().unwrap();
+
+        time.elapsed = MAX_ATTACK_DURATION.min(time.elapsed + delta_t);
     }
 
     pub fn draw_entities(&self) -> Vec<Shape> {
         let mut result = Vec::new();
 
-        for i in 0..self.buildings.len() {
-            if let Some(draw_fn) = self.buildings[i].draw() {
-                draw_fn(self, i, &mut result);
-            }
-        }
+        self.world.run_with_data(
+            |result: &mut Vec<Shape>, drawable: View<Drawable>| {
+                for (id, drawable) in drawable.iter().with_id() {
+                    (drawable.draw_fn)(&self.world, id, result);
+                }
+            },
+            &mut result,
+        );
 
         result
     }
 
     pub fn draw_grid(&self) -> Vec<Shape> {
+        let map_size = self.world.get_unique::<&MapSize>().unwrap();
+        let drop_zone = self.world.get_unique::<&DropZone>().unwrap();
+        let buildings_grid = self.world.get_unique::<&BuildingsGrid>().unwrap();
+
         let mut result = Vec::new();
 
-        for x in 0..self.total_size() {
-            for y in 0..self.total_size() {
+        for x in 0..map_size.total_size() {
+            for y in 0..map_size.total_size() {
                 result.push(Shape::Rect {
                     x: x as f32,
                     y: y as f32,
@@ -208,9 +221,9 @@ impl Game {
                     height: 1.0,
                     color: Cow::Borrowed(get_tile_color(
                         (y ^ x) % 2 == 0,
-                        self.is_border(x, y),
-                        self.drop_zone[(x as usize, y as usize)],
-                        self.buildings_grid[(x as usize, y as usize)].is_some(),
+                        map_size.is_border(x, y),
+                        drop_zone.0[(x as usize, y as usize)],
+                        buildings_grid.0[(x as usize, y as usize)].is_some(),
                     )),
                 });
             }
@@ -220,28 +233,18 @@ impl Game {
     }
 
     pub fn draw_collision(&mut self) -> Vec<Shape> {
-        self.need_redraw_collision = false;
+        let collision_grid = self.world.get_unique::<&CollisionGrid>().unwrap();
+        let mut need_redraw_collision =
+            self.world.get_unique::<&mut NeedRedrawCollision>().unwrap();
+
+        need_redraw_collision.0 = false;
 
         draw_bool_grid(
-            self.collision_grid.map(|building_id| building_id.is_some()),
+            collision_grid.0.map(|building_id| building_id.is_some()),
             COLLISION_TILE_SIZE,
             Cow::Borrowed(COLLISION_TILE_COLOR),
         )
     }
-
-    fn on_building_destroyed(&mut self, building_id: usize) {
-        self.need_redraw_collision = true;
-
-        let building = &self.buildings[building_id as usize];
-
-        if building.name == "TownHall" {
-            self.townhall_destroyed = true;
-        }
-
-        if building.name != "Wall" {
-            self.destroyed_buildings_count += 1;
-        }
-    }*/
 
     fn compute_counted_buildings_count(world: &World) -> usize {
         world.iter::<&CountedBuilding>().iter().count()
