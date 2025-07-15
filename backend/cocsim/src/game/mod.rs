@@ -47,7 +47,7 @@ impl Game {
     }
 
     fn destroyed_counted_buildings_count(&self) -> usize {
-        self.initial_counted_buildings_count - Self::compute_counted_buildings_count(&self.world)
+        self.initial_counted_buildings_count - Self::counted_buildings_count(&self.world)
     }
 
     pub fn stars(&self) -> u32 {
@@ -101,11 +101,12 @@ impl Game {
             building.create_building(&mut world);
         }
 
-        let initial_counted_buildings_count = Self::compute_counted_buildings_count(&world);
+        let initial_counted_buildings_count = Self::counted_buildings_count(&world);
 
         world.run(features::buildings::init_buildings_grid);
         world.run(features::buildings::init_drop_zone);
         world.run(features::collision::init_collision_grid);
+        world.run(features::created::handle_created);
 
         Self {
             world,
@@ -180,7 +181,7 @@ impl Game {
         )
     }
 
-    fn compute_counted_buildings_count(world: &World) -> usize {
+    fn counted_buildings_count(world: &World) -> usize {
         world.iter::<&CountedBuilding>().iter().count()
     }
 }
