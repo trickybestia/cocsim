@@ -24,7 +24,10 @@ use crate::{
         MapSize,
         features::{
             buildings::Building,
-            health::DeathRequest,
+            health::{
+                DeathRequest,
+                Health,
+            },
         },
     },
 };
@@ -75,9 +78,15 @@ pub fn update_collision(
     mut need_redraw_collision: UniqueViewMut<NeedRedrawCollision>,
     v_building: View<Building>,
     v_collider: View<ColliderComponent>,
+    v_health: View<Health>,
     mut v_update_collision_request: ViewMut<UpdateCollisionRequest>,
 ) {
-    for (id, (building, collider, _)) in (&v_building, &v_collider, &v_update_collision_request)
+    for (id, (building, collider, health, _)) in (
+        &v_building,
+        &v_collider,
+        &v_health,
+        &v_update_collision_request,
+    )
         .iter()
         .with_id()
     {
@@ -87,10 +96,11 @@ pub fn update_collision(
             for rel_y in 0..building.size.y {
                 let abs_y = building.position.y * COLLISION_TILES_PER_MAP_TILE + rel_y;
 
-                let occupy_tile = collider.0.contains(Vector2::new(
-                    abs_x as f32 / COLLISION_TILES_PER_MAP_TILE as f32,
-                    abs_y as f32 / COLLISION_TILES_PER_MAP_TILE as f32,
-                ));
+                let occupy_tile = health.0 > 0.0
+                    && collider.0.contains(Vector2::new(
+                        abs_x as f32 / COLLISION_TILES_PER_MAP_TILE as f32,
+                        abs_y as f32 / COLLISION_TILES_PER_MAP_TILE as f32,
+                    ));
 
                 collision_grid.0[(abs_x, abs_y)] = if occupy_tile { Some(id) } else { None }
             }
