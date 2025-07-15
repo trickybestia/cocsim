@@ -2,18 +2,7 @@ pub mod features;
 
 use std::borrow::Cow;
 
-use nalgebra::{
-    DMatrix,
-    Vector2,
-};
-use shipyard::{
-    Component,
-    EntityId,
-    IntoIter,
-    Unique,
-    View,
-    World,
-};
+use shipyard::World;
 
 use crate::{
     BuildingModel,
@@ -21,70 +10,25 @@ use crate::{
     Pathfinder,
     Shape,
     consts::*,
-    game::features::collision::{
-        Collider,
-        ColliderComponent,
-        CollisionGrid,
-        NeedRedrawCollision,
+    game::features::{
+        buildings::{
+            BuildingsGrid,
+            CountedBuilding,
+            DropZone,
+            TownHall,
+        },
+        collision::{
+            CollisionGrid,
+            NeedRedrawCollision,
+        },
+        map::MapSize,
+        time::Time,
     },
     utils::{
         draw_bool_grid,
         get_tile_color,
     },
 };
-
-#[derive(Unique)]
-struct MapSize {
-    base_size: i32,
-    border_size: i32,
-}
-
-impl MapSize {
-    pub fn total_size(&self) -> i32 {
-        self.base_size + 2 * self.border_size
-    }
-
-    pub fn is_inside_map(&self, x: i32, y: i32) -> bool {
-        0 <= x && x < self.total_size() && 0 <= y && y < self.total_size()
-    }
-
-    pub fn is_border(&self, x: i32, y: i32) -> bool {
-        y < self.border_size
-            || x < self.border_size
-            || y >= self.base_size + self.border_size
-            || x >= self.base_size + self.border_size
-    }
-}
-
-#[derive(Unique)]
-struct Time {
-    elapsed: f32,
-    delta: f32,
-}
-
-#[derive(Unique)]
-struct BuildingsGrid(DMatrix<Option<EntityId>>);
-
-#[derive(Unique)]
-struct DropZone(DMatrix<bool>);
-
-#[derive(Component)]
-struct Building {
-    position: Vector2<usize>,
-    size: Vector2<usize>,
-}
-
-/// "Counted" means that this building impacts destroyed buildings percentage.
-#[derive(Component)]
-struct CountedBuilding;
-
-#[derive(Component)]
-struct TownHall;
-
-#[derive(Component)]
-struct Drawable {
-    draw_fn: fn(&World, EntityId, &mut Vec<Shape>),
-}
 
 pub struct Game {
     world: World,
@@ -159,9 +103,9 @@ impl Game {
 
         let initial_counted_buildings_count = Self::compute_counted_buildings_count(&world);
 
-        Self::create_buildings_grid(&mut world);
-        Self::create_drop_zone(&mut world);
-        Self::create_collision_grid(&mut world);
+        world.run(features::buildings::init_buildings_grid);
+        world.run(features::buildings::init_drop_zone);
+        world.run(features::collision::init_collision_grid);
 
         Self {
             world,
@@ -169,36 +113,28 @@ impl Game {
         }
     }
 
-    pub fn tick(&mut self, delta_t: f32) {
+    pub fn tick(&mut self, delta_time: f32) {
         assert!(!self.done());
 
-        let mut time = self.world.get_unique::<&mut Time>().unwrap();
+        self.world
+            .run_with_data(features::time::set_delta_time, delta_time);
 
-        time.delta = delta_t;
-
-        drop(time);
-
+        // TODO: run system: deal damage
         self.world.run(features::health::handle_damage_requests);
         // TODO: run system: remove DamageRequest and use hero ability if not used
+        self.world
+            .run(features::collision::request_update_collision_on_death_request);
+        self.world.run(features::collision::update_collision);
         self.world.run(features::health::handle_death_requests);
         self.world.run(features::events::cleanup_events);
 
-        let mut time = self.world.get_unique::<&mut Time>().unwrap();
-
-        time.elapsed = MAX_ATTACK_DURATION.min(time.elapsed + delta_t);
+        self.world.run(features::time::update_elapsed_time);
     }
 
     pub fn draw_entities(&self) -> Vec<Shape> {
         let mut result = Vec::new();
 
-        self.world.run_with_data(
-            |result: &mut Vec<Shape>, drawable: View<Drawable>| {
-                for (id, drawable) in drawable.iter().with_id() {
-                    (drawable.draw_fn)(&self.world, id, result);
-                }
-            },
-            &mut result,
-        );
+        // TODO: run drawing systems
 
         result
     }
@@ -246,107 +182,5 @@ impl Game {
 
     fn compute_counted_buildings_count(world: &World) -> usize {
         world.iter::<&CountedBuilding>().iter().count()
-    }
-
-    fn create_buildings_grid(world: &mut World) {
-        let map_size = world.get_unique::<&MapSize>().unwrap();
-
-        let mut result = DMatrix::from_element(
-            map_size.total_size() as usize,
-            map_size.total_size() as usize,
-            None,
-        );
-
-        world.run_with_data(
-            |result: &mut DMatrix<Option<EntityId>>, building: View<Building>| {
-                for (id, building) in building.iter().with_id() {
-                    for rel_x in 0..building.size.x {
-                        let abs_x = building.position.x + rel_x;
-
-                        for rel_y in 0..building.size.y {
-                            let abs_y = building.position.y + rel_y;
-
-                            result[(abs_x, abs_y)] = Some(id)
-                        }
-                    }
-                }
-            },
-            &mut result,
-        );
-
-        world.add_unique(CollisionGrid(result));
-    }
-
-    fn create_drop_zone(world: &mut World) {
-        fn get_neighbors(map_size: &MapSize, x: i32, y: i32) -> Vec<(usize, usize)> {
-            let mut result = Vec::new();
-
-            for neighbor_x in (x - 1)..(x + 2) {
-                for neighbor_y in (y - 1)..(y + 2) {
-                    if map_size.is_inside_map(neighbor_x, neighbor_y) {
-                        result.push((neighbor_x as usize, neighbor_y as usize));
-                    }
-                }
-            }
-
-            result
-        }
-
-        let map_size = world.get_unique::<&MapSize>().unwrap();
-        let buildings_grid = world.get_unique::<&BuildingsGrid>().unwrap();
-
-        let mut result = DMatrix::from_element(
-            map_size.total_size() as usize,
-            map_size.total_size() as usize,
-            true,
-        );
-
-        for x in 0..map_size.total_size() {
-            for y in 0..map_size.total_size() {
-                if buildings_grid.0[(x as usize, y as usize)].is_some() {
-                    for neighbor in get_neighbors(&map_size, x as i32, y as i32) {
-                        result[neighbor] = false;
-                    }
-                }
-            }
-        }
-
-        world.add_unique(DropZone(result));
-    }
-
-    fn create_collision_grid(world: &mut World) {
-        let map_size = world.get_unique::<&MapSize>().unwrap();
-
-        let mut result = DMatrix::from_element(
-            map_size.total_size() as usize * COLLISION_TILES_PER_MAP_TILE,
-            map_size.total_size() as usize * COLLISION_TILES_PER_MAP_TILE,
-            None,
-        );
-
-        world.run_with_data(
-            |result: &mut DMatrix<Option<EntityId>>,
-             building: View<Building>,
-             collider: View<ColliderComponent>| {
-                for (id, (building, collider)) in (&building, &collider).iter().with_id() {
-                    for rel_x in 0..(building.size.x * COLLISION_TILES_PER_MAP_TILE) {
-                        let abs_x = building.position.x * COLLISION_TILES_PER_MAP_TILE + rel_x;
-
-                        for rel_y in 0..building.size.y {
-                            let abs_y = building.position.y * COLLISION_TILES_PER_MAP_TILE + rel_y;
-
-                            let occupy_tile = collider.0.contains(Vector2::new(
-                                abs_x as f32 / COLLISION_TILES_PER_MAP_TILE as f32,
-                                abs_y as f32 / COLLISION_TILES_PER_MAP_TILE as f32,
-                            ));
-
-                            result[(abs_x, abs_y)] = if occupy_tile { Some(id) } else { None }
-                        }
-                    }
-                }
-            },
-            &mut result,
-        );
-
-        world.add_unique(CollisionGrid(result));
     }
 }

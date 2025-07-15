@@ -4,6 +4,8 @@ use shipyard::{
     sparse_set::SparseSet,
 };
 
+/// To be used only for event entities which should be removed after event
+/// handling.
 #[derive(Component)]
 pub struct Event;
 
