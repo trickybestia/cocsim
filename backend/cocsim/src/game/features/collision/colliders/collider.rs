@@ -1,7 +1,7 @@
 use enum_dispatch::enum_dispatch;
 use nalgebra::Vector2;
 
-use crate::colliders::ColliderEnum;
+use super::ColliderEnum;
 
 #[enum_dispatch]
 pub trait Collider {

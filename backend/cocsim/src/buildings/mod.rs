@@ -2,7 +2,6 @@ mod army_camp;
 mod building_model;
 mod building_option;
 mod building_type;
-pub mod colliders;
 
 pub use army_camp::*;
 pub use building_model::BuildingModel;

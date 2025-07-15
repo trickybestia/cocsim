@@ -1,7 +1,9 @@
 use nalgebra::Vector2;
 
-use super::Collider;
-use crate::colliders::ColliderEnum;
+use super::{
+    Collider,
+    ColliderEnum,
+};
 
 pub struct RectCollider {
     position: Vector2<f32>,

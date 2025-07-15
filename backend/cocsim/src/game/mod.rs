@@ -1,3 +1,5 @@
+pub mod features;
+
 use std::borrow::Cow;
 
 use nalgebra::{
@@ -18,11 +20,13 @@ use crate::{
     Map,
     Pathfinder,
     Shape,
-    colliders::{
-        Collider,
-        ColliderEnum,
-    },
     consts::*,
+    game::features::collision::{
+        Collider,
+        ColliderComponent,
+        CollisionGrid,
+        NeedRedrawCollision,
+    },
     utils::{
         draw_bool_grid,
         get_tile_color,
@@ -63,15 +67,6 @@ struct BuildingsGrid(DMatrix<Option<EntityId>>);
 
 #[derive(Unique)]
 struct DropZone(DMatrix<bool>);
-
-#[derive(Unique)]
-struct CollisionGrid(DMatrix<Option<EntityId>>);
-
-#[derive(Unique)]
-struct NeedRedrawCollision(bool);
-
-#[derive(Component)]
-struct ColliderComponent(ColliderEnum);
 
 #[derive(Component)]
 struct Building {
@@ -183,7 +178,10 @@ impl Game {
 
         drop(time);
 
-        // run systems here
+        self.world.run(features::health::handle_damage_requests);
+        // TODO: run system: remove DamageRequest and use hero ability if not used
+        self.world.run(features::health::handle_death_requests);
+        self.world.run(features::events::cleanup_events);
 
         let mut time = self.world.get_unique::<&mut Time>().unwrap();
 
