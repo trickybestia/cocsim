@@ -20,6 +20,12 @@ pub struct Building {
     pub size: Vector2<usize>,
 }
 
+impl Building {
+    pub fn center(&self) -> Vector2<f32> {
+        self.position.cast() + self.size.cast() / 2.0
+    }
+}
+
 /// "Counted" means that this building impacts destroyed buildings percentage.
 #[derive(Component)]
 pub struct CountedBuilding;
