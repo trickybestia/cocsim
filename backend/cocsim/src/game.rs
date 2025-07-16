@@ -8,6 +8,7 @@ use nalgebra::DMatrix;
 
 use crate::{
     Building,
+    BuildingModel,
     Map,
     Pathfinder,
     Shape,
@@ -23,11 +24,11 @@ pub struct Game {
     base_size: i32,
     border_size: i32,
 
-    buildings: Vec<Rc<RefCell<dyn Building>>>,
+    buildings: Vec<Rc<dyn Building>>,
 
-    buildings_grid: DMatrix<Option<u32>>,
+    buildings_grid: DMatrix<Option<Rc<dyn Building>>>,
     drop_zone: DMatrix<bool>,
-    collision_grid: DMatrix<Option<u32>>,
+    collision_grid: DMatrix<Option<Rc<dyn Building>>>,
 
     pathfinder: Pathfinder,
 
@@ -88,7 +89,11 @@ impl Game {
     pub fn new(map: &Map) -> Self {
         let total_size = map.base_size + 2 * map.border_size;
 
-        let buildings = vec![];
+        let buildings = map
+            .buildings
+            .iter()
+            .map(BuildingModel::create_building)
+            .collect::<Vec<_>>();
 
         let buildings_grid = Self::compute_buildings_grid(total_size, &buildings);
         let collision_grid = Self::compute_collision_grid(total_size, &buildings);
@@ -112,7 +117,6 @@ impl Game {
 
         for building in &result.buildings {
             building
-                .borrow_mut()
                 .on_destroyed_mut()
                 .push(Box::new(Game::on_building_destroyed));
         }
@@ -133,7 +137,7 @@ impl Game {
         for i in 0..self.buildings.len() {
             let building = self.buildings[i].clone();
 
-            building.borrow_mut().tick(self, delta_t);
+            building.tick(self, delta_t);
         }
 
         self.time_elapsed = MAX_ATTACK_DURATION.min(self.time_elapsed + delta_t)
@@ -145,7 +149,7 @@ impl Game {
         for i in 0..self.buildings.len() {
             let building = self.buildings[i].clone();
 
-            building.borrow().draw(self, &mut result);
+            building.draw(self, &mut result);
         }
 
         result
@@ -178,7 +182,7 @@ impl Game {
         self.need_redraw_collision = false;
 
         draw_bool_grid(
-            self.collision_grid.map(|building_id| building_id.is_some()),
+            self.collision_grid.map(Option::is_some),
             COLLISION_TILE_SIZE,
             Cow::Borrowed(COLLISION_TILE_COLOR),
         )
@@ -187,26 +191,26 @@ impl Game {
     fn on_building_destroyed(&mut self, building: &dyn Building) {
         self.need_redraw_collision = true;
 
-        if building.name() == "TownHall" {
+        if building.name == "TownHall" {
             self.townhall_destroyed = true;
         }
 
-        if building.name() != "Wall" {
+        if building.name != "Wall" {
             self.destroyed_buildings_count += 1;
         }
     }
 
-    fn compute_total_buildings_count(buildings: &[Rc<RefCell<dyn Building>>]) -> usize {
+    fn compute_total_buildings_count(buildings: &[Rc<dyn Building>]) -> usize {
         buildings
             .iter()
-            .filter(|building| building.borrow().name() != "Wall")
+            .filter(|building| building.name != "Wall")
             .count()
     }
 
     fn compute_collision_grid(
         total_size: usize,
-        buildings: &[Rc<RefCell<dyn Building>>],
-    ) -> DMatrix<Option<u32>> {
+        buildings: &[Rc<dyn Building>],
+    ) -> DMatrix<Option<Rc<dyn Building>>> {
         let mut result = DMatrix::from_element(
             total_size * COLLISION_TILES_PER_MAP_TILE,
             total_size * COLLISION_TILES_PER_MAP_TILE,
@@ -214,7 +218,7 @@ impl Game {
         );
 
         for building in buildings {
-            building.borrow().update_collision(&mut result);
+            building.update_collision(&mut result);
         }
 
         result
@@ -222,12 +226,12 @@ impl Game {
 
     fn compute_buildings_grid(
         total_size: usize,
-        buildings: &[Rc<RefCell<dyn Building>>],
-    ) -> DMatrix<Option<u32>> {
+        buildings: &[Rc<dyn Building>],
+    ) -> DMatrix<Option<Rc<dyn Building>>> {
         let mut result = DMatrix::from_element(total_size, total_size, None);
 
         for building in buildings {
-            building.borrow().occupy_tiles(&mut result);
+            building.occupy_tiles(&mut result);
         }
 
         result
@@ -235,7 +239,7 @@ impl Game {
 
     fn compute_drop_zone(
         total_size: usize,
-        buildings_grid: &DMatrix<Option<u32>>,
+        buildings_grid: &DMatrix<Option<Rc<dyn Building>>>,
     ) -> DMatrix<bool> {
         fn get_neighbors(total_size: i32, x: i32, y: i32) -> Vec<(usize, usize)> {
             let mut result = Vec::new();
