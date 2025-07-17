@@ -9,15 +9,20 @@ use shipyard::{
     Unique,
     UniqueOrInitView,
     UniqueView,
-    View,
+    UniqueViewMut,
+    ViewMut,
+    track::InsertionAndModification,
 };
 
 use crate::game::features::map::MapSize;
 
-#[derive(Component)]
 pub struct Building {
     pub position: Vector2<usize>,
     pub size: Vector2<usize>,
+}
+
+impl Component for Building {
+    type Tracking = InsertionAndModification;
 }
 
 /// "Counted" means that this building impacts destroyed buildings percentage.
@@ -28,7 +33,7 @@ pub struct CountedBuilding;
 pub struct TownHall;
 
 #[derive(Unique)]
-pub struct BuildingsGrid(pub DMatrix<Option<EntityId>>);
+pub struct BuildingsGrid(pub DMatrix<EntityId>);
 
 impl Default for BuildingsGrid {
     fn default() -> Self {
@@ -48,27 +53,48 @@ impl Default for DropZone {
 pub fn init_buildings_grid(
     map_size: UniqueView<MapSize>,
     buildings_grid: UniqueOrInitView<BuildingsGrid>,
-    v_building: View<Building>,
 ) {
-    let mut result = DMatrix::from_element(
-        map_size.total_size() as usize,
-        map_size.total_size() as usize,
-        None,
-    );
+    buildings_grid
+        .set(BuildingsGrid(DMatrix::from_element(
+            map_size.total_size() as usize,
+            map_size.total_size() as usize,
+            EntityId::dead(),
+        )))
+        .unwrap();
+}
 
-    for (id, building) in v_building.iter().with_id() {
+pub fn update_buildings_grid(
+    mut buildings_grid: UniqueViewMut<BuildingsGrid>,
+    v_building: ViewMut<Building>,
+) {
+    let modified_ids = v_building
+        .modified()
+        .iter()
+        .with_id()
+        .map(|(id, _)| id)
+        .collect::<Vec<_>>();
+
+    if !modified_ids.is_empty() {
+        for item in &mut buildings_grid.0 {
+            if modified_ids.contains(item) {
+                *item = EntityId::dead();
+            }
+        }
+    }
+
+    for (id, building) in v_building.inserted_or_modified().iter().with_id() {
         for rel_x in 0..building.size.x {
             let abs_x = building.position.x + rel_x;
 
             for rel_y in 0..building.size.y {
                 let abs_y = building.position.y + rel_y;
 
-                result[(abs_x, abs_y)] = Some(id)
+                buildings_grid.0[(abs_x, abs_y)] = id
             }
         }
     }
 
-    buildings_grid.set(BuildingsGrid(result)).unwrap();
+    v_building.clear_all_inserted_and_modified();
 }
 
 pub fn init_drop_zone(
@@ -98,7 +124,7 @@ pub fn init_drop_zone(
 
     for x in 0..map_size.total_size() {
         for y in 0..map_size.total_size() {
-            if buildings_grid.0[(x as usize, y as usize)].is_some() {
+            if buildings_grid.0[(x as usize, y as usize)] != EntityId::dead() {
                 for neighbor in get_neighbors(&map_size, x as i32, y as i32) {
                     result[neighbor] = false;
                 }

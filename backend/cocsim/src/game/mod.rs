@@ -107,6 +107,8 @@ impl Game {
         let initial_counted_buildings_count = Self::counted_buildings_count(&world);
 
         world.run(features::buildings::init_buildings_grid);
+        world.run(features::buildings::update_buildings_grid);
+
         world.run(features::buildings::init_drop_zone);
         world.run(features::collision::init_collision_grid);
 
@@ -127,8 +129,9 @@ impl Game {
         // TODO: run system: deal damage
         self.world.run(features::health::handle_damage_requests);
         // TODO: run system: remove DamageRequest and use hero ability if not used
-        self.world.run(features::collision::update_collision);
         self.world.run(features::health::handle_death_requests);
+        self.world.run(features::collision::update_collision);
+        self.world.run(features::buildings::update_buildings_grid);
         self.world.run(features::events::cleanup_events);
 
         self.world.run(features::time::update_elapsed_time);
@@ -146,6 +149,7 @@ impl Game {
         let map_size = self.world.get_unique::<&MapSize>().unwrap();
         let drop_zone = self.world.get_unique::<&DropZone>().unwrap();
         let buildings_grid = self.world.get_unique::<&BuildingsGrid>().unwrap();
+        let entities = self.world.borrow::<EntitiesView>().unwrap();
 
         let mut result = Vec::new();
 
@@ -160,7 +164,7 @@ impl Game {
                         (y ^ x) % 2 == 0,
                         map_size.is_border(x, y),
                         drop_zone.0[(x as usize, y as usize)],
-                        buildings_grid.0[(x as usize, y as usize)].is_some(),
+                        entities.is_alive(buildings_grid.0[(x as usize, y as usize)]),
                     )),
                 });
             }
