@@ -13,7 +13,8 @@ use shipyard::{
     UniqueOrInitView,
     UniqueView,
     UniqueViewMut,
-    View,
+    ViewMut,
+    track::InsertionAndModification,
 };
 
 use crate::{
@@ -21,9 +22,11 @@ use crate::{
     game::MapSize,
 };
 
-#[derive(Component)]
-#[track(All)]
 pub struct ColliderComponent(pub ColliderEnum);
+
+impl Component for ColliderComponent {
+    type Tracking = InsertionAndModification;
+}
 
 #[derive(Unique)]
 pub struct CollisionGrid(pub DMatrix<EntityId>);
@@ -53,7 +56,7 @@ pub fn init_collision_grid(
 pub fn update_collision(
     mut collision_grid: UniqueViewMut<CollisionGrid>,
     mut need_redraw_collision: UniqueViewMut<NeedRedrawCollision>,
-    v_collider: View<ColliderComponent>,
+    v_collider: ViewMut<ColliderComponent>,
 ) {
     let modified_ids = v_collider
         .modified()
@@ -100,4 +103,6 @@ pub fn update_collision(
 
         need_redraw_collision.0 = true;
     }
+
+    v_collider.clear_all_inserted_and_modified();
 }
