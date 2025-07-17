@@ -5,9 +5,10 @@ use super::{
     ColliderEnum,
 };
 
+#[derive(Clone)]
 pub struct RectCollider {
-    position: Vector2<f32>,
-    size: Vector2<f32>,
+    pub position: Vector2<f32>,
+    pub size: Vector2<f32>,
 }
 
 impl RectCollider {
@@ -58,6 +59,10 @@ impl Collider for RectCollider {
                 }
             }
         }
+    }
+
+    fn bounding_box(&self) -> &Self {
+        self
     }
 
     fn contains(&self, point: Vector2<f32>) -> bool {

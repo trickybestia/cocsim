@@ -2,7 +2,10 @@ pub mod features;
 
 use std::borrow::Cow;
 
-use shipyard::World;
+use shipyard::{
+    EntitiesView,
+    World,
+};
 
 use crate::{
     BuildingModel,
@@ -107,8 +110,6 @@ impl Game {
         world.run(features::buildings::init_drop_zone);
         world.run(features::collision::init_collision_grid);
 
-        world.run(features::created::handle_created);
-
         world.run(features::collision::update_collision);
 
         Self {
@@ -126,8 +127,6 @@ impl Game {
         // TODO: run system: deal damage
         self.world.run(features::health::handle_damage_requests);
         // TODO: run system: remove DamageRequest and use hero ability if not used
-        self.world
-            .run(features::collision::request_update_collision_on_death_request);
         self.world.run(features::collision::update_collision);
         self.world.run(features::health::handle_death_requests);
         self.world.run(features::events::cleanup_events);
@@ -174,11 +173,14 @@ impl Game {
         let collision_grid = self.world.get_unique::<&CollisionGrid>().unwrap();
         let mut need_redraw_collision =
             self.world.get_unique::<&mut NeedRedrawCollision>().unwrap();
+        let entities = self.world.borrow::<EntitiesView>().unwrap();
 
         need_redraw_collision.0 = false;
 
         draw_bool_grid(
-            collision_grid.0.map(|building_id| building_id.is_some()),
+            collision_grid
+                .0
+                .map(|building_id| entities.is_alive(building_id)),
             COLLISION_TILE_SIZE,
             Cow::Borrowed(COLLISION_TILE_COLOR),
         )
