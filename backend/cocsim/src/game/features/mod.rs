@@ -3,6 +3,7 @@ pub mod collision;
 pub mod events;
 pub mod health;
 pub mod map;
+pub mod position;
 pub mod team;
 pub mod time;
 pub mod units;

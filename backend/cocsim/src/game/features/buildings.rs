@@ -3,6 +3,7 @@ use nalgebra::{
     Vector2,
 };
 use shipyard::{
+    AddComponent,
     Component,
     EntityId,
     IntoIter,
@@ -14,7 +15,10 @@ use shipyard::{
     track::InsertionAndModification,
 };
 
-use crate::game::features::map::MapSize;
+use crate::game::features::{
+    map::MapSize,
+    position::Position,
+};
 
 pub struct Building {
     pub position: Vector2<usize>,
@@ -63,9 +67,10 @@ pub fn init_buildings_grid(
         .unwrap();
 }
 
-pub fn update_buildings_grid(
+pub fn handle_building_changes(
     mut buildings_grid: UniqueViewMut<BuildingsGrid>,
     v_building: ViewMut<Building>,
+    mut v_position: ViewMut<Position>,
 ) {
     let modified_ids = v_building
         .modified()
@@ -83,6 +88,11 @@ pub fn update_buildings_grid(
     }
 
     for (id, building) in v_building.inserted_or_modified().iter().with_id() {
+        v_position.add_component_unchecked(
+            id,
+            Position(building.position.cast() + building.size.cast() / 2.0),
+        );
+
         for rel_x in 0..building.size.x {
             let abs_x = building.position.x + rel_x;
 
