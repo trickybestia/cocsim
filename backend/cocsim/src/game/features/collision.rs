@@ -10,6 +10,7 @@ use shipyard::{
     UniqueOrInitView,
     UniqueView,
     UniqueViewMut,
+    View,
     ViewMut,
     track::InsertionAndModification,
 };
@@ -20,7 +21,10 @@ use crate::{
         ColliderEnum,
     },
     consts::*,
-    game::MapSize,
+    game::{
+        MapSize,
+        features::position::Position,
+    },
 };
 
 pub struct ColliderComponent(pub ColliderEnum);
@@ -57,14 +61,16 @@ pub fn init_collision_grid(
 pub fn update_collision(
     mut collision_grid: UniqueViewMut<CollisionGrid>,
     mut need_redraw_collision: UniqueViewMut<NeedRedrawCollision>,
-    v_collider: ViewMut<ColliderComponent>,
+    v_position: View<Position>,
+    v_collider: View<ColliderComponent>,
 ) {
-    let modified_ids = v_collider
-        .modified()
-        .iter()
-        .with_id()
-        .map(|(id, _)| id)
-        .collect::<Vec<_>>();
+    let mut modified_ids = Vec::new();
+
+    for (id, _) in (&v_position, &v_collider).iter().with_id() {
+        if v_position.is_inserted_or_modified(id) || v_collider.is_inserted_or_modified(id) {
+            modified_ids.push(id);
+        }
+    }
 
     if !modified_ids.is_empty() {
         for item in &mut collision_grid.0 {
@@ -74,8 +80,13 @@ pub fn update_collision(
         }
     }
 
-    for (id, collider) in v_collider.inserted_or_modified().iter().with_id() {
-        let bounding_box = collider.0.bounding_box();
+    for (id, (position, collider)) in (&v_position, &v_collider).iter().with_id() {
+        if !(v_position.is_inserted_or_modified(id) || v_collider.is_inserted_or_modified(id)) {
+            continue;
+        }
+
+        let collider = collider.0.translate(position.0);
+        let bounding_box = collider.bounding_box();
         let start_x =
             (bounding_box.position.x * COLLISION_TILES_PER_MAP_TILE as f32).floor() as usize;
         let start_y =
@@ -91,7 +102,7 @@ pub fn update_collision(
             {
                 let abs_y = start_y + rel_y;
 
-                let occupy_tile = collider.0.contains(Vector2::new(
+                let occupy_tile = collider.contains(Vector2::new(
                     abs_x as f32 / COLLISION_TILES_PER_MAP_TILE as f32,
                     abs_y as f32 / COLLISION_TILES_PER_MAP_TILE as f32,
                 ));
