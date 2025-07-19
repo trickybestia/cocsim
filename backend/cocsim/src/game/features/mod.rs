@@ -1,3 +1,4 @@
+pub mod attack_collision;
 pub mod buildings;
 pub mod collision;
 pub mod events;

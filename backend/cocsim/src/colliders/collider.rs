@@ -15,7 +15,7 @@ pub trait Collider {
     /// Returns point of collider nearest to `point`.
     fn nearest_point(&self, point: Vector2<f32>) -> Vector2<f32>;
 
-    fn bounding_box(&self) -> &RectCollider;
+    fn bounding_box(&self) -> RectCollider;
 
     /// Checks if `point` is inside of collider.
     fn contains(&self, point: Vector2<f32>) -> bool;

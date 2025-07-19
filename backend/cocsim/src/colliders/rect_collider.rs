@@ -61,8 +61,8 @@ impl Collider for RectCollider {
         }
     }
 
-    fn bounding_box(&self) -> &Self {
-        self
+    fn bounding_box(&self) -> RectCollider {
+        self.clone()
     }
 
     fn contains(&self, point: Vector2<f32>) -> bool {

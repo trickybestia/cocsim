@@ -70,8 +70,8 @@ impl Collider for ListCollider {
         best_nearest_point
     }
 
-    fn bounding_box(&self) -> &RectCollider {
-        &self.bounding_box
+    fn bounding_box(&self) -> RectCollider {
+        self.bounding_box.clone()
     }
 
     fn contains(&self, point: Vector2<f32>) -> bool {
