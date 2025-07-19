@@ -103,8 +103,6 @@ pub fn handle_building_changes(
             }
         }
     }
-
-    v_building.clear_all_inserted_and_modified();
 }
 
 pub fn init_drop_zone(
@@ -143,4 +141,8 @@ pub fn init_drop_zone(
     }
 
     drop_zone.set(DropZone(result)).unwrap();
+}
+
+pub fn cleanup_tracking(v_building: ViewMut<Building>) {
+    v_building.clear_all_inserted_and_modified();
 }

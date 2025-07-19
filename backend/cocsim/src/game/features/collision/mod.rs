@@ -103,6 +103,8 @@ pub fn update_collision(
 
         need_redraw_collision.0 = true;
     }
+}
 
+pub fn cleanup_tracking(v_collider: ViewMut<ColliderComponent>) {
     v_collider.clear_all_inserted_and_modified();
 }

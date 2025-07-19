@@ -114,6 +114,8 @@ impl Game {
 
         world.run(features::collision::update_collision);
 
+        Self::tick_cleanup(&mut world);
+
         Self {
             world,
             initial_counted_buildings_count,
@@ -132,7 +134,8 @@ impl Game {
         self.world.run(features::health::handle_death_requests);
         self.world.run(features::collision::update_collision);
         self.world.run(features::buildings::handle_building_changes);
-        self.world.run(features::events::cleanup_events);
+
+        Self::tick_cleanup(&mut self.world);
 
         self.world.run(features::time::update_elapsed_time);
     }
@@ -188,6 +191,13 @@ impl Game {
             COLLISION_TILE_SIZE,
             Cow::Borrowed(COLLISION_TILE_COLOR),
         )
+    }
+
+    fn tick_cleanup(world: &mut World) {
+        world.run(features::buildings::cleanup_tracking);
+        world.run(features::collision::cleanup_tracking);
+
+        world.run(features::events::cleanup_events);
     }
 
     fn counted_buildings_count(world: &World) -> usize {
