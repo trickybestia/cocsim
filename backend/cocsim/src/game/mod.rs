@@ -10,7 +10,6 @@ use shipyard::{
 use crate::{
     BuildingModel,
     Map,
-    Pathfinder,
     Shape,
     consts::*,
     game::features::{
@@ -98,7 +97,6 @@ impl Game {
             elapsed: 0.0,
             delta: 0.0,
         });
-        world.add_unique(Pathfinder);
 
         for building in &map.buildings {
             building.create_building(&mut world);
