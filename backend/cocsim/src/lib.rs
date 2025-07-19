@@ -1,4 +1,5 @@
 mod buildings;
+pub mod colliders;
 pub mod consts;
 mod game;
 mod map;

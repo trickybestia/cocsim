@@ -1,6 +1,3 @@
-mod colliders;
-
-pub use colliders::*;
 use nalgebra::{
     DMatrix,
     Vector2,
@@ -18,6 +15,10 @@ use shipyard::{
 };
 
 use crate::{
+    colliders::{
+        Collider,
+        ColliderEnum,
+    },
     consts::*,
     game::MapSize,
 };
