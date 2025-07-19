@@ -6,6 +6,7 @@ use super::{
     RectCollider,
 };
 
+#[derive(Clone)]
 pub struct ListCollider {
     colliders: Vec<ColliderEnum>,
     bounding_box: RectCollider,
@@ -68,6 +69,17 @@ impl Collider for ListCollider {
         }
 
         best_nearest_point
+    }
+
+    fn translate(&self, offset: Vector2<f32>) -> Self {
+        Self {
+            colliders: self
+                .colliders
+                .iter()
+                .map(|collider| collider.translate(offset))
+                .collect(),
+            bounding_box: self.bounding_box.translate(offset),
+        }
     }
 
     fn bounding_box(&self) -> RectCollider {

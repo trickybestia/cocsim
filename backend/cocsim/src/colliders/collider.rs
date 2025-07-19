@@ -7,13 +7,18 @@ use super::{
 };
 
 #[enum_dispatch]
-pub trait Collider {
+pub trait Collider
+where
+    Self: Clone,
+{
     /// Returns attack area [`Collider`] from which units with given
     /// `attack_range` can attack this building.
     fn attack_area(&self, attack_range: f32) -> ColliderEnum;
 
     /// Returns point of collider nearest to `point`.
     fn nearest_point(&self, point: Vector2<f32>) -> Vector2<f32>;
+
+    fn translate(&self, offset: Vector2<f32>) -> Self;
 
     fn bounding_box(&self) -> RectCollider;
 

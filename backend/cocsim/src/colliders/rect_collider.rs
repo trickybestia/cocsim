@@ -61,6 +61,10 @@ impl Collider for RectCollider {
         }
     }
 
+    fn translate(&self, offset: Vector2<f32>) -> Self {
+        Self::new(self.position + offset, self.size)
+    }
+
     fn bounding_box(&self) -> RectCollider {
         self.clone()
     }

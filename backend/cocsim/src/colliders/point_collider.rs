@@ -27,6 +27,10 @@ impl Collider for PointCollider {
         self.0
     }
 
+    fn translate(&self, offset: Vector2<f32>) -> Self {
+        Self::new(self.0 + offset)
+    }
+
     fn bounding_box(&self) -> RectCollider {
         RectCollider::new(self.0, Vector2::zeros())
     }
