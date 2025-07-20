@@ -1,12 +1,22 @@
-use shipyard::Component;
+use shipyard::{
+    AllStoragesViewMut,
+    Component,
+    EntityId,
+};
 
 use crate::colliders::ColliderEnum;
 
 #[derive(Component)]
 pub struct Attacker {
     pub attack_range: f32,
-    /// Like vec!["AirDefense", "DefenseBuilding", "NotWall"]
-    pub priorities: Vec<String>,
+    pub first_attack_cooldown: f32,
+    pub attack_cooldown: f32,
+    pub target: EntityId,
+    pub current_attack_cooldown: f32,
+    /// (self_id, all_storages) -> target_id
+    pub find_target: fn(EntityId, AllStoragesViewMut) -> EntityId,
+    /// (self_id, all_storages)
+    pub attack: fn(EntityId, AllStoragesViewMut),
     pub team: Team,
 }
 
