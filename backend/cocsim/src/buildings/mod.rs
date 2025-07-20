@@ -15,7 +15,7 @@ use serde::{
 use shipyard::World;
 
 #[enum_dispatch(BuildingModel)]
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub enum BuildingModelEnum {
     ArmyCampModel,
 }

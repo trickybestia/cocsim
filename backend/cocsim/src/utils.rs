@@ -1,10 +1,44 @@
+use std::{
+    fs::File,
+    io::{
+        BufReader,
+        Read,
+    },
+    path::Path,
+};
+
+use anyhow::Result;
 use nalgebra::DMatrix;
+use zip::ZipArchive;
 
 use crate::{
+    Map,
     Shape,
     ShapeColor,
     consts::*,
 };
+
+pub fn load_test_map_raw(name: &str) -> Result<(String, Vec<u8>)> {
+    let path = Path::new(TEST_MAPS_PATH).join(name).with_extension("zip");
+    let file = File::open(path)?;
+    let reader = BufReader::new(file);
+
+    let mut archive = ZipArchive::new(reader)?;
+
+    let mut map_image = Vec::new();
+    let mut map_json = String::new();
+
+    archive.by_name("map.json")?.read_to_string(&mut map_json)?;
+    archive.by_name("map.jpg")?.read_to_end(&mut map_image)?;
+
+    Ok((map_json, map_image))
+}
+
+pub fn load_test_map(name: &str) -> Result<(Map, Vec<u8>)> {
+    let (map_json, map_image) = load_test_map_raw(name)?;
+
+    Ok((serde_json::from_str(&map_json)?, map_image))
+}
 
 pub fn get_tile_color(even: bool, border: bool, drop_zone: bool, occupied: bool) -> &'static str {
     if occupied {

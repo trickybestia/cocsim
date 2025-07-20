@@ -37,7 +37,7 @@ const ARMY_CAMP: &BuildingType = &BuildingType {
     options: vec![],
 };
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct ArmyCampModel {
     x: u32,
     y: u32,

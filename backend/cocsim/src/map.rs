@@ -5,7 +5,7 @@ use serde::{
 
 use crate::BuildingModelEnum;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Map {
     pub base_size: usize,
     pub border_size: usize,

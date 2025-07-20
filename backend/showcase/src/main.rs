@@ -1,7 +1,10 @@
+use cocsim::utils::load_test_map;
 use macroquad::prelude::*;
 
 #[macroquad::main("cocsim")]
 async fn main() {
+    let (map, map_image) = load_test_map("single_player/goblin_gauntlet").unwrap();
+
     loop {
         clear_background(RED);
 
