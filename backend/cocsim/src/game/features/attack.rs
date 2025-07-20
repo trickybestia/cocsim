@@ -4,6 +4,7 @@ use crate::colliders::ColliderEnum;
 
 #[derive(Component)]
 pub struct Attacker {
+    pub attack_range: f32,
     /// Like vec!["AirDefense", "DefenseBuilding", "NotWall"]
     pub priorities: Vec<String>,
     pub team: Team,

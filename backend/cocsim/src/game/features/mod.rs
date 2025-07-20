@@ -7,4 +7,4 @@ pub mod map;
 pub mod pathfinding;
 pub mod position;
 pub mod time;
-pub mod units;
+pub mod waypoint_mover;
