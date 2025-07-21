@@ -153,7 +153,8 @@ impl Game {
     pub fn draw_entities(&self) -> Vec<Shape> {
         let mut result = Vec::new();
 
-        // TODO: run drawing systems
+        self.world
+            .run_with_data(features::drawable::draw, &mut result);
 
         result
     }
