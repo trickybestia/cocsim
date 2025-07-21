@@ -17,18 +17,16 @@ pub struct Attacker {
     pub find_target: fn(EntityId, AllStoragesViewMut) -> EntityId,
     /// (self_id, all_storages)
     pub attack: fn(EntityId, AllStoragesViewMut),
-    pub team: Team,
 }
 
 #[derive(Component)]
 pub struct AttackTarget {
     pub collider: ColliderEnum,
     /// Like `vec!["Building", "NotWall", "ResourceBuilding", "GoldMine"]`
-    pub tags: Vec<String>,
-    pub team: Team,
+    pub tags: Vec<&'static str>,
 }
 
-#[derive(PartialEq, Eq, Clone, Copy)]
+#[derive(Component, PartialEq, Eq, Clone, Copy)]
 pub enum Team {
     Attack,
     Defense,

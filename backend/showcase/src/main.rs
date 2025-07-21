@@ -5,6 +5,10 @@ use macroquad::prelude::*;
 async fn main() {
     let (map, map_image) = load_test_map("single_player/goblin_gauntlet").unwrap();
 
+    println!("{:#?}", map);
+
+    return;
+
     loop {
         clear_background(RED);
 

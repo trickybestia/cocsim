@@ -1,0 +1,58 @@
+use anyhow::Result;
+use nalgebra::Vector2;
+use shipyard::{
+    EntityId,
+    World,
+};
+
+use crate::{
+    colliders::{
+        ColliderEnum,
+        RectCollider,
+    },
+    game::features::{
+        attack::{
+            AttackTarget,
+            Team,
+        },
+        buildings::{
+            Building,
+            CountedBuilding,
+        },
+        collision::PathfindingCollider,
+        health::Health,
+    },
+};
+
+pub fn default_attack_collider(size: Vector2<usize>) -> ColliderEnum {
+    RectCollider::new_from_center(Vector2::new(0.0, 0.0), size.cast() * 0.65).into()
+}
+
+pub fn create_passive_building(
+    world: &mut World,
+    health: f32,
+    position: Vector2<usize>,
+    size: Vector2<usize>,
+    attack_collider: Option<ColliderEnum>,
+) -> Result<EntityId> {
+    let attack_collider = match attack_collider {
+        Some(collider) => collider,
+        None => default_attack_collider(size),
+    };
+
+    let id = world.add_entity((
+        Health(health),
+        Building { position, size },
+        CountedBuilding,
+        PathfindingCollider(
+            RectCollider::new_from_center(Vector2::new(0.0, 0.0), size.cast()).into(),
+        ),
+        Team::Defense,
+        AttackTarget {
+            collider: attack_collider,
+            tags: vec!["Building", "PassiveBuilding"],
+        },
+    ));
+
+    Ok(id)
+}

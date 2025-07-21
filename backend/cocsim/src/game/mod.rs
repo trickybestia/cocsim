@@ -2,6 +2,7 @@ pub mod features;
 
 use std::borrow::Cow;
 
+use anyhow::ensure;
 use shipyard::{
     EntitiesView,
     World,
@@ -86,7 +87,18 @@ impl Game {
         result
     }
 
-    pub fn new(map: &Map) -> Self {
+    pub fn new(map: &Map) -> anyhow::Result<Self> {
+        ensure!(
+            map.base_size >= 1 && map.base_size <= 44,
+            "Invalid map.base_size = {0}",
+            map.base_size
+        );
+        ensure!(
+            map.border_size <= 4,
+            "Invalid map.border_size = {0}",
+            map.border_size
+        );
+
         let mut world = World::new();
 
         world.add_unique(MapSize {
@@ -99,7 +111,7 @@ impl Game {
         });
 
         for building in &map.buildings {
-            building.create_building(&mut world);
+            building.create_building(&mut world)?;
         }
 
         let initial_counted_buildings_count = Self::counted_buildings_count(&world);
@@ -114,10 +126,10 @@ impl Game {
 
         Self::tick_cleanup(&mut world);
 
-        Self {
+        Ok(Self {
             world,
             initial_counted_buildings_count,
-        }
+        })
     }
 
     pub fn tick(&mut self, delta_time: f32) {

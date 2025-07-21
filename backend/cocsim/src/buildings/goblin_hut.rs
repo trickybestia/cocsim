@@ -1,0 +1,53 @@
+use anyhow::{
+    Context,
+    Result,
+};
+use nalgebra::Vector2;
+use serde::{
+    Deserialize,
+    Serialize,
+};
+use shipyard::World;
+
+use crate::{
+    BuildingModel,
+    BuildingType,
+    buildings::utils::passive_building::create_passive_building,
+};
+
+struct GoblinHutLevel {
+    pub health: f32,
+}
+
+const GOBLIN_HUT_LEVELS: &[GoblinHutLevel] = &[GoblinHutLevel { health: 250.0 }];
+
+const GOBLIN_HUT: &BuildingType = &BuildingType {
+    name: "GoblinHut",
+    size: Vector2::new(2, 2),
+    levels: GOBLIN_HUT_LEVELS.len(),
+    options: &[],
+};
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct GoblinHutModel {
+    pub x: usize,
+    pub y: usize,
+    pub level: usize,
+}
+
+impl BuildingModel for GoblinHutModel {
+    fn create_building(&self, world: &mut World) -> Result<()> {
+        create_passive_building(
+            world,
+            GOBLIN_HUT_LEVELS
+                .get(self.level)
+                .context("Level out of range")?
+                .health,
+            Vector2::new(self.x, self.y),
+            GOBLIN_HUT.size,
+            None,
+        )?;
+
+        Ok(())
+    }
+}
