@@ -20,8 +20,8 @@ use crate::{
             TownHall,
         },
         collision::{
-            CollisionGrid,
             NeedRedrawCollision,
+            PathfindingCollisionGrid,
         },
         map::MapSize,
         time::Time,
@@ -175,7 +175,10 @@ impl Game {
     }
 
     pub fn draw_collision(&mut self) -> Vec<Shape> {
-        let collision_grid = self.world.get_unique::<&CollisionGrid>().unwrap();
+        let collision_grid = self
+            .world
+            .get_unique::<&PathfindingCollisionGrid>()
+            .unwrap();
         let mut need_redraw_collision =
             self.world.get_unique::<&mut NeedRedrawCollision>().unwrap();
         let entities = self.world.borrow::<EntitiesView>().unwrap();

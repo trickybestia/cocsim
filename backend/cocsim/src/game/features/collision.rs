@@ -27,16 +27,16 @@ use crate::{
     },
 };
 
-pub struct ColliderComponent(pub ColliderEnum);
+pub struct PathfindingCollider(pub ColliderEnum);
 
-impl Component for ColliderComponent {
+impl Component for PathfindingCollider {
     type Tracking = InsertionAndModification;
 }
 
 #[derive(Unique)]
-pub struct CollisionGrid(pub DMatrix<EntityId>);
+pub struct PathfindingCollisionGrid(pub DMatrix<EntityId>);
 
-impl Default for CollisionGrid {
+impl Default for PathfindingCollisionGrid {
     fn default() -> Self {
         unimplemented!()
     }
@@ -47,10 +47,10 @@ pub struct NeedRedrawCollision(pub bool);
 
 pub fn init_collision_grid(
     map_size: UniqueView<MapSize>,
-    collision_grid: UniqueOrInitView<CollisionGrid>,
+    collision_grid: UniqueOrInitView<PathfindingCollisionGrid>,
 ) {
     collision_grid
-        .set(CollisionGrid(DMatrix::from_element(
+        .set(PathfindingCollisionGrid(DMatrix::from_element(
             map_size.total_size() as usize * COLLISION_TILES_PER_MAP_TILE,
             map_size.total_size() as usize * COLLISION_TILES_PER_MAP_TILE,
             EntityId::dead(),
@@ -59,10 +59,10 @@ pub fn init_collision_grid(
 }
 
 pub fn update_collision(
-    mut collision_grid: UniqueViewMut<CollisionGrid>,
+    mut collision_grid: UniqueViewMut<PathfindingCollisionGrid>,
     mut need_redraw_collision: UniqueViewMut<NeedRedrawCollision>,
     v_position: View<Position>,
-    v_collider: View<ColliderComponent>,
+    v_collider: View<PathfindingCollider>,
 ) {
     let mut modified_ids = Vec::new();
 
@@ -117,6 +117,6 @@ pub fn update_collision(
     }
 }
 
-pub fn cleanup_tracking(v_collider: ViewMut<ColliderComponent>) {
+pub fn cleanup_tracking(v_collider: ViewMut<PathfindingCollider>) {
     v_collider.clear_all_inserted_and_modified();
 }
