@@ -35,7 +35,7 @@ pub fn create_passive_building(
     size: Vector2<usize>,
     attack_collider: Option<ColliderEnum>,
 ) -> Result<EntityId> {
-    let attack_collider = match attack_collider {
+    let collider = match attack_collider {
         Some(collider) => collider,
         None => default_attack_collider(size),
     };
@@ -44,12 +44,10 @@ pub fn create_passive_building(
         Health(health),
         Building { position, size },
         CountedBuilding,
-        PathfindingCollider(
-            RectCollider::new_from_center(Vector2::new(0.0, 0.0), size.cast()).into(),
-        ),
+        PathfindingCollider(collider.clone()),
         Team::Defense,
         AttackTarget {
-            collider: attack_collider,
+            collider,
             tags: vec!["Building", "PassiveBuilding"],
         },
     ));
