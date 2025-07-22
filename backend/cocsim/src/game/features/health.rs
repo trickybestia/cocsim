@@ -2,6 +2,7 @@ use shipyard::{
     AddComponent,
     AllStoragesViewMut,
     Component,
+    EntityId,
     IntoIter,
     View,
     ViewMut,
@@ -12,18 +13,23 @@ use shipyard::{
 pub struct Health(pub f32);
 
 #[derive(Component)]
-pub struct DamageRequest(pub f32);
+pub struct DamageEvent {
+    pub target: EntityId,
+    pub damage: f32,
+}
 
 #[derive(Component)]
 pub struct DeathRequest;
 
-pub fn handle_damage_requests(
+pub fn handle_damage_events(
     mut v_health: ViewMut<Health>,
-    v_damage_request: View<DamageRequest>,
     mut v_death_request: ViewMut<DeathRequest>,
+    v_damage_event: View<DamageEvent>,
 ) {
-    for (health, damage_request) in (&mut v_health, &v_damage_request).iter() {
-        health.0 = health.0 - damage_request.0;
+    for damage_event in v_damage_event.iter() {
+        let target_health = &mut v_health[damage_event.target];
+
+        target_health.0 = target_health.0 - damage_event.damage;
     }
 
     for (id, health) in v_health.iter().with_id() {
@@ -35,4 +41,8 @@ pub fn handle_damage_requests(
 
 pub fn handle_death_requests(mut all_storages: AllStoragesViewMut) {
     all_storages.delete_any::<SparseSet<DeathRequest>>();
+}
+
+pub fn cleanup_events(mut all_storages: AllStoragesViewMut) {
+    all_storages.delete_any::<SparseSet<DamageEvent>>();
 }

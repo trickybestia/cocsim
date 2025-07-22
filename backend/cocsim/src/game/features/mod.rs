@@ -2,7 +2,6 @@ pub mod attack;
 pub mod buildings;
 pub mod collision;
 pub mod drawable;
-pub mod events;
 pub mod health;
 pub mod map;
 pub mod pathfinding;
