@@ -1046,6 +1046,7 @@ dependencies = [
  "cocsim",
  "image",
  "macroquad",
+ "nalgebra",
 ]
 
 [[package]]
