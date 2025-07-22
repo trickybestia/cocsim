@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 use nalgebra::{
     DMatrix,
     Vector2,
@@ -79,17 +81,17 @@ pub fn update_collision(
         need_redraw_collision.0 = true;
     }
 
-    let mut modified_ids = Vec::new();
+    let mut modified_ids = HashSet::new();
 
     for (id, _) in (&v_position, &v_collider).iter().with_id() {
         if v_position.is_inserted_or_modified(id) || v_collider.is_inserted_or_modified(id) {
-            modified_ids.push(id);
+            modified_ids.insert(id);
         }
     }
 
     if !modified_ids.is_empty() {
         for item in &mut collision_grid.0 {
-            if modified_ids.contains(item) {
+            if *item != EntityId::dead() && modified_ids.contains(item) {
                 *item = EntityId::dead();
             }
         }
