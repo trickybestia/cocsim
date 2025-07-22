@@ -5,4 +5,5 @@ edition = "2024"
 
 [dependencies]
 cocsim = { path = "../cocsim" }
+image = { version = "0.24", default-features = false, features = ["jpeg"] }
 macroquad = "0.4"
