@@ -1,7 +1,5 @@
 pub mod features;
 
-use std::borrow::Cow;
-
 use anyhow::ensure;
 use shipyard::{
     EntitiesView,
@@ -49,10 +47,6 @@ impl Game {
             || self.stars() == 3
     }
 
-    fn destroyed_counted_buildings_count(&self) -> usize {
-        self.initial_counted_buildings_count - Self::counted_buildings_count(&self.world)
-    }
-
     pub fn stars(&self) -> u32 {
         let destroyed_buildings_count = self.destroyed_counted_buildings_count();
 
@@ -85,6 +79,10 @@ impl Game {
         result.push_str(&format!(" {} s left", total_seconds % 60));
 
         result
+    }
+
+    pub fn need_redraw_collision(&self) -> bool {
+        self.world.get_unique::<&NeedRedrawCollision>().unwrap().0
     }
 
     pub fn new(map: &Map) -> anyhow::Result<Self> {
@@ -174,12 +172,12 @@ impl Game {
                     y: y as f32,
                     width: 1.0,
                     height: 1.0,
-                    color: Cow::Borrowed(get_tile_color(
+                    color: get_tile_color(
                         (y ^ x) % 2 == 0,
                         map_size.is_border(x, y),
                         drop_zone.0[(x as usize, y as usize)],
                         entities.is_alive(buildings_grid.0[(x as usize, y as usize)]),
-                    )),
+                    ),
                 });
             }
         }
@@ -203,7 +201,7 @@ impl Game {
                 .0
                 .map(|building_id| entities.is_alive(building_id)),
             COLLISION_TILE_SIZE,
-            Cow::Borrowed(COLLISION_TILE_COLOR),
+            COLLISION_TILE_COLOR,
         )
     }
 
@@ -217,5 +215,9 @@ impl Game {
 
     fn counted_buildings_count(world: &World) -> usize {
         world.iter::<&CountedBuilding>().iter().count()
+    }
+
+    fn destroyed_counted_buildings_count(&self) -> usize {
+        self.initial_counted_buildings_count - Self::counted_buildings_count(&self.world)
     }
 }

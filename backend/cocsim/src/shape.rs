@@ -1,7 +1,28 @@
-use std::borrow::Cow;
+use std::fmt::Display;
 
-pub type ShapeColor = Cow<'static, str>;
+use serde::Serialize;
+use serde_with::SerializeDisplay;
 
+#[derive(Clone, Copy, SerializeDisplay)]
+pub struct ShapeColor {
+    pub r: u8,
+    pub g: u8,
+    pub b: u8,
+}
+
+impl Display for ShapeColor {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "#{:02x}{:02x}{:02x}", self.r, self.g, self.b)
+    }
+}
+
+impl ShapeColor {
+    pub const fn new(r: u8, g: u8, b: u8) -> Self {
+        Self { r, g, b }
+    }
+}
+
+#[derive(Serialize)]
 pub enum Shape {
     Rect {
         x: f32,

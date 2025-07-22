@@ -45,9 +45,16 @@ impl Default for PathfindingCollisionGrid {
 #[derive(Unique)]
 pub struct NeedRedrawCollision(pub bool);
 
+impl Default for NeedRedrawCollision {
+    fn default() -> Self {
+        unimplemented!()
+    }
+}
+
 pub fn init_collision_grid(
     map_size: UniqueView<MapSize>,
     collision_grid: UniqueOrInitView<PathfindingCollisionGrid>,
+    need_redraw_collision: UniqueOrInitView<NeedRedrawCollision>,
 ) {
     collision_grid
         .set(PathfindingCollisionGrid(DMatrix::from_element(
@@ -55,6 +62,9 @@ pub fn init_collision_grid(
             map_size.total_size() as usize * COLLISION_TILES_PER_MAP_TILE,
             EntityId::dead(),
         )))
+        .unwrap();
+    need_redraw_collision
+        .set(NeedRedrawCollision(true))
         .unwrap();
 }
 

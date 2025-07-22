@@ -40,7 +40,7 @@ pub fn load_test_map(name: &str) -> Result<(Map, Vec<u8>)> {
     Ok((serde_json::from_str(&map_json)?, map_image))
 }
 
-pub fn get_tile_color(even: bool, border: bool, drop_zone: bool, occupied: bool) -> &'static str {
+pub fn get_tile_color(even: bool, border: bool, drop_zone: bool, occupied: bool) -> ShapeColor {
     if occupied {
         if even {
             BUILDING_TILE_EVEN_COLOR
@@ -121,7 +121,7 @@ pub fn draw_bool_grid(mut grid: DMatrix<bool>, tile_size: f32, color: ShapeColor
                 y: start_y as f32 * tile_size,
                 width: width as f32 * tile_size,
                 height: height as f32 * tile_size,
-                color: color.clone(),
+                color,
             });
 
             for x in start_x..(start_x + width) {
