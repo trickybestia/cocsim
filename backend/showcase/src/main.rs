@@ -1,12 +1,14 @@
 mod consts;
 
 use cocsim::{
+    DragonModel,
     Game,
     Shape,
     utils::load_test_map,
 };
 use consts::*;
 use macroquad::prelude::*;
+use nalgebra::Vector2;
 
 fn draw_shapes(shapes: &[Shape], alpha: u8) {
     for shape in shapes {
@@ -68,6 +70,14 @@ async fn main() {
     let map_texture_size = PIXELS_PER_TILE * (map.base_size + 2 * map.border_size);
 
     let mut game = Game::new(&map).unwrap();
+
+    for i in 0..10 {
+        game.spawn_unit(
+            &DragonModel { level: 10 }.into(),
+            Vector2::new(0.5, i as f32 + 0.5),
+        )
+        .unwrap();
+    }
 
     let grid = game.draw_grid();
     let mut collision = game.draw_collision();

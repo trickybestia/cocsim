@@ -9,7 +9,7 @@ use shipyard::{
 use crate::Shape;
 
 #[derive(Component)]
-struct Drawable {
+pub struct Drawable {
     pub draw_fn: fn(EntityId, &AllStoragesView, &mut Vec<Shape>),
 }
 

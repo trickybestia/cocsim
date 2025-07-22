@@ -5,7 +5,7 @@ use super::{
     ColliderEnum,
 };
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct RectCollider {
     pub position: Vector2<f32>,
     pub size: Vector2<f32>,

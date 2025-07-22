@@ -1,5 +1,7 @@
 use std::{
+    collections::HashSet,
     fs::File,
+    hash::Hash,
     io::{
         BufReader,
         Read,
@@ -133,4 +135,16 @@ pub fn draw_bool_grid(mut grid: DMatrix<bool>, tile_size: f32, color: ShapeColor
     }
 
     result
+}
+
+pub fn intersects<T: Hash + Eq>(a: impl Iterator<Item = T>, b: impl Iterator<Item = T>) -> bool {
+    let hashset_a = a.collect::<HashSet<T>>();
+
+    for item in b {
+        if hashset_a.contains(&item) {
+            return true;
+        }
+    }
+
+    false
 }

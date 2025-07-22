@@ -12,7 +12,6 @@ use shipyard::{
     UniqueViewMut,
     View,
     ViewMut,
-    track::InsertionAndModification,
 };
 
 use crate::{
@@ -25,13 +24,12 @@ use crate::{
         MapSize,
         features::position::Position,
     },
+    utils::intersects,
 };
 
+#[derive(Component)]
+#[track(All)]
 pub struct PathfindingCollider(pub ColliderEnum);
-
-impl Component for PathfindingCollider {
-    type Tracking = InsertionAndModification;
-}
 
 #[derive(Unique)]
 pub struct PathfindingCollisionGrid(pub DMatrix<EntityId>);
@@ -74,6 +72,13 @@ pub fn update_collision(
     v_position: View<Position>,
     v_collider: View<PathfindingCollider>,
 ) {
+    if intersects(
+        v_position.removed_or_deleted(),
+        v_collider.removed_or_deleted(),
+    ) {
+        need_redraw_collision.0 = true;
+    }
+
     let mut modified_ids = Vec::new();
 
     for (id, _) in (&v_position, &v_collider).iter().with_id() {
@@ -88,6 +93,8 @@ pub fn update_collision(
                 *item = EntityId::dead();
             }
         }
+
+        need_redraw_collision.0 = true;
     }
 
     for (id, (position, collider)) in (&v_position, &v_collider).iter().with_id() {
@@ -122,11 +129,10 @@ pub fn update_collision(
                 }
             }
         }
-
-        need_redraw_collision.0 = true;
     }
 }
 
-pub fn cleanup_tracking(v_collider: ViewMut<PathfindingCollider>) {
+pub fn cleanup_tracking(mut v_collider: ViewMut<PathfindingCollider>) {
+    v_collider.clear_all_removed_and_deleted();
     v_collider.clear_all_inserted_and_modified();
 }

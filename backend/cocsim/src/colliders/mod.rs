@@ -11,7 +11,7 @@ pub use point_collider::PointCollider;
 pub use rect_collider::RectCollider;
 
 #[enum_dispatch(Collider)]
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub enum ColliderEnum {
     ListCollider,
     RectCollider,

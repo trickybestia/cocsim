@@ -4,6 +4,7 @@ pub mod consts;
 mod game;
 mod map;
 mod shape;
+mod units;
 pub mod utils;
 
 pub use buildings::*;
@@ -13,3 +14,4 @@ pub use shape::{
     Shape,
     ShapeColor,
 };
+pub use units::*;

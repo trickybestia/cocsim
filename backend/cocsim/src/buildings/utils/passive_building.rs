@@ -13,6 +13,7 @@ use crate::{
     game::features::{
         attack::{
             AttackTarget,
+            AttackTargetFlags,
             Team,
         },
         buildings::{
@@ -48,7 +49,9 @@ pub fn create_passive_building(
         Team::Defense,
         AttackTarget {
             collider,
-            tags: vec!["Building", "PassiveBuilding"],
+            flags: AttackTargetFlags::GROUND
+                | AttackTargetFlags::BUILDING
+                | AttackTargetFlags::PASSIVE_BUILDING,
         },
     ));
 

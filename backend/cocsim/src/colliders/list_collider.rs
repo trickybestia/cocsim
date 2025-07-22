@@ -6,7 +6,7 @@ use super::{
     RectCollider,
 };
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct ListCollider {
     colliders: Vec<ColliderEnum>,
     bounding_box: RectCollider,

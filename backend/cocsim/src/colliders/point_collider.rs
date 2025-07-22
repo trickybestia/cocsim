@@ -6,12 +6,16 @@ use super::{
 };
 use crate::colliders::RectCollider;
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct PointCollider(pub Vector2<f32>);
 
 impl PointCollider {
     pub fn new(position: Vector2<f32>) -> Self {
         Self(position)
+    }
+
+    pub fn zero() -> Self {
+        Self(Vector2::from_element(0.0))
     }
 }
 

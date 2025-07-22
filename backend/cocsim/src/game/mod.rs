@@ -1,6 +1,10 @@
 pub mod features;
 
-use anyhow::ensure;
+use anyhow::{
+    Result,
+    ensure,
+};
+use nalgebra::Vector2;
 use shipyard::{
     EntitiesView,
     World,
@@ -10,6 +14,8 @@ use crate::{
     BuildingModel,
     Map,
     Shape,
+    UnitModel,
+    UnitModelEnum,
     consts::*,
     game::features::{
         buildings::{
@@ -130,15 +136,23 @@ impl Game {
         })
     }
 
+    pub fn spawn_unit(&mut self, model: &UnitModelEnum, position: Vector2<f32>) -> Result<()> {
+        model.create_unit(&mut self.world, position)?;
+
+        Ok(())
+    }
+
     pub fn tick(&mut self, delta_time: f32) {
         assert!(!self.done());
 
         self.world
             .run_with_data(features::time::set_delta_time, delta_time);
 
-        // TODO: run system: deal damage
-        self.world.run(features::health::handle_damage_requests);
-        // TODO: run system: remove DamageRequest and use hero ability if not used
+        self.world.run(features::attack::find_target);
+        self.world.run(features::attack::attack);
+        self.world.run(features::waypoint_mover::r#move);
+        self.world.run(features::health::handle_damage_events);
+        // TODO: run system: remove DeathRequest and use hero ability if not used
         self.world.run(features::health::handle_death_requests);
         self.world.run(features::collision::update_collision);
         self.world.run(features::buildings::handle_building_changes);
@@ -210,7 +224,7 @@ impl Game {
         world.run(features::collision::cleanup_tracking);
         world.run(features::position::cleanup_tracking);
 
-        world.run(features::events::cleanup_events);
+        world.run(features::health::cleanup_events);
     }
 
     fn counted_buildings_count(world: &World) -> usize {
