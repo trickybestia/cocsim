@@ -5,6 +5,19 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "type": "lldb",
+            "request": "launch",
+            "name": "showcase",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--manifest-path=backend/showcase/Cargo.toml"
+                ]
+            },
+            "cwd": "${workspaceFolder}",
+            "args": []
+        },
+        {
             "name": "cocsim.tests",
             "type": "debugpy",
             "request": "launch",
