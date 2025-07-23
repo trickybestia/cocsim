@@ -7,12 +7,26 @@ use serde::{
     Deserialize,
     Serialize,
 };
-use shipyard::World;
+use shipyard::{
+    ViewMut,
+    World,
+};
 
 use crate::{
     BuildingModel,
     BuildingType,
     buildings::utils::passive_building::create_passive_building,
+    colliders::{
+        Collider,
+        RectCollider,
+    },
+    game::features::{
+        attack::{
+            AttackTarget,
+            AttackTargetFlags,
+        },
+        wall::Wall,
+    },
 };
 
 struct WallLevel {
@@ -56,7 +70,7 @@ pub struct WallModel {
 
 impl BuildingModel for WallModel {
     fn create_building(&self, world: &mut World) -> Result<()> {
-        create_passive_building(
+        let id = create_passive_building(
             world,
             WALL_LEVELS
                 .get(self.level)
@@ -66,6 +80,37 @@ impl BuildingModel for WallModel {
             WALL.size,
             None,
         )?;
+
+        world.borrow::<ViewMut<AttackTarget>>().unwrap()[id].flags |= AttackTargetFlags::WALL;
+        world.add_component(
+            id,
+            Wall {
+                center_collider: RectCollider::new_from_center(
+                    Vector2::zeros(),
+                    Vector2::from_element(0.65),
+                ),
+                up_connection_collider: RectCollider::new(
+                    Vector2::new(0.175, 0.0),
+                    Vector2::new(0.65, 0.5),
+                )
+                .translate(Vector2::from_element(-0.5)),
+                down_connection_collider: RectCollider::new(
+                    Vector2::new(0.175, 0.5),
+                    Vector2::new(0.65, 0.5),
+                )
+                .translate(Vector2::from_element(-0.5)),
+                left_connection_collider: RectCollider::new(
+                    Vector2::new(0.0, 0.175),
+                    Vector2::new(0.5, 0.65),
+                )
+                .translate(Vector2::from_element(-0.5)),
+                right_connection_collider: RectCollider::new(
+                    Vector2::new(0.5, 0.175),
+                    Vector2::new(0.5, 0.65),
+                )
+                .translate(Vector2::from_element(-0.5)),
+            },
+        );
 
         Ok(())
     }

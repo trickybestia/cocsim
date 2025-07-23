@@ -19,11 +19,11 @@ pub struct DamageEvent {
 }
 
 #[derive(Component)]
-pub struct DeathRequest;
+pub struct ToBeDeleted;
 
 pub fn handle_damage_events(
     mut v_health: ViewMut<Health>,
-    mut v_death_request: ViewMut<DeathRequest>,
+    mut v_death_request: ViewMut<ToBeDeleted>,
     v_damage_event: View<DamageEvent>,
 ) {
     for damage_event in v_damage_event.iter() {
@@ -34,13 +34,13 @@ pub fn handle_damage_events(
 
     for (id, health) in v_health.iter().with_id() {
         if health.0 <= 0.0 {
-            v_death_request.add_component_unchecked(id, DeathRequest);
+            v_death_request.add_component_unchecked(id, ToBeDeleted);
         }
     }
 }
 
-pub fn handle_death_requests(mut all_storages: AllStoragesViewMut) {
-    all_storages.delete_any::<SparseSet<DeathRequest>>();
+pub fn handle_to_be_deleted(mut all_storages: AllStoragesViewMut) {
+    all_storages.delete_any::<SparseSet<ToBeDeleted>>();
 }
 
 pub fn cleanup_events(mut all_storages: AllStoragesViewMut) {

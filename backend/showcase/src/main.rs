@@ -103,7 +103,7 @@ async fn main() {
         );
 
         draw_shapes(&grid, 100);
-        draw_shapes(&collision, 100);
+        draw_shapes(&collision, 255);
         draw_shapes(&entities, 255);
 
         if !game.done() {
