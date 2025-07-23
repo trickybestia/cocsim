@@ -44,8 +44,16 @@ pub struct Game {
 }
 
 impl Game {
+    pub fn time_elapsed(&self) -> f32 {
+        self.world.get_unique::<&Time>().unwrap().elapsed
+    }
+
     pub fn time_left(&self) -> f32 {
-        MAX_ATTACK_DURATION - self.world.get_unique::<&Time>().unwrap().elapsed
+        MAX_ATTACK_DURATION - self.time_elapsed()
+    }
+
+    pub fn total_size(&self) -> usize {
+        self.world.get_unique::<&MapSize>().unwrap().total_size() as usize
     }
 
     pub fn done(&self) -> bool {
@@ -62,7 +70,7 @@ impl Game {
             >= 50.0;
         let all_buildings_destroyed =
             destroyed_buildings_count == self.initial_counted_buildings_count;
-        let townhall_destroyed = self.world.iter::<&TownHall>().iter().count() != 0;
+        let townhall_destroyed = self.world.iter::<&TownHall>().iter().count() == 0;
 
         townhall_destroyed as u32 + half_buildings_destroyed as u32 + all_buildings_destroyed as u32
     }
