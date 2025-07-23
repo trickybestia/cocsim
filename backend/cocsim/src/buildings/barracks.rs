@@ -40,12 +40,14 @@ const BARRACKS_LEVELS: &[BarracksLevel] = &[
     BarracksLevel { health: 1450.0 },
 ];
 
-const BARRACKS: &BuildingType = &BuildingType {
+const BARRACKS: BuildingType = BuildingType {
     name: "Barracks",
     size: Vector2::new(3, 3),
     levels: BARRACKS_LEVELS.len(),
     options: &[],
 };
+
+inventory::submit! {BARRACKS}
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct BarracksModel {

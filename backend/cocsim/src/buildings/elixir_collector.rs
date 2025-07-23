@@ -38,12 +38,14 @@ const ELIXIR_COLLECTOR_LEVELS: &[ElixirCollectorLevel] = &[
     ElixirCollectorLevel { health: 1350.0 },
 ];
 
-const ELIXIR_COLLECTOR: &BuildingType = &BuildingType {
+const ELIXIR_COLLECTOR: BuildingType = BuildingType {
     name: "ElixirCollector",
     size: Vector2::new(3, 3),
     levels: ELIXIR_COLLECTOR_LEVELS.len(),
     options: &[],
 };
+
+inventory::submit! {ELIXIR_COLLECTOR}
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ElixirCollectorModel {

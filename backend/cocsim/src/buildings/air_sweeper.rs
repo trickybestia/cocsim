@@ -52,7 +52,7 @@ const AIR_SWEEPER_LEVELS: &[AirSweeperLevel] = &[
     },
 ];
 
-const AIR_SWEEPER: &BuildingType = &BuildingType {
+const AIR_SWEEPER: BuildingType = BuildingType {
     name: "AirSweeper",
     size: Vector2::new(2, 2),
     levels: AIR_SWEEPER_LEVELS.len(),
@@ -70,6 +70,8 @@ const AIR_SWEEPER: &BuildingType = &BuildingType {
         ],
     }],
 };
+
+inventory::submit! {AIR_SWEEPER}
 
 #[derive(Serialize, Deserialize, Debug)]
 pub enum AirSweeperRotation {

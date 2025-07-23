@@ -91,12 +91,14 @@ const WIZARD_TOWER_LEVELS: &[WizardTowerLevel] = &[
     },
 ];
 
-const WIZARD_TOWER: &BuildingType = &BuildingType {
+const WIZARD_TOWER: BuildingType = BuildingType {
     name: "WizardTower",
     size: Vector2::new(3, 3),
     levels: WIZARD_TOWER_LEVELS.len(),
     options: &[],
 };
+
+inventory::submit! {WIZARD_TOWER}
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct WizardTowerModel {

@@ -32,12 +32,14 @@ const DARK_ELIXIR_DRILL_LEVELS: &[DarkElixirDrillLevel] = &[
     DarkElixirDrillLevel { health: 1550.0 },
 ];
 
-const DARK_ELIXIR_DRILL: &BuildingType = &BuildingType {
+const DARK_ELIXIR_DRILL: BuildingType = BuildingType {
     name: "DarkElixirDrill",
     size: Vector2::new(3, 3),
     levels: DARK_ELIXIR_DRILL_LEVELS.len(),
     options: &[],
 };
+
+inventory::submit! {DARK_ELIXIR_DRILL}
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DarkElixirDrillModel {

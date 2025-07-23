@@ -84,12 +84,14 @@ const BOMB_TOWER_LEVELS: &[BombTowerLevel] = &[
     },
 ];
 
-const BOMB_TOWER: &BuildingType = &BuildingType {
+const BOMB_TOWER: BuildingType = BuildingType {
     name: "BombTower",
     size: Vector2::new(3, 3),
     levels: BOMB_TOWER_LEVELS.len(),
     options: &[],
 };
+
+inventory::submit! {BOMB_TOWER}
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct BombTowerModel {

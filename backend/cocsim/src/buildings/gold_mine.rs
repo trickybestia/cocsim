@@ -38,12 +38,14 @@ const GOLD_MINE_LEVELS: &[GoldMineLevel] = &[
     GoldMineLevel { health: 1350.0 },
 ];
 
-const GOLD_MINE: &BuildingType = &BuildingType {
+const GOLD_MINE: BuildingType = BuildingType {
     name: "GoldMine",
     size: Vector2::new(3, 3),
     levels: GOLD_MINE_LEVELS.len(),
     options: &[],
 };
+
+inventory::submit! {GOLD_MINE}
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct GoldMineModel {

@@ -34,12 +34,14 @@ const DARK_ELIXIR_STORAGE_LEVELS: &[DarkElixirStorageLevel] = &[
     DarkElixirStorageLevel { health: 4700.0 },
 ];
 
-const DARK_ELIXIR_STORAGE: &BuildingType = &BuildingType {
+const DARK_ELIXIR_STORAGE: BuildingType = BuildingType {
     name: "DarkElixirStorage",
     size: Vector2::new(3, 3),
     levels: DARK_ELIXIR_STORAGE_LEVELS.len(),
     options: &[],
 };
+
+inventory::submit! {DARK_ELIXIR_STORAGE}
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DarkElixirStorageModel {

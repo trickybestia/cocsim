@@ -83,12 +83,14 @@ const AIR_DEFENSE_LEVELS: &[AirDefenseLevel] = &[
     },
 ];
 
-const AIR_DEFENSE: &BuildingType = &BuildingType {
+const AIR_DEFENSE: BuildingType = BuildingType {
     name: "AirDefense",
     size: Vector2::new(3, 3),
     levels: AIR_DEFENSE_LEVELS.len(),
     options: &[],
 };
+
+inventory::submit! {AIR_DEFENSE}
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AirDefenseModel {

@@ -29,12 +29,14 @@ const BUILDERS_HUT_LEVELS: &[BuildersHutLevel] = &[
     BuildersHutLevel { health: 2000.0 },
 ];
 
-const BUILDERS_HUT: &BuildingType = &BuildingType {
+const BUILDERS_HUT: BuildingType = BuildingType {
     name: "BuildersHut",
     size: Vector2::new(2, 2),
     levels: BUILDERS_HUT_LEVELS.len(),
     options: &[],
 };
+
+inventory::submit! {BUILDERS_HUT}
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct BuildersHutModel {

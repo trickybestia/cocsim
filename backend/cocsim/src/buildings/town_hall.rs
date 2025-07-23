@@ -39,12 +39,14 @@ const TOWN_HALL_LEVELS: &[TownHallLevel] = &[
     TownHallLevel { health: 10400.0 },
 ];
 
-const TOWN_HALL: &BuildingType = &BuildingType {
+const TOWN_HALL: BuildingType = BuildingType {
     name: "TownHall",
     size: Vector2::new(4, 4),
     levels: TOWN_HALL_LEVELS.len(),
     options: &[],
 };
+
+inventory::submit! {TOWN_HALL}
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct TownHallModel {

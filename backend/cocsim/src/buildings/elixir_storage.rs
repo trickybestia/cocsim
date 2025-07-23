@@ -40,12 +40,14 @@ const ELIXIR_STORAGE_LEVELS: &[ElixirStorageLevel] = &[
     ElixirStorageLevel { health: 4200.0 },
 ];
 
-const ELIXIR_STORAGE: &BuildingType = &BuildingType {
+const ELIXIR_STORAGE: BuildingType = BuildingType {
     name: "ElixirStorage",
     size: Vector2::new(3, 3),
     levels: ELIXIR_STORAGE_LEVELS.len(),
     options: &[],
 };
+
+inventory::submit! {ELIXIR_STORAGE}
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ElixirStorageModel {

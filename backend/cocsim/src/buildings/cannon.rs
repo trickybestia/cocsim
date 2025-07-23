@@ -107,12 +107,14 @@ const CANNON_LEVELS: &[CannonLevel] = &[
     },
 ];
 
-const CANNON: &BuildingType = &BuildingType {
+const CANNON: BuildingType = BuildingType {
     name: "Cannon",
     size: Vector2::new(3, 3),
     levels: CANNON_LEVELS.len(),
     options: &[],
 };
+
+inventory::submit! {CANNON}
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CannonModel {

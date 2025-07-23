@@ -72,6 +72,8 @@ pub struct BuildingType {
     pub options: &'static [BuildingOption],
 }
 
+inventory::collect!(BuildingType);
+
 #[enum_dispatch(BuildingModel)]
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = "name")]

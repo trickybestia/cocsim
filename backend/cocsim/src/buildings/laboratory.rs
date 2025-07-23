@@ -36,12 +36,14 @@ const LABORATORY_LEVELS: &[LaboratoryLevel] = &[
     LaboratoryLevel { health: 1400.0 },
 ];
 
-const LABORATORY: &BuildingType = &BuildingType {
+const LABORATORY: BuildingType = BuildingType {
     name: "Laboratory",
     size: Vector2::new(3, 3),
     levels: LABORATORY_LEVELS.len(),
     options: &[],
 };
+
+inventory::submit! {LABORATORY}
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct LaboratoryModel {

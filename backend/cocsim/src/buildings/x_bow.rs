@@ -72,7 +72,7 @@ const X_BOW_LEVELS: &[XBowLevel] = &[
     },
 ];
 
-const X_BOW: &BuildingType = &BuildingType {
+const X_BOW: BuildingType = BuildingType {
     name: "XBow",
     size: Vector2::new(3, 3),
     levels: X_BOW_LEVELS.len(),
@@ -81,6 +81,8 @@ const X_BOW: &BuildingType = &BuildingType {
         values: &["Ground", "AirAndGround"],
     }],
 };
+
+inventory::submit! {X_BOW}
 
 #[derive(Serialize, Deserialize, Debug)]
 pub enum XBowTargetType {

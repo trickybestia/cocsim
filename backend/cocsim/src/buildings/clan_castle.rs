@@ -35,12 +35,14 @@ const CLAN_CASTLE_LEVELS: &[ClanCastleLevel] = &[
     ClanCastleLevel { health: 5800.0 },
 ];
 
-const CLAN_CASTLE: &BuildingType = &BuildingType {
+const CLAN_CASTLE: BuildingType = BuildingType {
     name: "ClanCastle",
     size: Vector2::new(3, 3),
     levels: CLAN_CASTLE_LEVELS.len(),
     options: &[],
 };
+
+inventory::submit! {CLAN_CASTLE}
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ClanCastleModel {

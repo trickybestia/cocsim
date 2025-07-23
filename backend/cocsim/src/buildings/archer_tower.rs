@@ -107,12 +107,14 @@ const ARCHER_TOWER_LEVELS: &[ArcherTowerLevel] = &[
     },
 ];
 
-const ARCHER_TOWER: &BuildingType = &BuildingType {
+const ARCHER_TOWER: BuildingType = BuildingType {
     name: "ArcherTower",
     size: Vector2::new(3, 3),
     levels: ARCHER_TOWER_LEVELS.len(),
     options: &[],
 };
+
+inventory::submit! {ARCHER_TOWER}
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ArcherTowerModel {

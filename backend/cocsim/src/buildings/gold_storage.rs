@@ -40,12 +40,14 @@ const GOLD_STORAGE_LEVELS: &[GoldStorageLevel] = &[
     GoldStorageLevel { health: 4200.0 },
 ];
 
-const GOLD_STORAGE: &BuildingType = &BuildingType {
+const GOLD_STORAGE: BuildingType = BuildingType {
     name: "GoldStorage",
     size: Vector2::new(3, 3),
     levels: GOLD_STORAGE_LEVELS.len(),
     options: &[],
 };
+
+inventory::submit! {GOLD_STORAGE}
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct GoldStorageModel {

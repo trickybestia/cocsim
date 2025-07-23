@@ -91,12 +91,14 @@ const MORTAR_LEVELS: &[MortarLevel] = &[
     },
 ];
 
-const MORTAR: &BuildingType = &BuildingType {
+const MORTAR: BuildingType = BuildingType {
     name: "Mortar",
     size: Vector2::new(3, 3),
     levels: MORTAR_LEVELS.len(),
     options: &[],
 };
+
+inventory::submit! {MORTAR}
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct MortarModel {

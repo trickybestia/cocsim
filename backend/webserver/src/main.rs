@@ -12,12 +12,14 @@ use tower_http::{
     trace::TraceLayer,
 };
 
+use crate::api::get_building_types;
+
 #[tokio::main]
 async fn main() {
     tracing_subscriber::fmt::init();
 
     let app = Router::new()
-        .route("/", get(|| async { "Hello, World!" }))
+        .route("/api/get-building-types", get(get_building_types))
         .layer(
             ServiceBuilder::new()
                 .layer(TraceLayer::new_for_http())

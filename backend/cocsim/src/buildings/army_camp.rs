@@ -35,12 +35,14 @@ const ARMY_CAMP_LEVELS: &[ArmyCampLevel] = &[
     ArmyCampLevel { health: 900.0 },
 ];
 
-const ARMY_CAMP: &BuildingType = &BuildingType {
+const ARMY_CAMP: BuildingType = BuildingType {
     name: "ArmyCamp",
     size: Vector2::new(4, 4),
     levels: ARMY_CAMP_LEVELS.len(),
     options: &[],
 };
+
+inventory::submit! {ARMY_CAMP}
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ArmyCampModel {

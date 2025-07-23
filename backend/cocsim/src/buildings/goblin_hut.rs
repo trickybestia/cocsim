@@ -21,12 +21,14 @@ struct GoblinHutLevel {
 
 const GOBLIN_HUT_LEVELS: &[GoblinHutLevel] = &[GoblinHutLevel { health: 250.0 }];
 
-const GOBLIN_HUT: &BuildingType = &BuildingType {
+const GOBLIN_HUT: BuildingType = BuildingType {
     name: "GoblinHut",
     size: Vector2::new(2, 2),
     levels: GOBLIN_HUT_LEVELS.len(),
     options: &[],
 };
+
+inventory::submit! {GOBLIN_HUT}
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct GoblinHutModel {

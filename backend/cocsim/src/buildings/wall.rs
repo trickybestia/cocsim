@@ -54,12 +54,14 @@ const WALL_LEVELS: &[WallLevel] = &[
     WallLevel { health: 15500.0 },
 ];
 
-const WALL: &BuildingType = &BuildingType {
+const WALL: BuildingType = BuildingType {
     name: "Wall",
     size: Vector2::new(1, 1),
     levels: WALL_LEVELS.len(),
     options: &[],
 };
+
+inventory::submit! {WALL}
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct WallModel {
