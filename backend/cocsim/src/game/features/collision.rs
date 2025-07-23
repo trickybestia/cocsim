@@ -110,24 +110,22 @@ pub fn update_collision(
             (bounding_box.position.x * COLLISION_TILES_PER_MAP_TILE as f32).floor() as usize;
         let start_y =
             (bounding_box.position.y * COLLISION_TILES_PER_MAP_TILE as f32).floor() as usize;
+        let end_x = ((bounding_box.position.x + bounding_box.size.x)
+            * COLLISION_TILES_PER_MAP_TILE as f32)
+            .ceil() as usize;
+        let end_y = ((bounding_box.position.y + bounding_box.size.y)
+            * COLLISION_TILES_PER_MAP_TILE as f32)
+            .ceil() as usize;
 
-        for rel_x in
-            0..((bounding_box.size.x * COLLISION_TILES_PER_MAP_TILE as f32).ceil() as usize)
-        {
-            let abs_x = start_x + rel_x;
-
-            for rel_y in
-                0..(bounding_box.size.y * COLLISION_TILES_PER_MAP_TILE as f32).ceil() as usize
-            {
-                let abs_y = start_y + rel_y;
-
+        for x in start_x..=end_x {
+            for y in start_y..=end_y {
                 let occupy_tile = collider.contains(Vector2::new(
-                    abs_x as f32 / COLLISION_TILES_PER_MAP_TILE as f32,
-                    abs_y as f32 / COLLISION_TILES_PER_MAP_TILE as f32,
+                    x as f32 / COLLISION_TILES_PER_MAP_TILE as f32,
+                    y as f32 / COLLISION_TILES_PER_MAP_TILE as f32,
                 ));
 
                 if occupy_tile {
-                    collision_grid.0[(abs_x, abs_y)] = id
+                    collision_grid.0[(x, y)] = id
                 }
             }
         }
