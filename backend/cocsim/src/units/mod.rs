@@ -23,6 +23,8 @@ pub struct UnitType {
     pub levels: usize,
 }
 
+inventory::collect!(UnitType);
+
 #[enum_dispatch(UnitModel)]
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = "name")]

@@ -86,11 +86,14 @@ const DRAGON_LEVELS: &[DragonLevel] = &[
     },
 ];
 
-const DRAGON: &UnitType = &UnitType {
+const DRAGON: UnitType = UnitType {
     name: "Dragon",
     housing_space: 20,
     levels: DRAGON_LEVELS.len(),
 };
+
+inventory::submit! {DRAGON}
+
 const DRAGON_SPEED: f32 = 2.0;
 const DRAGON_ATTACK_COOLDOWN: f32 = 1.25;
 const DRAGON_ATTACK_RANGE: f32 = 1.0;
