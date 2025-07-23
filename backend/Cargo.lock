@@ -1865,6 +1865,8 @@ dependencies = [
  "axum",
  "cocsim",
  "inventory",
+ "nalgebra",
+ "serde",
  "serde_json",
  "tokio",
  "tower",

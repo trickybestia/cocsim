@@ -1,4 +1,7 @@
 mod api;
+pub mod consts;
+pub mod dto_game_renderer;
+pub mod utils;
 
 use axum::{
     Router,
@@ -21,6 +24,11 @@ async fn main() {
     let app = Router::new()
         .route("/api/get-building-types", get(get_building_types))
         .route("/api/get-unit-types", get(get_unit_types))
+        .route(
+            "/api/get-showcase-attack-base-image",
+            get(get_showcase_attack_base_image),
+        )
+        .route("/api/get-showcase-attack", get(get_showcase_attack))
         .layer(
             ServiceBuilder::new()
                 .layer(TraceLayer::new_for_http())
