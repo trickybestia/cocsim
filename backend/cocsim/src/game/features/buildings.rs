@@ -115,7 +115,7 @@ pub fn init_drop_zone(
 
         for neighbor_x in (x - 1)..(x + 2) {
             for neighbor_y in (y - 1)..(y + 2) {
-                if map_size.is_inside_map(neighbor_x, neighbor_y) {
+                if map_size.is_inside_map(Vector2::new(neighbor_x, neighbor_y)) {
                     result.push((neighbor_x as usize, neighbor_y as usize));
                 }
             }

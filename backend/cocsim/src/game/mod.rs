@@ -188,7 +188,7 @@ impl Game {
                     height: 1.0,
                     color: get_tile_color(
                         (y ^ x) % 2 == 0,
-                        map_size.is_border(x, y),
+                        map_size.is_border(Vector2::new(x, y)),
                         drop_zone.0[(x as usize, y as usize)],
                         entities.is_alive(buildings_grid.0[(x as usize, y as usize)]),
                     ),
