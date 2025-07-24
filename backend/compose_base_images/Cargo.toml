@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-anyhow = "1.0.98"
-image = "0.25.6"
-ndarray = "0.16.1"
-nshare = "0.10.0"
+anyhow = "1"
+image = "0.25"
+ndarray = "0.16"
+nshare = "0.10"
