@@ -4,11 +4,15 @@ use std::cmp::min;
 
 use image::RgbImage;
 use ndarray::{
+    Array2,
     Array3,
     ArrayBase,
+    Axis,
     Data,
     Ix3,
+    s,
 };
+use ndarray_stats::QuantileExt;
 use nshare::{
     AsNdarray3,
     AsNdarray3Mut,
@@ -22,11 +26,16 @@ use crate::utils::{
     width,
 };
 
+const VIGNETTE_STRENGTH: f32 = 0.26;
+
 pub fn compose_base_images(left: &[RgbImage], right: &[RgbImage]) -> RgbImage {
-    let left = left.iter().map(AsNdarray3::as_ndarray3).collect::<Vec<_>>();
+    let left = left
+        .iter()
+        .map(|image| remove_vignette(&image.as_ndarray3(), VIGNETTE_STRENGTH))
+        .collect::<Vec<_>>();
     let right = right
         .iter()
-        .map(AsNdarray3::as_ndarray3)
+        .map(|image| remove_vignette(&image.as_ndarray3(), VIGNETTE_STRENGTH))
         .collect::<Vec<_>>();
 
     const VERTICAL_IGNORE_BORDERS: usize = 400;
@@ -45,7 +54,7 @@ pub fn compose_base_images(left: &[RgbImage], right: &[RgbImage]) -> RgbImage {
         );
     }
 
-    /*let mut right_composed = right[0].to_owned();
+    let mut right_composed = right[0].to_owned();
 
     for i in 1..right.len() {
         right_composed = compose_vertical_base_images(
@@ -61,34 +70,61 @@ pub fn compose_base_images(left: &[RgbImage], right: &[RgbImage]) -> RgbImage {
     const X_SKIP_FIRST: usize = 400;
     const X_SKIP_LAST: usize = 400;
 
-    let mut left_composed = crop(
-        &left_composed,
+    let mut right_composed = crop(
+        &right_composed,
+        width(&right_composed) / 2,
         0,
-        0,
-        width(&left_composed) / 2,
-        height(&left_composed),
+        width(&right_composed) - width(&right_composed) / 2,
+        height(&right_composed),
     );
 
     right_composed.swap_axes(1, 2);
     left_composed.swap_axes(1, 2);
 
     let mut result = compose_vertical_base_images(
-        &right_composed,
         &left_composed,
+        &right_composed,
         HORIZONTAL_IGNORE_BORDERS,
         X_SKIP_FIRST,
         X_SKIP_LAST,
     );
 
-    result.swap_axes(1, 2);*/
-
-    let result = left_composed;
+    result.swap_axes(1, 2);
 
     let mut result_image = RgbImage::new(width(&result) as u32, height(&result) as u32);
 
     AsNdarray3Mut::as_ndarray3_mut(&mut result_image).assign(&result);
 
     result_image
+}
+
+fn remove_vignette<S>(image: &ArrayBase<S, Ix3>, strength: f32) -> Array3<u8>
+where
+    S: Data<Elem = u8>,
+{
+    let width = width(image);
+    let height = height(image);
+
+    let vignette = Array2::from_shape_fn((height, width), |(y, x)| {
+        let x = x as f32 / width as f32 * 2.0 - 1.0;
+        let y = y as f32 / height as f32 * 2.0 - 1.0;
+
+        1.0 - strength * (x.powi(2) + y.powi(2))
+    });
+
+    let max = *vignette.max().unwrap();
+
+    let mut image = image.to_owned();
+
+    for channel in 0..image.len_of(Axis(0)) {
+        image
+            .slice_mut(s![channel, .., ..])
+            .zip_mut_with(&vignette, |pixel, vignette_strength| {
+                *pixel = (*pixel as f32 * max / vignette_strength) as u8;
+            });
+    }
+
+    image
 }
 
 fn compose_vertical_base_images<S1, S2>(
@@ -160,8 +196,8 @@ where
         let top_crop = crop(&top, 0, y, width(&top), WINDOW_HEIGHT);
         let bottom_crop = crop(&bottom, 0, 0, width(&bottom), WINDOW_HEIGHT);
         let difference = (top_crop.mapv(|elem| elem as i32) - bottom_crop.mapv(|elem| elem as i32))
-            .sum()
-            .saturating_abs();
+            .mapv_into(i32::abs)
+            .sum();
 
         if smallest_difference.is_none_or(|smallest_difference| difference < smallest_difference) {
             smallest_difference_y = Some(y);

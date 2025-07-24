@@ -43,7 +43,7 @@ fn compose_base_images_internal(left: Vec<Bytes>, right: Vec<Bytes>) -> anyhow::
     let result = compose_base_images::compose_base_images(&left_images, &right_images);
     let mut result_writer = Cursor::new(Vec::new());
 
-    let mut encoder = JpegEncoder::new_with_quality(&mut result_writer, 80);
+    let mut encoder = JpegEncoder::new_with_quality(&mut result_writer, 70);
 
     encoder.encode_image(&result)?;
 
