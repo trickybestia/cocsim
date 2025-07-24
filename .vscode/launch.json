@@ -7,6 +7,23 @@
         {
             "type": "lldb",
             "request": "launch",
+            "name": "compose_base_images",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--manifest-path=backend/compose_base_images/Cargo.toml",
+                    "--example",
+                    "compose_base_images"
+                ]
+            },
+            "cwd": "${workspaceFolder}",
+            "args": [
+                "test_images/single_player/goblin_gauntlet"
+            ]
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
             "name": "showcase",
             "cargo": {
                 "args": [
