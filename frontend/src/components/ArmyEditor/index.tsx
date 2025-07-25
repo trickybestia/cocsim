@@ -12,9 +12,7 @@ type Props = {
 
 const ArmyEditor: React.FC<Props> = ({ onOk }: Props) => {
   const { getUnitType } = useUnitTypes();
-  const [units, setUnits] = useState<UnitWithCount[]>([
-    { unit: { name: "Barbarian", level: 1 }, count: 3 }
-  ]);
+  const [units, setUnits] = useState<UnitWithCount[]>([]);
 
   const [isUnitCreationModalOpen, setIsUnitCreationModalOpen] = useState(false);
 
