@@ -6,6 +6,7 @@ edition = "2024"
 [dependencies]
 anyhow = "1"
 image = "0.25"
+magick_rust = "1"
 ndarray = "0.16"
 ndarray-stats = "0.6"
 nshare = "0.10"

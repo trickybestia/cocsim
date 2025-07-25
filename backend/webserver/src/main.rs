@@ -37,6 +37,7 @@ async fn main() {
         )
         .route("/api/get-showcase-attack", get(get_showcase_attack))
         .route("/api/get-unit-types", get(get_unit_types))
+        .route("/api/reverse-projection", post(reverse_projection))
         .layer(
             ServiceBuilder::new()
                 .layer(TraceLayer::new_for_http())
