@@ -12,6 +12,9 @@ pub const DISTANCE_TO_WAYPOINT_EPS: f32 = 0.1;
 
 pub const MAX_ATTACK_DURATION: f32 = 180.0;
 
+/// attack_optimizer
+pub const MAX_UNIT_DROP_TIME: f32 = 20.0;
+
 pub const SHAPE_SERIALIZE_ROUND_DIGITS: u32 = 2;
 
 pub const DROP_ZONE_TILE_EVEN_COLOR: ShapeColor = ShapeColor::new(50, 70, 40);

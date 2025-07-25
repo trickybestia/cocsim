@@ -26,7 +26,7 @@ pub struct UnitType {
 inventory::collect!(UnitType);
 
 #[enum_dispatch(UnitModel)]
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(tag = "name")]
 pub enum UnitModelEnum {
     #[serde(rename = "Dragon")]

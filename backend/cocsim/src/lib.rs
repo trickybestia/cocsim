@@ -1,3 +1,4 @@
+mod attack_optimizer;
 mod buildings;
 pub mod colliders;
 pub mod consts;

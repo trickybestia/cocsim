@@ -109,7 +109,7 @@ fn draw_dragon(id: EntityId, all_storages: &AllStoragesView, result: &mut Vec<Sh
     });
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct DragonModel {
     pub level: usize,
 }
