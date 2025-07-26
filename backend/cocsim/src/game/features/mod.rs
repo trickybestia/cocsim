@@ -4,7 +4,6 @@ pub mod collision;
 pub mod drawable;
 pub mod health;
 pub mod map;
-pub mod pathfinding;
 pub mod position;
 pub mod time;
 pub mod wall;
