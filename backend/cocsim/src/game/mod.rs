@@ -42,6 +42,7 @@ pub struct Game {
     world: World,
 
     initial_counted_buildings_count: usize,
+    enable_collision_grid: bool,
 }
 
 impl Game {
@@ -104,7 +105,7 @@ impl Game {
         self.world.get_unique::<&NeedRedrawCollision>().unwrap().0
     }
 
-    pub fn new(map: &Map) -> anyhow::Result<Self> {
+    pub fn new(map: &Map, enable_collision_grid: bool) -> anyhow::Result<Self> {
         ensure!(
             map.base_size >= 1 && map.base_size <= 44,
             "Invalid map.base_size = {0}",
@@ -138,15 +139,18 @@ impl Game {
         world.run(features::wall::update_walls);
 
         world.run(features::buildings::init_drop_zone);
-        world.run(features::collision::init_collision_grid);
 
-        world.run(features::collision::update_collision);
+        if enable_collision_grid {
+            world.run(features::collision::init_collision_grid);
+            world.run(features::collision::update_collision);
+        }
 
         Self::tick_cleanup(&mut world);
 
         Ok(Self {
             world,
             initial_counted_buildings_count,
+            enable_collision_grid,
         })
     }
 
@@ -170,7 +174,10 @@ impl Game {
         self.world.run(features::wall::update_walls);
         self.world.run(features::health::handle_to_be_deleted);
         self.world.run(features::buildings::handle_building_changes);
-        self.world.run(features::collision::update_collision);
+
+        if self.enable_collision_grid {
+            self.world.run(features::collision::update_collision);
+        }
 
         Self::tick_cleanup(&mut self.world);
 
@@ -215,6 +222,10 @@ impl Game {
     }
 
     pub fn draw_collision(&mut self) -> Vec<Shape> {
+        if !self.enable_collision_grid {
+            return Vec::new();
+        }
+
         let collision_grid = self
             .world
             .get_unique::<&PathfindingCollisionGrid>()

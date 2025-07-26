@@ -22,7 +22,7 @@ use crate::{
 pub async fn get_showcase_attack() -> Json<Value> {
     let (map, _) = load_test_map(SHOWCASE_MAP).expect("Map should be loaded successfully");
 
-    let mut game = Game::new(&map).expect("Test map should be valid");
+    let mut game = Game::new(&map, true).expect("Test map should be valid");
 
     for i in 0..10 {
         game.spawn_unit(

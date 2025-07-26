@@ -15,7 +15,7 @@ use crate::utils::macroquad_run_game;
 async fn main() {
     let (map, map_image) = load_test_map("single_player/goblin_gauntlet").unwrap();
 
-    let mut game = Game::new(&map).unwrap();
+    let mut game = Game::new(&map, true).unwrap();
 
     for i in 0..10 {
         game.spawn_unit(
