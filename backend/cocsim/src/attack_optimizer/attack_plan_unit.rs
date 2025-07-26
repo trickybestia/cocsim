@@ -102,7 +102,7 @@ impl AttackPlanUnit {
             }
 
             if map_size.is_inside_map(Vector2::new(x_i32 - 1, y_i32))
-                && drop_zone[(x_usize, y_usize)] != drop_zone[(x_usize, y_usize + 1)]
+                && drop_zone[(x_usize, y_usize)] != drop_zone[(x_usize - 1, y_usize)]
             // left tile border
             {
                 start_point = ray.intersection_with_segment(&Segment::new(

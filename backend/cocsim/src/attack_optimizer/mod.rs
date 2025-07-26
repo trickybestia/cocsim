@@ -60,7 +60,8 @@ impl AttackOptimizer {
                     &self.population[a_index].0,
                     &self.population[b_index].0,
                     &mut self.rng,
-                );
+                )
+                .mutate(&mut self.rng);
                 let new_plan_score = self.score_attack_plan(&new_plan)?;
 
                 new_population.push((new_plan, new_plan_score));
