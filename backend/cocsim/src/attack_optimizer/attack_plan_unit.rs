@@ -18,6 +18,7 @@ use crate::{
     game::features::map::MapSize,
 };
 
+#[derive(Clone)]
 pub struct AttackPlanUnit {
     unit_model: UnitModelEnum,
     /// radians
@@ -37,7 +38,7 @@ impl AttackPlanUnit {
         }
     }
 
-    pub fn mutated(&self, rng: &mut impl Rng) -> Self {
+    pub fn mutate(&self, rng: &mut impl Rng) -> Self {
         Self {
             unit_model: self.unit_model.clone(),
             angle: self.angle + rng.random_range((-1.0)..=1.0),
@@ -50,7 +51,11 @@ impl AttackPlanUnit {
         }
     }
 
-    pub fn cartesian_pos(&self, map_size: &MapSize, drop_zone: &DMatrix<bool>) -> Vector2<f32> {
+    pub fn cartesian_position(
+        &self,
+        map_size: &MapSize,
+        drop_zone: &DMatrix<bool>,
+    ) -> Vector2<f32> {
         let offset = map_size.total_size() as f32 / 2.0;
         let center = Vector2::from_element(offset);
 
@@ -130,5 +135,13 @@ impl AttackPlanUnit {
         let result = start_point + (stop_point - start_point) * clamp(self.distance, 0.01, 0.99); // clamp for unit to not spawn on right or bottom border
 
         result
+    }
+
+    pub fn unit_model(&self) -> &UnitModelEnum {
+        &self.unit_model
+    }
+
+    pub fn drop_time(&self) -> f32 {
+        self.drop_time
     }
 }

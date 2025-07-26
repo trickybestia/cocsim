@@ -7,6 +7,7 @@ use anyhow::{
 use nalgebra::Vector2;
 use shipyard::{
     EntitiesView,
+    UniqueView,
     World,
 };
 
@@ -52,8 +53,12 @@ impl Game {
         MAX_ATTACK_DURATION - self.time_elapsed()
     }
 
-    pub fn total_size(&self) -> usize {
-        self.world.get_unique::<&MapSize>().unwrap().total_size() as usize
+    pub fn map_size(&self) -> UniqueView<MapSize> {
+        self.world.get_unique::<&MapSize>().unwrap()
+    }
+
+    pub fn drop_zone(&self) -> UniqueView<DropZone> {
+        self.world.get_unique::<&DropZone>().unwrap()
     }
 
     pub fn done(&self) -> bool {

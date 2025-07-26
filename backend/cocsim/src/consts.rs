@@ -14,6 +14,10 @@ pub const MAX_ATTACK_DURATION: f32 = 180.0;
 
 /// attack_optimizer
 pub const MAX_UNIT_DROP_TIME: f32 = 20.0;
+pub const POPULATION_SIZE: usize = 20;
+pub const NEW_POPULATION_SIZE: usize = 40;
+pub const NEW_RANDOM_PLANS: usize = 5;
+pub const ATTACK_PLAN_EXECUTOR_FPS: usize = 60;
 
 pub const SHAPE_SERIALIZE_ROUND_DIGITS: u32 = 2;
 

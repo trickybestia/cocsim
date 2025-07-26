@@ -8,6 +8,7 @@ mod shape;
 mod units;
 pub mod utils;
 
+pub use attack_optimizer::*;
 pub use buildings::*;
 pub use game::Game;
 pub use map::Map;

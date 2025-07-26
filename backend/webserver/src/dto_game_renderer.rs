@@ -67,7 +67,7 @@ impl DtoGameRenderer {
         self.result.push(Frame {
             time_elapsed: game.time_elapsed(),
             progress_info: game.progress_info(),
-            total_base_size: game.total_size(),
+            total_base_size: game.map_size().total_size() as usize,
             grid,
             collision,
             entities: game.draw_entities(),
