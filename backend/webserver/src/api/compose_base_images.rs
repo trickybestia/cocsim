@@ -1,19 +1,24 @@
 use std::io::Cursor;
 
+use anyhow::Context;
 use axum::{
     extract::Multipart,
     http::{
         HeaderMap,
-        StatusCode,
         header,
     },
-    response::IntoResponse,
+    response::{
+        IntoResponse,
+        Response,
+    },
 };
 use bytes::Bytes;
 use image::{
     ImageReader,
     codecs::jpeg::JpegEncoder,
 };
+
+use crate::webserver_error::WebserverError;
 
 fn compose_base_images_internal(left: Vec<Bytes>, right: Vec<Bytes>) -> anyhow::Result<Bytes> {
     let mut left_images = Vec::new();
@@ -50,13 +55,16 @@ fn compose_base_images_internal(left: Vec<Bytes>, right: Vec<Bytes>) -> anyhow::
     Ok(Bytes::from_owner(result_writer.into_inner()))
 }
 
-pub async fn compose_base_images(mut multipart: Multipart) -> impl IntoResponse {
+pub async fn compose_base_images(mut multipart: Multipart) -> Result<Response, WebserverError> {
     let mut left = Vec::new();
     let mut right = Vec::new();
 
-    while let Some(field) = multipart.next_field().await.unwrap() {
-        let name = field.name().unwrap().to_string();
-        let data = field.bytes().await.unwrap();
+    while let Some(field) = multipart.next_field().await? {
+        let name = field
+            .name()
+            .context("Field name not found I guess")?
+            .to_string();
+        let data = field.bytes().await?;
 
         if name == "left" {
             left.push(data);
@@ -65,12 +73,13 @@ pub async fn compose_base_images(mut multipart: Multipart) -> impl IntoResponse 
         }
     }
 
-    if let Ok(result) = compose_base_images_internal(left, right) {
-        let mut headers = HeaderMap::new();
-        headers.insert(header::CONTENT_TYPE, "image/jpeg".parse().unwrap());
+    let result = compose_base_images_internal(left, right)?;
 
-        (headers, result).into_response()
-    } else {
-        StatusCode::INTERNAL_SERVER_ERROR.into_response()
-    }
+    let mut headers = HeaderMap::new();
+    headers.insert(
+        header::CONTENT_TYPE,
+        "image/jpeg".parse().expect("Should be valid content type"),
+    );
+
+    Ok((headers, result).into_response())
 }

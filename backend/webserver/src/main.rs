@@ -2,6 +2,7 @@ mod api;
 pub mod consts;
 pub mod dto_game_renderer;
 pub mod utils;
+mod webserver_error;
 
 use axum::{
     Router,
