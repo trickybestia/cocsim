@@ -7,15 +7,12 @@ use serde::{
     Deserialize,
     Serialize,
 };
-use shipyard::{
-    ViewMut,
-    World,
-};
+use shipyard::World;
 
 use crate::{
     BuildingModel,
     BuildingType,
-    buildings::utils::passive_building::create_passive_building,
+    buildings::utils::passive_building::default_attack_collider,
     colliders::{
         Collider,
         RectCollider,
@@ -24,7 +21,11 @@ use crate::{
         attack::{
             AttackTarget,
             AttackTargetFlags,
+            Team,
         },
+        buildings::Building,
+        collision::PathfindingCollider,
+        health::Health,
         wall::Wall,
     },
 };
@@ -72,20 +73,25 @@ pub struct WallModel {
 
 impl BuildingModel for WallModel {
     fn create_building(&self, world: &mut World) -> Result<()> {
-        let id = create_passive_building(
-            world,
-            WALL_LEVELS
-                .get(self.level)
-                .context("Level out of range")?
-                .health,
-            Vector2::new(self.x, self.y),
-            WALL.size,
-            None,
-        )?;
+        let collider = default_attack_collider(WALL.size);
 
-        world.borrow::<ViewMut<AttackTarget>>().unwrap()[id].flags |= AttackTargetFlags::WALL;
-        world.add_component(
-            id,
+        world.add_entity((
+            Health(
+                WALL_LEVELS
+                    .get(self.level)
+                    .context("Level out of range")?
+                    .health,
+            ),
+            Building {
+                position: Vector2::new(self.x, self.y),
+                size: WALL.size,
+            },
+            PathfindingCollider(collider.clone()),
+            Team::Defense,
+            AttackTarget {
+                collider,
+                flags: AttackTargetFlags::GROUND | AttackTargetFlags::BUILDING,
+            },
             Wall {
                 center_collider: RectCollider::new_from_center(
                     Vector2::zeros(),
@@ -112,7 +118,7 @@ impl BuildingModel for WallModel {
                 )
                 .translate(Vector2::from_element(-0.5)),
             },
-        );
+        ));
 
         Ok(())
     }

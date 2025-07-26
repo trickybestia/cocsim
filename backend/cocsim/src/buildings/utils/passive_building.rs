@@ -51,7 +51,7 @@ pub fn create_passive_building(
             collider,
             flags: AttackTargetFlags::GROUND
                 | AttackTargetFlags::BUILDING
-                | AttackTargetFlags::PASSIVE_BUILDING,
+                | AttackTargetFlags::COUNTED_BUILDING,
         },
     ));
 

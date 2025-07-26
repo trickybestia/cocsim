@@ -52,8 +52,7 @@ bitflags! {
         const AIR = 1 << 2;
         const GROUND = 1 << 3;
 
-        const PASSIVE_BUILDING = 1 << 4;
-        const WALL = 1 << 5;
+        const COUNTED_BUILDING = 1 << 4;
     }
 }
 

@@ -128,7 +128,7 @@ impl UnitModel for DragonModel {
             DRAGON_ATTACK_RANGE,
             DRAGON_ATTACK_COOLDOWN,
             AirUnitFindTargetBehaviour {
-                pattern: AttackTargetFlags::BUILDING,
+                pattern: AttackTargetFlags::COUNTED_BUILDING,
             }
             .into(),
             MeleeAttackBehaviour {
