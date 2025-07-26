@@ -3,6 +3,14 @@ name = "showcase"
 version = "0.1.0"
 edition = "2024"
 
+[[bin]]
+name = "simple"
+path = "src/simple.rs"
+
+[[bin]]
+name = "attack-optimizer"
+path = "src/attack_optimizer.rs"
+
 [dependencies]
 cocsim = { path = "../cocsim" }
 image = { version = "0.24", default-features = false, features = ["jpeg"] }

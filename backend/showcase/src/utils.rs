@@ -1,16 +1,34 @@
-mod consts;
-
 use cocsim::{
-    DragonModel,
     Game,
     Shape,
-    utils::load_test_map,
 };
-use consts::*;
-use macroquad::prelude::*;
-use nalgebra::Vector2;
+use macroquad::{
+    color::{
+        BLACK,
+        Color,
+        WHITE,
+    },
+    math::Vec2,
+    shapes::{
+        draw_circle,
+        draw_line,
+        draw_rectangle,
+    },
+    texture::{
+        DrawTextureParams,
+        Texture2D,
+        draw_texture_ex,
+    },
+    time::get_frame_time,
+    window::{
+        clear_background,
+        next_frame,
+    },
+};
 
-fn draw_shapes(shapes: &[Shape], alpha: u8) {
+use crate::consts::PIXELS_PER_TILE;
+
+pub fn draw_shapes(shapes: &[Shape], alpha: u8) {
     for shape in shapes {
         match shape {
             Shape::Rect {
@@ -62,22 +80,13 @@ fn draw_shapes(shapes: &[Shape], alpha: u8) {
     }
 }
 
-#[macroquad::main("cocsim")]
-async fn main() {
-    let (map, map_image) = load_test_map("single_player/goblin_gauntlet").unwrap();
-
+pub async fn macroquad_run_game(
+    game: &mut Game,
+    map_image: &[u8],
+    mut before_tick: Option<Box<dyn FnMut(&mut Game)>>,
+) {
     let map_texture = Texture2D::from_file_with_format(&map_image, None);
-    let map_texture_size = PIXELS_PER_TILE * (map.base_size + 2 * map.border_size);
-
-    let mut game = Game::new(&map).unwrap();
-
-    for i in 0..10 {
-        game.spawn_unit(
-            &DragonModel { level: 10 }.into(),
-            Vector2::new(0.5, i as f32 + 0.5),
-        )
-        .unwrap();
-    }
+    let map_texture_size = PIXELS_PER_TILE * game.map_size().total_size() as usize;
 
     let grid = game.draw_grid();
     let mut collision = game.draw_collision();
@@ -107,6 +116,10 @@ async fn main() {
         draw_shapes(&entities, 255);
 
         if !game.done() {
+            if let Some(before_tick) = &mut before_tick {
+                before_tick(game);
+            }
+
             game.tick(get_frame_time());
         }
 
