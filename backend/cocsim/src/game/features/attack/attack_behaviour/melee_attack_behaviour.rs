@@ -16,7 +16,7 @@ pub struct MeleeAttackBehaviour {
 impl AttackBehaviour for MeleeAttackBehaviour {
     fn attack(
         &self,
-        attacker_id: EntityId,
+        _attacker_id: EntityId,
         target_id: EntityId,
         all_storages: &mut AllStoragesViewMut,
     ) {

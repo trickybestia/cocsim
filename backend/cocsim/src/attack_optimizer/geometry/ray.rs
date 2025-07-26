@@ -36,7 +36,7 @@ impl Ray {
         let t = cross_2d(q - p, s / cross_2d(r, s));
         let u = cross_2d(q - p, r / cross_2d(r, s));
 
-        if t >= 0.0 && 0.0 <= u && u <= 1.0 {
+        if t >= 0.0 && (0.0..=1.0).contains(&u) {
             Some(q + s * u)
         } else {
             None

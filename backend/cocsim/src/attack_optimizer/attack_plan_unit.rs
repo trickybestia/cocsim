@@ -132,9 +132,7 @@ impl AttackPlanUnit {
 
         let start_point = start_point.expect("At least one intersection expected");
 
-        let result = start_point + (stop_point - start_point) * clamp(self.distance, 0.01, 0.99); // clamp for unit to not spawn on right or bottom border
-
-        result
+        start_point + (stop_point - start_point) * clamp(self.distance, 0.01, 0.99) // clamp for unit to not spawn on right or bottom border
     }
 
     pub fn unit_model(&self) -> &UnitModelEnum {

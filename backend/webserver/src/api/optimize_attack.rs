@@ -33,7 +33,7 @@ use crate::{
 pub async fn optimize_attack(ws: WebSocketUpgrade) -> Response {
     ws.on_upgrade(async |socket| {
         if let Err(err) = optimize_attack_internal(socket).await {
-            warn!("optimize_attack_internal finished with error: {:#?}", err);
+            warn!("optimize_attack_internal finished with error: {err:#?}");
         }
     })
 }

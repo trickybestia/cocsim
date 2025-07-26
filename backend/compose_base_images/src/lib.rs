@@ -136,10 +136,10 @@ pub fn compose_base_images(left: &[RgbImage], right: &[RgbImage]) -> RgbImage {
 
     let mut left_composed = left[0].to_owned();
 
-    for i in 1..left.len() {
+    for left_image in left.iter().skip(1) {
         left_composed = compose_vertical_base_images(
             &left_composed,
-            &left[i],
+            left_image,
             VERTICAL_IGNORE_BORDERS,
             Y_SKIP_FIRST,
             Y_SKIP_LAST,
@@ -148,10 +148,10 @@ pub fn compose_base_images(left: &[RgbImage], right: &[RgbImage]) -> RgbImage {
 
     let mut right_composed = right[0].to_owned();
 
-    for i in 1..right.len() {
+    for right_image in right.iter().skip(1) {
         right_composed = compose_vertical_base_images(
             &right_composed,
-            &right[i],
+            right_image,
             VERTICAL_IGNORE_BORDERS,
             Y_SKIP_FIRST,
             Y_SKIP_LAST,
@@ -238,17 +238,17 @@ where
         height(top) - y_skip_last,
     );
 
-    let mut composed = Array3::zeros((3, bottom_paste_y + height(&bottom), width(top)));
+    let mut composed = Array3::zeros((3, bottom_paste_y + height(bottom), width(top)));
 
-    crop_mut(&mut composed, 0, 0, width(&top), height(&top)).assign(&top);
+    crop_mut(&mut composed, 0, 0, width(top), height(top)).assign(top);
     crop_mut(
         &mut composed,
         0,
         bottom_paste_y,
-        width(&bottom),
-        height(&bottom),
+        width(bottom),
+        height(bottom),
     )
-    .assign(&bottom);
+    .assign(bottom);
 
     composed
 }

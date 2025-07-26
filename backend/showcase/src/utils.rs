@@ -85,7 +85,7 @@ pub async fn macroquad_run_game(
     map_image: &[u8],
     mut before_tick: Option<Box<dyn FnMut(&mut Game)>>,
 ) {
-    let map_texture = Texture2D::from_file_with_format(&map_image, None);
+    let map_texture = Texture2D::from_file_with_format(map_image, None);
     let map_texture_size = PIXELS_PER_TILE * game.map_size().total_size() as usize;
 
     let grid = game.draw_grid();

@@ -29,7 +29,7 @@ pub fn handle_damage_events(
     for damage_event in v_damage_event.iter() {
         let target_health = &mut v_health[damage_event.target];
 
-        target_health.0 = target_health.0 - damage_event.damage;
+        target_health.0 -= damage_event.damage;
     }
 
     for (id, health) in v_health.iter().with_id() {

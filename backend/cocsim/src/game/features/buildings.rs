@@ -133,7 +133,7 @@ pub fn init_drop_zone(
     for x in 0..map_size.total_size() {
         for y in 0..map_size.total_size() {
             if buildings_grid.0[(x as usize, y as usize)] != EntityId::dead() {
-                for neighbor in get_neighbors(&map_size, x as i32, y as i32) {
+                for neighbor in get_neighbors(&map_size, x, y) {
                     result[neighbor] = false;
                 }
             }

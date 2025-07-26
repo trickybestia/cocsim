@@ -93,7 +93,7 @@ impl Game {
         );
 
         if minutes != 0 {
-            result.push_str(&format!(" {} min", minutes));
+            result.push_str(&format!(" {minutes} min"));
         }
 
         result.push_str(&format!(" {} s left", total_seconds % 60));
