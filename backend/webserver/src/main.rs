@@ -9,6 +9,7 @@ use axum::{
     extract::DefaultBodyLimit,
     http::HeaderValue,
     routing::{
+        any,
         get,
         post,
     },
@@ -38,6 +39,7 @@ async fn main() {
         )
         .route("/api/get-showcase-attack", get(get_showcase_attack))
         .route("/api/get-unit-types", get(get_unit_types))
+        .route("/api/optimize-attack", any(optimize_attack))
         .route("/api/reverse-projection", post(reverse_projection))
         .layer(
             ServiceBuilder::new()
