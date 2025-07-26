@@ -6,11 +6,8 @@ mod geometry;
 pub use attack_plan::AttackPlan;
 pub use attack_plan_executor::AttackPlanExecutor;
 use attack_plan_unit::AttackPlanUnit;
-use rand::{
-    rng,
-    rngs::ThreadRng,
-    seq::index::sample_array,
-};
+use rand::seq::index::sample_array;
+use rand_pcg::Pcg64Mcg;
 
 use crate::{
     Game,
@@ -21,13 +18,14 @@ use crate::{
         NEW_POPULATION_SIZE,
         NEW_RANDOM_PLANS,
         POPULATION_SIZE,
+        RNG_INITIAL_STATE,
     },
 };
 
 pub struct AttackOptimizer {
     map: Map,
     units: Vec<UnitModelEnum>,
-    rng: ThreadRng,
+    rng: Pcg64Mcg,
     population: Vec<(AttackPlan, f32)>,
     best: Option<(AttackPlan, f32)>,
 }
@@ -37,13 +35,13 @@ impl AttackOptimizer {
         Self {
             map,
             units,
-            rng: rng(),
+            rng: Pcg64Mcg::new(RNG_INITIAL_STATE),
             population: Vec::new(),
             best: None,
         }
     }
 
-    pub fn next(&mut self) -> anyhow::Result<()> {
+    pub fn step(&mut self) -> anyhow::Result<&(AttackPlan, f32)> {
         let mut new_population = Vec::new();
 
         while new_population.len() != NEW_RANDOM_PLANS {
@@ -80,7 +78,7 @@ impl AttackOptimizer {
 
         self.population = new_population;
 
-        Ok(())
+        Ok(self.best.as_ref().unwrap())
     }
 
     fn score_attack_plan(&mut self, plan: &AttackPlan) -> anyhow::Result<f32> {
@@ -97,5 +95,9 @@ impl AttackOptimizer {
 
     pub fn best(&self) -> Option<&(AttackPlan, f32)> {
         self.best.as_ref()
+    }
+
+    pub fn map(&self) -> &Map {
+        &self.map
     }
 }

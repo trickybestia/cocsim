@@ -18,6 +18,7 @@ pub const POPULATION_SIZE: usize = 20;
 pub const NEW_POPULATION_SIZE: usize = 40;
 pub const NEW_RANDOM_PLANS: usize = 5;
 pub const ATTACK_PLAN_EXECUTOR_FPS: usize = 60;
+pub const RNG_INITIAL_STATE: u128 = 0x28eccc9e8da2792e12f88fb222616a86;
 
 pub const SHAPE_SERIALIZE_ROUND_DIGITS: u32 = 2;
 
