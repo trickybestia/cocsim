@@ -56,7 +56,6 @@ impl BuildingModel for GoblinHutModel {
             GOBLIN_HUT_LEVELS[self.level].health,
             Vector2::new(self.x, self.y),
             GOBLIN_HUT.size,
-            None,
         );
     }
 }

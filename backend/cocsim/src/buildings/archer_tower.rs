@@ -142,7 +142,6 @@ impl BuildingModel for ArcherTowerModel {
             ARCHER_TOWER_LEVELS[self.level].health,
             Vector2::new(self.x, self.y),
             ARCHER_TOWER.size,
-            None,
         );
     }
 }

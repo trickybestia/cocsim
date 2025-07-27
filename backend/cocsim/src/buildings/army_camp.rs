@@ -70,7 +70,6 @@ impl BuildingModel for ArmyCampModel {
             ARMY_CAMP_LEVELS[self.level].health,
             Vector2::new(self.x, self.y),
             ARMY_CAMP.size,
-            None,
         );
     }
 }

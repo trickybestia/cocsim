@@ -75,7 +75,6 @@ impl BuildingModel for BarracksModel {
             BARRACKS_LEVELS[self.level].health,
             Vector2::new(self.x, self.y),
             BARRACKS.size,
-            None,
         );
     }
 }

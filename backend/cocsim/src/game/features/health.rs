@@ -9,6 +9,8 @@ use shipyard::{
     sparse_set::SparseSet,
 };
 
+use crate::game::features::to_be_deleted::ToBeDeleted;
+
 #[derive(Component)]
 pub struct Health(pub f32);
 
@@ -18,12 +20,9 @@ pub struct DamageEvent {
     pub damage: f32,
 }
 
-#[derive(Component)]
-pub struct ToBeDeleted;
-
 pub fn handle_damage_events(
     mut v_health: ViewMut<Health>,
-    mut v_death_request: ViewMut<ToBeDeleted>,
+    mut v_to_be_deleted: ViewMut<ToBeDeleted>,
     v_damage_event: View<DamageEvent>,
 ) {
     for damage_event in v_damage_event.iter() {
@@ -34,13 +33,9 @@ pub fn handle_damage_events(
 
     for (id, health) in v_health.iter().with_id() {
         if health.0 <= 0.0 {
-            v_death_request.add_component_unchecked(id, ToBeDeleted);
+            v_to_be_deleted.add_component_unchecked(id, ToBeDeleted);
         }
     }
-}
-
-pub fn handle_to_be_deleted(mut all_storages: AllStoragesViewMut) {
-    all_storages.delete_any::<SparseSet<ToBeDeleted>>();
 }
 
 pub fn cleanup_events(mut all_storages: AllStoragesViewMut) {

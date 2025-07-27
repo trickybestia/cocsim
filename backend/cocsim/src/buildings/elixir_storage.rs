@@ -75,7 +75,6 @@ impl BuildingModel for ElixirStorageModel {
             ELIXIR_STORAGE_LEVELS[self.level].health,
             Vector2::new(self.x, self.y),
             ELIXIR_STORAGE.size,
-            None,
         );
     }
 }

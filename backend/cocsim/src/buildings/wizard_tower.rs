@@ -126,7 +126,6 @@ impl BuildingModel for WizardTowerModel {
             WIZARD_TOWER_LEVELS[self.level].health,
             Vector2::new(self.x, self.y),
             WIZARD_TOWER.size,
-            None,
         );
     }
 }

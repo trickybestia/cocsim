@@ -73,7 +73,6 @@ impl BuildingModel for GoldMineModel {
             GOLD_MINE_LEVELS[self.level].health,
             Vector2::new(self.x, self.y),
             GOLD_MINE.size,
-            None,
         );
     }
 }

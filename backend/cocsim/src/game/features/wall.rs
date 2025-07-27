@@ -21,8 +21,8 @@ use crate::{
             BuildingsGrid,
         },
         collision::PathfindingCollider,
-        health::ToBeDeleted,
         map::MapSize,
+        to_be_deleted::ToBeDeleted,
     },
 };
 

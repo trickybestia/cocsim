@@ -71,7 +71,6 @@ impl BuildingModel for LaboratoryModel {
             LABORATORY_LEVELS[self.level].health,
             Vector2::new(self.x, self.y),
             LABORATORY.size,
-            None,
         );
     }
 }

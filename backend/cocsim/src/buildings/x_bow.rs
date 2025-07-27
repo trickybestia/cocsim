@@ -117,7 +117,6 @@ impl BuildingModel for XBowModel {
             X_BOW_LEVELS[self.level].health,
             Vector2::new(self.x, self.y),
             X_BOW.size,
-            None,
         );
     }
 }

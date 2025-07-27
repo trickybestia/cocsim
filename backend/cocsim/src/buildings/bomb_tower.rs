@@ -119,7 +119,6 @@ impl BuildingModel for BombTowerModel {
             BOMB_TOWER_LEVELS[self.level].health,
             Vector2::new(self.x, self.y),
             BOMB_TOWER.size,
-            None,
         );
     }
 }

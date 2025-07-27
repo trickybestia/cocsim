@@ -69,7 +69,6 @@ impl BuildingModel for DarkElixirStorageModel {
             DARK_ELIXIR_STORAGE_LEVELS[self.level].health,
             Vector2::new(self.x, self.y),
             DARK_ELIXIR_STORAGE.size,
-            None,
         );
     }
 }

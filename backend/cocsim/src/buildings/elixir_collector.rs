@@ -73,7 +73,6 @@ impl BuildingModel for ElixirCollectorModel {
             ELIXIR_COLLECTOR_LEVELS[self.level].health,
             Vector2::new(self.x, self.y),
             ELIXIR_COLLECTOR.size,
-            None,
         );
     }
 }

@@ -70,7 +70,6 @@ impl BuildingModel for ClanCastleModel {
             CLAN_CASTLE_LEVELS[self.level].health,
             Vector2::new(self.x, self.y),
             CLAN_CASTLE.size,
-            None,
         );
     }
 }

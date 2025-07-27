@@ -5,6 +5,8 @@ pub mod drawable;
 pub mod health;
 pub mod map;
 pub mod position;
+pub mod projectiles;
 pub mod time;
 pub mod wall;
 pub mod waypoint_mover;
+pub mod to_be_deleted;

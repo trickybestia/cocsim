@@ -10,7 +10,11 @@ use shipyard::World;
 use crate::{
     BuildingModel,
     BuildingType,
-    buildings::utils::passive_building::create_passive_building,
+    buildings::utils::active_building::create_active_building,
+    game::features::attack::{
+        BuildingFindTargetBehaviour,
+        TargetProjectileAttackBehaviour,
+    },
 };
 
 struct AirDefenseLevel {
@@ -90,6 +94,10 @@ const AIR_DEFENSE: BuildingType = BuildingType {
 
 inventory::submit! {AIR_DEFENSE}
 
+const AIR_DEFENSE_ATTACK_RANGE: f32 = 10.0;
+const AIR_DEFENSE_ATTACK_COOLDOWN: f32 = 1.0;
+const AIR_DEFENSE_PROJECTILE_SPEED: f32 = 8.0;
+
 #[derive(Serialize, Deserialize, Debug, Arbitrary)]
 pub struct AirDefenseModel {
     pub x: usize,
@@ -113,12 +121,25 @@ impl BuildingModel for AirDefenseModel {
     }
 
     fn create_building(&self, world: &mut World) {
-        create_passive_building(
+        let level = &AIR_DEFENSE_LEVELS[self.level];
+
+        create_active_building(
             world,
-            AIR_DEFENSE_LEVELS[self.level].health,
+            level.health,
             Vector2::new(self.x, self.y),
             AIR_DEFENSE.size,
-            None,
+            AIR_DEFENSE_ATTACK_RANGE,
+            AIR_DEFENSE_ATTACK_COOLDOWN,
+            BuildingFindTargetBehaviour {
+                attack_air: true,
+                attack_ground: false,
+            }
+            .into(),
+            TargetProjectileAttackBehaviour {
+                damage: level.attack_damage,
+                projectile_speed: AIR_DEFENSE_PROJECTILE_SPEED,
+            }
+            .into(),
         );
     }
 }

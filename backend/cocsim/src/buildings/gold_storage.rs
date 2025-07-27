@@ -75,7 +75,6 @@ impl BuildingModel for GoldStorageModel {
             GOLD_STORAGE_LEVELS[self.level].health,
             Vector2::new(self.x, self.y),
             GOLD_STORAGE.size,
-            None,
         );
     }
 }

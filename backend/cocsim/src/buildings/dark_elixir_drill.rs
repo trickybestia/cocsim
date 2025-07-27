@@ -67,7 +67,6 @@ impl BuildingModel for DarkElixirDrillModel {
             DARK_ELIXIR_DRILL_LEVELS[self.level].health,
             Vector2::new(self.x, self.y),
             DARK_ELIXIR_DRILL.size,
-            None,
         );
     }
 }

@@ -34,7 +34,7 @@ pub fn r#move(
 
         let next_waypoint = waypoint_mover.waypoints.last().unwrap();
 
-        if position.0.metric_distance(next_waypoint) <= DISTANCE_TO_WAYPOINT_EPS {
+        if position.0.metric_distance(next_waypoint) <= UNIT_DISTANCE_TO_WAYPOINT_EPS {
             waypoint_mover.waypoints.pop().unwrap();
         } else {
             let direction = (next_waypoint - position.0).normalize();

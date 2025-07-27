@@ -64,7 +64,6 @@ impl BuildingModel for BuildersHutModel {
             BUILDERS_HUT_LEVELS[self.level].health,
             Vector2::new(self.x, self.y),
             BUILDERS_HUT.size,
-            None,
         );
     }
 }

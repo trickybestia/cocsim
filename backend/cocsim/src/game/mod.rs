@@ -151,11 +151,14 @@ impl Game {
 
         self.world.run(features::attack::find_target);
         self.world.run(features::attack::attack);
+        self.world
+            .run(features::projectiles::target_projectile::update);
         self.world.run(features::waypoint_mover::r#move);
         self.world.run(features::health::handle_damage_events);
         // TODO: run system: remove DeathRequest and use hero ability if not used
         self.world.run(features::wall::update_walls);
-        self.world.run(features::health::handle_to_be_deleted);
+        self.world
+            .run(features::to_be_deleted::handle_to_be_deleted);
         self.world.run(features::buildings::handle_building_changes);
 
         if self.enable_collision_grid {
@@ -172,6 +175,8 @@ impl Game {
 
         self.world
             .run_with_data(features::drawable::draw, &mut result);
+        self.world
+            .run_with_data(features::projectiles::target_projectile::draw, &mut result);
 
         result
     }

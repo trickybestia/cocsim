@@ -53,6 +53,8 @@ bitflags! {
         const GROUND = 1 << 3;
 
         const COUNTED_BUILDING = 1 << 4;
+
+        const ACTIVE_BUILDING = 1 << 5;
     }
 }
 
@@ -80,13 +82,29 @@ pub fn attack(mut all_storages: AllStoragesViewMut) {
 
 fn create_find_target_queue(
     mut v_attacker: ViewMut<Attacker>,
+    v_attack_target: View<AttackTarget>,
+    v_position: View<Position>,
     entities: EntitiesView,
 ) -> Vec<(FindTargetBehaviourEnum, EntityId)> {
     let mut result = Vec::new();
 
-    for (id, attacker) in (&mut v_attacker).iter().with_id() {
-        if !entities.is_alive(attacker.target) {
-            result.push((attacker.find_target_behaviour.clone(), id));
+    for (attacker_id, attacker) in (&mut v_attacker).iter().with_id() {
+        let retarget = if !entities.is_alive(attacker.target) {
+            true
+        } else {
+            let attacker_position = v_position[attacker_id].0;
+            let target_position = v_position[attacker.target].0;
+            let attack_target = &v_attack_target[attacker.target];
+
+            !attack_target
+                .collider
+                .translate(target_position)
+                .attack_area(attacker.attack_range + UNIT_DISTANCE_TO_WAYPOINT_EPS)
+                .contains(attacker_position)
+        };
+
+        if retarget {
+            result.push((attacker.find_target_behaviour.clone(), attacker_id));
 
             attacker.remaining_attack_cooldown = attacker.attack_cooldown;
         }
@@ -113,7 +131,7 @@ fn create_attack_queue(
             let attack_area = attack_target
                 .collider
                 .translate(attack_target_position)
-                .attack_area(attacker.attack_range + DISTANCE_TO_WAYPOINT_EPS);
+                .attack_area(attacker.attack_range + UNIT_DISTANCE_TO_WAYPOINT_EPS);
 
             if attack_area.contains(attacker_position) {
                 attacker.remaining_attack_cooldown =

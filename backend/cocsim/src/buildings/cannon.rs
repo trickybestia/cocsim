@@ -142,7 +142,6 @@ impl BuildingModel for CannonModel {
             CANNON_LEVELS[self.level].health,
             Vector2::new(self.x, self.y),
             CANNON.size,
-            None,
         );
     }
 }

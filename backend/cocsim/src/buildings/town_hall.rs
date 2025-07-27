@@ -74,7 +74,6 @@ impl BuildingModel for TownHallModel {
             TOWN_HALL_LEVELS[self.level].health,
             Vector2::new(self.x, self.y),
             TOWN_HALL.size,
-            None,
         );
 
         world.add_component(id, crate::game::features::buildings::TownHall);

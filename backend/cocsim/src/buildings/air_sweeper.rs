@@ -112,7 +112,6 @@ impl BuildingModel for AirSweeperModel {
             AIR_SWEEPER_LEVELS[self.level].health,
             Vector2::new(self.x, self.y),
             AIR_SWEEPER.size,
-            None,
         );
     }
 }

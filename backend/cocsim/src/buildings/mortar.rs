@@ -126,7 +126,6 @@ impl BuildingModel for MortarModel {
             MORTAR_LEVELS[self.level].health,
             Vector2::new(self.x, self.y),
             MORTAR.size,
-            None,
         );
     }
 }
