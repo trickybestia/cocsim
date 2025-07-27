@@ -1,3 +1,4 @@
+use anyhow::Context;
 use nalgebra::{
     DMatrix,
     Vector2,
@@ -71,7 +72,7 @@ pub fn handle_building_changes(
     mut buildings_grid: UniqueViewMut<BuildingsGrid>,
     v_building: ViewMut<Building>,
     mut v_position: ViewMut<Position>,
-) {
+) -> anyhow::Result<()> {
     let modified_ids = v_building
         .modified()
         .iter()
@@ -99,10 +100,15 @@ pub fn handle_building_changes(
             for rel_y in 0..building.size.y {
                 let abs_y = building.position.y + rel_y;
 
-                buildings_grid.0[(abs_x, abs_y)] = id
+                *buildings_grid
+                    .0
+                    .get_mut((abs_x, abs_y))
+                    .context("Valid buildings_grid index expected")? = id;
             }
         }
     }
+
+    Ok(())
 }
 
 pub fn init_drop_zone(

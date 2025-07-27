@@ -25,6 +25,7 @@ mod x_bow;
 pub use air_defense::*;
 pub use air_sweeper::*;
 use anyhow::Result;
+use arbitrary::Arbitrary;
 pub use archer_tower::*;
 pub use army_camp::*;
 pub use barracks::*;
@@ -75,7 +76,7 @@ pub struct BuildingType {
 inventory::collect!(BuildingType);
 
 #[enum_dispatch(BuildingModel)]
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Arbitrary)]
 #[serde(tag = "name")]
 pub enum BuildingModelEnum {
     #[serde(rename = "AirDefense")]

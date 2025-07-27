@@ -1,5 +1,9 @@
 use std::f32::consts::PI;
 
+use arbitrary::{
+    Arbitrary,
+    Unstructured,
+};
 use nalgebra::{
     DMatrix,
     Vector2,
@@ -26,6 +30,17 @@ pub struct AttackPlanUnit {
     /// from 0 to 1
     distance: f32,
     drop_time: f32,
+}
+
+impl<'a> Arbitrary<'a> for AttackPlanUnit {
+    fn arbitrary(u: &mut Unstructured<'a>) -> arbitrary::Result<Self> {
+        Ok(Self {
+            unit_model: u.arbitrary()?,
+            angle: u.arbitrary()?,
+            distance: (u.int_in_range::<u8>(0u8..=100u8)? as f32) / 100.0,
+            drop_time: (u.int_in_range::<u8>(0u8..=100u8)? as f32) / 100.0 * MAX_UNIT_DROP_TIME,
+        })
+    }
 }
 
 impl AttackPlanUnit {

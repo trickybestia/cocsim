@@ -135,7 +135,7 @@ impl Game {
         let initial_counted_buildings_count = Self::counted_buildings_count(&world);
 
         world.run(features::buildings::init_buildings_grid);
-        world.run(features::buildings::handle_building_changes);
+        world.run(features::buildings::handle_building_changes)?;
         world.run(features::wall::update_walls);
 
         world.run(features::buildings::init_drop_zone);
@@ -160,7 +160,7 @@ impl Game {
         Ok(())
     }
 
-    pub fn tick(&mut self, delta_time: f32) {
+    pub fn tick(&mut self, delta_time: f32) -> anyhow::Result<()> {
         assert!(!self.done());
 
         self.world
@@ -173,7 +173,8 @@ impl Game {
         // TODO: run system: remove DeathRequest and use hero ability if not used
         self.world.run(features::wall::update_walls);
         self.world.run(features::health::handle_to_be_deleted);
-        self.world.run(features::buildings::handle_building_changes);
+        self.world
+            .run(features::buildings::handle_building_changes)?;
 
         if self.enable_collision_grid {
             self.world.run(features::collision::update_collision);
@@ -182,6 +183,8 @@ impl Game {
         Self::tick_cleanup(&mut self.world);
 
         self.world.run(features::time::update_elapsed_time);
+
+        Ok(())
     }
 
     pub fn draw_entities(&self) -> Vec<Shape> {

@@ -2,6 +2,7 @@ use anyhow::{
     Context,
     Result,
 };
+use arbitrary::Arbitrary;
 use nalgebra::Vector2;
 use serde::{
     Deserialize,
@@ -109,7 +110,7 @@ fn draw_dragon(id: EntityId, all_storages: &AllStoragesView, result: &mut Vec<Sh
     });
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, Arbitrary)]
 pub struct DragonModel {
     pub level: usize,
 }

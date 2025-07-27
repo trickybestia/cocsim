@@ -2,6 +2,7 @@ use anyhow::{
     Context,
     Result,
 };
+use arbitrary::Arbitrary;
 use nalgebra::Vector2;
 use serde::{
     Deserialize,
@@ -43,7 +44,7 @@ const DARK_ELIXIR_STORAGE: BuildingType = BuildingType {
 
 inventory::submit! {DARK_ELIXIR_STORAGE}
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Arbitrary)]
 pub struct DarkElixirStorageModel {
     pub x: usize,
     pub y: usize,

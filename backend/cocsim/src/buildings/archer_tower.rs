@@ -2,6 +2,7 @@ use anyhow::{
     Context,
     Result,
 };
+use arbitrary::Arbitrary;
 use nalgebra::Vector2;
 use serde::{
     Deserialize,
@@ -116,7 +117,7 @@ const ARCHER_TOWER: BuildingType = BuildingType {
 
 inventory::submit! {ARCHER_TOWER}
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Arbitrary)]
 pub struct ArcherTowerModel {
     pub x: usize,
     pub y: usize,

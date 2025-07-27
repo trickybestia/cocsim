@@ -2,6 +2,7 @@ mod dragon;
 pub mod utils;
 
 use anyhow::Result;
+use arbitrary::Arbitrary;
 pub use dragon::*;
 use enum_dispatch::enum_dispatch;
 use nalgebra::Vector2;
@@ -26,7 +27,7 @@ pub struct UnitType {
 inventory::collect!(UnitType);
 
 #[enum_dispatch(UnitModel)]
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, Arbitrary)]
 #[serde(tag = "name")]
 pub enum UnitModelEnum {
     #[serde(rename = "Dragon")]

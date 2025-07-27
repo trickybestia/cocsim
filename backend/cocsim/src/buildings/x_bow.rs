@@ -2,6 +2,7 @@ use anyhow::{
     Context,
     Result,
 };
+use arbitrary::Arbitrary;
 use nalgebra::Vector2;
 use serde::{
     Deserialize,
@@ -84,13 +85,13 @@ const X_BOW: BuildingType = BuildingType {
 
 inventory::submit! {X_BOW}
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Arbitrary)]
 pub enum XBowTargetType {
     Ground,
     AirAndGround,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Arbitrary)]
 pub struct XBowModel {
     pub x: usize,
     pub y: usize,

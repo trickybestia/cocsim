@@ -1,3 +1,4 @@
+use arbitrary::Arbitrary;
 use rand::{
     Rng,
     seq::IndexedRandom,
@@ -8,7 +9,7 @@ use crate::{
     attack_optimizer::AttackPlanUnit,
 };
 
-#[derive(Clone)]
+#[derive(Clone, Arbitrary)]
 pub struct AttackPlan {
     units: Vec<AttackPlanUnit>,
 }

@@ -1,3 +1,4 @@
+use arbitrary::Arbitrary;
 use serde::{
     Deserialize,
     Serialize,
@@ -5,7 +6,7 @@ use serde::{
 
 use crate::BuildingModelEnum;
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Arbitrary)]
 #[serde(rename_all = "camelCase")]
 pub struct Map {
     pub base_size: usize,

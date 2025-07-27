@@ -2,6 +2,7 @@ use anyhow::{
     Context,
     Result,
 };
+use arbitrary::Arbitrary;
 use nalgebra::Vector2;
 use serde::{
     Deserialize,
@@ -30,7 +31,7 @@ const GOBLIN_HUT: BuildingType = BuildingType {
 
 inventory::submit! {GOBLIN_HUT}
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Arbitrary)]
 pub struct GoblinHutModel {
     pub x: usize,
     pub y: usize,

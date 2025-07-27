@@ -2,6 +2,7 @@ use anyhow::{
     Context,
     Result,
 };
+use arbitrary::Arbitrary;
 use nalgebra::Vector2;
 use serde::{
     Deserialize,
@@ -73,7 +74,7 @@ const AIR_SWEEPER: BuildingType = BuildingType {
 
 inventory::submit! {AIR_SWEEPER}
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Arbitrary)]
 pub enum AirSweeperRotation {
     Right,
     RightUp,
@@ -85,7 +86,7 @@ pub enum AirSweeperRotation {
     RightDown,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Arbitrary)]
 pub struct AirSweeperModel {
     pub x: usize,
     pub y: usize,

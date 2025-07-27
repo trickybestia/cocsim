@@ -5,6 +5,7 @@ edition = "2024"
 
 [dependencies]
 anyhow = "1"
+arbitrary = { version = "1", features = ["derive"] }
 bitflags = "2.9"
 enum_dispatch = "0.3"
 inventory = "0.3"
