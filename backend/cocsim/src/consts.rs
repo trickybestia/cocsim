@@ -3,6 +3,12 @@ use crate::ShapeColor;
 pub const TEST_IMAGES_PATH: &str = "test_images";
 pub const TEST_MAPS_PATH: &str = "test_maps";
 
+pub const MIN_BASE_SIZE: usize = 1;
+pub const MAX_BASE_SIZE: usize = 44;
+pub const MAX_BORDER_SIZE: usize = 4;
+pub const MAX_BUILDINGS_COUNT: usize = 1000;
+pub const MAX_UNITS_COUNT: usize = 100;
+
 /// Used for pathfinding.
 pub const COLLISION_TILES_PER_MAP_TILE: usize = 10;
 pub const COLLISION_TILE_SIZE: f32 = 1.0 / COLLISION_TILES_PER_MAP_TILE as f32;

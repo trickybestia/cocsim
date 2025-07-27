@@ -1,6 +1,7 @@
 mod dragon;
 pub mod utils;
 
+use anyhow::ensure;
 use arbitrary::Arbitrary;
 pub use dragon::*;
 use enum_dispatch::enum_dispatch;
@@ -10,6 +11,8 @@ use serde::{
     Serialize,
 };
 use shipyard::World;
+
+use crate::consts::MAX_UNITS_COUNT;
 
 #[enum_dispatch]
 pub trait UnitModel {
@@ -39,7 +42,9 @@ pub fn validate_units<'a, T>(units: T) -> anyhow::Result<()>
 where
     T: IntoIterator<Item = &'a UnitModelEnum>,
 {
-    for unit in units {
+    for (i, unit) in units.into_iter().enumerate() {
+        ensure!(i < MAX_UNITS_COUNT);
+
         unit.validate()?;
     }
 
