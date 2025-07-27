@@ -7,7 +7,7 @@ use cocsim::{
     validate_units,
 };
 
-#[derive(Arbitrary)]
+#[derive(Arbitrary, Debug)]
 struct FuzzInputs {
     pub map: Map,
     pub plan: AttackPlan,
@@ -18,6 +18,9 @@ fn main() {
         if inputs.map.validate().is_ok()
             && validate_units(inputs.plan.units().iter().map(|unit| unit.unit_model())).is_ok()
         {
+            // uncomment next line when debugging crash
+            //println!("{:#?}", inputs);
+
             let mut game = Game::new(&inputs.map, false);
             let mut plan_executor = AttackPlanExecutor::new(inputs.plan.units());
 

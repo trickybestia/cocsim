@@ -57,6 +57,8 @@ impl Map {
             }
         }
 
+        ensure!(has_town_hall);
+
         Ok(())
     }
 }

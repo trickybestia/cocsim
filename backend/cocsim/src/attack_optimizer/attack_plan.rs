@@ -9,7 +9,7 @@ use crate::{
     attack_optimizer::AttackPlanUnit,
 };
 
-#[derive(Clone, Arbitrary)]
+#[derive(Clone, Arbitrary, Debug)]
 pub struct AttackPlan {
     units: Vec<AttackPlanUnit>,
 }

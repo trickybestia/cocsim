@@ -22,7 +22,7 @@ use crate::{
     game::features::map::MapSize,
 };
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct AttackPlanUnit {
     unit_model: UnitModelEnum,
     /// radians
