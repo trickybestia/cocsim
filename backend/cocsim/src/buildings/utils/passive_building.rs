@@ -1,4 +1,3 @@
-use anyhow::Result;
 use nalgebra::Vector2;
 use shipyard::{
     EntityId,
@@ -35,13 +34,13 @@ pub fn create_passive_building(
     position: Vector2<usize>,
     size: Vector2<usize>,
     attack_collider: Option<ColliderEnum>,
-) -> Result<EntityId> {
+) -> EntityId {
     let collider = match attack_collider {
         Some(collider) => collider,
         None => default_attack_collider(size),
     };
 
-    let id = world.add_entity((
+    world.add_entity((
         Health(health),
         Building { position, size },
         CountedBuilding,
@@ -53,7 +52,5 @@ pub fn create_passive_building(
                 | AttackTargetFlags::BUILDING
                 | AttackTargetFlags::COUNTED_BUILDING,
         },
-    ));
-
-    Ok(id)
+    ))
 }

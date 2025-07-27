@@ -24,7 +24,6 @@ mod x_bow;
 
 pub use air_defense::*;
 pub use air_sweeper::*;
-use anyhow::Result;
 use arbitrary::Arbitrary;
 pub use archer_tower::*;
 pub use army_camp::*;
@@ -54,11 +53,6 @@ pub use wall::*;
 pub use wizard_tower::*;
 pub use x_bow::*;
 
-#[enum_dispatch]
-pub trait BuildingModel {
-    fn create_building(&self, world: &mut World) -> Result<()>;
-}
-
 #[derive(Serialize)]
 pub struct BuildingOption {
     pub name: &'static str,
@@ -74,6 +68,17 @@ pub struct BuildingType {
 }
 
 inventory::collect!(BuildingType);
+
+#[enum_dispatch]
+pub trait BuildingModel {
+    fn r#type(&self) -> &'static BuildingType;
+
+    fn position(&self) -> Vector2<usize>;
+
+    fn validate(&self) -> anyhow::Result<()>;
+
+    fn create_building(&self, world: &mut World);
+}
 
 #[enum_dispatch(BuildingModel)]
 #[derive(Serialize, Deserialize, Debug, Arbitrary)]

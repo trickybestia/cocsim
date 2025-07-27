@@ -1,7 +1,4 @@
-use anyhow::{
-    Context,
-    Result,
-};
+use anyhow::ensure;
 use arbitrary::Arbitrary;
 use nalgebra::Vector2;
 use serde::{
@@ -116,10 +113,14 @@ pub struct DragonModel {
 }
 
 impl UnitModel for DragonModel {
-    fn create_unit(&self, world: &mut World, position: Vector2<f32>) -> Result<()> {
-        let level = DRAGON_LEVELS
-            .get(self.level)
-            .context("Level out of range")?;
+    fn validate(&self) -> anyhow::Result<()> {
+        ensure!(self.level < DRAGON_LEVELS.len());
+
+        Ok(())
+    }
+
+    fn create_unit(&self, world: &mut World, position: Vector2<f32>) {
+        let level = &DRAGON_LEVELS[self.level];
 
         create_air_unit(
             world,
@@ -138,7 +139,5 @@ impl UnitModel for DragonModel {
             .into(),
             draw_dragon,
         );
-
-        Ok(())
     }
 }

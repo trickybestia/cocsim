@@ -1,7 +1,4 @@
-use anyhow::{
-    Context,
-    Result,
-};
+use anyhow::ensure;
 use arbitrary::Arbitrary;
 use nalgebra::Vector2;
 use serde::{
@@ -95,18 +92,27 @@ pub struct AirSweeperModel {
 }
 
 impl BuildingModel for AirSweeperModel {
-    fn create_building(&self, world: &mut World) -> Result<()> {
+    fn r#type(&self) -> &'static BuildingType {
+        &AIR_SWEEPER
+    }
+
+    fn position(&self) -> Vector2<usize> {
+        Vector2::new(self.x, self.y)
+    }
+
+    fn validate(&self) -> anyhow::Result<()> {
+        ensure!(self.level < AIR_SWEEPER_LEVELS.len());
+
+        Ok(())
+    }
+
+    fn create_building(&self, world: &mut World) {
         create_passive_building(
             world,
-            AIR_SWEEPER_LEVELS
-                .get(self.level)
-                .context("Level out of range")?
-                .health,
+            AIR_SWEEPER_LEVELS[self.level].health,
             Vector2::new(self.x, self.y),
             AIR_SWEEPER.size,
             None,
-        )?;
-
-        Ok(())
+        );
     }
 }

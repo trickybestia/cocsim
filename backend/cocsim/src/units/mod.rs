@@ -1,7 +1,6 @@
 mod dragon;
 pub mod utils;
 
-use anyhow::Result;
 use arbitrary::Arbitrary;
 pub use dragon::*;
 use enum_dispatch::enum_dispatch;
@@ -14,7 +13,9 @@ use shipyard::World;
 
 #[enum_dispatch]
 pub trait UnitModel {
-    fn create_unit(&self, world: &mut World, position: Vector2<f32>) -> Result<()>;
+    fn validate(&self) -> anyhow::Result<()>;
+
+    fn create_unit(&self, world: &mut World, position: Vector2<f32>);
 }
 
 #[derive(Serialize)]
@@ -32,4 +33,15 @@ inventory::collect!(UnitType);
 pub enum UnitModelEnum {
     #[serde(rename = "Dragon")]
     DragonModel,
+}
+
+pub fn validate_units<'a, T>(units: T) -> anyhow::Result<()>
+where
+    T: IntoIterator<Item = &'a UnitModelEnum>,
+{
+    for unit in units {
+        unit.validate()?;
+    }
+
+    Ok(())
 }

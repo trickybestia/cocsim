@@ -1,7 +1,4 @@
-use anyhow::{
-    Context,
-    Result,
-};
+use anyhow::ensure;
 use arbitrary::Arbitrary;
 use nalgebra::Vector2;
 use serde::{
@@ -73,16 +70,25 @@ pub struct WallModel {
 }
 
 impl BuildingModel for WallModel {
-    fn create_building(&self, world: &mut World) -> Result<()> {
+    fn r#type(&self) -> &'static BuildingType {
+        &WALL
+    }
+
+    fn position(&self) -> Vector2<usize> {
+        Vector2::new(self.x, self.y)
+    }
+
+    fn validate(&self) -> anyhow::Result<()> {
+        ensure!(self.level < WALL_LEVELS.len());
+
+        Ok(())
+    }
+
+    fn create_building(&self, world: &mut World) {
         let collider = default_attack_collider(WALL.size);
 
         world.add_entity((
-            Health(
-                WALL_LEVELS
-                    .get(self.level)
-                    .context("Level out of range")?
-                    .health,
-            ),
+            Health(WALL_LEVELS[self.level].health),
             Building {
                 position: Vector2::new(self.x, self.y),
                 size: WALL.size,
@@ -120,7 +126,5 @@ impl BuildingModel for WallModel {
                 .translate(Vector2::from_element(-0.5)),
             },
         ));
-
-        Ok(())
     }
 }

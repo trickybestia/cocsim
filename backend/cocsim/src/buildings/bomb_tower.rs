@@ -1,7 +1,4 @@
-use anyhow::{
-    Context,
-    Result,
-};
+use anyhow::ensure;
 use arbitrary::Arbitrary;
 use nalgebra::Vector2;
 use serde::{
@@ -102,18 +99,27 @@ pub struct BombTowerModel {
 }
 
 impl BuildingModel for BombTowerModel {
-    fn create_building(&self, world: &mut World) -> Result<()> {
+    fn r#type(&self) -> &'static BuildingType {
+        &BOMB_TOWER
+    }
+
+    fn position(&self) -> Vector2<usize> {
+        Vector2::new(self.x, self.y)
+    }
+
+    fn validate(&self) -> anyhow::Result<()> {
+        ensure!(self.level < BOMB_TOWER_LEVELS.len());
+
+        Ok(())
+    }
+
+    fn create_building(&self, world: &mut World) {
         create_passive_building(
             world,
-            BOMB_TOWER_LEVELS
-                .get(self.level)
-                .context("Level out of range")?
-                .health,
+            BOMB_TOWER_LEVELS[self.level].health,
             Vector2::new(self.x, self.y),
             BOMB_TOWER.size,
             None,
-        )?;
-
-        Ok(())
+        );
     }
 }

@@ -1,9 +1,5 @@
 pub mod features;
 
-use anyhow::{
-    Result,
-    ensure,
-};
 use nalgebra::Vector2;
 use shipyard::{
     EntitiesView,
@@ -105,18 +101,7 @@ impl Game {
         self.world.get_unique::<&NeedRedrawCollision>().unwrap().0
     }
 
-    pub fn new(map: &Map, enable_collision_grid: bool) -> anyhow::Result<Self> {
-        ensure!(
-            map.base_size >= 1 && map.base_size <= 44,
-            "Invalid map.base_size = {0}",
-            map.base_size
-        );
-        ensure!(
-            map.border_size <= 4,
-            "Invalid map.border_size = {0}",
-            map.border_size
-        );
-
+    pub fn new(map: &Map, enable_collision_grid: bool) -> Self {
         let mut world = World::new();
 
         world.add_unique(MapSize {
@@ -129,13 +114,13 @@ impl Game {
         });
 
         for building in &map.buildings {
-            building.create_building(&mut world)?;
+            building.create_building(&mut world);
         }
 
         let initial_counted_buildings_count = Self::counted_buildings_count(&world);
 
         world.run(features::buildings::init_buildings_grid);
-        world.run(features::buildings::handle_building_changes)?;
+        world.run(features::buildings::handle_building_changes);
         world.run(features::wall::update_walls);
 
         world.run(features::buildings::init_drop_zone);
@@ -147,20 +132,18 @@ impl Game {
 
         Self::tick_cleanup(&mut world);
 
-        Ok(Self {
+        Self {
             world,
             initial_counted_buildings_count,
             enable_collision_grid,
-        })
+        }
     }
 
-    pub fn spawn_unit(&mut self, model: &UnitModelEnum, position: Vector2<f32>) -> Result<()> {
-        model.create_unit(&mut self.world, position)?;
-
-        Ok(())
+    pub fn spawn_unit(&mut self, model: &UnitModelEnum, position: Vector2<f32>) {
+        model.create_unit(&mut self.world, position);
     }
 
-    pub fn tick(&mut self, delta_time: f32) -> anyhow::Result<()> {
+    pub fn tick(&mut self, delta_time: f32) {
         assert!(!self.done());
 
         self.world
@@ -173,8 +156,7 @@ impl Game {
         // TODO: run system: remove DeathRequest and use hero ability if not used
         self.world.run(features::wall::update_walls);
         self.world.run(features::health::handle_to_be_deleted);
-        self.world
-            .run(features::buildings::handle_building_changes)?;
+        self.world.run(features::buildings::handle_building_changes);
 
         if self.enable_collision_grid {
             self.world.run(features::collision::update_collision);
@@ -183,8 +165,6 @@ impl Game {
         Self::tick_cleanup(&mut self.world);
 
         self.world.run(features::time::update_elapsed_time);
-
-        Ok(())
     }
 
     pub fn draw_entities(&self) -> Vec<Shape> {

@@ -1,7 +1,4 @@
-use anyhow::{
-    Context,
-    Result,
-};
+use anyhow::ensure;
 use arbitrary::Arbitrary;
 use nalgebra::Vector2;
 use serde::{
@@ -54,18 +51,27 @@ pub struct LaboratoryModel {
 }
 
 impl BuildingModel for LaboratoryModel {
-    fn create_building(&self, world: &mut World) -> Result<()> {
+    fn r#type(&self) -> &'static BuildingType {
+        &LABORATORY
+    }
+
+    fn position(&self) -> Vector2<usize> {
+        Vector2::new(self.x, self.y)
+    }
+
+    fn validate(&self) -> anyhow::Result<()> {
+        ensure!(self.level < LABORATORY_LEVELS.len());
+
+        Ok(())
+    }
+
+    fn create_building(&self, world: &mut World) {
         create_passive_building(
             world,
-            LABORATORY_LEVELS
-                .get(self.level)
-                .context("Level out of range")?
-                .health,
+            LABORATORY_LEVELS[self.level].health,
             Vector2::new(self.x, self.y),
             LABORATORY.size,
             None,
-        )?;
-
-        Ok(())
+        );
     }
 }

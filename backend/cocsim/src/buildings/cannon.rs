@@ -1,7 +1,4 @@
-use anyhow::{
-    Context,
-    Result,
-};
+use anyhow::ensure;
 use arbitrary::Arbitrary;
 use nalgebra::Vector2;
 use serde::{
@@ -125,18 +122,27 @@ pub struct CannonModel {
 }
 
 impl BuildingModel for CannonModel {
-    fn create_building(&self, world: &mut World) -> Result<()> {
+    fn r#type(&self) -> &'static BuildingType {
+        &CANNON
+    }
+
+    fn position(&self) -> Vector2<usize> {
+        Vector2::new(self.x, self.y)
+    }
+
+    fn validate(&self) -> anyhow::Result<()> {
+        ensure!(self.level < CANNON_LEVELS.len());
+
+        Ok(())
+    }
+
+    fn create_building(&self, world: &mut World) {
         create_passive_building(
             world,
-            CANNON_LEVELS
-                .get(self.level)
-                .context("Level out of range")?
-                .health,
+            CANNON_LEVELS[self.level].health,
             Vector2::new(self.x, self.y),
             CANNON.size,
             None,
-        )?;
-
-        Ok(())
+        );
     }
 }

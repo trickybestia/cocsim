@@ -1,7 +1,4 @@
-use anyhow::{
-    Context,
-    Result,
-};
+use anyhow::ensure;
 use arbitrary::Arbitrary;
 use nalgebra::Vector2;
 use serde::{
@@ -53,18 +50,27 @@ pub struct ClanCastleModel {
 }
 
 impl BuildingModel for ClanCastleModel {
-    fn create_building(&self, world: &mut World) -> Result<()> {
+    fn r#type(&self) -> &'static BuildingType {
+        &CLAN_CASTLE
+    }
+
+    fn position(&self) -> Vector2<usize> {
+        Vector2::new(self.x, self.y)
+    }
+
+    fn validate(&self) -> anyhow::Result<()> {
+        ensure!(self.level < CLAN_CASTLE_LEVELS.len());
+
+        Ok(())
+    }
+
+    fn create_building(&self, world: &mut World) {
         create_passive_building(
             world,
-            CLAN_CASTLE_LEVELS
-                .get(self.level)
-                .context("Level out of range")?
-                .health,
+            CLAN_CASTLE_LEVELS[self.level].health,
             Vector2::new(self.x, self.y),
             CLAN_CASTLE.size,
             None,
-        )?;
-
-        Ok(())
+        );
     }
 }

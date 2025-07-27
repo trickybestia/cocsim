@@ -16,6 +16,7 @@ use cocsim::{
     Map,
     UnitModelEnum,
     consts::MAX_ATTACK_DURATION,
+    validate_units,
 };
 use log::warn;
 use serde_json::json;
@@ -42,8 +43,12 @@ async fn optimize_attack_internal(mut socket: WebSocket) -> anyhow::Result<()> {
     let map_message = socket.recv().await.context("Expected message")??;
     let map: Map = serde_json::from_str(map_message.to_text()?)?;
 
+    map.validate()?;
+
     let units_message = socket.recv().await.context("Expected message")??;
     let units = serde_json::from_str::<Vec<UnitModelEnum>>(units_message.to_text()?)?;
+
+    validate_units(&units)?;
 
     socket
         .send(Message::text(
@@ -59,17 +64,13 @@ async fn optimize_attack_internal(mut socket: WebSocket) -> anyhow::Result<()> {
 
     for i in 0..OPTIMIZE_ATTACK_ITERATIONS {
         let step_result = spawn_blocking(move || {
-            let step_err = optimizer.step().err();
+            optimizer.step();
 
-            (optimizer, step_err)
+            optimizer
         })
         .await?;
 
-        optimizer = step_result.0;
-
-        if let Some(step_err) = step_result.1 {
-            return Err(step_err);
-        }
+        optimizer = step_result;
 
         socket
             .send(Message::text(
@@ -92,17 +93,17 @@ async fn optimize_attack_internal(mut socket: WebSocket) -> anyhow::Result<()> {
         ))
         .await?;
 
-    let mut game = Game::new(optimizer.map(), true)?;
+    let mut game = Game::new(optimizer.map(), true);
     let mut plan_executor =
         AttackPlanExecutor::new(optimizer.best().expect("Best plan exists here").0.units());
 
     let mut renderer = DtoGameRenderer::new(1);
 
-    plan_executor.tick(&mut game)?;
+    plan_executor.tick(&mut game);
     renderer.draw(&mut game);
 
     while !game.done() {
-        plan_executor.tick(&mut game)?; // no problem calling it twice on first loop iteration
+        plan_executor.tick(&mut game); // no problem calling it twice on first loop iteration
         game.tick(1.0 / FPS as f32);
         renderer.draw(&mut game);
     }

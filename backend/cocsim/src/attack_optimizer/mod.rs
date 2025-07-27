@@ -41,12 +41,12 @@ impl AttackOptimizer {
         }
     }
 
-    pub fn step(&mut self) -> anyhow::Result<&(AttackPlan, f32)> {
+    pub fn step(&mut self) -> &(AttackPlan, f32) {
         let mut new_population = Vec::new();
 
         while new_population.len() != NEW_RANDOM_PLANS {
             let new_plan = AttackPlan::new_randomized(&self.units, &mut self.rng);
-            let new_plan_score = self.score_attack_plan(&new_plan)?;
+            let new_plan_score = self.score_attack_plan(&new_plan);
 
             new_population.push((new_plan, new_plan_score));
         }
@@ -62,7 +62,7 @@ impl AttackOptimizer {
                     &mut self.rng,
                 )
                 .mutate(&mut self.rng);
-                let new_plan_score = self.score_attack_plan(&new_plan)?;
+                let new_plan_score = self.score_attack_plan(&new_plan);
 
                 new_population.push((new_plan, new_plan_score));
             }
@@ -79,21 +79,21 @@ impl AttackOptimizer {
 
         self.population = new_population;
 
-        Ok(self.best.as_ref().unwrap())
+        self.best.as_ref().unwrap()
     }
 
-    fn score_attack_plan(&mut self, plan: &AttackPlan) -> anyhow::Result<f32> {
+    fn score_attack_plan(&mut self, plan: &AttackPlan) -> f32 {
         // maybe set enable_collision_grid to true in future (when ground units will be
         // added)
-        let mut game = Game::new(&self.map, false)?;
+        let mut game = Game::new(&self.map, false);
         let mut attack_plan_executor = AttackPlanExecutor::new(plan.units());
 
         while !game.done() {
-            attack_plan_executor.tick(&mut game)?;
+            attack_plan_executor.tick(&mut game);
             game.tick(1.0 / ATTACK_PLAN_EXECUTOR_FPS as f32);
         }
 
-        Ok(game.time_left())
+        game.time_left()
     }
 
     pub fn best(&self) -> Option<&(AttackPlan, f32)> {

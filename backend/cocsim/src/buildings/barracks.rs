@@ -1,7 +1,4 @@
-use anyhow::{
-    Context,
-    Result,
-};
+use anyhow::ensure;
 use arbitrary::Arbitrary;
 use nalgebra::Vector2;
 use serde::{
@@ -58,18 +55,27 @@ pub struct BarracksModel {
 }
 
 impl BuildingModel for BarracksModel {
-    fn create_building(&self, world: &mut World) -> Result<()> {
+    fn r#type(&self) -> &'static BuildingType {
+        &BARRACKS
+    }
+
+    fn position(&self) -> Vector2<usize> {
+        Vector2::new(self.x, self.y)
+    }
+
+    fn validate(&self) -> anyhow::Result<()> {
+        ensure!(self.level < BARRACKS_LEVELS.len());
+
+        Ok(())
+    }
+
+    fn create_building(&self, world: &mut World) {
         create_passive_building(
             world,
-            BARRACKS_LEVELS
-                .get(self.level)
-                .context("Level out of range")?
-                .health,
+            BARRACKS_LEVELS[self.level].health,
             Vector2::new(self.x, self.y),
             BARRACKS.size,
             None,
-        )?;
-
-        Ok(())
+        );
     }
 }
