@@ -145,7 +145,12 @@ impl AttackPlanUnit {
             }
         }
 
-        let start_point = start_point.expect("At least one intersection expected");
+        // if there is no intersected buildings, we can place unit anywhere on the line
+        let start_point = start_point.unwrap_or(
+            Ray::new_with_angle(center, self.angle + PI)
+                .intersection_with_square(&border_square)
+                .unwrap(),
+        );
 
         start_point + (stop_point - start_point) * clamp(self.distance, 0.01, 0.99) // clamp for unit to not spawn on right or bottom border
     }
