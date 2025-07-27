@@ -50,7 +50,7 @@ impl Map {
                 for y in start_y..end_y {
                     let tile = &mut buildings_grid[(x - self.border_size, y - self.border_size)];
 
-                    assert!(!*tile);
+                    ensure!(!*tile);
 
                     *tile = true;
                 }
