@@ -36,7 +36,7 @@ impl<'a> Arbitrary<'a> for AttackPlanUnit {
     fn arbitrary(u: &mut Unstructured<'a>) -> arbitrary::Result<Self> {
         Ok(Self {
             unit_model: u.arbitrary()?,
-            angle: u.arbitrary()?,
+            angle: (u.int_in_range::<u8>(0u8..=255u8)? as f32) / 255.0 * 2.0 * PI,
             distance: (u.int_in_range::<u8>(0u8..=100u8)? as f32) / 100.0,
             drop_time: (u.int_in_range::<u8>(0u8..=100u8)? as f32) / 100.0 * MAX_UNIT_DROP_TIME,
         })
