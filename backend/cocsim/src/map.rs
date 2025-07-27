@@ -40,11 +40,15 @@ impl Map {
 
             let start_x = building.position().x;
             let start_y = building.position().y;
+
+            ensure!(start_x >= self.border_size && start_x < self.base_size + self.border_size);
+            ensure!(start_y >= self.border_size && start_y < self.base_size + self.border_size);
+
             let end_x = start_x + building.r#type().size.x;
             let end_y = start_y + building.r#type().size.y;
 
-            ensure!(start_x >= self.border_size && end_x <= self.base_size + self.border_size);
-            ensure!(start_y >= self.border_size && end_y <= self.base_size + self.border_size);
+            ensure!(end_x <= self.base_size + self.border_size);
+            ensure!(end_y <= self.base_size + self.border_size);
 
             for x in start_x..end_x {
                 for y in start_y..end_y {
