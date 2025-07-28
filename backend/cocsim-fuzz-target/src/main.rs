@@ -28,6 +28,8 @@ fn main() {
                 plan_executor.tick(&mut game);
                 game.tick(1.0 / 60.0 as f32);
             }
+
+            //println!("done!")
         }
     });
 }
