@@ -28,7 +28,8 @@
             "cargo": {
                 "args": [
                     "build",
-                    "--manifest-path=backend/showcase/Cargo.toml"
+                    "--manifest-path=backend/showcase/Cargo.toml",
+                    "--bin=simple"
                 ]
             },
             "cwd": "${workspaceFolder}",

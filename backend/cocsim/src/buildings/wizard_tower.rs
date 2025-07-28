@@ -149,7 +149,7 @@ impl BuildingModel for WizardTowerModel {
             SplashProjectileAttackBehaviour {
                 damage: level.attack_damage,
                 damage_radius: WIZARD_TOWER_SPLASH_ATTACK_RADIUS,
-                damage_air: false,
+                damage_air: true,
                 damage_ground: true,
                 projectile_speed,
             }
