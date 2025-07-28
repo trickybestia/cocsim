@@ -43,6 +43,8 @@ impl FindTargetBehaviour for AirUnitFindTargetBehaviour {
         let mut nearest_target_distance: f32 = f32::INFINITY;
 
         for (target_id, (attack_target, team)) in (&v_attack_target, &v_team).iter().with_id() {
+            assert!(attacker.min_attack_range == 0.0);
+
             if *team == attacker_team || !attack_target.flags.contains(self.pattern) {
                 continue;
             }
@@ -50,7 +52,7 @@ impl FindTargetBehaviour for AirUnitFindTargetBehaviour {
             let nearest_point = attack_target
                 .collider
                 .translate(v_position[target_id].0)
-                .attack_area(attacker.attack_range)
+                .attack_area(attacker.max_attack_range)
                 .nearest_point(attacker_position);
             let distance = nearest_point.metric_distance(&attacker_position);
 

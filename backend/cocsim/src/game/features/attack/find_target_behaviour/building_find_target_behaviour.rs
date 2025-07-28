@@ -8,6 +8,7 @@ use shipyard::{
 
 use crate::{
     colliders::Collider,
+    consts::UNIT_DISTANCE_TO_WAYPOINT_EPS,
     game::features::{
         attack::{
             AttackTarget,
@@ -40,7 +41,9 @@ impl FindTargetBehaviour for BuildingFindTargetBehaviour {
         let mut nearest_target = EntityId::dead();
         let mut nearest_target_distance: f32 = f32::INFINITY;
 
-        for (target_id, (attack_target, team)) in (&v_attack_target, &v_team).iter().with_id() {
+        for (target_id, (attack_target, team, position)) in
+            (&v_attack_target, &v_team, &v_position).iter().with_id()
+        {
             if *team == attacker_team {
                 continue;
             }
@@ -51,14 +54,23 @@ impl FindTargetBehaviour for BuildingFindTargetBehaviour {
                 continue;
             }
 
-            let distance = attack_target
-                .collider
-                .translate(v_position[target_id].0)
-                .attack_area(attacker.attack_range)
+            let attack_target_collider = attack_target.collider.translate(position.0);
+            let min_attack_range_collider =
+                attack_target_collider.attack_area(attacker.min_attack_range);
+            let max_attack_range_collider = attack_target_collider
+                .attack_area(attacker.max_attack_range + UNIT_DISTANCE_TO_WAYPOINT_EPS);
+
+            if min_attack_range_collider.contains(attacker_position)
+                || !max_attack_range_collider.contains(attacker_position)
+            {
+                continue;
+            }
+
+            let distance = max_attack_range_collider
                 .nearest_point(attacker_position)
                 .metric_distance(&attacker_position);
 
-            if distance < attacker.attack_range && distance < nearest_target_distance {
+            if distance < nearest_target_distance {
                 nearest_target = target_id;
                 nearest_target_distance = distance;
             }

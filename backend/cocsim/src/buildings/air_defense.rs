@@ -94,7 +94,8 @@ const AIR_DEFENSE: BuildingType = BuildingType {
 
 inventory::submit! {AIR_DEFENSE}
 
-const AIR_DEFENSE_ATTACK_RANGE: f32 = 10.0;
+const AIR_DEFENSE_MIN_ATTACK_RANGE: f32 = 0.0;
+const AIR_DEFENSE_MAX_ATTACK_RANGE: f32 = 10.0;
 const AIR_DEFENSE_ATTACK_COOLDOWN: f32 = 1.0;
 const AIR_DEFENSE_PROJECTILE_SPEED: f32 = 8.0;
 
@@ -128,7 +129,8 @@ impl BuildingModel for AirDefenseModel {
             level.health,
             Vector2::new(self.x, self.y),
             AIR_DEFENSE.size,
-            AIR_DEFENSE_ATTACK_RANGE,
+            AIR_DEFENSE_MIN_ATTACK_RANGE,
+            AIR_DEFENSE_MAX_ATTACK_RANGE,
             AIR_DEFENSE_ATTACK_COOLDOWN,
             BuildingFindTargetBehaviour {
                 attack_air: true,

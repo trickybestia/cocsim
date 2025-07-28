@@ -29,7 +29,7 @@ pub fn create_air_unit(
     position: Vector2<f32>,
     health: f32,
     speed: f32,
-    attack_range: f32,
+    max_attack_range: f32,
     attack_cooldown: f32,
     find_target_behaviour: FindTargetBehaviourEnum,
     attack_behaviour: AttackBehaviourEnum,
@@ -44,7 +44,8 @@ pub fn create_air_unit(
         Health(health),
         Team::Attack,
         Attacker {
-            attack_range,
+            min_attack_range: 0.0,
+            max_attack_range,
             attack_cooldown,
             target: EntityId::dead(),
             remaining_attack_cooldown: 0.0,

@@ -29,7 +29,8 @@ use crate::{
 
 #[derive(Component)]
 pub struct Attacker {
-    pub attack_range: f32,
+    pub min_attack_range: f32,
+    pub max_attack_range: f32,
     pub attack_cooldown: f32,
     pub target: EntityId,
     pub remaining_attack_cooldown: f32,
@@ -95,12 +96,14 @@ fn create_find_target_queue(
             let attacker_position = v_position[attacker_id].0;
             let target_position = v_position[attacker.target].0;
             let attack_target = &v_attack_target[attacker.target];
+            let attack_target_collider = attack_target.collider.translate(target_position);
 
-            !attack_target
-                .collider
-                .translate(target_position)
-                .attack_area(attacker.attack_range + UNIT_DISTANCE_TO_WAYPOINT_EPS)
+            attack_target_collider
+                .attack_area(attacker.min_attack_range)
                 .contains(attacker_position)
+                || !attack_target_collider
+                    .attack_area(attacker.max_attack_range + UNIT_DISTANCE_TO_WAYPOINT_EPS)
+                    .contains(attacker_position)
         };
 
         if retarget {
@@ -127,13 +130,16 @@ fn create_attack_queue(
             let attacker_position = v_position[attacker_id].0;
             let attack_target = &v_attack_target[attacker.target];
             let attack_target_position = v_position[attacker.target].0;
+            let attack_target_collider = attack_target.collider.translate(attack_target_position);
 
-            let attack_area = attack_target
-                .collider
-                .translate(attack_target_position)
-                .attack_area(attacker.attack_range + UNIT_DISTANCE_TO_WAYPOINT_EPS);
+            let in_attack_range = !attack_target_collider
+                .attack_area(attacker.min_attack_range)
+                .contains(attacker_position)
+                && attack_target_collider
+                    .attack_area(attacker.max_attack_range + UNIT_DISTANCE_TO_WAYPOINT_EPS)
+                    .contains(attacker_position);
 
-            if attack_area.contains(attacker_position) {
+            if in_attack_range {
                 attacker.remaining_attack_cooldown =
                     0.0f32.max(attacker.remaining_attack_cooldown - time.delta);
 
