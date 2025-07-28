@@ -15,7 +15,7 @@ use crate::{
     ShapeColor,
     consts::PROJECTILE_DISTANCE_TO_TARGET_EPS,
     game::features::{
-        health::DamageEvent,
+        health::EntityDamageEvent,
         position::Position,
         time::Time,
         to_be_deleted::ToBeDeleted,
@@ -36,7 +36,7 @@ pub fn update(
     mut v_target_projectile: ViewMut<TargetProjectile>,
     mut v_position: ViewMut<Position>,
     mut v_to_be_deleted: ViewMut<ToBeDeleted>,
-    mut v_damage_event: ViewMut<DamageEvent>,
+    mut v_entity_damage_event: ViewMut<EntityDamageEvent>,
 ) {
     for (id, target_projectile) in (&mut v_target_projectile).iter().with_id() {
         if !entities.is_alive(target_projectile.target) {
@@ -55,8 +55,8 @@ pub fn update(
 
         if target_projectile.relative_position.norm() <= PROJECTILE_DISTANCE_TO_TARGET_EPS {
             entities.add_entity(
-                &mut v_damage_event,
-                DamageEvent {
+                &mut v_entity_damage_event,
+                EntityDamageEvent {
                     target: target_projectile.target,
                     damage: target_projectile.damage,
                 },

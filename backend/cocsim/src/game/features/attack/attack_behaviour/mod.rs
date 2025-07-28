@@ -1,4 +1,5 @@
 mod melee_attack_behaviour;
+mod splash_projectile_attack_behaviour;
 mod target_projectile_attack_behaviour;
 
 use enum_dispatch::enum_dispatch;
@@ -7,6 +8,7 @@ use shipyard::{
     AllStoragesViewMut,
     EntityId,
 };
+pub use splash_projectile_attack_behaviour::SplashProjectileAttackBehaviour;
 pub use target_projectile_attack_behaviour::TargetProjectileAttackBehaviour;
 
 #[enum_dispatch]
@@ -23,5 +25,6 @@ pub trait AttackBehaviour {
 #[derive(Clone)]
 pub enum AttackBehaviourEnum {
     MeleeAttackBehaviour,
+    SplashProjectileAttackBehaviour,
     TargetProjectileAttackBehaviour,
 }

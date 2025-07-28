@@ -153,8 +153,13 @@ impl Game {
         self.world.run(features::attack::attack);
         self.world
             .run(features::projectiles::target_projectile::update);
+        self.world
+            .run(features::projectiles::splash_projectile::update);
         self.world.run(features::waypoint_mover::r#move);
-        self.world.run(features::health::handle_damage_events);
+        self.world
+            .run(features::health::handle_splash_damage_events);
+        self.world
+            .run(features::health::handle_entity_damage_events);
         // TODO: run system: remove DeathRequest and use hero ability if not used
         self.world.run(features::wall::update_walls);
         self.world
@@ -177,6 +182,8 @@ impl Game {
             .run_with_data(features::drawable::draw, &mut result);
         self.world
             .run_with_data(features::projectiles::target_projectile::draw, &mut result);
+        self.world
+            .run_with_data(features::projectiles::splash_projectile::draw, &mut result);
 
         result
     }

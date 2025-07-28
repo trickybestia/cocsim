@@ -5,7 +5,7 @@ use shipyard::{
 
 use crate::game::features::{
     attack::AttackBehaviour,
-    health::DamageEvent,
+    health::EntityDamageEvent,
 };
 
 #[derive(Clone)]
@@ -20,7 +20,7 @@ impl AttackBehaviour for MeleeAttackBehaviour {
         target_id: EntityId,
         all_storages: &mut AllStoragesViewMut,
     ) {
-        all_storages.add_entity((DamageEvent {
+        all_storages.add_entity((EntityDamageEvent {
             target: target_id,
             damage: self.damage,
         },));
