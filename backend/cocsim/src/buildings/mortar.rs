@@ -10,7 +10,11 @@ use shipyard::World;
 use crate::{
     BuildingModel,
     BuildingType,
-    buildings::utils::passive_building::create_passive_building,
+    buildings::utils::active_building::create_active_building,
+    game::features::attack::{
+        BuildingFindTargetBehaviour,
+        SplashProjectileAttackBehaviour,
+    },
 };
 
 struct MortarLevel {
@@ -98,6 +102,12 @@ const MORTAR: BuildingType = BuildingType {
 
 inventory::submit! {MORTAR}
 
+const MORTAR_MIN_ATTACK_RANGE: f32 = 4.0;
+const MORTAR_MAX_ATTACK_RANGE: f32 = 11.0;
+const MORTAR_ATTACK_COOLDOWN: f32 = 5.0;
+const MORTAR_PROJECTILE_SPEED: f32 = 5.0;
+const MORTAR_SPLASH_ATTACK_RADIUS: f32 = 1.5;
+
 #[derive(Serialize, Deserialize, Debug, Arbitrary)]
 pub struct MortarModel {
     pub x: usize,
@@ -121,11 +131,29 @@ impl BuildingModel for MortarModel {
     }
 
     fn create_building(&self, world: &mut World) {
-        create_passive_building(
+        let level = &MORTAR_LEVELS[self.level];
+
+        create_active_building(
             world,
-            MORTAR_LEVELS[self.level].health,
+            level.health,
             Vector2::new(self.x, self.y),
             MORTAR.size,
+            MORTAR_MIN_ATTACK_RANGE,
+            MORTAR_MAX_ATTACK_RANGE,
+            MORTAR_ATTACK_COOLDOWN,
+            BuildingFindTargetBehaviour {
+                attack_air: false,
+                attack_ground: true,
+            }
+            .into(),
+            SplashProjectileAttackBehaviour {
+                damage: level.attack_damage,
+                damage_radius: MORTAR_SPLASH_ATTACK_RADIUS,
+                damage_air: false,
+                damage_ground: true,
+                projectile_speed: MORTAR_PROJECTILE_SPEED,
+            }
+            .into(),
         );
     }
 }
