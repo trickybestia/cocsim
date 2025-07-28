@@ -10,7 +10,11 @@ use shipyard::World;
 use crate::{
     BuildingModel,
     BuildingType,
-    buildings::utils::passive_building::create_passive_building,
+    buildings::utils::active_building::create_active_building,
+    game::features::attack::{
+        BuildingFindTargetBehaviour,
+        TargetProjectileAttackBehaviour,
+    },
 };
 
 struct CannonLevel {
@@ -114,6 +118,11 @@ const CANNON: BuildingType = BuildingType {
 
 inventory::submit! {CANNON}
 
+const CANNON_MIN_ATTACK_RANGE: f32 = 0.0;
+const CANNON_MAX_ATTACK_RANGE: f32 = 9.0;
+const CANNON_ATTACK_COOLDOWN: f32 = 0.8;
+const CANNON_PROJECTILE_SPEED: f32 = 12.0;
+
 #[derive(Serialize, Deserialize, Debug, Arbitrary)]
 pub struct CannonModel {
     pub x: usize,
@@ -137,11 +146,26 @@ impl BuildingModel for CannonModel {
     }
 
     fn create_building(&self, world: &mut World) {
-        create_passive_building(
+        let level = &CANNON_LEVELS[self.level];
+
+        create_active_building(
             world,
-            CANNON_LEVELS[self.level].health,
+            level.health,
             Vector2::new(self.x, self.y),
             CANNON.size,
+            CANNON_MIN_ATTACK_RANGE,
+            CANNON_MAX_ATTACK_RANGE,
+            CANNON_ATTACK_COOLDOWN,
+            BuildingFindTargetBehaviour {
+                attack_air: false,
+                attack_ground: true,
+            }
+            .into(),
+            TargetProjectileAttackBehaviour {
+                damage: level.attack_damage,
+                projectile_speed: CANNON_PROJECTILE_SPEED,
+            }
+            .into(),
         );
     }
 }

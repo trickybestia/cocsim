@@ -11,7 +11,11 @@ use crate::{
     BuildingModel,
     BuildingOption,
     BuildingType,
-    buildings::utils::passive_building::create_passive_building,
+    buildings::utils::active_building::create_active_building,
+    game::features::attack::{
+        BuildingFindTargetBehaviour,
+        TargetProjectileAttackBehaviour,
+    },
 };
 
 struct XBowLevel {
@@ -82,7 +86,10 @@ const X_BOW: BuildingType = BuildingType {
 
 inventory::submit! {X_BOW}
 
-#[derive(Serialize, Deserialize, Debug, Arbitrary)]
+const X_BOW_MIN_ATTACK_RANGE: f32 = 0.0;
+const X_BOW_ATTACK_COOLDOWN: f32 = 0.128;
+
+#[derive(Serialize, Deserialize, Debug, Arbitrary, PartialEq, Eq)]
 pub enum XBowTargetType {
     Ground,
     AirAndGround,
@@ -112,11 +119,35 @@ impl BuildingModel for XBowModel {
     }
 
     fn create_building(&self, world: &mut World) {
-        create_passive_building(
+        let max_attack_range = match self.target {
+            XBowTargetType::Ground => 14.0,
+            XBowTargetType::AirAndGround => 11.5,
+        };
+        let projectile_speed = match self.level {
+            0 => 23.0,
+            1 => 24.0,
+            _ => 25.0,
+        };
+        let level = &X_BOW_LEVELS[self.level];
+
+        create_active_building(
             world,
-            X_BOW_LEVELS[self.level].health,
+            level.health,
             Vector2::new(self.x, self.y),
             X_BOW.size,
+            X_BOW_MIN_ATTACK_RANGE,
+            max_attack_range,
+            X_BOW_ATTACK_COOLDOWN,
+            BuildingFindTargetBehaviour {
+                attack_air: self.target == XBowTargetType::AirAndGround,
+                attack_ground: true,
+            }
+            .into(),
+            TargetProjectileAttackBehaviour {
+                damage: level.attack_damage,
+                projectile_speed,
+            }
+            .into(),
         );
     }
 }

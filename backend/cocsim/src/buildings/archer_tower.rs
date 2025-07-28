@@ -10,7 +10,11 @@ use shipyard::World;
 use crate::{
     BuildingModel,
     BuildingType,
-    buildings::utils::passive_building::create_passive_building,
+    buildings::utils::active_building::create_active_building,
+    game::features::attack::{
+        BuildingFindTargetBehaviour,
+        TargetProjectileAttackBehaviour,
+    },
 };
 
 struct ArcherTowerLevel {
@@ -114,6 +118,11 @@ const ARCHER_TOWER: BuildingType = BuildingType {
 
 inventory::submit! {ARCHER_TOWER}
 
+const ARCHER_TOWER_MIN_ATTACK_RANGE: f32 = 0.0;
+const ARCHER_TOWER_MAX_ATTACK_RANGE: f32 = 10.0;
+const ARCHER_TOWER_ATTACK_COOLDOWN: f32 = 0.5;
+const ARCHER_TOWER_PROJECTILE_SPEED: f32 = 18.0;
+
 #[derive(Serialize, Deserialize, Debug, Arbitrary)]
 pub struct ArcherTowerModel {
     pub x: usize,
@@ -137,11 +146,26 @@ impl BuildingModel for ArcherTowerModel {
     }
 
     fn create_building(&self, world: &mut World) {
-        create_passive_building(
+        let level = &ARCHER_TOWER_LEVELS[self.level];
+
+        create_active_building(
             world,
-            ARCHER_TOWER_LEVELS[self.level].health,
+            level.health,
             Vector2::new(self.x, self.y),
             ARCHER_TOWER.size,
+            ARCHER_TOWER_MIN_ATTACK_RANGE,
+            ARCHER_TOWER_MAX_ATTACK_RANGE,
+            ARCHER_TOWER_ATTACK_COOLDOWN,
+            BuildingFindTargetBehaviour {
+                attack_air: true,
+                attack_ground: true,
+            }
+            .into(),
+            TargetProjectileAttackBehaviour {
+                damage: level.attack_damage,
+                projectile_speed: ARCHER_TOWER_PROJECTILE_SPEED,
+            }
+            .into(),
         );
     }
 }
