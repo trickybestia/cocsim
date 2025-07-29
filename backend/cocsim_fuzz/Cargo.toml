@@ -18,3 +18,10 @@ path = "fuzz_targets/fuzz_validate.rs"
 test = false
 doc = false
 bench = false
+
+[[bin]]
+name = "fuzz_game"
+path = "fuzz_targets/fuzz_game.rs"
+test = false
+doc = false
+bench = false
