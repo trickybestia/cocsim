@@ -56,7 +56,7 @@ class SplashProjectile(Projectile):
             )
 
     def draw(self, shapes: list[Shape]):
-        shapes.append(circle(self.position[0], self.position[1], 0, 2, "red"))
+        shapes.append(circle(self.position[0], self.position[1], 0.2, "red"))
 
 
 class SplashProjectileActiveBuilding(ProjectileActiveBuilding):
