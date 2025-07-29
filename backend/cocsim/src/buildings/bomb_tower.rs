@@ -11,9 +11,14 @@ use crate::{
     BuildingModel,
     BuildingType,
     buildings::utils::active_building::create_active_building,
-    game::features::actions::{
-        BuildingFindTarget,
-        SplashProjectileAttack,
+    game::features::{
+        actions::{
+            BuildingFindTarget,
+            Delayed,
+            SplashDamage,
+            SplashProjectileAttack,
+        },
+        to_be_deleted::OnDelete,
     },
 };
 
@@ -100,6 +105,8 @@ const BOMB_TOWER_MAX_ATTACK_RANGE: f32 = 6.0;
 const BOMB_TOWER_ATTACK_COOLDOWN: f32 = 1.1;
 const BOMB_TOWER_PROJECTILE_SPEED: f32 = 8.0;
 const BOMB_TOWER_SPLASH_ATTACK_RADIUS: f32 = 1.5;
+const BOMB_TOWER_DEATH_DAMAGE_ATTACK_RADIUS: f32 = 2.75;
+const BOMB_TOWER_DEATH_DAMAGE_DELAY: f32 = 1.0;
 
 #[derive(Serialize, Deserialize, Debug, Arbitrary)]
 pub struct BombTowerModel {
@@ -126,7 +133,7 @@ impl BuildingModel for BombTowerModel {
     fn create_building(&self, world: &mut World) {
         let level = &BOMB_TOWER_LEVELS[self.level];
 
-        create_active_building(
+        let id = create_active_building(
             world,
             level.health,
             Vector2::new(self.x, self.y),
@@ -147,6 +154,25 @@ impl BuildingModel for BombTowerModel {
                 projectile_speed: BOMB_TOWER_PROJECTILE_SPEED,
             }
             .into(),
+        );
+
+        world.add_component(
+            id,
+            OnDelete(
+                Delayed {
+                    time: BOMB_TOWER_DEATH_DAMAGE_DELAY,
+                    action: Box::new(
+                        SplashDamage {
+                            damage_ground: true,
+                            damage_air: false,
+                            damage: level.death_damage,
+                            radius: BOMB_TOWER_DEATH_DAMAGE_ATTACK_RADIUS,
+                        }
+                        .into(),
+                    ),
+                }
+                .into(),
+            ),
         );
     }
 }
