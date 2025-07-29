@@ -34,33 +34,6 @@
             },
             "cwd": "${workspaceFolder}",
             "args": []
-        },
-        {
-            "name": "cocsim.tests",
-            "type": "debugpy",
-            "request": "launch",
-            "module": "cocsim.tests",
-        },
-        {
-            "name": "cocsim.compose_base_images",
-            "type": "debugpy",
-            "request": "launch",
-            "module": "cocsim.compose_base_images",
-            "args": [
-                "single_player/goblin_gauntlet"
-            ]
-        },
-        {
-            "name": "cocsim.showcase",
-            "type": "debugpy",
-            "request": "launch",
-            "module": "cocsim.showcase"
-        },
-        {
-            "name": "cocsim.attack_optimizer",
-            "type": "debugpy",
-            "request": "launch",
-            "module": "cocsim.attack_optimizer"
         }
     ]
 }
