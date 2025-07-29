@@ -2,6 +2,7 @@ pub mod actions;
 pub mod attack;
 pub mod buildings;
 pub mod collision;
+pub mod delay;
 pub mod drawable;
 pub mod health;
 pub mod map;

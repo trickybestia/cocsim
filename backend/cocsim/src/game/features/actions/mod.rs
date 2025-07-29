@@ -1,11 +1,13 @@
 mod air_unit_find_target;
 mod building_find_target;
+mod empty_action;
 mod melee_attack;
 mod splash_projectile_attack;
 mod target_projectile_attack;
 
 pub use air_unit_find_target::AirUnitFindTarget;
 pub use building_find_target::BuildingFindTarget;
+pub use empty_action::EmptyAction;
 use enum_dispatch::enum_dispatch;
 pub use melee_attack::MeleeAttack;
 use shipyard::{
@@ -25,6 +27,7 @@ pub trait Action {
 pub enum ActionEnum {
     AirUnitFindTarget,
     BuildingFindTarget,
+    EmptyAction,
     MeleeAttack,
     SplashProjectileAttack,
     TargetProjectileAttack,
