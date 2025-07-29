@@ -3,6 +3,7 @@ At first:
 ```bash
 cargo install cargo-fuzz
 cargo install rustfilt
+rustup component add llvm-tools-preview
 ```
 
 To run fuzzing in debug mode:
