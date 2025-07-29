@@ -1,8 +1,10 @@
+mod balloon;
 mod dragon;
 pub mod utils;
 
 use anyhow::ensure;
 use arbitrary::Arbitrary;
+pub use balloon::*;
 pub use dragon::*;
 use enum_dispatch::enum_dispatch;
 use nalgebra::Vector2;
@@ -34,6 +36,8 @@ inventory::collect!(UnitType);
 #[derive(Serialize, Deserialize, Debug, Clone, Arbitrary)]
 #[serde(tag = "name")]
 pub enum UnitModelEnum {
+    #[serde(rename = "Balloon")]
+    BalloonModel,
     #[serde(rename = "Dragon")]
     DragonModel,
 }

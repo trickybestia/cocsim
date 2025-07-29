@@ -58,7 +58,7 @@ bitflags! {
     }
 }
 
-#[derive(Component, PartialEq, Eq, Clone, Copy)]
+#[derive(Component, PartialEq, Eq, Clone, Copy, Debug)]
 pub enum Team {
     Attack,
     Defense,
@@ -131,9 +131,8 @@ fn create_attack_queue(
             let attack_target_position = v_position[attacker.target].0;
             let attack_target_collider = attack_target.collider.translate(attack_target_position);
 
-            let in_attack_range = !attack_target_collider
-                .attack_area(attacker.min_attack_range)
-                .contains(attacker_position)
+            let in_attack_range = attacker_position.metric_distance(&attack_target_position)
+                >= attacker.min_attack_range
                 && attack_target_collider
                     .attack_area(attacker.max_attack_range + UNIT_DISTANCE_TO_WAYPOINT_EPS)
                     .contains(attacker_position);

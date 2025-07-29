@@ -2,7 +2,7 @@ mod consts;
 mod utils;
 
 use cocsim::{
-    DragonModel,
+    BalloonModel,
     Game,
     utils::load_test_map,
 };
@@ -21,7 +21,7 @@ async fn main() {
 
     for i in 0..10 {
         game.spawn_unit(
-            &DragonModel { level: 10 }.into(),
+            &BalloonModel { level: 10 }.into(),
             Vector2::new(0.5, i as f32 + 0.5),
         );
     }
