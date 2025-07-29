@@ -14,7 +14,7 @@ use crate::game::features::{
 /// Despawn entity after time
 #[derive(Component)]
 pub struct Delay {
-    time_left: f32,
+    pub time_left: f32,
 }
 
 pub fn update(
