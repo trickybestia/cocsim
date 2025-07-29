@@ -12,9 +12,9 @@ use crate::{
     BuildingOption,
     BuildingType,
     buildings::utils::active_building::create_active_building,
-    game::features::attack::{
-        BuildingFindTargetBehaviour,
-        TargetProjectileAttackBehaviour,
+    game::features::actions::{
+        BuildingFindTarget,
+        TargetProjectileAttack,
     },
 };
 
@@ -138,12 +138,12 @@ impl BuildingModel for XBowModel {
             X_BOW_MIN_ATTACK_RANGE,
             max_attack_range,
             X_BOW_ATTACK_COOLDOWN,
-            BuildingFindTargetBehaviour {
+            BuildingFindTarget {
                 attack_air: self.target == XBowTargetType::AirAndGround,
                 attack_ground: true,
             }
             .into(),
-            TargetProjectileAttackBehaviour {
+            TargetProjectileAttack {
                 damage: level.attack_damage,
                 projectile_speed,
             }

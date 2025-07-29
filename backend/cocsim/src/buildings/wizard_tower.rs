@@ -11,9 +11,9 @@ use crate::{
     BuildingModel,
     BuildingType,
     buildings::utils::active_building::create_active_building,
-    game::features::attack::{
-        BuildingFindTargetBehaviour,
-        SplashProjectileAttackBehaviour,
+    game::features::actions::{
+        BuildingFindTarget,
+        SplashProjectileAttack,
     },
 };
 
@@ -141,12 +141,12 @@ impl BuildingModel for WizardTowerModel {
             WIZARD_TOWER_MIN_ATTACK_RANGE,
             WIZARD_TOWER_MAX_ATTACK_RANGE,
             WIZARD_TOWER_ATTACK_COOLDOWN,
-            BuildingFindTargetBehaviour {
+            BuildingFindTarget {
                 attack_air: true,
                 attack_ground: true,
             }
             .into(),
-            SplashProjectileAttackBehaviour {
+            SplashProjectileAttack {
                 damage: level.attack_damage,
                 damage_radius: WIZARD_TOWER_SPLASH_ATTACK_RADIUS,
                 damage_air: true,

@@ -9,12 +9,11 @@ use crate::{
     Shape,
     colliders::PointCollider,
     game::features::{
+        actions::ActionEnum,
         attack::{
-            AttackBehaviourEnum,
             AttackTarget,
             AttackTargetFlags,
             Attacker,
-            FindTargetBehaviourEnum,
             Team,
         },
         drawable::Drawable,
@@ -31,8 +30,8 @@ pub fn create_air_unit(
     speed: f32,
     max_attack_range: f32,
     attack_cooldown: f32,
-    find_target_behaviour: FindTargetBehaviourEnum,
-    attack_behaviour: AttackBehaviourEnum,
+    find_target: ActionEnum,
+    attack: ActionEnum,
     draw: fn(EntityId, &AllStoragesView, &mut Vec<Shape>),
 ) -> EntityId {
     world.add_entity((
@@ -49,8 +48,8 @@ pub fn create_air_unit(
             attack_cooldown,
             target: EntityId::dead(),
             remaining_attack_cooldown: 0.0,
-            find_target_behaviour,
-            attack_behaviour,
+            find_target,
+            attack,
         },
         AttackTarget {
             collider: PointCollider::zero().into(),

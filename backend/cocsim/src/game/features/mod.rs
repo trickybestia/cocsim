@@ -1,3 +1,4 @@
+pub mod actions;
 pub mod attack;
 pub mod buildings;
 pub mod collision;
@@ -7,6 +8,6 @@ pub mod map;
 pub mod position;
 pub mod projectiles;
 pub mod time;
+pub mod to_be_deleted;
 pub mod wall;
 pub mod waypoint_mover;
-pub mod to_be_deleted;

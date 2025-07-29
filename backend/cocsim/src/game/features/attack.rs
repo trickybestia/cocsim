@@ -1,9 +1,4 @@
-mod attack_behaviour;
-mod find_target_behaviour;
-
-pub use attack_behaviour::*;
 use bitflags::bitflags;
-pub use find_target_behaviour::*;
 use shipyard::{
     AllStoragesViewMut,
     Component,
@@ -22,6 +17,10 @@ use crate::{
     },
     consts::*,
     game::features::{
+        actions::{
+            Action,
+            ActionEnum,
+        },
         position::Position,
         time::Time,
     },
@@ -34,8 +33,8 @@ pub struct Attacker {
     pub attack_cooldown: f32,
     pub target: EntityId,
     pub remaining_attack_cooldown: f32,
-    pub find_target_behaviour: FindTargetBehaviourEnum,
-    pub attack_behaviour: AttackBehaviourEnum,
+    pub find_target: ActionEnum,
+    pub attack: ActionEnum,
 }
 
 #[derive(Component)]
@@ -65,19 +64,19 @@ pub enum Team {
     Defense,
 }
 
-pub fn find_target(all_storages: AllStoragesViewMut) {
+pub fn find_target(mut all_storages: AllStoragesViewMut) {
     let find_target_queue = all_storages.run(create_find_target_queue);
 
-    for (find_target_behaviour, id) in find_target_queue {
-        find_target_behaviour.find_target(id, &all_storages);
+    for (find_target, id) in find_target_queue {
+        find_target.call(id, &mut all_storages);
     }
 }
 
 pub fn attack(mut all_storages: AllStoragesViewMut) {
     let attack_queue = all_storages.run(create_attack_queue);
 
-    for (attack_behaviour, attacker_id, target_id) in attack_queue {
-        attack_behaviour.attack(attacker_id, target_id, &mut all_storages);
+    for (attack, attacker_id) in attack_queue {
+        attack.call(attacker_id, &mut all_storages);
     }
 }
 
@@ -86,7 +85,7 @@ fn create_find_target_queue(
     v_attack_target: View<AttackTarget>,
     v_position: View<Position>,
     entities: EntitiesView,
-) -> Vec<(FindTargetBehaviourEnum, EntityId)> {
+) -> Vec<(ActionEnum, EntityId)> {
     let mut result = Vec::new();
 
     for (attacker_id, attacker) in (&mut v_attacker).iter().with_id() {
@@ -107,7 +106,7 @@ fn create_find_target_queue(
         };
 
         if retarget {
-            result.push((attacker.find_target_behaviour.clone(), attacker_id));
+            result.push((attacker.find_target.clone(), attacker_id));
 
             attacker.remaining_attack_cooldown = attacker.attack_cooldown;
         }
@@ -122,7 +121,7 @@ fn create_attack_queue(
     entities: EntitiesView,
     v_attack_target: View<AttackTarget>,
     v_position: View<Position>,
-) -> Vec<(AttackBehaviourEnum, EntityId, EntityId)> {
+) -> Vec<(ActionEnum, EntityId)> {
     let mut result = Vec::new();
 
     for (attacker_id, attacker) in (&mut v_attacker).iter().with_id() {
@@ -144,11 +143,7 @@ fn create_attack_queue(
                     0.0f32.max(attacker.remaining_attack_cooldown - time.delta);
 
                 if attacker.remaining_attack_cooldown == 0.0 {
-                    result.push((
-                        attacker.attack_behaviour.clone(),
-                        attacker_id,
-                        attacker.target,
-                    ));
+                    result.push((attacker.attack.clone(), attacker_id));
 
                     attacker.remaining_attack_cooldown = attacker.attack_cooldown;
                 }

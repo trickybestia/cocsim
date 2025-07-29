@@ -11,9 +11,9 @@ use crate::{
     BuildingModel,
     BuildingType,
     buildings::utils::active_building::create_active_building,
-    game::features::attack::{
-        BuildingFindTargetBehaviour,
-        TargetProjectileAttackBehaviour,
+    game::features::actions::{
+        BuildingFindTarget,
+        TargetProjectileAttack,
     },
 };
 
@@ -156,12 +156,12 @@ impl BuildingModel for ArcherTowerModel {
             ARCHER_TOWER_MIN_ATTACK_RANGE,
             ARCHER_TOWER_MAX_ATTACK_RANGE,
             ARCHER_TOWER_ATTACK_COOLDOWN,
-            BuildingFindTargetBehaviour {
+            BuildingFindTarget {
                 attack_air: true,
                 attack_ground: true,
             }
             .into(),
-            TargetProjectileAttackBehaviour {
+            TargetProjectileAttack {
                 damage: level.attack_damage,
                 projectile_speed: ARCHER_TOWER_PROJECTILE_SPEED,
             }

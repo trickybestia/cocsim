@@ -5,16 +5,17 @@ use shipyard::{
 };
 
 use crate::game::features::{
+    actions::Action,
     attack::{
-        AttackBehaviour,
+        Attacker,
         Team,
     },
     position::Position,
     projectiles::splash_projectile::SplashProjectile,
 };
 
-#[derive(Clone)]
-pub struct SplashProjectileAttackBehaviour {
+#[derive(Clone, Debug)]
+pub struct SplashProjectileAttack {
     pub damage: f32,
     pub damage_radius: f32,
     pub damage_air: bool,
@@ -22,19 +23,15 @@ pub struct SplashProjectileAttackBehaviour {
     pub projectile_speed: f32,
 }
 
-impl AttackBehaviour for SplashProjectileAttackBehaviour {
-    fn attack(
-        &self,
-        attacker_id: EntityId,
-        target_id: EntityId,
-        all_storages: &mut AllStoragesViewMut,
-    ) {
+impl Action for SplashProjectileAttack {
+    fn call(&self, actor: EntityId, all_storages: &mut AllStoragesViewMut) {
+        let target = all_storages.borrow::<View<Attacker>>().unwrap()[actor].target;
         let v_position = all_storages.borrow::<View<Position>>().unwrap();
         let v_team = all_storages.borrow::<View<Team>>().unwrap();
 
-        let attacker_position = v_position[attacker_id].0;
-        let target_position = v_position[target_id].0;
-        let attacker_team = v_team[attacker_id];
+        let attacker_position = v_position[actor].0;
+        let target_position = v_position[target].0;
+        let attacker_team = v_team[actor];
 
         drop(v_position);
         drop(v_team);

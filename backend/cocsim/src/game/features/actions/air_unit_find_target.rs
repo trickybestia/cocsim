@@ -10,11 +10,11 @@ use shipyard::{
 use crate::{
     colliders::Collider,
     game::features::{
+        actions::Action,
         attack::{
             AttackTarget,
             AttackTargetFlags,
             Attacker,
-            FindTargetBehaviour,
             Team,
         },
         position::Position,
@@ -22,21 +22,21 @@ use crate::{
     },
 };
 
-#[derive(Clone)]
-pub struct AirUnitFindTargetBehaviour {
+#[derive(Clone, Debug)]
+pub struct AirUnitFindTarget {
     pub pattern: AttackTargetFlags,
 }
 
-impl FindTargetBehaviour for AirUnitFindTargetBehaviour {
-    fn find_target(&self, attacker_id: EntityId, all_storages: &AllStoragesViewMut) {
+impl Action for AirUnitFindTarget {
+    fn call(&self, actor: EntityId, all_storages: &mut AllStoragesViewMut) {
         let mut v_attacker = all_storages.borrow::<ViewMut<Attacker>>().unwrap();
         let v_attack_target = all_storages.borrow::<View<AttackTarget>>().unwrap();
         let v_team = all_storages.borrow::<View<Team>>().unwrap();
         let v_position = all_storages.borrow::<View<Position>>().unwrap();
 
-        let attacker = &mut v_attacker[attacker_id];
-        let attacker_team = v_team[attacker_id];
-        let attacker_position = v_position[attacker_id].0;
+        let attacker = &mut v_attacker[actor];
+        let attacker_team = v_team[actor];
+        let attacker_position = v_position[actor].0;
 
         let mut nearest_target = EntityId::dead();
         let mut nearest_target_nearest_point = Vector2::zeros();
@@ -66,7 +66,7 @@ impl FindTargetBehaviour for AirUnitFindTargetBehaviour {
         if nearest_target != EntityId::dead() {
             let mut v_waypoint_mover = all_storages.borrow::<ViewMut<WaypointMover>>().unwrap();
 
-            v_waypoint_mover[attacker_id].waypoints = vec![nearest_target_nearest_point];
+            v_waypoint_mover[actor].waypoints = vec![nearest_target_nearest_point];
         }
 
         attacker.target = nearest_target;

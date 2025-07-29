@@ -18,11 +18,11 @@ use crate::{
     UnitModel,
     UnitType,
     game::features::{
-        attack::{
-            AirUnitFindTargetBehaviour,
-            AttackTargetFlags,
-            MeleeAttackBehaviour,
+        actions::{
+            AirUnitFindTarget,
+            MeleeAttack,
         },
+        attack::AttackTargetFlags,
         position::Position,
     },
     units::utils::air_unit::create_air_unit,
@@ -129,11 +129,11 @@ impl UnitModel for DragonModel {
             DRAGON_SPEED,
             DRAGON_ATTACK_RANGE,
             DRAGON_ATTACK_COOLDOWN,
-            AirUnitFindTargetBehaviour {
+            AirUnitFindTarget {
                 pattern: AttackTargetFlags::COUNTED_BUILDING,
             }
             .into(),
-            MeleeAttackBehaviour {
+            MeleeAttack {
                 damage: level.attack_damage,
             }
             .into(),

@@ -11,9 +11,9 @@ use crate::{
     BuildingModel,
     BuildingType,
     buildings::utils::active_building::create_active_building,
-    game::features::attack::{
-        BuildingFindTargetBehaviour,
-        TargetProjectileAttackBehaviour,
+    game::features::actions::{
+        BuildingFindTarget,
+        TargetProjectileAttack,
     },
 };
 
@@ -156,12 +156,12 @@ impl BuildingModel for CannonModel {
             CANNON_MIN_ATTACK_RANGE,
             CANNON_MAX_ATTACK_RANGE,
             CANNON_ATTACK_COOLDOWN,
-            BuildingFindTargetBehaviour {
+            BuildingFindTarget {
                 attack_air: false,
                 attack_ground: true,
             }
             .into(),
-            TargetProjectileAttackBehaviour {
+            TargetProjectileAttack {
                 damage: level.attack_damage,
                 projectile_speed: CANNON_PROJECTILE_SPEED,
             }

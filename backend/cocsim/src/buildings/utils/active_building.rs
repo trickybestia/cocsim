@@ -7,12 +7,11 @@ use shipyard::{
 use crate::{
     buildings::utils::passive_building::default_attack_collider,
     game::features::{
+        actions::ActionEnum,
         attack::{
-            AttackBehaviourEnum,
             AttackTarget,
             AttackTargetFlags,
             Attacker,
-            FindTargetBehaviourEnum,
             Team,
         },
         buildings::{
@@ -32,8 +31,8 @@ pub fn create_active_building(
     min_attack_range: f32,
     max_attack_range: f32,
     attack_cooldown: f32,
-    find_target_behaviour: FindTargetBehaviourEnum,
-    attack_behaviour: AttackBehaviourEnum,
+    find_target: ActionEnum,
+    attack: ActionEnum,
 ) -> EntityId {
     let collider = default_attack_collider(size);
 
@@ -49,8 +48,8 @@ pub fn create_active_building(
             attack_cooldown,
             target: EntityId::dead(),
             remaining_attack_cooldown: 0.0,
-            find_target_behaviour,
-            attack_behaviour,
+            find_target,
+            attack,
         },
         AttackTarget {
             collider,

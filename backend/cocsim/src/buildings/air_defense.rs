@@ -11,9 +11,9 @@ use crate::{
     BuildingModel,
     BuildingType,
     buildings::utils::active_building::create_active_building,
-    game::features::attack::{
-        BuildingFindTargetBehaviour,
-        TargetProjectileAttackBehaviour,
+    game::features::actions::{
+        BuildingFindTarget,
+        TargetProjectileAttack,
     },
 };
 
@@ -132,12 +132,12 @@ impl BuildingModel for AirDefenseModel {
             AIR_DEFENSE_MIN_ATTACK_RANGE,
             AIR_DEFENSE_MAX_ATTACK_RANGE,
             AIR_DEFENSE_ATTACK_COOLDOWN,
-            BuildingFindTargetBehaviour {
+            BuildingFindTarget {
                 attack_air: true,
                 attack_ground: false,
             }
             .into(),
-            TargetProjectileAttackBehaviour {
+            TargetProjectileAttack {
                 damage: level.attack_damage,
                 projectile_speed: AIR_DEFENSE_PROJECTILE_SPEED,
             }

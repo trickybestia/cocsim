@@ -10,33 +10,33 @@ use crate::{
     colliders::Collider,
     consts::UNIT_DISTANCE_TO_WAYPOINT_EPS,
     game::features::{
+        actions::Action,
         attack::{
             AttackTarget,
             AttackTargetFlags,
             Attacker,
-            FindTargetBehaviour,
             Team,
         },
         position::Position,
     },
 };
 
-#[derive(Clone)]
-pub struct BuildingFindTargetBehaviour {
+#[derive(Clone, Debug)]
+pub struct BuildingFindTarget {
     pub attack_air: bool,
     pub attack_ground: bool,
 }
 
-impl FindTargetBehaviour for BuildingFindTargetBehaviour {
-    fn find_target(&self, attacker_id: EntityId, all_storages: &AllStoragesViewMut) {
+impl Action for BuildingFindTarget {
+    fn call(&self, actor: EntityId, all_storages: &mut AllStoragesViewMut) {
         let mut v_attacker = all_storages.borrow::<ViewMut<Attacker>>().unwrap();
         let v_attack_target = all_storages.borrow::<View<AttackTarget>>().unwrap();
         let v_team = all_storages.borrow::<View<Team>>().unwrap();
         let v_position = all_storages.borrow::<View<Position>>().unwrap();
 
-        let attacker = &mut v_attacker[attacker_id];
-        let attacker_team = v_team[attacker_id];
-        let attacker_position = v_position[attacker_id].0;
+        let attacker = &mut v_attacker[actor];
+        let attacker_team = v_team[actor];
+        let attacker_position = v_position[actor].0;
 
         let mut nearest_target = EntityId::dead();
         let mut nearest_target_distance: f32 = f32::INFINITY;
