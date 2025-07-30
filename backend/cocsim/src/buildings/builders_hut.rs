@@ -1,4 +1,3 @@
-use anyhow::ensure;
 use arbitrary::Arbitrary;
 use nalgebra::Vector2;
 use serde::{
@@ -10,6 +9,7 @@ use shipyard::World;
 use crate::{
     BuildingModel,
     BuildingType,
+    LevelIndex,
     buildings::utils::passive_building::create_passive_building,
 };
 
@@ -17,7 +17,9 @@ struct BuildersHutLevel {
     pub health: f32,
 }
 
-const BUILDERS_HUT_LEVELS: &[BuildersHutLevel] = &[
+const BUILDERS_HUT_LEVELS_LEN: usize = 7;
+const BUILDERS_HUT_LEVEL_INDEX_MAX: usize = BUILDERS_HUT_LEVELS_LEN - 1;
+const BUILDERS_HUT_LEVELS: [BuildersHutLevel; BUILDERS_HUT_LEVELS_LEN] = [
     BuildersHutLevel { health: 250.0 },
     BuildersHutLevel { health: 1000.0 },
     BuildersHutLevel { health: 1300.0 },
@@ -40,7 +42,7 @@ inventory::submit! {BUILDERS_HUT}
 pub struct BuildersHutModel {
     pub x: usize,
     pub y: usize,
-    pub level: usize,
+    pub level: LevelIndex<BUILDERS_HUT_LEVEL_INDEX_MAX>,
 }
 
 impl BuildingModel for BuildersHutModel {
@@ -52,16 +54,10 @@ impl BuildingModel for BuildersHutModel {
         Vector2::new(self.x, self.y)
     }
 
-    fn validate(&self) -> anyhow::Result<()> {
-        ensure!(self.level < BUILDERS_HUT_LEVELS.len());
-
-        Ok(())
-    }
-
     fn create_building(&self, world: &mut World) {
         create_passive_building(
             world,
-            BUILDERS_HUT_LEVELS[self.level].health,
+            BUILDERS_HUT_LEVELS[*self.level].health,
             Vector2::new(self.x, self.y),
             BUILDERS_HUT.size,
         );

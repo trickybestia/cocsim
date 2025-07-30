@@ -1,4 +1,3 @@
-use anyhow::ensure;
 use arbitrary::Arbitrary;
 use nalgebra::Vector2;
 use serde::{
@@ -10,6 +9,7 @@ use shipyard::World;
 use crate::{
     BuildingModel,
     BuildingType,
+    LevelIndex,
     buildings::utils::passive_building::create_passive_building,
 };
 
@@ -17,7 +17,9 @@ struct GoldMineLevel {
     pub health: f32,
 }
 
-const GOLD_MINE_LEVELS: &[GoldMineLevel] = &[
+const GOLD_MINE_LEVELS_LEN: usize = 16;
+const GOLD_MINE_LEVEL_INDEX_MAX: usize = GOLD_MINE_LEVELS_LEN - 1;
+const GOLD_MINE_LEVELS: [GoldMineLevel; GOLD_MINE_LEVELS_LEN] = [
     GoldMineLevel { health: 400.0 },
     GoldMineLevel { health: 440.0 },
     GoldMineLevel { health: 480.0 },
@@ -49,7 +51,7 @@ inventory::submit! {GOLD_MINE}
 pub struct GoldMineModel {
     pub x: usize,
     pub y: usize,
-    pub level: usize,
+    pub level: LevelIndex<GOLD_MINE_LEVEL_INDEX_MAX>,
 }
 
 impl BuildingModel for GoldMineModel {
@@ -61,16 +63,10 @@ impl BuildingModel for GoldMineModel {
         Vector2::new(self.x, self.y)
     }
 
-    fn validate(&self) -> anyhow::Result<()> {
-        ensure!(self.level < GOLD_MINE_LEVELS.len());
-
-        Ok(())
-    }
-
     fn create_building(&self, world: &mut World) {
         create_passive_building(
             world,
-            GOLD_MINE_LEVELS[self.level].health,
+            GOLD_MINE_LEVELS[*self.level].health,
             Vector2::new(self.x, self.y),
             GOLD_MINE.size,
         );

@@ -1,4 +1,3 @@
-use anyhow::ensure;
 use arbitrary::Arbitrary;
 use nalgebra::Vector2;
 use serde::{
@@ -10,6 +9,7 @@ use shipyard::World;
 use crate::{
     BuildingModel,
     BuildingType,
+    LevelIndex,
     buildings::utils::active_building::create_active_building,
     game::features::{
         actions::{
@@ -28,7 +28,9 @@ struct BombTowerLevel {
     pub death_damage: f32,
 }
 
-const BOMB_TOWER_LEVELS: &[BombTowerLevel] = &[
+const BOMB_TOWER_LEVELS_LEN: usize = 12;
+const BOMB_TOWER_LEVEL_INDEX_MAX: usize = BOMB_TOWER_LEVELS_LEN - 1;
+const BOMB_TOWER_LEVELS: [BombTowerLevel; BOMB_TOWER_LEVELS_LEN] = [
     BombTowerLevel {
         health: 650.0,
         attack_damage: 26.4,
@@ -112,7 +114,7 @@ const BOMB_TOWER_DEATH_DAMAGE_DELAY: f32 = 1.0;
 pub struct BombTowerModel {
     pub x: usize,
     pub y: usize,
-    pub level: usize,
+    pub level: LevelIndex<BOMB_TOWER_LEVEL_INDEX_MAX>,
 }
 
 impl BuildingModel for BombTowerModel {
@@ -124,14 +126,8 @@ impl BuildingModel for BombTowerModel {
         Vector2::new(self.x, self.y)
     }
 
-    fn validate(&self) -> anyhow::Result<()> {
-        ensure!(self.level < BOMB_TOWER_LEVELS.len());
-
-        Ok(())
-    }
-
     fn create_building(&self, world: &mut World) {
-        let level = &BOMB_TOWER_LEVELS[self.level];
+        let level = &BOMB_TOWER_LEVELS[*self.level];
 
         let id = create_active_building(
             world,

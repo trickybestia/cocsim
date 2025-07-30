@@ -1,4 +1,3 @@
-use anyhow::ensure;
 use arbitrary::Arbitrary;
 use nalgebra::Vector2;
 use serde::{
@@ -10,6 +9,7 @@ use shipyard::World;
 use crate::{
     BuildingModel,
     BuildingType,
+    LevelIndex,
     buildings::utils::passive_building::create_passive_building,
 };
 
@@ -17,7 +17,9 @@ struct ElixirCollectorLevel {
     pub health: f32,
 }
 
-const ELIXIR_COLLECTOR_LEVELS: &[ElixirCollectorLevel] = &[
+const ELIXIR_COLLECTOR_LEVELS_LEN: usize = 16;
+const ELIXIR_COLLECTOR_LEVEL_INDEX_MAX: usize = ELIXIR_COLLECTOR_LEVELS_LEN - 1;
+const ELIXIR_COLLECTOR_LEVELS: [ElixirCollectorLevel; ELIXIR_COLLECTOR_LEVELS_LEN] = [
     ElixirCollectorLevel { health: 400.0 },
     ElixirCollectorLevel { health: 440.0 },
     ElixirCollectorLevel { health: 480.0 },
@@ -49,7 +51,7 @@ inventory::submit! {ELIXIR_COLLECTOR}
 pub struct ElixirCollectorModel {
     pub x: usize,
     pub y: usize,
-    pub level: usize,
+    pub level: LevelIndex<ELIXIR_COLLECTOR_LEVEL_INDEX_MAX>,
 }
 
 impl BuildingModel for ElixirCollectorModel {
@@ -61,16 +63,10 @@ impl BuildingModel for ElixirCollectorModel {
         Vector2::new(self.x, self.y)
     }
 
-    fn validate(&self) -> anyhow::Result<()> {
-        ensure!(self.level < ELIXIR_COLLECTOR_LEVELS.len());
-
-        Ok(())
-    }
-
     fn create_building(&self, world: &mut World) {
         create_passive_building(
             world,
-            ELIXIR_COLLECTOR_LEVELS[self.level].health,
+            ELIXIR_COLLECTOR_LEVELS[*self.level].health,
             Vector2::new(self.x, self.y),
             ELIXIR_COLLECTOR.size,
         );

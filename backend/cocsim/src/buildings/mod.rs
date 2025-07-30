@@ -75,8 +75,6 @@ pub trait BuildingModel {
 
     fn position(&self) -> Vector2<usize>;
 
-    fn validate(&self) -> anyhow::Result<()>;
-
     fn create_building(&self, world: &mut World);
 }
 

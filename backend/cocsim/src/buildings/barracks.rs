@@ -1,4 +1,3 @@
-use anyhow::ensure;
 use arbitrary::Arbitrary;
 use nalgebra::Vector2;
 use serde::{
@@ -10,6 +9,7 @@ use shipyard::World;
 use crate::{
     BuildingModel,
     BuildingType,
+    LevelIndex,
     buildings::utils::passive_building::create_passive_building,
 };
 
@@ -17,7 +17,9 @@ struct BarracksLevel {
     pub health: f32,
 }
 
-const BARRACKS_LEVELS: &[BarracksLevel] = &[
+const BARRACKS_LEVELS_LEN: usize = 18;
+const BARRACKS_LEVEL_INDEX_MAX: usize = BARRACKS_LEVELS_LEN - 1;
+const BARRACKS_LEVELS: [BarracksLevel; BARRACKS_LEVELS_LEN] = [
     BarracksLevel { health: 250.0 },
     BarracksLevel { health: 290.0 },
     BarracksLevel { health: 330.0 },
@@ -51,7 +53,7 @@ inventory::submit! {BARRACKS}
 pub struct BarracksModel {
     pub x: usize,
     pub y: usize,
-    pub level: usize,
+    pub level: LevelIndex<BARRACKS_LEVEL_INDEX_MAX>,
 }
 
 impl BuildingModel for BarracksModel {
@@ -63,16 +65,10 @@ impl BuildingModel for BarracksModel {
         Vector2::new(self.x, self.y)
     }
 
-    fn validate(&self) -> anyhow::Result<()> {
-        ensure!(self.level < BARRACKS_LEVELS.len());
-
-        Ok(())
-    }
-
     fn create_building(&self, world: &mut World) {
         create_passive_building(
             world,
-            BARRACKS_LEVELS[self.level].health,
+            BARRACKS_LEVELS[*self.level].health,
             Vector2::new(self.x, self.y),
             BARRACKS.size,
         );

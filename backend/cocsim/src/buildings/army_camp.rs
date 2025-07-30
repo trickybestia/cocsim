@@ -1,4 +1,3 @@
-use anyhow::ensure;
 use arbitrary::Arbitrary;
 use nalgebra::Vector2;
 use serde::{
@@ -10,6 +9,7 @@ use shipyard::World;
 use crate::{
     BuildingModel,
     BuildingType,
+    LevelIndex,
     buildings::utils::passive_building::create_passive_building,
 };
 
@@ -17,7 +17,9 @@ struct ArmyCampLevel {
     pub health: f32,
 }
 
-const ARMY_CAMP_LEVELS: &[ArmyCampLevel] = &[
+const ARMY_CAMP_LEVELS_LEN: usize = 13;
+const ARMY_CAMP_LEVEL_INDEX_MAX: usize = ARMY_CAMP_LEVELS_LEN - 1;
+const ARMY_CAMP_LEVELS: [ArmyCampLevel; ARMY_CAMP_LEVELS_LEN] = [
     ArmyCampLevel { health: 250.0 },
     ArmyCampLevel { health: 270.0 },
     ArmyCampLevel { health: 290.0 },
@@ -46,7 +48,7 @@ inventory::submit! {ARMY_CAMP}
 pub struct ArmyCampModel {
     pub x: usize,
     pub y: usize,
-    pub level: usize,
+    pub level: LevelIndex<ARMY_CAMP_LEVEL_INDEX_MAX>,
 }
 
 impl BuildingModel for ArmyCampModel {
@@ -58,16 +60,10 @@ impl BuildingModel for ArmyCampModel {
         Vector2::new(self.x, self.y)
     }
 
-    fn validate(&self) -> anyhow::Result<()> {
-        ensure!(self.level < ARMY_CAMP_LEVELS.len());
-
-        Ok(())
-    }
-
     fn create_building(&self, world: &mut World) {
         create_passive_building(
             world,
-            ARMY_CAMP_LEVELS[self.level].health,
+            ARMY_CAMP_LEVELS[*self.level].health,
             Vector2::new(self.x, self.y),
             ARMY_CAMP.size,
         );

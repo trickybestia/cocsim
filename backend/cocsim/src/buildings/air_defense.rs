@@ -1,4 +1,3 @@
-use anyhow::ensure;
 use arbitrary::Arbitrary;
 use nalgebra::Vector2;
 use serde::{
@@ -10,6 +9,7 @@ use shipyard::World;
 use crate::{
     BuildingModel,
     BuildingType,
+    LevelIndex,
     buildings::utils::active_building::create_active_building,
     game::features::actions::{
         BuildingFindTarget,
@@ -22,7 +22,9 @@ struct AirDefenseLevel {
     pub attack_damage: f32,
 }
 
-const AIR_DEFENSE_LEVELS: &[AirDefenseLevel] = &[
+const AIR_DEFENSE_LEVELS_LEN: usize = 15;
+const AIR_DEFENSE_LEVEL_INDEX_MAX: usize = AIR_DEFENSE_LEVELS_LEN - 1;
+const AIR_DEFENSE_LEVELS: [AirDefenseLevel; AIR_DEFENSE_LEVELS_LEN] = [
     AirDefenseLevel {
         health: 800.0,
         attack_damage: 80.0,
@@ -103,7 +105,7 @@ const AIR_DEFENSE_PROJECTILE_SPEED: f32 = 8.0;
 pub struct AirDefenseModel {
     pub x: usize,
     pub y: usize,
-    pub level: usize,
+    pub level: LevelIndex<AIR_DEFENSE_LEVEL_INDEX_MAX>,
 }
 
 impl BuildingModel for AirDefenseModel {
@@ -115,14 +117,8 @@ impl BuildingModel for AirDefenseModel {
         Vector2::new(self.x, self.y)
     }
 
-    fn validate(&self) -> anyhow::Result<()> {
-        ensure!(self.level < AIR_DEFENSE_LEVELS.len());
-
-        Ok(())
-    }
-
     fn create_building(&self, world: &mut World) {
-        let level = &AIR_DEFENSE_LEVELS[self.level];
+        let level = &AIR_DEFENSE_LEVELS[*self.level];
 
         create_active_building(
             world,

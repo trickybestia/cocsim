@@ -36,8 +36,6 @@ impl Map {
         let mut buildings_grid = DMatrix::from_element(self.base_size, self.base_size, false);
 
         for building in &self.buildings {
-            building.validate()?;
-
             if let BuildingModelEnum::TownHallModel(_) = building {
                 ensure!(!has_town_hall);
 

@@ -1,4 +1,3 @@
-use anyhow::ensure;
 use arbitrary::Arbitrary;
 use nalgebra::Vector2;
 use serde::{
@@ -10,6 +9,7 @@ use shipyard::World;
 use crate::{
     BuildingModel,
     BuildingType,
+    LevelIndex,
     buildings::utils::passive_building::create_passive_building,
 };
 
@@ -17,7 +17,9 @@ struct ClanCastleLevel {
     pub health: f32,
 }
 
-const CLAN_CASTLE_LEVELS: &[ClanCastleLevel] = &[
+const CLAN_CASTLE_LEVELS_LEN: usize = 13;
+const CLAN_CASTLE_LEVEL_INDEX_MAX: usize = CLAN_CASTLE_LEVELS_LEN - 1;
+const CLAN_CASTLE_LEVELS: [ClanCastleLevel; CLAN_CASTLE_LEVELS_LEN] = [
     ClanCastleLevel { health: 1000.0 },
     ClanCastleLevel { health: 1400.0 },
     ClanCastleLevel { health: 2000.0 },
@@ -46,7 +48,7 @@ inventory::submit! {CLAN_CASTLE}
 pub struct ClanCastleModel {
     pub x: usize,
     pub y: usize,
-    pub level: usize,
+    pub level: LevelIndex<CLAN_CASTLE_LEVEL_INDEX_MAX>,
 }
 
 impl BuildingModel for ClanCastleModel {
@@ -58,16 +60,10 @@ impl BuildingModel for ClanCastleModel {
         Vector2::new(self.x, self.y)
     }
 
-    fn validate(&self) -> anyhow::Result<()> {
-        ensure!(self.level < CLAN_CASTLE_LEVELS.len());
-
-        Ok(())
-    }
-
     fn create_building(&self, world: &mut World) {
         create_passive_building(
             world,
-            CLAN_CASTLE_LEVELS[self.level].health,
+            CLAN_CASTLE_LEVELS[*self.level].health,
             Vector2::new(self.x, self.y),
             CLAN_CASTLE.size,
         );

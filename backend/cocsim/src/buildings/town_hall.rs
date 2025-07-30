@@ -1,4 +1,3 @@
-use anyhow::ensure;
 use arbitrary::Arbitrary;
 use nalgebra::Vector2;
 use serde::{
@@ -10,6 +9,7 @@ use shipyard::World;
 use crate::{
     BuildingModel,
     BuildingType,
+    LevelIndex,
     buildings::utils::passive_building::create_passive_building,
 };
 
@@ -17,7 +17,9 @@ struct TownHallLevel {
     pub health: f32,
 }
 
-const TOWN_HALL_LEVELS: &[TownHallLevel] = &[
+const TOWN_HALL_LEVELS_LEN: usize = 17;
+const TOWN_HALL_LEVEL_INDEX_MAX: usize = TOWN_HALL_LEVELS_LEN - 1;
+const TOWN_HALL_LEVELS: [TownHallLevel; TOWN_HALL_LEVELS_LEN] = [
     TownHallLevel { health: 450.0 },
     TownHallLevel { health: 1600.0 },
     TownHallLevel { health: 1850.0 },
@@ -50,7 +52,7 @@ inventory::submit! {TOWN_HALL}
 pub struct TownHallModel {
     pub x: usize,
     pub y: usize,
-    pub level: usize,
+    pub level: LevelIndex<TOWN_HALL_LEVEL_INDEX_MAX>,
 }
 
 impl BuildingModel for TownHallModel {
@@ -62,16 +64,10 @@ impl BuildingModel for TownHallModel {
         Vector2::new(self.x, self.y)
     }
 
-    fn validate(&self) -> anyhow::Result<()> {
-        ensure!(self.level < TOWN_HALL_LEVELS.len());
-
-        Ok(())
-    }
-
     fn create_building(&self, world: &mut World) {
         let id = create_passive_building(
             world,
-            TOWN_HALL_LEVELS[self.level].health,
+            TOWN_HALL_LEVELS[*self.level].health,
             Vector2::new(self.x, self.y),
             TOWN_HALL.size,
         );

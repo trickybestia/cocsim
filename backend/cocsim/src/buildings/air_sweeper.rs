@@ -1,4 +1,3 @@
-use anyhow::ensure;
 use arbitrary::Arbitrary;
 use nalgebra::Vector2;
 use serde::{
@@ -11,6 +10,7 @@ use crate::{
     BuildingModel,
     BuildingOption,
     BuildingType,
+    LevelIndex,
     buildings::utils::passive_building::create_passive_building,
 };
 
@@ -19,7 +19,9 @@ struct AirSweeperLevel {
     pub push_strength: f32,
 }
 
-const AIR_SWEEPER_LEVELS: &[AirSweeperLevel] = &[
+const AIR_SWEEPER_LEVELS_LEN: usize = 7;
+const AIR_SWEEPER_LEVEL_INDEX_MAX: usize = AIR_SWEEPER_LEVELS_LEN - 1;
+const AIR_SWEEPER_LEVELS: [AirSweeperLevel; AIR_SWEEPER_LEVELS_LEN] = [
     AirSweeperLevel {
         health: 750.0,
         push_strength: 1.6,
@@ -87,7 +89,7 @@ pub enum AirSweeperRotation {
 pub struct AirSweeperModel {
     pub x: usize,
     pub y: usize,
-    pub level: usize,
+    pub level: LevelIndex<AIR_SWEEPER_LEVEL_INDEX_MAX>,
     pub rotation: AirSweeperRotation,
 }
 
@@ -100,16 +102,10 @@ impl BuildingModel for AirSweeperModel {
         Vector2::new(self.x, self.y)
     }
 
-    fn validate(&self) -> anyhow::Result<()> {
-        ensure!(self.level < AIR_SWEEPER_LEVELS.len());
-
-        Ok(())
-    }
-
     fn create_building(&self, world: &mut World) {
         create_passive_building(
             world,
-            AIR_SWEEPER_LEVELS[self.level].health,
+            AIR_SWEEPER_LEVELS[*self.level].health,
             Vector2::new(self.x, self.y),
             AIR_SWEEPER.size,
         );

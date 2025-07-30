@@ -1,4 +1,3 @@
-use anyhow::ensure;
 use arbitrary::Arbitrary;
 use nalgebra::Vector2;
 use serde::{
@@ -10,6 +9,7 @@ use shipyard::World;
 use crate::{
     BuildingModel,
     BuildingType,
+    LevelIndex,
     buildings::utils::active_building::create_active_building,
     game::features::actions::{
         BuildingFindTarget,
@@ -22,7 +22,9 @@ struct ArcherTowerLevel {
     pub attack_damage: f32,
 }
 
-const ARCHER_TOWER_LEVELS: &[ArcherTowerLevel] = &[
+const ARCHER_TOWER_LEVELS_LEN: usize = 21;
+const ARCHER_TOWER_LEVEL_INDEX_MAX: usize = ARCHER_TOWER_LEVELS_LEN - 1;
+const ARCHER_TOWER_LEVELS: [ArcherTowerLevel; ARCHER_TOWER_LEVELS_LEN] = [
     ArcherTowerLevel {
         health: 380.0,
         attack_damage: 5.5,
@@ -127,7 +129,7 @@ const ARCHER_TOWER_PROJECTILE_SPEED: f32 = 18.0;
 pub struct ArcherTowerModel {
     pub x: usize,
     pub y: usize,
-    pub level: usize,
+    pub level: LevelIndex<ARCHER_TOWER_LEVEL_INDEX_MAX>,
 }
 
 impl BuildingModel for ArcherTowerModel {
@@ -139,14 +141,8 @@ impl BuildingModel for ArcherTowerModel {
         Vector2::new(self.x, self.y)
     }
 
-    fn validate(&self) -> anyhow::Result<()> {
-        ensure!(self.level < ARCHER_TOWER_LEVELS.len());
-
-        Ok(())
-    }
-
     fn create_building(&self, world: &mut World) {
-        let level = &ARCHER_TOWER_LEVELS[self.level];
+        let level = &ARCHER_TOWER_LEVELS[*self.level];
 
         create_active_building(
             world,

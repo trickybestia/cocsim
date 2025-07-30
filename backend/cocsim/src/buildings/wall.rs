@@ -1,4 +1,3 @@
-use anyhow::ensure;
 use arbitrary::Arbitrary;
 use nalgebra::Vector2;
 use serde::{
@@ -10,6 +9,7 @@ use shipyard::World;
 use crate::{
     BuildingModel,
     BuildingType,
+    LevelIndex,
     buildings::utils::passive_building::default_attack_collider,
     colliders::{
         Collider,
@@ -32,7 +32,9 @@ struct WallLevel {
     pub health: f32,
 }
 
-const WALL_LEVELS: &[WallLevel] = &[
+const WALL_LEVELS_LEN: usize = 18;
+const WALL_LEVEL_INDEX_MAX: usize = WALL_LEVELS_LEN - 1;
+const WALL_LEVELS: [WallLevel; WALL_LEVELS_LEN] = [
     WallLevel { health: 300.0 },
     WallLevel { health: 500.0 },
     WallLevel { health: 700.0 },
@@ -66,7 +68,7 @@ inventory::submit! {WALL}
 pub struct WallModel {
     pub x: usize,
     pub y: usize,
-    pub level: usize,
+    pub level: LevelIndex<WALL_LEVEL_INDEX_MAX>,
 }
 
 impl BuildingModel for WallModel {
@@ -78,17 +80,11 @@ impl BuildingModel for WallModel {
         Vector2::new(self.x, self.y)
     }
 
-    fn validate(&self) -> anyhow::Result<()> {
-        ensure!(self.level < WALL_LEVELS.len());
-
-        Ok(())
-    }
-
     fn create_building(&self, world: &mut World) {
         let collider = default_attack_collider(WALL.size);
 
         world.add_entity((
-            Health(WALL_LEVELS[self.level].health),
+            Health(WALL_LEVELS[*self.level].health),
             Building {
                 position: Vector2::new(self.x, self.y),
                 size: WALL.size,

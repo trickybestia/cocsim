@@ -1,4 +1,3 @@
-use anyhow::ensure;
 use arbitrary::Arbitrary;
 use nalgebra::Vector2;
 use serde::{
@@ -10,6 +9,7 @@ use shipyard::World;
 use crate::{
     BuildingModel,
     BuildingType,
+    LevelIndex,
     buildings::utils::active_building::create_active_building,
     game::features::actions::{
         BuildingFindTarget,
@@ -22,7 +22,9 @@ struct WizardTowerLevel {
     pub attack_damage: f32,
 }
 
-const WIZARD_TOWER_LEVELS: &[WizardTowerLevel] = &[
+const WIZARD_TOWER_LEVELS_LEN: usize = 17;
+const WIZARD_TOWER_LEVEL_INDEX_MAX: usize = WIZARD_TOWER_LEVELS_LEN - 1;
+const WIZARD_TOWER_LEVELS: [WizardTowerLevel; WIZARD_TOWER_LEVELS_LEN] = [
     WizardTowerLevel {
         health: 620.0,
         attack_damage: 14.3,
@@ -111,7 +113,7 @@ const WIZARD_TOWER_SPLASH_ATTACK_RADIUS: f32 = 1.0;
 pub struct WizardTowerModel {
     pub x: usize,
     pub y: usize,
-    pub level: usize,
+    pub level: LevelIndex<WIZARD_TOWER_LEVEL_INDEX_MAX>,
 }
 
 impl BuildingModel for WizardTowerModel {
@@ -123,15 +125,9 @@ impl BuildingModel for WizardTowerModel {
         Vector2::new(self.x, self.y)
     }
 
-    fn validate(&self) -> anyhow::Result<()> {
-        ensure!(self.level < WIZARD_TOWER_LEVELS.len());
-
-        Ok(())
-    }
-
     fn create_building(&self, world: &mut World) {
-        let projectile_speed = if self.level >= 4 { 9.0 } else { 5.0 };
-        let level = &WIZARD_TOWER_LEVELS[self.level];
+        let projectile_speed = if *self.level >= 4 { 9.0 } else { 5.0 };
+        let level = &WIZARD_TOWER_LEVELS[*self.level];
 
         create_active_building(
             world,

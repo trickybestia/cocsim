@@ -1,4 +1,3 @@
-use anyhow::ensure;
 use arbitrary::Arbitrary;
 use nalgebra::Vector2;
 use serde::{
@@ -10,6 +9,7 @@ use shipyard::World;
 use crate::{
     BuildingModel,
     BuildingType,
+    LevelIndex,
     buildings::utils::passive_building::create_passive_building,
 };
 
@@ -17,7 +17,10 @@ struct GoblinHutLevel {
     pub health: f32,
 }
 
-const GOBLIN_HUT_LEVELS: &[GoblinHutLevel] = &[GoblinHutLevel { health: 250.0 }];
+const GOBLIN_HUT_LEVELS_LEN: usize = 1;
+const GOBLIN_HUT_LEVEL_INDEX_MAX: usize = GOBLIN_HUT_LEVELS_LEN - 1;
+const GOBLIN_HUT_LEVELS: [GoblinHutLevel; GOBLIN_HUT_LEVELS_LEN] =
+    [GoblinHutLevel { health: 250.0 }];
 
 const GOBLIN_HUT: BuildingType = BuildingType {
     name: "GoblinHut",
@@ -32,7 +35,7 @@ inventory::submit! {GOBLIN_HUT}
 pub struct GoblinHutModel {
     pub x: usize,
     pub y: usize,
-    pub level: usize,
+    pub level: LevelIndex<GOBLIN_HUT_LEVEL_INDEX_MAX>,
 }
 
 impl BuildingModel for GoblinHutModel {
@@ -44,16 +47,10 @@ impl BuildingModel for GoblinHutModel {
         Vector2::new(self.x, self.y)
     }
 
-    fn validate(&self) -> anyhow::Result<()> {
-        ensure!(self.level < GOBLIN_HUT_LEVELS.len());
-
-        Ok(())
-    }
-
     fn create_building(&self, world: &mut World) {
         create_passive_building(
             world,
-            GOBLIN_HUT_LEVELS[self.level].health,
+            GOBLIN_HUT_LEVELS[*self.level].health,
             Vector2::new(self.x, self.y),
             GOBLIN_HUT.size,
         );

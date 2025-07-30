@@ -1,4 +1,3 @@
-use anyhow::ensure;
 use arbitrary::Arbitrary;
 use nalgebra::Vector2;
 use serde::{
@@ -10,6 +9,7 @@ use shipyard::World;
 use crate::{
     BuildingModel,
     BuildingType,
+    LevelIndex,
     buildings::utils::passive_building::create_passive_building,
 };
 
@@ -17,7 +17,9 @@ struct LaboratoryLevel {
     pub health: f32,
 }
 
-const LABORATORY_LEVELS: &[LaboratoryLevel] = &[
+const LABORATORY_LEVELS_LEN: usize = 14;
+const LABORATORY_LEVEL_INDEX_MAX: usize = LABORATORY_LEVELS_LEN - 1;
+const LABORATORY_LEVELS: [LaboratoryLevel; LABORATORY_LEVELS_LEN] = [
     LaboratoryLevel { health: 500.0 },
     LaboratoryLevel { health: 550.0 },
     LaboratoryLevel { health: 600.0 },
@@ -47,7 +49,7 @@ inventory::submit! {LABORATORY}
 pub struct LaboratoryModel {
     pub x: usize,
     pub y: usize,
-    pub level: usize,
+    pub level: LevelIndex<LABORATORY_LEVEL_INDEX_MAX>,
 }
 
 impl BuildingModel for LaboratoryModel {
@@ -59,16 +61,10 @@ impl BuildingModel for LaboratoryModel {
         Vector2::new(self.x, self.y)
     }
 
-    fn validate(&self) -> anyhow::Result<()> {
-        ensure!(self.level < LABORATORY_LEVELS.len());
-
-        Ok(())
-    }
-
     fn create_building(&self, world: &mut World) {
         create_passive_building(
             world,
-            LABORATORY_LEVELS[self.level].health,
+            LABORATORY_LEVELS[*self.level].health,
             Vector2::new(self.x, self.y),
             LABORATORY.size,
         );

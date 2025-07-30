@@ -1,4 +1,3 @@
-use anyhow::ensure;
 use arbitrary::Arbitrary;
 use nalgebra::Vector2;
 use serde::{
@@ -11,6 +10,7 @@ use crate::{
     BuildingModel,
     BuildingOption,
     BuildingType,
+    LevelIndex,
     buildings::utils::active_building::create_active_building,
     game::features::actions::{
         BuildingFindTarget,
@@ -23,7 +23,9 @@ struct XBowLevel {
     pub attack_damage: f32,
 }
 
-const X_BOW_LEVELS: &[XBowLevel] = &[
+const X_BOW_LEVELS_LEN: usize = 12;
+const X_BOW_LEVEL_INDEX_MAX: usize = X_BOW_LEVELS_LEN - 1;
+const X_BOW_LEVELS: [XBowLevel; X_BOW_LEVELS_LEN] = [
     XBowLevel {
         health: 1500.0,
         attack_damage: 7.68,
@@ -99,7 +101,7 @@ pub enum XBowTargetType {
 pub struct XBowModel {
     pub x: usize,
     pub y: usize,
-    pub level: usize,
+    pub level: LevelIndex<X_BOW_LEVEL_INDEX_MAX>,
     pub target: XBowTargetType,
 }
 
@@ -112,23 +114,17 @@ impl BuildingModel for XBowModel {
         Vector2::new(self.x, self.y)
     }
 
-    fn validate(&self) -> anyhow::Result<()> {
-        ensure!(self.level < X_BOW_LEVELS.len());
-
-        Ok(())
-    }
-
     fn create_building(&self, world: &mut World) {
         let max_attack_range = match self.target {
             XBowTargetType::Ground => 14.0,
             XBowTargetType::AirAndGround => 11.5,
         };
-        let projectile_speed = match self.level {
+        let projectile_speed = match *self.level {
             0 => 23.0,
             1 => 24.0,
             _ => 25.0,
         };
-        let level = &X_BOW_LEVELS[self.level];
+        let level = &X_BOW_LEVELS[*self.level];
 
         create_active_building(
             world,

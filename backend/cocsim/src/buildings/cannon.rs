@@ -1,4 +1,3 @@
-use anyhow::ensure;
 use arbitrary::Arbitrary;
 use nalgebra::Vector2;
 use serde::{
@@ -10,6 +9,7 @@ use shipyard::World;
 use crate::{
     BuildingModel,
     BuildingType,
+    LevelIndex,
     buildings::utils::active_building::create_active_building,
     game::features::actions::{
         BuildingFindTarget,
@@ -22,7 +22,9 @@ struct CannonLevel {
     pub attack_damage: f32,
 }
 
-const CANNON_LEVELS: &[CannonLevel] = &[
+const CANNON_LEVELS_LEN: usize = 21;
+const CANNON_LEVEL_INDEX_MAX: usize = CANNON_LEVELS_LEN - 1;
+const CANNON_LEVELS: [CannonLevel; CANNON_LEVELS_LEN] = [
     CannonLevel {
         health: 420.0,
         attack_damage: 7.2,
@@ -127,7 +129,7 @@ const CANNON_PROJECTILE_SPEED: f32 = 12.0;
 pub struct CannonModel {
     pub x: usize,
     pub y: usize,
-    pub level: usize,
+    pub level: LevelIndex<CANNON_LEVEL_INDEX_MAX>,
 }
 
 impl BuildingModel for CannonModel {
@@ -139,14 +141,8 @@ impl BuildingModel for CannonModel {
         Vector2::new(self.x, self.y)
     }
 
-    fn validate(&self) -> anyhow::Result<()> {
-        ensure!(self.level < CANNON_LEVELS.len());
-
-        Ok(())
-    }
-
     fn create_building(&self, world: &mut World) {
-        let level = &CANNON_LEVELS[self.level];
+        let level = &CANNON_LEVELS[*self.level];
 
         create_active_building(
             world,

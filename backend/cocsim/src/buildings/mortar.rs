@@ -1,4 +1,3 @@
-use anyhow::ensure;
 use arbitrary::Arbitrary;
 use nalgebra::Vector2;
 use serde::{
@@ -10,6 +9,7 @@ use shipyard::World;
 use crate::{
     BuildingModel,
     BuildingType,
+    LevelIndex,
     buildings::utils::active_building::create_active_building,
     game::features::actions::{
         BuildingFindTarget,
@@ -22,7 +22,9 @@ struct MortarLevel {
     pub attack_damage: f32,
 }
 
-const MORTAR_LEVELS: &[MortarLevel] = &[
+const MORTAR_LEVELS_LEN: usize = 17;
+const MORTAR_LEVEL_INDEX_MAX: usize = MORTAR_LEVELS_LEN - 1;
+const MORTAR_LEVELS: [MortarLevel; MORTAR_LEVELS_LEN] = [
     MortarLevel {
         health: 400.0,
         attack_damage: 20.0,
@@ -112,7 +114,7 @@ const MORTAR_SPLASH_ATTACK_RADIUS: f32 = 1.5;
 pub struct MortarModel {
     pub x: usize,
     pub y: usize,
-    pub level: usize,
+    pub level: LevelIndex<MORTAR_LEVEL_INDEX_MAX>,
 }
 
 impl BuildingModel for MortarModel {
@@ -124,14 +126,8 @@ impl BuildingModel for MortarModel {
         Vector2::new(self.x, self.y)
     }
 
-    fn validate(&self) -> anyhow::Result<()> {
-        ensure!(self.level < MORTAR_LEVELS.len());
-
-        Ok(())
-    }
-
     fn create_building(&self, world: &mut World) {
-        let level = &MORTAR_LEVELS[self.level];
+        let level = &MORTAR_LEVELS[*self.level];
 
         create_active_building(
             world,
