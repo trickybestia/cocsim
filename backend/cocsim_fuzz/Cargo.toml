@@ -13,15 +13,8 @@ cocsim = { path = "../cocsim" }
 libfuzzer-sys = "0.4"
 
 [[bin]]
-name = "fuzz_validate"
-path = "fuzz_targets/fuzz_validate.rs"
-test = false
-doc = false
-bench = false
-
-[[bin]]
-name = "fuzz_game"
-path = "fuzz_targets/fuzz_game.rs"
+name = "fuzz"
+path = "fuzz_targets/fuzz.rs"
 test = false
 doc = false
 bench = false
