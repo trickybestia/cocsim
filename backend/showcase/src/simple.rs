@@ -21,7 +21,10 @@ async fn main() {
 
     for i in 0..10 {
         game.spawn_unit(
-            &BalloonModel { level: 10 }.into(),
+            &BalloonModel {
+                level: 10.try_into().unwrap(),
+            }
+            .into(),
             Vector2::new(0.5, i as f32 + 0.5),
         );
     }

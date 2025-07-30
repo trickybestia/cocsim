@@ -29,7 +29,10 @@ fn get_showcase_attack_internal() -> Json<Value> {
 
     for i in 0..10 {
         game.spawn_unit(
-            &DragonModel { level: 10 }.into(),
+            &DragonModel {
+                level: 10.try_into().unwrap(),
+            }
+            .into(),
             Vector2::new(0.5, i as f32 + 0.5),
         );
     }

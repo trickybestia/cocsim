@@ -1,4 +1,3 @@
-use anyhow::ensure;
 use arbitrary::Arbitrary;
 use nalgebra::Vector2;
 use serde::{
@@ -26,6 +25,7 @@ use crate::{
         position::Position,
         to_be_deleted::OnDelete,
     },
+    level_index::LevelIndex,
     units::utils::air_unit::create_air_unit,
 };
 
@@ -35,7 +35,9 @@ struct BalloonLevel {
     pub death_damage: f32,
 }
 
-const BALLOON_LEVELS: &[BalloonLevel] = &[
+const BALLON_LEVELS_LEN: usize = 11;
+const BALLOON_LEVEL_INDEX_MAX: usize = BALLON_LEVELS_LEN - 1;
+const BALLOON_LEVELS: [BalloonLevel; BALLON_LEVELS_LEN] = [
     BalloonLevel {
         health: 150.0,
         attack_damage: 75.0,
@@ -119,18 +121,12 @@ fn draw_balloon(id: EntityId, all_storages: &AllStoragesView, result: &mut Vec<S
 
 #[derive(Serialize, Deserialize, Debug, Clone, Arbitrary)]
 pub struct BalloonModel {
-    pub level: usize,
+    pub level: LevelIndex<BALLOON_LEVEL_INDEX_MAX>,
 }
 
 impl UnitModel for BalloonModel {
-    fn validate(&self) -> anyhow::Result<()> {
-        ensure!(self.level < BALLOON_LEVELS.len());
-
-        Ok(())
-    }
-
     fn create_unit(&self, world: &mut World, position: Vector2<f32>) {
-        let level = &BALLOON_LEVELS[self.level];
+        let level = &BALLOON_LEVELS[*self.level];
 
         let id = create_air_unit(
             world,

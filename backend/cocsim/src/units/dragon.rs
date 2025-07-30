@@ -1,4 +1,3 @@
-use anyhow::ensure;
 use arbitrary::Arbitrary;
 use nalgebra::Vector2;
 use serde::{
@@ -25,6 +24,7 @@ use crate::{
         attack::AttackTargetFlags,
         position::Position,
     },
+    level_index::LevelIndex,
     units::utils::air_unit::create_air_unit,
 };
 
@@ -33,7 +33,9 @@ struct DragonLevel {
     pub attack_damage: f32,
 }
 
-const DRAGON_LEVELS: &[DragonLevel] = &[
+const DRAGON_LEVELS_LEN: usize = 12;
+const DRAGON_LEVEL_INDEX_MAX: usize = DRAGON_LEVELS_LEN - 1;
+const DRAGON_LEVELS: [DragonLevel; DRAGON_LEVELS_LEN] = [
     DragonLevel {
         health: 1900.0,
         attack_damage: 175.0,
@@ -109,18 +111,12 @@ fn draw_dragon(id: EntityId, all_storages: &AllStoragesView, result: &mut Vec<Sh
 
 #[derive(Serialize, Deserialize, Debug, Clone, Arbitrary)]
 pub struct DragonModel {
-    pub level: usize,
+    pub level: LevelIndex<DRAGON_LEVEL_INDEX_MAX>,
 }
 
 impl UnitModel for DragonModel {
-    fn validate(&self) -> anyhow::Result<()> {
-        ensure!(self.level < DRAGON_LEVELS.len());
-
-        Ok(())
-    }
-
     fn create_unit(&self, world: &mut World, position: Vector2<f32>) {
-        let level = &DRAGON_LEVELS[self.level];
+        let level = &DRAGON_LEVELS[*self.level];
 
         create_air_unit(
             world,

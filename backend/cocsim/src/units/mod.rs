@@ -18,8 +18,6 @@ use crate::consts::MAX_UNITS_COUNT;
 
 #[enum_dispatch]
 pub trait UnitModel {
-    fn validate(&self) -> anyhow::Result<()>;
-
     fn create_unit(&self, world: &mut World, position: Vector2<f32>);
 }
 
@@ -46,11 +44,7 @@ pub fn validate_units<'a, T>(units: T) -> anyhow::Result<()>
 where
     T: IntoIterator<Item = &'a UnitModelEnum>,
 {
-    for (i, unit) in units.into_iter().enumerate() {
-        ensure!(i < MAX_UNITS_COUNT);
-
-        unit.validate()?;
-    }
+    ensure!(units.into_iter().count() <= MAX_UNITS_COUNT);
 
     Ok(())
 }

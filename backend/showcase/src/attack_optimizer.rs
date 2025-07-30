@@ -16,9 +16,18 @@ use crate::utils::macroquad_run_game;
 #[macroquad::main("cocsim")]
 async fn main() {
     let units: Vec<UnitModelEnum> = vec![
-        DragonModel { level: 5 }.into(),
-        DragonModel { level: 5 }.into(),
-        DragonModel { level: 5 }.into(),
+        DragonModel {
+            level: 5.try_into().unwrap(),
+        }
+        .into(),
+        DragonModel {
+            level: 5.try_into().unwrap(),
+        }
+        .into(),
+        DragonModel {
+            level: 5.try_into().unwrap(),
+        }
+        .into(),
     ];
 
     validate_units(&units).unwrap();
