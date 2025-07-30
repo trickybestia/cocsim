@@ -13,6 +13,7 @@ use axum::{
     },
 };
 use image::codecs::jpeg::JpegEncoder;
+use tokio::task::spawn_blocking;
 
 use crate::webserver_error::WebserverError;
 
@@ -23,12 +24,17 @@ pub async fn reverse_projection(mut multipart: Multipart) -> Result<Response, We
         .context("Field name not found I guess")?;
     let file_bytes = file.bytes().await?;
 
-    let result = compose_base_images::reverse_projection(file_bytes)?;
-    let mut result_writer = Cursor::new(Vec::new());
+    let result = spawn_blocking(move || {
+        let result = compose_base_images::reverse_projection(file_bytes).unwrap();
+        let mut result_writer = Cursor::new(Vec::new());
 
-    let mut encoder = JpegEncoder::new_with_quality(&mut result_writer, 70);
+        let mut encoder = JpegEncoder::new_with_quality(&mut result_writer, 70);
 
-    encoder.encode_image(&result)?;
+        encoder.encode_image(&result).unwrap();
+
+        result_writer.into_inner()
+    })
+    .await?;
 
     let mut headers = HeaderMap::new();
     headers.insert(
@@ -36,5 +42,5 @@ pub async fn reverse_projection(mut multipart: Multipart) -> Result<Response, We
         "image/jpeg".parse().expect("Should be valid content type"),
     );
 
-    Ok((headers, result_writer.into_inner()).into_response())
+    Ok((headers, result).into_response())
 }

@@ -17,6 +17,7 @@ use image::{
     ImageReader,
     codecs::jpeg::JpegEncoder,
 };
+use tokio::task::spawn_blocking;
 
 use crate::webserver_error::WebserverError;
 
@@ -73,7 +74,7 @@ pub async fn compose_base_images(mut multipart: Multipart) -> Result<Response, W
         }
     }
 
-    let result = compose_base_images_internal(left, right)?;
+    let result = spawn_blocking(|| compose_base_images_internal(left, right)).await??;
 
     let mut headers = HeaderMap::new();
     headers.insert(

@@ -93,25 +93,30 @@ async fn optimize_attack_internal(mut socket: WebSocket) -> anyhow::Result<()> {
         ))
         .await?;
 
-    let mut game = Game::new(optimizer.map(), true);
-    let mut plan_executor =
-        AttackPlanExecutor::new(optimizer.best().expect("Best plan exists here").0.units());
+    let result = spawn_blocking(move || {
+        let mut game = Game::new(optimizer.map(), true);
+        let mut plan_executor =
+            AttackPlanExecutor::new(optimizer.best().expect("Best plan exists here").0.units());
 
-    let mut renderer = DtoGameRenderer::new(1);
+        let mut renderer = DtoGameRenderer::new(1);
 
-    plan_executor.tick(&mut game);
-    renderer.draw(&mut game);
-
-    while !game.done() {
-        plan_executor.tick(&mut game); // no problem calling it twice on first loop iteration
-        game.tick(1.0 / FPS as f32);
+        plan_executor.tick(&mut game);
         renderer.draw(&mut game);
-    }
 
-    let mut result: serde_json::Value =
-        serde_json::to_value(renderer.finish(&mut game)).expect("Should not fail");
+        while !game.done() {
+            plan_executor.tick(&mut game); // no problem calling it twice on first loop iteration
+            game.tick(1.0 / FPS as f32);
+            renderer.draw(&mut game);
+        }
 
-    round_floats(&mut result, 2);
+        let mut result: serde_json::Value =
+            serde_json::to_value(renderer.finish(&mut game)).expect("Should not fail");
+
+        round_floats(&mut result, 2);
+
+        result
+    })
+    .await?;
 
     socket
         .send(Message::text(

@@ -9,6 +9,7 @@ use serde_json::{
     Value,
     to_value,
 };
+use tokio::task::spawn_blocking;
 
 use crate::{
     consts::{
@@ -19,7 +20,7 @@ use crate::{
     utils::round_floats,
 };
 
-pub async fn get_showcase_attack() -> Json<Value> {
+fn get_showcase_attack_internal() -> Json<Value> {
     let (map, _) = load_test_map(SHOWCASE_MAP).expect("Map should be loaded successfully");
 
     map.validate().expect("Test map should be valid");
@@ -47,4 +48,10 @@ pub async fn get_showcase_attack() -> Json<Value> {
     round_floats(&mut result, 2);
 
     result.into()
+}
+
+pub async fn get_showcase_attack() -> Json<Value> {
+    spawn_blocking(get_showcase_attack_internal)
+        .await
+        .expect("Should not panic")
 }
