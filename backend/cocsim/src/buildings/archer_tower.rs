@@ -9,8 +9,9 @@ use shipyard::World;
 use crate::{
     BuildingModel,
     BuildingType,
-    LevelIndex,
+    UsizeWithMax,
     buildings::utils::active_building::create_active_building,
+    consts::MAX_BUILDING_POS,
     game::features::actions::{
         BuildingFindTarget,
         TargetProjectileAttack,
@@ -127,9 +128,9 @@ const ARCHER_TOWER_PROJECTILE_SPEED: f32 = 18.0;
 
 #[derive(Serialize, Deserialize, Debug, Arbitrary)]
 pub struct ArcherTowerModel {
-    pub x: usize,
-    pub y: usize,
-    pub level: LevelIndex<ARCHER_TOWER_LEVEL_INDEX_MAX>,
+    pub x: UsizeWithMax<MAX_BUILDING_POS>,
+    pub y: UsizeWithMax<MAX_BUILDING_POS>,
+    pub level: UsizeWithMax<ARCHER_TOWER_LEVEL_INDEX_MAX>,
 }
 
 impl BuildingModel for ArcherTowerModel {
@@ -138,7 +139,7 @@ impl BuildingModel for ArcherTowerModel {
     }
 
     fn position(&self) -> Vector2<usize> {
-        Vector2::new(self.x, self.y)
+        Vector2::new(*self.x, *self.y)
     }
 
     fn create_building(&self, world: &mut World) {
@@ -147,7 +148,7 @@ impl BuildingModel for ArcherTowerModel {
         create_active_building(
             world,
             level.health,
-            Vector2::new(self.x, self.y),
+            Vector2::new(*self.x, *self.y),
             ARCHER_TOWER.size,
             ARCHER_TOWER_MIN_ATTACK_RANGE,
             ARCHER_TOWER_MAX_ATTACK_RANGE,

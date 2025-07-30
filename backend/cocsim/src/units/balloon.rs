@@ -25,8 +25,8 @@ use crate::{
         position::Position,
         to_be_deleted::OnDelete,
     },
-    level_index::LevelIndex,
     units::utils::air_unit::create_air_unit,
+    usize_with_max::UsizeWithMax,
 };
 
 struct BalloonLevel {
@@ -121,7 +121,7 @@ fn draw_balloon(id: EntityId, all_storages: &AllStoragesView, result: &mut Vec<S
 
 #[derive(Serialize, Deserialize, Debug, Clone, Arbitrary)]
 pub struct BalloonModel {
-    pub level: LevelIndex<BALLOON_LEVEL_INDEX_MAX>,
+    pub level: UsizeWithMax<BALLOON_LEVEL_INDEX_MAX>,
 }
 
 impl UnitModel for BalloonModel {

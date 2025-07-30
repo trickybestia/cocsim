@@ -9,12 +9,13 @@ use shipyard::World;
 use crate::{
     BuildingModel,
     BuildingType,
-    LevelIndex,
+    UsizeWithMax,
     buildings::utils::passive_building::default_attack_collider,
     colliders::{
         Collider,
         RectCollider,
     },
+    consts::MAX_BUILDING_POS,
     game::features::{
         attack::{
             AttackTarget,
@@ -66,9 +67,9 @@ inventory::submit! {WALL}
 
 #[derive(Serialize, Deserialize, Debug, Arbitrary)]
 pub struct WallModel {
-    pub x: usize,
-    pub y: usize,
-    pub level: LevelIndex<WALL_LEVEL_INDEX_MAX>,
+    pub x: UsizeWithMax<MAX_BUILDING_POS>,
+    pub y: UsizeWithMax<MAX_BUILDING_POS>,
+    pub level: UsizeWithMax<WALL_LEVEL_INDEX_MAX>,
 }
 
 impl BuildingModel for WallModel {
@@ -77,7 +78,7 @@ impl BuildingModel for WallModel {
     }
 
     fn position(&self) -> Vector2<usize> {
-        Vector2::new(self.x, self.y)
+        Vector2::new(*self.x, *self.y)
     }
 
     fn create_building(&self, world: &mut World) {
@@ -86,7 +87,7 @@ impl BuildingModel for WallModel {
         world.add_entity((
             Health(WALL_LEVELS[*self.level].health),
             Building {
-                position: Vector2::new(self.x, self.y),
+                position: Vector2::new(*self.x, *self.y),
                 size: WALL.size,
             },
             PathfindingCollider(collider.clone()),

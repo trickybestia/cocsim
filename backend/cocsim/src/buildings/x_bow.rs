@@ -10,8 +10,9 @@ use crate::{
     BuildingModel,
     BuildingOption,
     BuildingType,
-    LevelIndex,
+    UsizeWithMax,
     buildings::utils::active_building::create_active_building,
+    consts::MAX_BUILDING_POS,
     game::features::actions::{
         BuildingFindTarget,
         TargetProjectileAttack,
@@ -99,9 +100,9 @@ pub enum XBowTargetType {
 
 #[derive(Serialize, Deserialize, Debug, Arbitrary)]
 pub struct XBowModel {
-    pub x: usize,
-    pub y: usize,
-    pub level: LevelIndex<X_BOW_LEVEL_INDEX_MAX>,
+    pub x: UsizeWithMax<MAX_BUILDING_POS>,
+    pub y: UsizeWithMax<MAX_BUILDING_POS>,
+    pub level: UsizeWithMax<X_BOW_LEVEL_INDEX_MAX>,
     pub target: XBowTargetType,
 }
 
@@ -111,7 +112,7 @@ impl BuildingModel for XBowModel {
     }
 
     fn position(&self) -> Vector2<usize> {
-        Vector2::new(self.x, self.y)
+        Vector2::new(*self.x, *self.y)
     }
 
     fn create_building(&self, world: &mut World) {
@@ -129,7 +130,7 @@ impl BuildingModel for XBowModel {
         create_active_building(
             world,
             level.health,
-            Vector2::new(self.x, self.y),
+            Vector2::new(*self.x, *self.y),
             X_BOW.size,
             X_BOW_MIN_ATTACK_RANGE,
             max_attack_range,

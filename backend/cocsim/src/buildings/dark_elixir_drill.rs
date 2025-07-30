@@ -9,8 +9,9 @@ use shipyard::World;
 use crate::{
     BuildingModel,
     BuildingType,
-    LevelIndex,
+    UsizeWithMax,
     buildings::utils::passive_building::create_passive_building,
+    consts::MAX_BUILDING_POS,
 };
 
 struct DarkElixirDrillLevel {
@@ -43,9 +44,9 @@ inventory::submit! {DARK_ELIXIR_DRILL}
 
 #[derive(Serialize, Deserialize, Debug, Arbitrary)]
 pub struct DarkElixirDrillModel {
-    pub x: usize,
-    pub y: usize,
-    pub level: LevelIndex<DARK_ELIXIR_DRILL_LEVEL_INDEX_MAX>,
+    pub x: UsizeWithMax<MAX_BUILDING_POS>,
+    pub y: UsizeWithMax<MAX_BUILDING_POS>,
+    pub level: UsizeWithMax<DARK_ELIXIR_DRILL_LEVEL_INDEX_MAX>,
 }
 
 impl BuildingModel for DarkElixirDrillModel {
@@ -54,14 +55,14 @@ impl BuildingModel for DarkElixirDrillModel {
     }
 
     fn position(&self) -> Vector2<usize> {
-        Vector2::new(self.x, self.y)
+        Vector2::new(*self.x, *self.y)
     }
 
     fn create_building(&self, world: &mut World) {
         create_passive_building(
             world,
             DARK_ELIXIR_DRILL_LEVELS[*self.level].health,
-            Vector2::new(self.x, self.y),
+            Vector2::new(*self.x, *self.y),
             DARK_ELIXIR_DRILL.size,
         );
     }

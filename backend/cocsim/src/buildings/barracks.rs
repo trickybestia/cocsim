@@ -9,8 +9,9 @@ use shipyard::World;
 use crate::{
     BuildingModel,
     BuildingType,
-    LevelIndex,
+    UsizeWithMax,
     buildings::utils::passive_building::create_passive_building,
+    consts::MAX_BUILDING_POS,
 };
 
 struct BarracksLevel {
@@ -51,9 +52,9 @@ inventory::submit! {BARRACKS}
 
 #[derive(Serialize, Deserialize, Debug, Arbitrary)]
 pub struct BarracksModel {
-    pub x: usize,
-    pub y: usize,
-    pub level: LevelIndex<BARRACKS_LEVEL_INDEX_MAX>,
+    pub x: UsizeWithMax<MAX_BUILDING_POS>,
+    pub y: UsizeWithMax<MAX_BUILDING_POS>,
+    pub level: UsizeWithMax<BARRACKS_LEVEL_INDEX_MAX>,
 }
 
 impl BuildingModel for BarracksModel {
@@ -62,14 +63,14 @@ impl BuildingModel for BarracksModel {
     }
 
     fn position(&self) -> Vector2<usize> {
-        Vector2::new(self.x, self.y)
+        Vector2::new(*self.x, *self.y)
     }
 
     fn create_building(&self, world: &mut World) {
         create_passive_building(
             world,
             BARRACKS_LEVELS[*self.level].health,
-            Vector2::new(self.x, self.y),
+            Vector2::new(*self.x, *self.y),
             BARRACKS.size,
         );
     }

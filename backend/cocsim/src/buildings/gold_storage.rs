@@ -9,8 +9,9 @@ use shipyard::World;
 use crate::{
     BuildingModel,
     BuildingType,
-    LevelIndex,
+    UsizeWithMax,
     buildings::utils::passive_building::create_passive_building,
+    consts::MAX_BUILDING_POS,
 };
 
 struct GoldStorageLevel {
@@ -51,9 +52,9 @@ inventory::submit! {GOLD_STORAGE}
 
 #[derive(Serialize, Deserialize, Debug, Arbitrary)]
 pub struct GoldStorageModel {
-    pub x: usize,
-    pub y: usize,
-    pub level: LevelIndex<GOLD_STORAGE_LEVEL_INDEX_MAX>,
+    pub x: UsizeWithMax<MAX_BUILDING_POS>,
+    pub y: UsizeWithMax<MAX_BUILDING_POS>,
+    pub level: UsizeWithMax<GOLD_STORAGE_LEVEL_INDEX_MAX>,
 }
 
 impl BuildingModel for GoldStorageModel {
@@ -62,14 +63,14 @@ impl BuildingModel for GoldStorageModel {
     }
 
     fn position(&self) -> Vector2<usize> {
-        Vector2::new(self.x, self.y)
+        Vector2::new(*self.x, *self.y)
     }
 
     fn create_building(&self, world: &mut World) {
         create_passive_building(
             world,
             GOLD_STORAGE_LEVELS[*self.level].health,
-            Vector2::new(self.x, self.y),
+            Vector2::new(*self.x, *self.y),
             GOLD_STORAGE.size,
         );
     }

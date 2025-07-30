@@ -10,8 +10,9 @@ use crate::{
     BuildingModel,
     BuildingOption,
     BuildingType,
-    LevelIndex,
+    UsizeWithMax,
     buildings::utils::passive_building::create_passive_building,
+    consts::MAX_BUILDING_POS,
 };
 
 struct AirSweeperLevel {
@@ -87,9 +88,9 @@ pub enum AirSweeperRotation {
 
 #[derive(Serialize, Deserialize, Debug, Arbitrary)]
 pub struct AirSweeperModel {
-    pub x: usize,
-    pub y: usize,
-    pub level: LevelIndex<AIR_SWEEPER_LEVEL_INDEX_MAX>,
+    pub x: UsizeWithMax<MAX_BUILDING_POS>,
+    pub y: UsizeWithMax<MAX_BUILDING_POS>,
+    pub level: UsizeWithMax<AIR_SWEEPER_LEVEL_INDEX_MAX>,
     pub rotation: AirSweeperRotation,
 }
 
@@ -99,14 +100,14 @@ impl BuildingModel for AirSweeperModel {
     }
 
     fn position(&self) -> Vector2<usize> {
-        Vector2::new(self.x, self.y)
+        Vector2::new(*self.x, *self.y)
     }
 
     fn create_building(&self, world: &mut World) {
         create_passive_building(
             world,
             AIR_SWEEPER_LEVELS[*self.level].health,
-            Vector2::new(self.x, self.y),
+            Vector2::new(*self.x, *self.y),
             AIR_SWEEPER.size,
         );
     }

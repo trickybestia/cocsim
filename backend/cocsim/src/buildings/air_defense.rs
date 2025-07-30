@@ -9,8 +9,9 @@ use shipyard::World;
 use crate::{
     BuildingModel,
     BuildingType,
-    LevelIndex,
+    UsizeWithMax,
     buildings::utils::active_building::create_active_building,
+    consts::MAX_BUILDING_POS,
     game::features::actions::{
         BuildingFindTarget,
         TargetProjectileAttack,
@@ -103,9 +104,9 @@ const AIR_DEFENSE_PROJECTILE_SPEED: f32 = 8.0;
 
 #[derive(Serialize, Deserialize, Debug, Arbitrary)]
 pub struct AirDefenseModel {
-    pub x: usize,
-    pub y: usize,
-    pub level: LevelIndex<AIR_DEFENSE_LEVEL_INDEX_MAX>,
+    pub x: UsizeWithMax<MAX_BUILDING_POS>,
+    pub y: UsizeWithMax<MAX_BUILDING_POS>,
+    pub level: UsizeWithMax<AIR_DEFENSE_LEVEL_INDEX_MAX>,
 }
 
 impl BuildingModel for AirDefenseModel {
@@ -114,7 +115,7 @@ impl BuildingModel for AirDefenseModel {
     }
 
     fn position(&self) -> Vector2<usize> {
-        Vector2::new(self.x, self.y)
+        Vector2::new(*self.x, *self.y)
     }
 
     fn create_building(&self, world: &mut World) {
@@ -123,7 +124,7 @@ impl BuildingModel for AirDefenseModel {
         create_active_building(
             world,
             level.health,
-            Vector2::new(self.x, self.y),
+            Vector2::new(*self.x, *self.y),
             AIR_DEFENSE.size,
             AIR_DEFENSE_MIN_ATTACK_RANGE,
             AIR_DEFENSE_MAX_ATTACK_RANGE,

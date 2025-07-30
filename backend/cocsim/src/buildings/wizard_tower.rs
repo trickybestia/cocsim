@@ -9,8 +9,9 @@ use shipyard::World;
 use crate::{
     BuildingModel,
     BuildingType,
-    LevelIndex,
+    UsizeWithMax,
     buildings::utils::active_building::create_active_building,
+    consts::MAX_BUILDING_POS,
     game::features::actions::{
         BuildingFindTarget,
         SplashProjectileAttack,
@@ -111,9 +112,9 @@ const WIZARD_TOWER_SPLASH_ATTACK_RADIUS: f32 = 1.0;
 
 #[derive(Serialize, Deserialize, Debug, Arbitrary)]
 pub struct WizardTowerModel {
-    pub x: usize,
-    pub y: usize,
-    pub level: LevelIndex<WIZARD_TOWER_LEVEL_INDEX_MAX>,
+    pub x: UsizeWithMax<MAX_BUILDING_POS>,
+    pub y: UsizeWithMax<MAX_BUILDING_POS>,
+    pub level: UsizeWithMax<WIZARD_TOWER_LEVEL_INDEX_MAX>,
 }
 
 impl BuildingModel for WizardTowerModel {
@@ -122,7 +123,7 @@ impl BuildingModel for WizardTowerModel {
     }
 
     fn position(&self) -> Vector2<usize> {
-        Vector2::new(self.x, self.y)
+        Vector2::new(*self.x, *self.y)
     }
 
     fn create_building(&self, world: &mut World) {
@@ -132,7 +133,7 @@ impl BuildingModel for WizardTowerModel {
         create_active_building(
             world,
             level.health,
-            Vector2::new(self.x, self.y),
+            Vector2::new(*self.x, *self.y),
             WIZARD_TOWER.size,
             WIZARD_TOWER_MIN_ATTACK_RANGE,
             WIZARD_TOWER_MAX_ATTACK_RANGE,

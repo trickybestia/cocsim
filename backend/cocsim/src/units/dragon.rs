@@ -24,8 +24,8 @@ use crate::{
         attack::AttackTargetFlags,
         position::Position,
     },
-    level_index::LevelIndex,
     units::utils::air_unit::create_air_unit,
+    usize_with_max::UsizeWithMax,
 };
 
 struct DragonLevel {
@@ -111,7 +111,7 @@ fn draw_dragon(id: EntityId, all_storages: &AllStoragesView, result: &mut Vec<Sh
 
 #[derive(Serialize, Deserialize, Debug, Clone, Arbitrary)]
 pub struct DragonModel {
-    pub level: LevelIndex<DRAGON_LEVEL_INDEX_MAX>,
+    pub level: UsizeWithMax<DRAGON_LEVEL_INDEX_MAX>,
 }
 
 impl UnitModel for DragonModel {
