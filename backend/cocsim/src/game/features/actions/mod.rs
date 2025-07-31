@@ -7,7 +7,7 @@ mod splash_damage;
 mod splash_projectile_attack;
 mod target_projectile_attack;
 
-pub use air_unit_find_target::AirUnitFindTarget;
+pub use air_unit_find_target::*;
 pub use building_find_target::BuildingFindTarget;
 pub use delayed::Delayed;
 pub use empty_action::EmptyAction;

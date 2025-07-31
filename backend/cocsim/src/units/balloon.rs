@@ -18,10 +18,10 @@ use crate::{
     UnitType,
     game::features::{
         actions::{
+            ActiveBuildingTargetPrioritizer,
             AirUnitFindTarget,
             SplashDamage,
         },
-        attack::AttackTargetFlags,
         position::Position,
         to_be_deleted::OnDelete,
     },
@@ -136,7 +136,7 @@ impl UnitModel for BalloonModel {
             BALLOON_ATTACK_RANGE,
             BALLOON_ATTACK_COOLDOWN,
             AirUnitFindTarget {
-                pattern: AttackTargetFlags::COUNTED_BUILDING,
+                prioritizer: ActiveBuildingTargetPrioritizer.into(),
             }
             .into(),
             SplashDamage {

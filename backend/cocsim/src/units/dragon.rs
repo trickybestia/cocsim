@@ -19,9 +19,9 @@ use crate::{
     game::features::{
         actions::{
             AirUnitFindTarget,
+            CountedBuildingTargetPrioritizer,
             MeleeAttack,
         },
-        attack::AttackTargetFlags,
         position::Position,
     },
     units::utils::air_unit::create_air_unit,
@@ -126,7 +126,7 @@ impl UnitModel for DragonModel {
             DRAGON_ATTACK_RANGE,
             DRAGON_ATTACK_COOLDOWN,
             AirUnitFindTarget {
-                pattern: AttackTargetFlags::COUNTED_BUILDING,
+                prioritizer: CountedBuildingTargetPrioritizer.into(),
             }
             .into(),
             MeleeAttack {
