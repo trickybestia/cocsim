@@ -1,5 +1,5 @@
 [package]
-name = "cocsim_fuzz"
+name = "cocsim-fuzz"
 version = "0.0.0"
 publish = false
 edition = "2024"
@@ -9,7 +9,7 @@ cargo-fuzz = true
 
 [dependencies]
 arbitrary = { version = "1", features = ["derive"] }
-cocsim = { path = "../cocsim" }
+cocsim = { path = ".." }
 libfuzzer-sys = "0.4"
 
 [[bin]]

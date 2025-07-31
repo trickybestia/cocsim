@@ -500,7 +500,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "cocsim_fuzz"
+name = "cocsim-fuzz"
 version = "0.0.0"
 dependencies = [
  "arbitrary",
