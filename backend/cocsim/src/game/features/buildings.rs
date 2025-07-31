@@ -12,7 +12,6 @@ use shipyard::{
     UniqueView,
     UniqueViewMut,
     ViewMut,
-    track::InsertionAndModification,
 };
 
 use crate::game::features::{
@@ -20,13 +19,11 @@ use crate::game::features::{
     position::Position,
 };
 
+#[derive(Component)]
+#[track(All)]
 pub struct Building {
     pub position: Vector2<usize>,
     pub size: Vector2<usize>,
-}
-
-impl Component for Building {
-    type Tracking = InsertionAndModification;
 }
 
 /// "Counted" means that this building impacts destroyed buildings percentage.
@@ -143,6 +140,7 @@ pub fn init_drop_zone(
     drop_zone.set(DropZone(result)).unwrap();
 }
 
-pub fn cleanup_tracking(v_building: ViewMut<Building>) {
+pub fn cleanup_tracking(mut v_building: ViewMut<Building>) {
+    v_building.clear_all_removed_and_deleted();
     v_building.clear_all_inserted_and_modified();
 }

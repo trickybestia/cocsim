@@ -121,7 +121,6 @@ impl Game {
 
         world.run(features::buildings::init_buildings_grid);
         world.run(features::buildings::handle_building_changes);
-        world.run(features::wall::update_walls);
 
         world.run(features::buildings::init_drop_zone);
 
@@ -161,7 +160,6 @@ impl Game {
         self.world
             .run(features::health::handle_entity_damage_events);
         // TODO: run system: remove DeathRequest and use hero ability if not used
-        self.world.run(features::wall::update_walls);
         self.world.run(features::delay::update);
         self.world
             .run(features::to_be_deleted::handle_to_be_deleted);
@@ -245,7 +243,6 @@ impl Game {
         world.run(features::buildings::cleanup_tracking);
         world.run(features::collision::cleanup_tracking);
         world.run(features::position::cleanup_tracking);
-        world.run(features::wall::cleanup_tracking);
 
         world.run(features::health::cleanup_events);
     }

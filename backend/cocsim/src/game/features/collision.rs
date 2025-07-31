@@ -17,21 +17,21 @@ use shipyard::{
 };
 
 use crate::{
-    colliders::{
-        Collider,
-        ColliderEnum,
-    },
     consts::*,
     game::{
         MapSize,
-        features::position::Position,
+        features::buildings::Building,
     },
     utils::intersects,
 };
 
 #[derive(Component)]
 #[track(All)]
-pub struct PathfindingCollider(pub ColliderEnum);
+pub struct PathfindingCollider {
+    /// position relative to top-left corner of building
+    pub position: Vector2<usize>,
+    pub size: Vector2<usize>,
+}
 
 #[derive(Unique)]
 pub struct PathfindingCollisionGrid(pub DMatrix<EntityId>);
@@ -71,11 +71,11 @@ pub fn init_collision_grid(
 pub fn update_collision(
     mut collision_grid: UniqueViewMut<PathfindingCollisionGrid>,
     mut need_redraw_collision: UniqueViewMut<NeedRedrawCollision>,
-    v_position: View<Position>,
+    v_building: View<Building>,
     v_collider: View<PathfindingCollider>,
 ) {
     if intersects(
-        v_position.removed_or_deleted(),
+        v_building.removed_or_deleted(),
         v_collider.removed_or_deleted(),
     ) {
         need_redraw_collision.0 = true;
@@ -83,8 +83,8 @@ pub fn update_collision(
 
     let mut modified_ids = HashSet::new();
 
-    for (id, _) in (&v_position, &v_collider).iter().with_id() {
-        if v_position.is_inserted_or_modified(id) || v_collider.is_inserted_or_modified(id) {
+    for (id, _) in (&v_building, &v_collider).iter().with_id() {
+        if v_building.is_inserted_or_modified(id) || v_collider.is_inserted_or_modified(id) {
             modified_ids.insert(id);
         }
     }
@@ -99,34 +99,17 @@ pub fn update_collision(
         need_redraw_collision.0 = true;
     }
 
-    for (id, (position, collider)) in (&v_position, &v_collider).iter().with_id() {
-        if !(v_position.is_inserted_or_modified(id) || v_collider.is_inserted_or_modified(id)) {
+    for (id, (building, collider)) in (&v_building, &v_collider).iter().with_id() {
+        if !(v_building.is_inserted_or_modified(id) || v_collider.is_inserted_or_modified(id)) {
             continue;
         }
 
-        let collider = collider.0.translate(position.0);
-        let bounding_box = collider.bounding_box();
-        let start_x =
-            (bounding_box.position.x * COLLISION_TILES_PER_MAP_TILE as f32).floor() as usize;
-        let start_y =
-            (bounding_box.position.y * COLLISION_TILES_PER_MAP_TILE as f32).floor() as usize;
-        let end_x = ((bounding_box.position.x + bounding_box.size.x)
-            * COLLISION_TILES_PER_MAP_TILE as f32)
-            .ceil() as usize;
-        let end_y = ((bounding_box.position.y + bounding_box.size.y)
-            * COLLISION_TILES_PER_MAP_TILE as f32)
-            .ceil() as usize;
+        let start = building.position * COLLISION_TILES_PER_MAP_TILE + collider.position;
+        let end_exclusive = start + collider.size;
 
-        for x in start_x..=end_x {
-            for y in start_y..=end_y {
-                let occupy_tile = collider.contains(Vector2::new(
-                    x as f32 / COLLISION_TILES_PER_MAP_TILE as f32,
-                    y as f32 / COLLISION_TILES_PER_MAP_TILE as f32,
-                ));
-
-                if occupy_tile {
-                    collision_grid.0[(x, y)] = id
-                }
+        for x in start.x..end_exclusive.x {
+            for y in start.y..end_exclusive.y {
+                collision_grid.0[(x, y)] = id
             }
         }
     }

@@ -10,5 +10,4 @@ pub mod position;
 pub mod projectiles;
 pub mod time;
 pub mod to_be_deleted;
-pub mod wall;
 pub mod waypoint_mover;

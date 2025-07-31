@@ -10,10 +10,9 @@ use crate::{
     BuildingModel,
     BuildingType,
     UsizeWithMax,
-    buildings::utils::passive_building::default_attack_collider,
-    colliders::{
-        Collider,
-        RectCollider,
+    buildings::utils::passive_building::{
+        default_attack_collider,
+        default_pathfinding_collider,
     },
     consts::MAX_BUILDING_POS,
     game::features::{
@@ -23,9 +22,7 @@ use crate::{
             Team,
         },
         buildings::Building,
-        collision::PathfindingCollider,
         health::Health,
-        wall::Wall,
     },
 };
 
@@ -82,45 +79,17 @@ impl BuildingModel for WallModel {
     }
 
     fn create_building(&self, world: &mut World) {
-        let collider = default_attack_collider(WALL.size);
-
         world.add_entity((
             Health(WALL_LEVELS[*self.level].health),
             Building {
                 position: Vector2::new(*self.x, *self.y),
                 size: WALL.size,
             },
-            PathfindingCollider(collider.clone()),
+            default_pathfinding_collider(WALL.size),
             Team::Defense,
             AttackTarget {
-                collider,
+                collider: default_attack_collider(WALL.size),
                 flags: AttackTargetFlags::GROUND | AttackTargetFlags::BUILDING,
-            },
-            Wall {
-                center_collider: RectCollider::new_from_center(
-                    Vector2::zeros(),
-                    Vector2::from_element(0.65),
-                ),
-                up_connection_collider: RectCollider::new(
-                    Vector2::new(0.175, 0.0),
-                    Vector2::new(0.65, 0.5),
-                )
-                .translate(Vector2::from_element(-0.5)),
-                down_connection_collider: RectCollider::new(
-                    Vector2::new(0.175, 0.5),
-                    Vector2::new(0.65, 0.5),
-                )
-                .translate(Vector2::from_element(-0.5)),
-                left_connection_collider: RectCollider::new(
-                    Vector2::new(0.0, 0.175),
-                    Vector2::new(0.5, 0.65),
-                )
-                .translate(Vector2::from_element(-0.5)),
-                right_connection_collider: RectCollider::new(
-                    Vector2::new(0.5, 0.175),
-                    Vector2::new(0.5, 0.65),
-                )
-                .translate(Vector2::from_element(-0.5)),
             },
         ));
     }

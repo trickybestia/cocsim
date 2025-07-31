@@ -9,7 +9,7 @@ pub const MAX_UNITS_COUNT: usize = 100;
 pub const MAX_BUILDING_POS: usize = MAX_BORDER_SIZE + MAX_BASE_SIZE - 1;
 
 /// Used for pathfinding.
-pub const COLLISION_TILES_PER_MAP_TILE: usize = 10;
+pub const COLLISION_TILES_PER_MAP_TILE: usize = 2;
 pub const COLLISION_TILE_SIZE: f32 = 1.0 / COLLISION_TILES_PER_MAP_TILE as f32;
 
 /// Unit distance to waypoint to consider it visited.

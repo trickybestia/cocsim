@@ -5,7 +5,10 @@ use shipyard::{
 };
 
 use crate::{
-    buildings::utils::passive_building::default_attack_collider,
+    buildings::utils::passive_building::{
+        default_attack_collider,
+        default_pathfinding_collider,
+    },
     game::features::{
         actions::ActionEnum,
         attack::{
@@ -18,7 +21,6 @@ use crate::{
             Building,
             CountedBuilding,
         },
-        collision::PathfindingCollider,
         health::Health,
     },
 };
@@ -34,13 +36,11 @@ pub fn create_active_building(
     find_target: ActionEnum,
     attack: ActionEnum,
 ) -> EntityId {
-    let collider = default_attack_collider(size);
-
     world.add_entity((
         Health(health),
         Building { position, size },
         CountedBuilding,
-        PathfindingCollider(collider.clone()),
+        default_pathfinding_collider(size),
         Team::Defense,
         Attacker {
             min_attack_range,
@@ -52,7 +52,7 @@ pub fn create_active_building(
             attack,
         },
         AttackTarget {
-            collider,
+            collider: default_attack_collider(size),
             flags: AttackTargetFlags::GROUND
                 | AttackTargetFlags::BUILDING
                 | AttackTargetFlags::COUNTED_BUILDING
