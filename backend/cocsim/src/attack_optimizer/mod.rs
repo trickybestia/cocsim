@@ -85,7 +85,7 @@ impl AttackOptimizer {
     fn score_attack_plan(&mut self, plan: &AttackPlan) -> f32 {
         // maybe set enable_collision_grid to true in future (when ground units will be
         // added)
-        let mut game = Game::new(&self.map, false);
+        let mut game = Game::new(&self.map, false, Some(self.rng.clone()));
         let mut attack_plan_executor = AttackPlanExecutor::new(plan.units());
 
         while !game.done() {

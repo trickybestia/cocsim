@@ -44,7 +44,7 @@ async fn main() {
         println!("{i}: best time left: {best_score}");
     }
 
-    let mut game = Game::new(optimizer.map(), true);
+    let mut game = Game::new(optimizer.map(), true, None);
     let mut plan_executor = AttackPlanExecutor::new(optimizer.best().unwrap().0.units());
 
     macroquad_run_game(

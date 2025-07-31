@@ -17,7 +17,7 @@ async fn main() {
 
     map.validate().unwrap();
 
-    let mut game = Game::new(&map, true);
+    let mut game = Game::new(&map, true, None);
 
     for i in 0..10 {
         game.spawn_unit(

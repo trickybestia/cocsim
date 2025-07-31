@@ -8,6 +8,7 @@ pub mod health;
 pub mod map;
 pub mod position;
 pub mod projectiles;
+pub mod rng;
 pub mod time;
 pub mod to_be_deleted;
 pub mod waypoint_mover;

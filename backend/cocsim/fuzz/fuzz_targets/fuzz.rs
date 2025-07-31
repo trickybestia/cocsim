@@ -23,7 +23,7 @@ fuzz_target!(|inputs: FuzzInputs| {
         // uncomment next line when debugging crash
         //dbg!(inputs);
 
-        let mut game = Game::new(&inputs.map, false);
+        let mut game = Game::new(&inputs.map, false, None);
         let mut plan_executor = AttackPlanExecutor::new(inputs.plan.units());
 
         while !game.done() {

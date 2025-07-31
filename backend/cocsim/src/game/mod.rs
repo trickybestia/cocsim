@@ -1,6 +1,7 @@
 pub mod features;
 
 use nalgebra::Vector2;
+use rand_pcg::Pcg64Mcg;
 use shipyard::{
     EntitiesView,
     UniqueView,
@@ -13,7 +14,12 @@ use crate::{
     Shape,
     UnitModel,
     UnitModelEnum,
-    consts::*,
+    consts::{
+        COLLISION_TILE_COLOR,
+        COLLISION_TILE_SIZE,
+        MAX_ATTACK_DURATION,
+        RNG_INITIAL_STATE,
+    },
     game::features::{
         buildings::{
             BuildingsGrid,
@@ -26,6 +32,7 @@ use crate::{
             PathfindingCollisionGrid,
         },
         map::MapSize,
+        rng::RngUnique,
         time::Time,
     },
     utils::{
@@ -101,7 +108,7 @@ impl Game {
         self.world.get_unique::<&NeedRedrawCollision>().unwrap().0
     }
 
-    pub fn new(map: &Map, enable_collision_grid: bool) -> Self {
+    pub fn new(map: &Map, enable_collision_grid: bool, rng: Option<Pcg64Mcg>) -> Self {
         let mut world = World::new();
 
         world.add_unique(MapSize {
@@ -112,6 +119,7 @@ impl Game {
             elapsed: 0.0,
             delta: 0.0,
         });
+        world.add_unique(RngUnique(rng.unwrap_or(Pcg64Mcg::new(RNG_INITIAL_STATE))));
 
         for building in &map.buildings {
             building.create_building(&mut world);

@@ -15,7 +15,7 @@ use criterion::{
 use nalgebra::Vector2;
 
 fn run(map: &Map) {
-    let mut game = Game::new(map, true);
+    let mut game = Game::new(map, true, None);
 
     for i in 0..10 {
         game.spawn_unit(

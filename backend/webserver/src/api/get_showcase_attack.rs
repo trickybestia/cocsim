@@ -25,7 +25,7 @@ fn get_showcase_attack_internal() -> Json<Value> {
 
     map.validate().expect("Test map should be valid");
 
-    let mut game = Game::new(&map, true);
+    let mut game = Game::new(&map, true, None);
 
     for i in 0..10 {
         game.spawn_unit(

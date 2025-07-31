@@ -94,7 +94,7 @@ async fn optimize_attack_internal(mut socket: WebSocket) -> anyhow::Result<()> {
         .await?;
 
     let result = spawn_blocking(move || {
-        let mut game = Game::new(optimizer.map(), true);
+        let mut game = Game::new(optimizer.map(), true, None);
         let mut plan_executor =
             AttackPlanExecutor::new(optimizer.best().expect("Best plan exists here").0.units());
 
