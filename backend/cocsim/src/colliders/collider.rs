@@ -1,10 +1,8 @@
 use enum_dispatch::enum_dispatch;
 use nalgebra::Vector2;
+use rand::Rng;
 
-use super::{
-    ColliderEnum,
-    RectCollider,
-};
+use super::ColliderEnum;
 
 #[enum_dispatch]
 pub trait Collider
@@ -20,7 +18,9 @@ where
 
     fn translate(&self, offset: Vector2<f32>) -> Self;
 
-    fn bounding_box(&self) -> RectCollider;
+    fn area(&self) -> f32;
+
+    fn random_point(&self, rng: &mut impl Rng) -> Vector2<f32>;
 
     /// Checks if `point` is inside of collider.
     fn contains(&self, point: Vector2<f32>) -> bool;

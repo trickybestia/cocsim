@@ -1,4 +1,5 @@
 use nalgebra::Vector2;
+use rand::Rng;
 
 use super::{
     Collider,
@@ -35,8 +36,12 @@ impl Collider for PointCollider {
         Self::new(self.0 + offset)
     }
 
-    fn bounding_box(&self) -> RectCollider {
-        RectCollider::new(self.0, Vector2::zeros())
+    fn area(&self) -> f32 {
+        0.0
+    }
+
+    fn random_point(&self, _rng: &mut impl Rng) -> Vector2<f32> {
+        self.0
     }
 
     fn contains(&self, point: Vector2<f32>) -> bool {
