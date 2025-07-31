@@ -1,8 +1,5 @@
 use crate::ShapeColor;
 
-pub const TEST_IMAGES_PATH: &str = "test_images";
-pub const TEST_MAPS_PATH: &str = "test_maps";
-
 pub const MIN_BASE_SIZE: usize = 1;
 pub const MAX_BASE_SIZE: usize = 44;
 pub const MAX_BORDER_SIZE: usize = 4;

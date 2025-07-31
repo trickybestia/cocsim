@@ -1,15 +1,15 @@
 use std::{
     collections::HashSet,
+    env,
     fs::File,
     hash::Hash,
     io::{
         BufReader,
         Read,
     },
-    path::Path,
+    path::PathBuf,
 };
 
-use anyhow::Result;
 use nalgebra::DMatrix;
 use zip::ZipArchive;
 
@@ -20,8 +20,10 @@ use crate::{
     consts::*,
 };
 
-pub fn load_test_map_raw(name: &str) -> Result<(String, Vec<u8>)> {
-    let path = Path::new(TEST_MAPS_PATH).join(name).with_extension("zip");
+pub fn load_test_map_raw(name: &str) -> anyhow::Result<(String, Vec<u8>)> {
+    let path = PathBuf::from(env::var("TEST_MAPS_PATH")?)
+        .join(name)
+        .with_extension("zip");
     let file = File::open(path)?;
     let reader = BufReader::new(file);
 
@@ -36,7 +38,7 @@ pub fn load_test_map_raw(name: &str) -> Result<(String, Vec<u8>)> {
     Ok((map_json, map_image))
 }
 
-pub fn load_test_map(name: &str) -> Result<(Map, Vec<u8>)> {
+pub fn load_test_map(name: &str) -> anyhow::Result<(Map, Vec<u8>)> {
     let (map_json, map_image) = load_test_map_raw(name)?;
 
     Ok((serde_json::from_str(&map_json)?, map_image))
