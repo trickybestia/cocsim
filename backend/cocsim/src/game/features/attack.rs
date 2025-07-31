@@ -4,6 +4,7 @@ use shipyard::{
     Component,
     EntitiesView,
     EntityId,
+    Get,
     IntoIter,
     UniqueView,
     View,
@@ -23,6 +24,7 @@ use crate::{
         },
         position::Position,
         time::Time,
+        waypoint_mover::WaypointMover,
     },
 };
 
@@ -121,6 +123,7 @@ fn create_attack_queue(
     entities: EntitiesView,
     v_attack_target: View<AttackTarget>,
     v_position: View<Position>,
+    v_waypoint_mover: View<WaypointMover>,
 ) -> Vec<(ActionEnum, EntityId)> {
     let mut result = Vec::new();
 
@@ -131,13 +134,19 @@ fn create_attack_queue(
             let attack_target_position = v_position[attacker.target].0;
             let attack_target_collider = attack_target.collider.translate(attack_target_position);
 
-            let in_attack_range = attacker_position.metric_distance(&attack_target_position)
-                >= attacker.min_attack_range
-                && attack_target_collider
-                    .attack_area(attacker.max_attack_range + UNIT_DISTANCE_TO_WAYPOINT_EPS)
-                    .contains(attacker_position);
+            let can_attack = if let Ok(waypoint_mover) = v_waypoint_mover.get(attacker_id) {
+                // attacker is unit
+                waypoint_mover.waypoints.is_empty()
+            } else {
+                // attacker is building
+                attacker_position.metric_distance(&attack_target_position)
+                    >= attacker.min_attack_range
+                    && attack_target_collider
+                        .attack_area(attacker.max_attack_range + UNIT_DISTANCE_TO_WAYPOINT_EPS)
+                        .contains(attacker_position) // target is in attack range
+            };
 
-            if in_attack_range {
+            if can_attack {
                 attacker.remaining_attack_cooldown =
                     0.0f32.max(attacker.remaining_attack_cooldown - time.delta);
 
