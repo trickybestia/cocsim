@@ -12,7 +12,10 @@ use cocsim::{
     validate_units,
 };
 use rand_pcg::Pcg64Mcg;
-use textplots::Plot;
+use textplots::{
+    Plot,
+    Shape,
+};
 
 use crate::utils::macroquad_run_game;
 
@@ -45,7 +48,7 @@ async fn main() {
         let (_, best_plan_stats) = optimizer.step();
 
         println!(
-            "{i}: best time left: {:.1} <= {:.1} <= {:.1} seconds",
+            "Gen. #{i} best plan finished in {:.1} <= {:.1} <= {:.1} seconds",
             best_plan_stats.min_time_elapsed(),
             best_plan_stats.avg_time_elapsed,
             best_plan_stats.max_time_elapsed()
@@ -62,18 +65,21 @@ async fn main() {
             })
             .collect::<Vec<_>>();
 
-        textplots::Chart::new_with_y_range(
+        let mut chart = textplots::Chart::new_with_y_range(
             120,
             60,
             plot_data[0].0 as f32,
             plot_data.last().unwrap().0 as f32,
             0.0,
             1.0,
-        )
-        .lineplot(&textplots::Shape::Continuous(Box::new(|x| {
+        );
+        let line = textplots::Shape::Continuous(Box::new(|x| {
             plot_data[x.round() as usize - plot_data[0].0 as usize].1
-        })))
-        .display();
+        }));
+        let chart = chart.lineplot(&line);
+
+        chart.borders();
+        chart.display();
     }
 
     let mut game = Game::new(
