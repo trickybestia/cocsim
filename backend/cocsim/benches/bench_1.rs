@@ -26,6 +26,10 @@ fn run(map: &Map) {
             Vector2::new(0.5, i as f32 + 0.5),
         );
     }
+
+    while !game.done() {
+        game.tick(1.0 / 60.0);
+    }
 }
 
 pub fn criterion_benchmark(c: &mut Criterion) {
