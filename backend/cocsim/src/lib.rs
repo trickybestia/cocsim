@@ -3,6 +3,7 @@ mod buildings;
 pub mod colliders;
 pub mod consts;
 mod game;
+mod geometry;
 mod map;
 mod shape;
 mod units;

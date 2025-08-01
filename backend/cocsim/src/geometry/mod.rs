@@ -1,7 +1,7 @@
 mod ray;
+mod rect;
 mod segment;
-mod square;
 
 pub use ray::Ray;
+pub use rect::Rect;
 pub use segment::Segment;
-pub use square::Square;

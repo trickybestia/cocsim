@@ -1,5 +1,6 @@
 use nalgebra::Vector2;
 
+#[derive(Debug)]
 pub struct Segment {
     pub a: Vector2<f32>,
     pub b: Vector2<f32>,

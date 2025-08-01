@@ -18,7 +18,6 @@ use crate::{
         COLLISION_TILE_COLOR,
         COLLISION_TILE_SIZE,
         MAX_ATTACK_DURATION,
-        RNG_INITIAL_STATE,
     },
     game::features::{
         buildings::{
@@ -119,7 +118,7 @@ impl Game {
             elapsed: 0.0,
             delta: 0.0,
         });
-        world.add_unique(RngUnique(rng.unwrap_or(Pcg64Mcg::new(RNG_INITIAL_STATE))));
+        world.add_unique(RngUnique(rng.unwrap_or(Pcg64Mcg::new(rand::random()))));
 
         for building in &map.buildings {
             building.create_building(&mut world);

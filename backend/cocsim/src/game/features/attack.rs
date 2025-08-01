@@ -87,13 +87,20 @@ fn create_find_target_queue(
     v_attack_target: View<AttackTarget>,
     v_position: View<Position>,
     entities: EntitiesView,
+    v_waypoint_mover: View<WaypointMover>,
 ) -> Vec<(ActionEnum, EntityId)> {
     let mut result = Vec::new();
 
     for (attacker_id, attacker) in (&mut v_attacker).iter().with_id() {
         let retarget = if !entities.is_alive(attacker.target) {
             true
+        } else if v_waypoint_mover.get(attacker_id).is_ok() {
+            // attacker is unit, it's moving to target, just wait
+
+            false
         } else {
+            // attacker is building
+
             let attacker_position = v_position[attacker_id].0;
             let target_position = v_position[attacker.target].0;
             let attack_target = &v_attack_target[attacker.target];

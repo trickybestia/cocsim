@@ -13,13 +13,13 @@ use rand::Rng;
 
 use crate::{
     UnitModelEnum,
-    attack_optimizer::geometry::{
-        Ray,
-        Segment,
-        Square,
-    },
     consts::MAX_UNIT_DROP_TIME,
     game::features::map::MapSize,
+    geometry::{
+        Ray,
+        Rect,
+        Segment,
+    },
 };
 
 #[derive(Clone, Debug)]
@@ -75,9 +75,9 @@ impl AttackPlanUnit {
         let center = Vector2::from_element(offset);
 
         let ray = Ray::new_with_angle(center, self.angle);
-        let border_square = Square::new_from_center(center, map_size.total_size() as f32);
+        let border_square = Rect::new_square_from_center(center, map_size.total_size() as f32);
         let mut start_point = None;
-        let stop_point = ray.intersection_with_square(&border_square).unwrap();
+        let stop_point = ray.intersection_with_rect(&border_square).unwrap();
         let segment_length = (stop_point - ray.start).norm();
 
         for t in 0..100 {
@@ -148,7 +148,7 @@ impl AttackPlanUnit {
         // if there is no intersected buildings, we can place unit anywhere on the line
         let start_point = start_point.unwrap_or(
             Ray::new_with_angle(center, self.angle + PI)
-                .intersection_with_square(&border_square)
+                .intersection_with_rect(&border_square)
                 .unwrap(),
         );
 

@@ -1,9 +1,15 @@
+use std::f32::consts::PI;
+
 use nalgebra::Vector2;
 use rand::Rng;
 
 use super::{
     Collider,
     ColliderEnum,
+};
+use crate::geometry::{
+    Ray,
+    Rect,
 };
 
 #[derive(Debug, Clone)]
@@ -66,15 +72,41 @@ impl Collider for RectCollider {
         Self::new(self.position + offset, self.size)
     }
 
-    fn area(&self) -> f32 {
-        self.size.x * self.size.y
-    }
+    fn random_near_point(&self, point: Vector2<f32>, rng: &mut impl Rng) -> Vector2<f32> {
+        if self.contains(point) {
+            return point;
+        }
 
-    fn random_point(&self, rng: &mut impl Rng) -> Vector2<f32> {
-        Vector2::new(
-            rng.random_range(0.0..self.size.x),
-            rng.random_range(0.0..self.size.y),
-        ) + self.position
+        let rect = Rect::new(self.position, self.size);
+
+        let mut angles = rect.vertices.map(|vertex| {
+            Ray {
+                start: point,
+                direction: (vertex - point).normalize(),
+            }
+            .angle()
+        });
+
+        angles.sort_unstable_by(|a, b| a.total_cmp(&b));
+
+        const STEPS_COUNT: usize = 100;
+
+        let start_angle: f32;
+        let step: f32;
+
+        if angles[3] - angles[0] < PI {
+            start_angle = angles[0];
+            step = (angles[3] - start_angle) / STEPS_COUNT as f32;
+        } else {
+            start_angle = angles[3];
+            step = (angles[0] + 2.0 * PI - start_angle) / STEPS_COUNT as f32;
+        }
+
+        let step_index = rng.random_range(1..STEPS_COUNT); // avoid using boundaries (0 and STEPS_COUNT)
+
+        Ray::new_with_angle(point, start_angle + step * step_index as f32)
+            .intersection_with_rect(&rect)
+            .expect("Expected at least one intersection")
     }
 
     fn contains(&self, point: Vector2<f32>) -> bool {

@@ -1,9 +1,9 @@
 use enum_dispatch::enum_dispatch;
-use nalgebra::Vector2;
 use shipyard::{
     AllStoragesViewMut,
     EntityId,
     IntoIter,
+    UniqueViewMut,
     View,
     ViewMut,
 };
@@ -19,6 +19,7 @@ use crate::{
             Team,
         },
         position::Position,
+        rng::RngUnique,
         waypoint_mover::WaypointMover,
     },
 };
@@ -106,7 +107,6 @@ impl Action for AirUnitFindTarget {
         struct NearestTarget {
             pub id: EntityId,
             pub flags: AttackTargetFlags,
-            pub nearest_point: Vector2<f32>,
             pub distance: f32,
         }
 
@@ -145,7 +145,6 @@ impl Action for AirUnitFindTarget {
                 nearest_target = Some(NearestTarget {
                     id: target_id,
                     flags: attack_target.flags,
-                    nearest_point,
                     distance,
                 });
             }
@@ -153,8 +152,15 @@ impl Action for AirUnitFindTarget {
 
         if let Some(nearest_target) = nearest_target {
             let mut v_waypoint_mover = all_storages.borrow::<ViewMut<WaypointMover>>().unwrap();
+            let mut rng = all_storages.borrow::<UniqueViewMut<RngUnique>>().unwrap();
 
-            v_waypoint_mover[actor].waypoints = vec![nearest_target.nearest_point];
+            v_waypoint_mover[actor].waypoints = vec![
+                v_attack_target[nearest_target.id]
+                    .collider
+                    .translate(v_position[nearest_target.id].0)
+                    .attack_area(attacker.max_attack_range)
+                    .random_near_point(attacker_position, &mut rng.0),
+            ];
             attacker.target = nearest_target.id;
         }
     }

@@ -36,11 +36,7 @@ impl Collider for PointCollider {
         Self::new(self.0 + offset)
     }
 
-    fn area(&self) -> f32 {
-        0.0
-    }
-
-    fn random_point(&self, _rng: &mut impl Rng) -> Vector2<f32> {
+    fn random_near_point(&self, _point: Vector2<f32>, _rng: &mut impl Rng) -> Vector2<f32> {
         self.0
     }
 

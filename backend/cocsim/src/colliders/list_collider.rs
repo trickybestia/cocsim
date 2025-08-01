@@ -1,8 +1,4 @@
 use nalgebra::Vector2;
-use rand::distr::{
-    Distribution,
-    weighted::WeightedIndex,
-};
 
 use super::{
     Collider,
@@ -62,14 +58,8 @@ impl Collider for ListCollider {
         }
     }
 
-    fn area(&self) -> f32 {
-        self.colliders().iter().map(ColliderEnum::area).sum()
-    }
-
-    fn random_point(&self, rng: &mut impl rand::Rng) -> Vector2<f32> {
-        let dist = WeightedIndex::new(self.colliders.iter().map(ColliderEnum::area)).unwrap();
-
-        self.colliders[dist.sample(rng)].random_point(rng)
+    fn random_near_point(&self, _point: Vector2<f32>, _rng: &mut impl rand::Rng) -> Vector2<f32> {
+        unimplemented!()
     }
 
     fn contains(&self, point: Vector2<f32>) -> bool {

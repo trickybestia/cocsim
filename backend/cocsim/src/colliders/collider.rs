@@ -18,9 +18,9 @@ where
 
     fn translate(&self, offset: Vector2<f32>) -> Self;
 
-    fn area(&self) -> f32;
-
-    fn random_point(&self, rng: &mut impl Rng) -> Vector2<f32>;
+    /// Returns random viewable point from `point` point of view. This is used
+    /// by air units targeting.
+    fn random_near_point(&self, point: Vector2<f32>, rng: &mut impl Rng) -> Vector2<f32>;
 
     /// Checks if `point` is inside of collider.
     fn contains(&self, point: Vector2<f32>) -> bool;

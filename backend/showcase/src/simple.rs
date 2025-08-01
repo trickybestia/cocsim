@@ -6,7 +6,6 @@ use cocsim::{
     Game,
     utils::load_test_map,
 };
-use macroquad::prelude::*;
 use nalgebra::Vector2;
 
 use crate::utils::macroquad_run_game;
@@ -19,13 +18,13 @@ async fn main() {
 
     let mut game = Game::new(&map, true, None);
 
-    for i in 0..10 {
+    for _i in 0..10 {
         game.spawn_unit(
             &BalloonModel {
                 level: 10.try_into().unwrap(),
             }
             .into(),
-            Vector2::new(0.5, i as f32 + 0.5),
+            Vector2::new(0.5, 0.5),
         );
     }
 

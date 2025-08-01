@@ -1,7 +1,6 @@
 mod attack_plan;
 mod attack_plan_executor;
 mod attack_plan_unit;
-mod geometry;
 
 pub use attack_plan::AttackPlan;
 pub use attack_plan_executor::AttackPlanExecutor;

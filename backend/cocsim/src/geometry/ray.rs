@@ -1,8 +1,8 @@
 use nalgebra::Vector2;
 
 use super::{
+    Rect,
     Segment,
-    Square,
 };
 
 pub struct Ray {
@@ -19,6 +19,11 @@ impl Ray {
             start,
             direction: Vector2::new(cos, sin),
         }
+    }
+
+    /// Returns angle in radians in range [-pi; pi]
+    pub fn angle(&self) -> f32 {
+        self.direction.y.atan2(self.direction.x)
     }
 
     /// https://stackoverflow.com/questions/14307158/how-do-you-check-for-intersection-between-a-line-segment-and-a-line-ray-emanatin
@@ -43,16 +48,32 @@ impl Ray {
         }
     }
 
-    pub fn intersection_with_square(&self, square: &Square) -> Option<Vector2<f32>> {
-        for segment in &square.segments {
-            let intersection = self.intersection_with_segment(segment);
+    pub fn intersection_with_rect(&self, rect: &Rect) -> Option<Vector2<f32>> {
+        let mut intersection: Option<(Vector2<f32>, f32)> = None;
 
-            if intersection.is_some() {
-                return intersection;
+        for segment in &rect.segments {
+            let new_intersection = self.intersection_with_segment(segment);
+
+            if let Some(new_intersection) = new_intersection {
+                let new_intersection_distance = new_intersection.metric_distance(&self.start);
+
+                let mut update_intersection = false;
+
+                if let Some((_, old_intersection_distance)) = intersection {
+                    if new_intersection_distance < old_intersection_distance {
+                        update_intersection = true;
+                    }
+                } else {
+                    update_intersection = true;
+                }
+
+                if update_intersection {
+                    intersection = Some((new_intersection, new_intersection_distance));
+                }
             }
         }
 
-        None
+        intersection.map(|intersection| intersection.0)
     }
 }
 
