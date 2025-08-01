@@ -14,9 +14,8 @@ use image::{
 use magick_rust::{
     MagickWand,
     bindings::{
-        DistortMethod_AffineDistortion,
-        MagickBooleanType_MagickFalse,
-        MagickBooleanType_MagickTrue,
+        DistortMethod,
+        MagickBooleanType,
         MagickDistortImage,
     },
     magick_wand_genesis,
@@ -101,15 +100,15 @@ pub fn reverse_projection<T: AsRef<[u8]>>(image: T) -> anyhow::Result<RgbImage> 
     unsafe {
         ok = MagickDistortImage(
             wand.wand,
-            DistortMethod_AffineDistortion,
+            DistortMethod::Affine,
             args.len(),
             args.as_ptr(),
-            MagickBooleanType_MagickFalse,
+            MagickBooleanType::MagickFalse,
         );
     }
 
     ensure!(
-        ok == MagickBooleanType_MagickTrue,
+        ok == MagickBooleanType::MagickTrue,
         "MagickBooleanType_MagickTrue expected"
     );
 
