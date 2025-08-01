@@ -15,7 +15,6 @@ use cocsim::{
     Game,
     Map,
     UnitModelEnum,
-    consts::MAX_ATTACK_DURATION,
     validate_units,
 };
 use log::warn;
@@ -63,20 +62,27 @@ async fn optimize_attack_internal(mut socket: WebSocket) -> anyhow::Result<()> {
     let mut optimizer = AttackOptimizer::new(map, units);
 
     for i in 0..OPTIMIZE_ATTACK_ITERATIONS {
-        let step_result = spawn_blocking(move || {
+        optimizer = spawn_blocking(move || {
             optimizer.step();
 
             optimizer
         })
         .await?;
 
-        optimizer = step_result;
+        let (_, best_plan_stats) = optimizer.best().expect("Best plan exists here");
+
+        let progress = format!(
+            "Gen. #{i} best plan finished in {:.1} <= {:.1} <= {:.1} seconds",
+            best_plan_stats.min_time_elapsed(),
+            best_plan_stats.avg_time_elapsed,
+            best_plan_stats.max_time_elapsed()
+        );
 
         socket
             .send(Message::text(
                 json!({
                     "type": "progress",
-                    "progress": format!("Gen. #{i} best plan finished in {:.2} seconds", MAX_ATTACK_DURATION - optimizer.best().expect("Best plan exists here").1),
+                    "progress": progress,
                 })
                 .to_string(),
             ))

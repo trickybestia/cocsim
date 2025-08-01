@@ -16,4 +16,6 @@ cocsim = { path = "../cocsim" }
 image = { version = "0.24", default-features = false, features = ["jpeg"] }
 macroquad = "0.4"
 nalgebra = "0.33"
+rand = "0.9"
+rand_pcg = "0.9"
 textplots = "0.8"
