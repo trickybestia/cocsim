@@ -33,6 +33,9 @@
                 ]
             },
             "cwd": "${workspaceFolder}",
+            "env": {
+                "TEST_MAPS_PATH": "test_maps"
+            },
             "args": []
         }
     ]

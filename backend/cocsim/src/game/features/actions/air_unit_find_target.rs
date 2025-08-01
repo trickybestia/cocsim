@@ -75,6 +75,7 @@ impl TargetPrioritizer for ActiveBuildingTargetPrioritizer {
                 && other_distance < current_distance
         } else {
             other_flags.contains(AttackTargetFlags::ACTIVE_BUILDING)
+                || other_distance < current_distance
         }
     }
 }
