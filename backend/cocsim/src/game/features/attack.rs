@@ -24,6 +24,7 @@ use crate::{
         },
         position::Position,
         time::Time,
+        trapped::Trapped,
         waypoint_mover::WaypointMover,
     },
 };
@@ -88,10 +89,19 @@ fn create_find_target_queue(
     v_position: View<Position>,
     entities: EntitiesView,
     v_waypoint_mover: View<WaypointMover>,
+    v_trapped: View<Trapped>,
 ) -> Vec<(ActionEnum, EntityId)> {
     let mut result = Vec::new();
 
-    for (attacker_id, attacker) in (&mut v_attacker).iter().with_id() {
+    for (attacker_id, (attacker, trapped)) in
+        (&mut v_attacker, v_trapped.as_optional()).iter().with_id()
+    {
+        if trapped.is_some() {
+            attacker.target = EntityId::dead();
+
+            continue;
+        }
+
         let retarget = if !entities.is_alive(attacker.target) {
             true
         } else if v_waypoint_mover.get(attacker_id).is_ok() {

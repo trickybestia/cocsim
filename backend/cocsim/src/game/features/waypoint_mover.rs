@@ -3,6 +3,7 @@ use shipyard::{
     Component,
     IntoIter,
     UniqueView,
+    View,
     ViewMut,
 };
 
@@ -11,6 +12,7 @@ use crate::{
     game::features::{
         position::Position,
         time::Time,
+        trapped::Trapped,
     },
 };
 
@@ -24,10 +26,13 @@ pub struct WaypointMover {
 
 pub fn r#move(
     time: UniqueView<Time>,
+    v_trapped: View<Trapped>,
     mut v_position: ViewMut<Position>,
     mut v_waypoint_mover: ViewMut<WaypointMover>,
 ) {
-    for (mut position, waypoint_mover) in (&mut v_position, &mut v_waypoint_mover).iter() {
+    for (mut position, waypoint_mover, _) in
+        (&mut v_position, &mut v_waypoint_mover, !&v_trapped).iter()
+    {
         if waypoint_mover.waypoints.is_empty() {
             continue;
         }
