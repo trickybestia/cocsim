@@ -32,7 +32,7 @@ const GOBLIN_HUT: BuildingType = BuildingType {
 
 inventory::submit! {GOBLIN_HUT}
 
-#[derive(Serialize, Deserialize, Debug, Arbitrary)]
+#[derive(Serialize, Deserialize, Debug, Arbitrary, Clone)]
 pub struct GoblinHutModel {
     pub x: UsizeWithMax<MAX_BUILDING_POS>,
     pub y: UsizeWithMax<MAX_BUILDING_POS>,

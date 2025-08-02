@@ -92,13 +92,13 @@ inventory::submit! {X_BOW}
 const X_BOW_MIN_ATTACK_RANGE: f32 = 0.0;
 const X_BOW_ATTACK_COOLDOWN: f32 = 0.128;
 
-#[derive(Serialize, Deserialize, Debug, Arbitrary, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Arbitrary, PartialEq, Eq, Clone, Copy)]
 pub enum XBowTargetType {
     Ground,
     AirAndGround,
 }
 
-#[derive(Serialize, Deserialize, Debug, Arbitrary)]
+#[derive(Serialize, Deserialize, Debug, Arbitrary, Clone)]
 pub struct XBowModel {
     pub x: UsizeWithMax<MAX_BUILDING_POS>,
     pub y: UsizeWithMax<MAX_BUILDING_POS>,

@@ -126,7 +126,7 @@ const ARCHER_TOWER_MAX_ATTACK_RANGE: f32 = 10.0;
 const ARCHER_TOWER_ATTACK_COOLDOWN: f32 = 0.5;
 const ARCHER_TOWER_PROJECTILE_SPEED: f32 = 18.0;
 
-#[derive(Serialize, Deserialize, Debug, Arbitrary)]
+#[derive(Serialize, Deserialize, Debug, Arbitrary, Clone)]
 pub struct ArcherTowerModel {
     pub x: UsizeWithMax<MAX_BUILDING_POS>,
     pub y: UsizeWithMax<MAX_BUILDING_POS>,

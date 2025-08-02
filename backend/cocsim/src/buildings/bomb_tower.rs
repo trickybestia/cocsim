@@ -111,7 +111,7 @@ const BOMB_TOWER_SPLASH_ATTACK_RADIUS: f32 = 1.5;
 const BOMB_TOWER_DEATH_DAMAGE_ATTACK_RADIUS: f32 = 2.75;
 const BOMB_TOWER_DEATH_DAMAGE_DELAY: f32 = 1.0;
 
-#[derive(Serialize, Deserialize, Debug, Arbitrary)]
+#[derive(Serialize, Deserialize, Debug, Arbitrary, Clone)]
 pub struct BombTowerModel {
     pub x: UsizeWithMax<MAX_BUILDING_POS>,
     pub y: UsizeWithMax<MAX_BUILDING_POS>,

@@ -17,7 +17,7 @@ use crate::{
     },
 };
 
-#[derive(Serialize, Deserialize, Debug, Arbitrary)]
+#[derive(Serialize, Deserialize, Debug, Arbitrary, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct Map {
     pub base_size: usize,

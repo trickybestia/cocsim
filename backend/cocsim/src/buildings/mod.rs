@@ -79,7 +79,7 @@ pub trait BuildingModel {
 }
 
 #[enum_dispatch(BuildingModel)]
-#[derive(Serialize, Deserialize, Debug, Arbitrary)]
+#[derive(Serialize, Deserialize, Debug, Arbitrary, Clone)]
 #[serde(tag = "name")]
 pub enum BuildingModelEnum {
     #[serde(rename = "AirDefense")]

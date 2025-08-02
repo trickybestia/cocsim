@@ -50,7 +50,7 @@ const BARRACKS: BuildingType = BuildingType {
 
 inventory::submit! {BARRACKS}
 
-#[derive(Serialize, Deserialize, Debug, Arbitrary)]
+#[derive(Serialize, Deserialize, Debug, Arbitrary, Clone)]
 pub struct BarracksModel {
     pub x: UsizeWithMax<MAX_BUILDING_POS>,
     pub y: UsizeWithMax<MAX_BUILDING_POS>,

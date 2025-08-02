@@ -18,8 +18,6 @@ use crate::{
 };
 
 pub trait AttackOptimizer {
-    fn map(&self) -> &Map;
-
     fn best(&self) -> Option<&(AttackPlan, AttackPlanExecutionStats)>;
 
     fn step(&mut self) -> &(AttackPlan, AttackPlanExecutionStats);

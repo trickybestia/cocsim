@@ -74,7 +74,7 @@ const AIR_SWEEPER: BuildingType = BuildingType {
 
 inventory::submit! {AIR_SWEEPER}
 
-#[derive(Serialize, Deserialize, Debug, Arbitrary)]
+#[derive(Serialize, Deserialize, Debug, Arbitrary, Clone)]
 pub enum AirSweeperRotation {
     Right,
     RightUp,
@@ -86,7 +86,7 @@ pub enum AirSweeperRotation {
     RightDown,
 }
 
-#[derive(Serialize, Deserialize, Debug, Arbitrary)]
+#[derive(Serialize, Deserialize, Debug, Arbitrary, Clone)]
 pub struct AirSweeperModel {
     pub x: UsizeWithMax<MAX_BUILDING_POS>,
     pub y: UsizeWithMax<MAX_BUILDING_POS>,

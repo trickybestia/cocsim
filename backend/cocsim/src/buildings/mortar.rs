@@ -111,7 +111,7 @@ const MORTAR_ATTACK_COOLDOWN: f32 = 5.0;
 const MORTAR_PROJECTILE_SPEED: f32 = 5.0;
 const MORTAR_SPLASH_ATTACK_RADIUS: f32 = 1.5;
 
-#[derive(Serialize, Deserialize, Debug, Arbitrary)]
+#[derive(Serialize, Deserialize, Debug, Arbitrary, Clone)]
 pub struct MortarModel {
     pub x: UsizeWithMax<MAX_BUILDING_POS>,
     pub y: UsizeWithMax<MAX_BUILDING_POS>,

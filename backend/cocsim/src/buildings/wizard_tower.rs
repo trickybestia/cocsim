@@ -110,7 +110,7 @@ const WIZARD_TOWER_MAX_ATTACK_RANGE: f32 = 7.0;
 const WIZARD_TOWER_ATTACK_COOLDOWN: f32 = 1.3;
 const WIZARD_TOWER_SPLASH_ATTACK_RADIUS: f32 = 1.0;
 
-#[derive(Serialize, Deserialize, Debug, Arbitrary)]
+#[derive(Serialize, Deserialize, Debug, Arbitrary, Clone)]
 pub struct WizardTowerModel {
     pub x: UsizeWithMax<MAX_BUILDING_POS>,
     pub y: UsizeWithMax<MAX_BUILDING_POS>,

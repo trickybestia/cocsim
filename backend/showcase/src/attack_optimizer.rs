@@ -4,9 +4,10 @@ mod utils;
 use cocsim::{
     AttackOptimizer,
     AttackPlanExecutor,
+    BalloonModel,
     DerivativeAttackOptimizer,
-    DragonModel,
     Game,
+    GeneticAttackOptimizer,
     UnitModelEnum,
     consts::RNG_INITIAL_STATE,
     utils::load_test_map,
@@ -19,11 +20,11 @@ use crate::utils::macroquad_run_game;
 
 fn main() {
     let units: Vec<UnitModelEnum> = vec![
-        DragonModel {
-            level: 5.try_into().unwrap(),
+        BalloonModel {
+            level: 6.try_into().unwrap(),
         }
         .into();
-        3
+        10
     ];
 
     validate_units(&units).unwrap();
@@ -32,9 +33,20 @@ fn main() {
 
     map.validate().unwrap();
 
-    let mut optimizer = DerivativeAttackOptimizer::new(map, units);
+    let mut optimizer: Box<dyn AttackOptimizer> =
+        Box::new(GeneticAttackOptimizer::new(map.clone(), units.clone()));
 
-    for i in 0..100 {
+    for i in 0..40 {
+        if i == 20 {
+            println!("Switching to DerivativeAttackOptimizer");
+
+            optimizer = Box::new(DerivativeAttackOptimizer::new(
+                map.clone(),
+                units.clone(),
+                optimizer.best().cloned(),
+            ));
+        }
+
         let (_, best_plan_stats) = optimizer.step();
 
         println!(
@@ -72,11 +84,7 @@ fn main() {
         chart.display();
     }
 
-    let game = Game::new(
-        optimizer.map(),
-        true,
-        Some(Pcg64Mcg::new(RNG_INITIAL_STATE)),
-    );
+    let game = Game::new(&map, true, Some(Pcg64Mcg::new(RNG_INITIAL_STATE)));
     let mut plan_executor = AttackPlanExecutor::new(&optimizer.best().unwrap().0.units);
 
     macroquad_run_game(

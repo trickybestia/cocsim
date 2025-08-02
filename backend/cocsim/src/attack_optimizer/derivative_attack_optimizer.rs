@@ -25,12 +25,16 @@ pub struct DerivativeAttackOptimizer {
 }
 
 impl DerivativeAttackOptimizer {
-    pub fn new(map: Map, units: Vec<UnitModelEnum>) -> Self {
+    pub fn new(
+        map: Map,
+        units: Vec<UnitModelEnum>,
+        initial_plan: Option<(AttackPlan, AttackPlanExecutionStats)>,
+    ) -> Self {
         Self {
             map,
             units,
             rng: Pcg64Mcg::new(RNG_INITIAL_STATE),
-            plan: None,
+            plan: initial_plan,
         }
     }
 
@@ -50,10 +54,6 @@ impl DerivativeAttackOptimizer {
 }
 
 impl AttackOptimizer for DerivativeAttackOptimizer {
-    fn map(&self) -> &Map {
-        &self.map
-    }
-
     fn best(&self) -> Option<&(AttackPlan, AttackPlanExecutionStats)> {
         self.plan.as_ref()
     }

@@ -48,7 +48,7 @@ const GOLD_MINE: BuildingType = BuildingType {
 
 inventory::submit! {GOLD_MINE}
 
-#[derive(Serialize, Deserialize, Debug, Arbitrary)]
+#[derive(Serialize, Deserialize, Debug, Arbitrary, Clone)]
 pub struct GoldMineModel {
     pub x: UsizeWithMax<MAX_BUILDING_POS>,
     pub y: UsizeWithMax<MAX_BUILDING_POS>,

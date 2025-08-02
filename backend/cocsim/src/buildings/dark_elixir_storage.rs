@@ -44,7 +44,7 @@ const DARK_ELIXIR_STORAGE: BuildingType = BuildingType {
 
 inventory::submit! {DARK_ELIXIR_STORAGE}
 
-#[derive(Serialize, Deserialize, Debug, Arbitrary)]
+#[derive(Serialize, Deserialize, Debug, Arbitrary, Clone)]
 pub struct DarkElixirStorageModel {
     pub x: UsizeWithMax<MAX_BUILDING_POS>,
     pub y: UsizeWithMax<MAX_BUILDING_POS>,

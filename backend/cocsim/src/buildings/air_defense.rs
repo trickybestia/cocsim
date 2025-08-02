@@ -102,7 +102,7 @@ const AIR_DEFENSE_MAX_ATTACK_RANGE: f32 = 10.0;
 const AIR_DEFENSE_ATTACK_COOLDOWN: f32 = 1.0;
 const AIR_DEFENSE_PROJECTILE_SPEED: f32 = 8.0;
 
-#[derive(Serialize, Deserialize, Debug, Arbitrary)]
+#[derive(Serialize, Deserialize, Debug, Arbitrary, Clone)]
 pub struct AirDefenseModel {
     pub x: UsizeWithMax<MAX_BUILDING_POS>,
     pub y: UsizeWithMax<MAX_BUILDING_POS>,

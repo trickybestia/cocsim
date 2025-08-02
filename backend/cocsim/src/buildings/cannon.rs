@@ -126,7 +126,7 @@ const CANNON_MAX_ATTACK_RANGE: f32 = 9.0;
 const CANNON_ATTACK_COOLDOWN: f32 = 0.8;
 const CANNON_PROJECTILE_SPEED: f32 = 12.0;
 
-#[derive(Serialize, Deserialize, Debug, Arbitrary)]
+#[derive(Serialize, Deserialize, Debug, Arbitrary, Clone)]
 pub struct CannonModel {
     pub x: UsizeWithMax<MAX_BUILDING_POS>,
     pub y: UsizeWithMax<MAX_BUILDING_POS>,

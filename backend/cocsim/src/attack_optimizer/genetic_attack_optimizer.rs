@@ -39,10 +39,6 @@ impl GeneticAttackOptimizer {
 }
 
 impl AttackOptimizer for GeneticAttackOptimizer {
-    fn map(&self) -> &Map {
-        &self.map
-    }
-
     fn best(&self) -> Option<&(AttackPlan, AttackPlanExecutionStats)> {
         self.best.as_ref()
     }

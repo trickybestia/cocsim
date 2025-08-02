@@ -45,7 +45,7 @@ const ARMY_CAMP: BuildingType = BuildingType {
 
 inventory::submit! {ARMY_CAMP}
 
-#[derive(Serialize, Deserialize, Debug, Arbitrary)]
+#[derive(Serialize, Deserialize, Debug, Arbitrary, Clone)]
 pub struct ArmyCampModel {
     pub x: UsizeWithMax<MAX_BUILDING_POS>,
     pub y: UsizeWithMax<MAX_BUILDING_POS>,

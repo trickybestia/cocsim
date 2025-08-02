@@ -48,7 +48,7 @@ const ELIXIR_COLLECTOR: BuildingType = BuildingType {
 
 inventory::submit! {ELIXIR_COLLECTOR}
 
-#[derive(Serialize, Deserialize, Debug, Arbitrary)]
+#[derive(Serialize, Deserialize, Debug, Arbitrary, Clone)]
 pub struct ElixirCollectorModel {
     pub x: UsizeWithMax<MAX_BUILDING_POS>,
     pub y: UsizeWithMax<MAX_BUILDING_POS>,
