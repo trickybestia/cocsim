@@ -161,6 +161,8 @@ impl Game {
             .run(features::projectiles::target_projectile::update);
         self.world
             .run(features::projectiles::splash_projectile::update);
+        self.world
+            .run(features::projectiles::air_sweeper_projectile::update);
         self.world.run(features::waypoint_mover::r#move);
         self.world
             .run(features::health::handle_splash_damage_events);
@@ -190,6 +192,10 @@ impl Game {
             .run_with_data(features::projectiles::target_projectile::draw, &mut result);
         self.world
             .run_with_data(features::projectiles::splash_projectile::draw, &mut result);
+        self.world.run_with_data(
+            features::projectiles::air_sweeper_projectile::draw,
+            &mut result,
+        );
 
         result
     }

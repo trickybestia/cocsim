@@ -132,6 +132,7 @@ impl BuildingModel for AirDefenseModel {
             BuildingFindTarget {
                 attack_air: true,
                 attack_ground: false,
+                rotation_angle: None,
             }
             .into(),
             TargetProjectileAttack {

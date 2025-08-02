@@ -47,6 +47,15 @@ pub enum Shape {
         width: f32,
         color: ShapeColor,
     },
+    Arc {
+        x: f32,
+        y: f32,
+        radius: f32,
+        rotation: f32,
+        angle: f32,
+        width: f32,
+        color: ShapeColor,
+    },
 }
 
 impl Serialize for Shape {
@@ -104,6 +113,28 @@ impl Serialize for Shape {
                 tuple.serialize_element(y1)?;
                 tuple.serialize_element(x2)?;
                 tuple.serialize_element(y2)?;
+                tuple.serialize_element(width)?;
+                tuple.serialize_element(color)?;
+
+                tuple.end()
+            }
+            Shape::Arc {
+                x,
+                y,
+                radius,
+                rotation,
+                angle,
+                width,
+                color,
+            } => {
+                let mut tuple = serializer.serialize_tuple(8)?;
+
+                tuple.serialize_element("arc")?;
+                tuple.serialize_element(x)?;
+                tuple.serialize_element(y)?;
+                tuple.serialize_element(radius)?;
+                tuple.serialize_element(rotation)?;
+                tuple.serialize_element(angle)?;
                 tuple.serialize_element(width)?;
                 tuple.serialize_element(color)?;
 

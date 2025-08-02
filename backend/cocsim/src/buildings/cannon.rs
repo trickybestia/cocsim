@@ -156,6 +156,7 @@ impl BuildingModel for CannonModel {
             BuildingFindTarget {
                 attack_air: false,
                 attack_ground: true,
+                rotation_angle: None,
             }
             .into(),
             TargetProjectileAttack {

@@ -141,6 +141,7 @@ impl BuildingModel for WizardTowerModel {
             BuildingFindTarget {
                 attack_air: true,
                 attack_ground: true,
+                rotation_angle: None,
             }
             .into(),
             SplashProjectileAttack {

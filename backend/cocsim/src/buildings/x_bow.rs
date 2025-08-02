@@ -138,6 +138,7 @@ impl BuildingModel for XBowModel {
             BuildingFindTarget {
                 attack_air: self.target == XBowTargetType::AirAndGround,
                 attack_ground: true,
+                rotation_angle: None,
             }
             .into(),
             TargetProjectileAttack {

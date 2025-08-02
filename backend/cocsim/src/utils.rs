@@ -150,3 +150,18 @@ pub fn intersects<T: Hash + Eq>(a: impl Iterator<Item = T>, b: impl Iterator<Ite
 
     false
 }
+
+/// All args in degrees.
+pub fn arc_contains_angle(mut arc_start: f32, arc_angle: f32, mut angle: f32) -> bool {
+    if arc_angle >= 360.0 {
+        return true;
+    }
+
+    arc_start = arc_start.rem_euclid(360.0);
+
+    let arc_end = arc_start + arc_angle;
+
+    angle = angle.rem_euclid(360.0);
+
+    (arc_start..arc_end).contains(&angle) || (arc_start..arc_end).contains(&(angle + 360.0))
+}

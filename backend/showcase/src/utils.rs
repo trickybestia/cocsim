@@ -11,6 +11,7 @@ use macroquad::{
     },
     math::Vec2,
     shapes::{
+        draw_arc,
         draw_circle,
         draw_line,
         draw_rectangle,
@@ -74,6 +75,26 @@ pub fn draw_shapes(shapes: &[Shape], alpha: u8) {
                     x2 * PIXELS_PER_TILE as f32,
                     y2 * PIXELS_PER_TILE as f32,
                     width * PIXELS_PER_TILE as f32,
+                    Color::from_rgba(color.r, color.g, color.b, alpha),
+                );
+            }
+            Shape::Arc {
+                x,
+                y,
+                radius,
+                rotation,
+                angle,
+                width,
+                color,
+            } => {
+                draw_arc(
+                    x * PIXELS_PER_TILE as f32,
+                    y * PIXELS_PER_TILE as f32,
+                    100,
+                    radius * PIXELS_PER_TILE as f32,
+                    *rotation,
+                    width * PIXELS_PER_TILE as f32,
+                    *angle,
                     Color::from_rgba(color.r, color.g, color.b, alpha),
                 );
             }

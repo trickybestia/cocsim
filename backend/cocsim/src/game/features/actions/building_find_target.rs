@@ -19,12 +19,14 @@ use crate::{
         },
         position::Position,
     },
+    utils::arc_contains_angle,
 };
 
 #[derive(Clone, Debug)]
 pub struct BuildingFindTarget {
     pub attack_air: bool,
     pub attack_ground: bool,
+    pub rotation_angle: Option<(f32, f32)>,
 }
 
 impl Action for BuildingFindTarget {
@@ -39,9 +41,9 @@ impl Action for BuildingFindTarget {
         let attacker_position = v_position[actor].0;
 
         let mut nearest_target = EntityId::dead();
-        let mut nearest_target_distance: f32 = f32::INFINITY;
+        let mut nearest_target_distance = f32::INFINITY;
 
-        for (target_id, (attack_target, team, position)) in
+        for (target_id, (attack_target, team, target_position)) in
             (&v_attack_target, &v_team, &v_position).iter().with_id()
         {
             if *team == attacker_team {
@@ -54,7 +56,16 @@ impl Action for BuildingFindTarget {
                 continue;
             }
 
-            let attack_target_collider = attack_target.collider.translate(position.0);
+            if let Some((rotation, angle)) = self.rotation_angle {
+                let target_offset = target_position.0 - attacker_position;
+                let target_angle = target_offset.y.atan2(target_offset.x).to_degrees();
+
+                if !arc_contains_angle(rotation, angle, target_angle) {
+                    continue;
+                }
+            }
+
+            let attack_target_collider = attack_target.collider.translate(target_position.0);
             let min_attack_range_collider =
                 attack_target_collider.attack_area(attacker.min_attack_range);
             let max_attack_range_collider = attack_target_collider

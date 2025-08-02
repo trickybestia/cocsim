@@ -141,6 +141,7 @@ impl BuildingModel for MortarModel {
             BuildingFindTarget {
                 attack_air: false,
                 attack_ground: true,
+                rotation_angle: None,
             }
             .into(),
             SplashProjectileAttack {
