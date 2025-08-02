@@ -2,10 +2,11 @@ mod consts;
 mod utils;
 
 use cocsim::{
+    AttackOptimizer,
     AttackPlanExecutor,
+    DerivativeAttackOptimizer,
     DragonModel,
     Game,
-    GeneticAttackOptimizer,
     UnitModelEnum,
     consts::RNG_INITIAL_STATE,
     utils::load_test_map,
@@ -16,21 +17,13 @@ use textplots::Plot;
 
 use crate::utils::macroquad_run_game;
 
-#[macroquad::main("cocsim")]
-async fn main() {
+fn main() {
     let units: Vec<UnitModelEnum> = vec![
         DragonModel {
             level: 5.try_into().unwrap(),
         }
-        .into(),
-        DragonModel {
-            level: 5.try_into().unwrap(),
-        }
-        .into(),
-        DragonModel {
-            level: 5.try_into().unwrap(),
-        }
-        .into(),
+        .into();
+        3
     ];
 
     validate_units(&units).unwrap();
@@ -39,9 +32,9 @@ async fn main() {
 
     map.validate().unwrap();
 
-    let mut optimizer = GeneticAttackOptimizer::new(map, units);
+    let mut optimizer = DerivativeAttackOptimizer::new(map, units);
 
-    for i in 0..10 {
+    for i in 0..100 {
         let (_, best_plan_stats) = optimizer.step();
 
         println!(
@@ -79,17 +72,16 @@ async fn main() {
         chart.display();
     }
 
-    let mut game = Game::new(
+    let game = Game::new(
         optimizer.map(),
         true,
         Some(Pcg64Mcg::new(RNG_INITIAL_STATE)),
     );
-    let mut plan_executor = AttackPlanExecutor::new(optimizer.best().unwrap().0.units());
+    let mut plan_executor = AttackPlanExecutor::new(&optimizer.best().unwrap().0.units);
 
     macroquad_run_game(
-        &mut game,
-        &map_image,
+        game,
+        map_image,
         Some(Box::new(move |game| plan_executor.tick(game))),
-    )
-    .await;
+    );
 }

@@ -24,12 +24,29 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "showcase",
+            "name": "showcase simple",
             "cargo": {
                 "args": [
                     "build",
                     "--manifest-path=backend/showcase/Cargo.toml",
                     "--bin=simple"
+                ]
+            },
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "TEST_MAPS_PATH": "test_maps"
+            },
+            "args": []
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "showcase attack-optimizer",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--manifest-path=backend/showcase/Cargo.toml",
+                    "--bin=attack-optimizer"
                 ]
             },
             "cwd": "${workspaceFolder}",

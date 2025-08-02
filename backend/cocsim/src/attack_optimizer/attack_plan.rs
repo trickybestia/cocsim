@@ -11,7 +11,7 @@ use crate::{
 
 #[derive(Clone, Arbitrary, Debug)]
 pub struct AttackPlan {
-    units: Vec<AttackPlanUnit>,
+    pub units: Vec<AttackPlanUnit>,
 }
 
 impl AttackPlan {
@@ -39,9 +39,5 @@ impl AttackPlan {
         let units = self.units.iter().map(|unit| unit.mutate(rng)).collect();
 
         Self { units }
-    }
-
-    pub fn units(&self) -> &[AttackPlanUnit] {
-        &self.units
     }
 }

@@ -2,6 +2,7 @@ use rand::seq::index::sample_array;
 use rand_pcg::Pcg64Mcg;
 
 use crate::{
+    AttackOptimizer,
     AttackPlan,
     AttackPlanExecutionStats,
     Map,
@@ -35,8 +36,18 @@ impl GeneticAttackOptimizer {
             best: None,
         }
     }
+}
 
-    pub fn step(&mut self) -> &(AttackPlan, AttackPlanExecutionStats) {
+impl AttackOptimizer for GeneticAttackOptimizer {
+    fn map(&self) -> &Map {
+        &self.map
+    }
+
+    fn best(&self) -> Option<&(AttackPlan, AttackPlanExecutionStats)> {
+        self.best.as_ref()
+    }
+
+    fn step(&mut self) -> &(AttackPlan, AttackPlanExecutionStats) {
         let mut new_population = Vec::new();
 
         while new_population.len() != NEW_RANDOM_PLANS {
@@ -87,13 +98,5 @@ impl GeneticAttackOptimizer {
         self.population = new_population;
 
         self.best.as_ref().unwrap()
-    }
-
-    pub fn best(&self) -> Option<&(AttackPlan, AttackPlanExecutionStats)> {
-        self.best.as_ref()
-    }
-
-    pub fn map(&self) -> &Map {
-        &self.map
     }
 }

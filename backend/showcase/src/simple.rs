@@ -10,8 +10,7 @@ use nalgebra::Vector2;
 
 use crate::utils::macroquad_run_game;
 
-#[macroquad::main("cocsim")]
-async fn main() {
+fn main() {
     let (map, map_image) = load_test_map("single_player/goblin_gauntlet").unwrap();
 
     map.validate().unwrap();
@@ -28,5 +27,5 @@ async fn main() {
         );
     }
 
-    macroquad_run_game(&mut game, &map_image, None).await;
+    macroquad_run_game(game, map_image, None);
 }

@@ -24,12 +24,12 @@ use crate::{
 
 #[derive(Clone, Debug)]
 pub struct AttackPlanUnit {
-    unit_model: UnitModelEnum,
+    pub unit_model: UnitModelEnum,
     /// radians
-    angle: f32,
+    pub angle: f32,
     /// from 0 to 1
-    distance: f32,
-    drop_time: f32,
+    pub distance: f32,
+    pub drop_time: f32,
 }
 
 impl<'a> Arbitrary<'a> for AttackPlanUnit {
@@ -153,13 +153,5 @@ impl AttackPlanUnit {
         );
 
         start_point + (stop_point - start_point) * clamp(self.distance, 0.01, 0.99) // clamp for unit to not spawn on right or bottom border
-    }
-
-    pub fn unit_model(&self) -> &UnitModelEnum {
-        &self.unit_model
-    }
-
-    pub fn drop_time(&self) -> f32 {
-        self.drop_time
     }
 }

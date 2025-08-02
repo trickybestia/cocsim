@@ -1,11 +1,13 @@
 mod attack_plan;
 mod attack_plan_executor;
 mod attack_plan_unit;
+mod derivative_attack_optimizer;
 mod genetic_attack_optimizer;
 
 pub use attack_plan::AttackPlan;
 pub use attack_plan_executor::AttackPlanExecutor;
-use attack_plan_unit::AttackPlanUnit;
+pub use attack_plan_unit::AttackPlanUnit;
+pub use derivative_attack_optimizer::DerivativeAttackOptimizer;
 pub use genetic_attack_optimizer::GeneticAttackOptimizer;
 use rand_pcg::Pcg64Mcg;
 
@@ -14,6 +16,14 @@ use crate::{
     Map,
     consts::RNG_INITIAL_STATE,
 };
+
+pub trait AttackOptimizer {
+    fn map(&self) -> &Map;
+
+    fn best(&self) -> Option<&(AttackPlan, AttackPlanExecutionStats)>;
+
+    fn step(&mut self) -> &(AttackPlan, AttackPlanExecutionStats);
+}
 
 #[derive(Clone, Debug)]
 pub struct AttackPlanExecutionStats {
@@ -64,7 +74,7 @@ fn execute_attack_plan(
             false,
             Some(Pcg64Mcg::new(RNG_INITIAL_STATE + i as u128)),
         );
-        let mut attack_plan_executor = AttackPlanExecutor::new(plan.units());
+        let mut attack_plan_executor = AttackPlanExecutor::new(&plan.units);
 
         while !game.done() {
             attack_plan_executor.tick(&mut game);

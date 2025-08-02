@@ -3,6 +3,7 @@ use cocsim::{
     Shape,
 };
 use macroquad::{
+    Window,
     color::{
         BLACK,
         Color,
@@ -80,49 +81,51 @@ pub fn draw_shapes(shapes: &[Shape], alpha: u8) {
     }
 }
 
-pub async fn macroquad_run_game(
-    game: &mut Game,
-    map_image: &[u8],
+pub fn macroquad_run_game(
+    mut game: Game,
+    map_image: Vec<u8>,
     mut before_tick: Option<Box<dyn FnMut(&mut Game)>>,
 ) {
-    let map_texture = Texture2D::from_file_with_format(map_image, None);
-    let map_texture_size = PIXELS_PER_TILE * game.map_size().total_size() as usize;
+    Window::new("cocsim", async move {
+        let map_texture = Texture2D::from_file_with_format(&map_image, None);
+        let map_texture_size = PIXELS_PER_TILE * game.map_size().total_size() as usize;
 
-    let grid = game.draw_grid();
-    let mut collision = game.draw_collision();
+        let grid = game.draw_grid();
+        let mut collision = game.draw_collision();
 
-    loop {
-        if game.need_redraw_collision() {
-            collision = game.draw_collision();
-        }
-
-        let entities = game.draw_entities();
-
-        clear_background(BLACK);
-
-        draw_texture_ex(
-            &map_texture,
-            0.0,
-            0.0,
-            WHITE,
-            DrawTextureParams {
-                dest_size: Some(Vec2::new(map_texture_size as f32, map_texture_size as f32)),
-                ..Default::default()
-            },
-        );
-
-        draw_shapes(&grid, 100);
-        draw_shapes(&collision, 100);
-        draw_shapes(&entities, 255);
-
-        if !game.done() {
-            if let Some(before_tick) = &mut before_tick {
-                before_tick(game);
+        loop {
+            if game.need_redraw_collision() {
+                collision = game.draw_collision();
             }
 
-            game.tick(get_frame_time());
-        }
+            let entities = game.draw_entities();
 
-        next_frame().await
-    }
+            clear_background(BLACK);
+
+            draw_texture_ex(
+                &map_texture,
+                0.0,
+                0.0,
+                WHITE,
+                DrawTextureParams {
+                    dest_size: Some(Vec2::new(map_texture_size as f32, map_texture_size as f32)),
+                    ..Default::default()
+                },
+            );
+
+            draw_shapes(&grid, 100);
+            draw_shapes(&collision, 100);
+            draw_shapes(&entities, 255);
+
+            if !game.done() {
+                if let Some(before_tick) = &mut before_tick {
+                    before_tick(&mut game);
+                }
+
+                game.tick(get_frame_time());
+            }
+
+            next_frame().await
+        }
+    });
 }

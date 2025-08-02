@@ -24,7 +24,7 @@ pub const MAX_UNIT_DROP_TIME: f32 = 20.0;
 pub const POPULATION_SIZE: usize = 20;
 pub const NEW_POPULATION_SIZE: usize = 40;
 pub const NEW_RANDOM_PLANS: usize = 5;
-pub const ATTACK_PLAN_EXECUTOR_TPS: usize = 60;
+pub const ATTACK_PLAN_EXECUTOR_TPS: usize = 15;
 pub const ATTACK_PLAN_EXECUTIONS_COUNT: usize = 20;
 pub const RNG_INITIAL_STATE: u128 = 0x28eccc9e8da2792e12f88fb222616a86;
 
