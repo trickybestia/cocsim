@@ -92,7 +92,7 @@ impl AttackOptimizer for DerivativeAttackOptimizer {
         for i in 0..plan.units.len() {
             let unit = &mut plan.units[i];
             let prev_distance = unit.distance;
-            let distance_delta: f32 = self.rng.random_range(-0.1..=0.1);
+            let distance_delta: f32 = self.rng.random_range(-0.5..=0.5);
             let new_distance = clamp(unit.distance + distance_delta, 0.0, 1.0);
 
             unit.distance = new_distance;
@@ -116,7 +116,7 @@ impl AttackOptimizer for DerivativeAttackOptimizer {
         for i in 0..plan.units.len() {
             let unit = &mut plan.units[i];
             let prev_angle = unit.angle;
-            let angle_delta: f32 = self.rng.random_range(-0.05..=0.05);
+            let angle_delta: f32 = self.rng.random_range(-0.5..=0.5);
             unit.angle = unit.angle + angle_delta;
 
             let new_stats = execute_attack_plan(

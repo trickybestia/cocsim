@@ -17,7 +17,7 @@ use crate::{
     consts::RNG_INITIAL_STATE,
 };
 
-pub trait AttackOptimizer {
+pub trait AttackOptimizer: Send {
     fn best(&self) -> Option<&(AttackPlan, AttackPlanExecutionStats)>;
 
     fn step(&mut self) -> &(AttackPlan, AttackPlanExecutionStats);

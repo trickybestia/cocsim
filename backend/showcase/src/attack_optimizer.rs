@@ -33,8 +33,12 @@ fn main() {
 
     map.validate().unwrap();
 
-    let mut optimizer: Box<dyn AttackOptimizer> =
-        Box::new(GeneticAttackOptimizer::new(map.clone(), units.clone()));
+    let mut optimizer: Box<dyn AttackOptimizer> = Box::new(GeneticAttackOptimizer::new(
+        map.clone(),
+        units.clone(),
+        0.02,
+        0.05,
+    ));
 
     for i in 0..40 {
         if i == 20 {

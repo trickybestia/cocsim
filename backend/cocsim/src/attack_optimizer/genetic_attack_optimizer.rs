@@ -1,4 +1,11 @@
-use rand::seq::index::sample_array;
+use nalgebra::clamp;
+use rand::{
+    Rng,
+    seq::{
+        IndexedRandom,
+        index::sample_array,
+    },
+};
 use rand_pcg::Pcg64Mcg;
 
 use crate::{
@@ -23,24 +30,35 @@ pub struct GeneticAttackOptimizer {
     units: Vec<UnitModelEnum>,
     rng: Pcg64Mcg,
     population: Vec<(AttackPlan, AttackPlanExecutionStats)>,
-    best: Option<(AttackPlan, AttackPlanExecutionStats)>,
+    pub mutation_probability: f64,
+    pub mutation_probability_decay: f64,
+    pub merge_probability: f64,
+    pub merge_probability_decay: f64,
 }
 
 impl GeneticAttackOptimizer {
-    pub fn new(map: Map, units: Vec<UnitModelEnum>) -> Self {
+    pub fn new(
+        map: Map,
+        units: Vec<UnitModelEnum>,
+        mutation_probability_decay: f64,
+        merge_probability_decay: f64,
+    ) -> Self {
         Self {
             map,
             units,
             rng: Pcg64Mcg::new(RNG_INITIAL_STATE),
             population: Vec::new(),
-            best: None,
+            mutation_probability: 1.0,
+            mutation_probability_decay,
+            merge_probability: 1.0,
+            merge_probability_decay,
         }
     }
 }
 
 impl AttackOptimizer for GeneticAttackOptimizer {
     fn best(&self) -> Option<&(AttackPlan, AttackPlanExecutionStats)> {
-        self.best.as_ref()
+        self.population.first()
     }
 
     fn step(&mut self) -> &(AttackPlan, AttackPlanExecutionStats) {
@@ -59,16 +77,23 @@ impl AttackOptimizer for GeneticAttackOptimizer {
         }
 
         if !self.population.is_empty() {
-            while new_population.len() != NEW_POPULATION_SIZE {
-                let [a_index, b_index] =
-                    sample_array(&mut self.rng, self.population.len()).unwrap();
+            new_population.push(self.population[0].clone());
 
-                let new_plan = AttackPlan::merge(
-                    &self.population[a_index].0,
-                    &self.population[b_index].0,
-                    &mut self.rng,
-                )
-                .mutate(&mut self.rng);
+            while new_population.len() != NEW_POPULATION_SIZE {
+                let new_plan = if self.rng.random_bool(self.merge_probability) {
+                    let [a_index, b_index] =
+                        sample_array(&mut self.rng, self.population.len()).unwrap();
+
+                    AttackPlan::merge(
+                        &self.population[a_index].0,
+                        &self.population[b_index].0,
+                        &mut self.rng,
+                    )
+                } else {
+                    self.population.choose(&mut self.rng).unwrap().0.clone()
+                };
+
+                let new_plan = new_plan.mutate(&mut self.rng, self.mutation_probability);
                 let new_plan_stats = execute_attack_plan(
                     &self.map,
                     &new_plan,
@@ -83,16 +108,21 @@ impl AttackOptimizer for GeneticAttackOptimizer {
         new_population
             .sort_unstable_by(|a, b| a.1.avg_time_elapsed.total_cmp(&b.1.avg_time_elapsed));
 
-        if self.best.is_none()
-            || new_population[0].1.avg_time_elapsed < self.best.as_ref().unwrap().1.avg_time_elapsed
-        {
-            self.best = Some(new_population[0].clone());
-        }
-
         new_population.truncate(POPULATION_SIZE);
 
         self.population = new_population;
 
-        self.best.as_ref().unwrap()
+        self.mutation_probability = clamp(
+            self.mutation_probability - self.mutation_probability_decay,
+            0.0,
+            1.0,
+        );
+        self.merge_probability = clamp(
+            self.merge_probability - self.merge_probability_decay,
+            0.0,
+            1.0,
+        );
+
+        &self.population[0]
     }
 }

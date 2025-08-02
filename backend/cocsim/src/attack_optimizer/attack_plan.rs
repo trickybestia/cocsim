@@ -35,8 +35,18 @@ impl AttackPlan {
         Self { units }
     }
 
-    pub fn mutate(&self, rng: &mut impl Rng) -> Self {
-        let units = self.units.iter().map(|unit| unit.mutate(rng)).collect();
+    pub fn mutate(&self, rng: &mut impl Rng, probability: f64) -> Self {
+        let units = self
+            .units
+            .iter()
+            .map(|unit| {
+                if rng.random_bool(probability) {
+                    unit.mutate(rng)
+                } else {
+                    unit.clone()
+                }
+            })
+            .collect();
 
         Self { units }
     }

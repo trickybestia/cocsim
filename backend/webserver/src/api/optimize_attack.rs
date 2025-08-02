@@ -12,6 +12,7 @@ use axum::{
 use cocsim::{
     AttackOptimizer,
     AttackPlanExecutor,
+    DerivativeAttackOptimizer,
     Game,
     GeneticAttackOptimizer,
     Map,
@@ -60,9 +61,22 @@ async fn optimize_attack_internal(mut socket: WebSocket) -> anyhow::Result<()> {
         ))
         .await?;
 
-    let mut optimizer = GeneticAttackOptimizer::new(map.clone(), units);
+    let mut optimizer: Box<dyn AttackOptimizer> = Box::new(GeneticAttackOptimizer::new(
+        map.clone(),
+        units.clone(),
+        0.02,
+        0.05,
+    ));
 
     for i in 0..OPTIMIZE_ATTACK_ITERATIONS {
+        if i == OPTIMIZE_ATTACK_ITERATIONS / 2 {
+            optimizer = Box::new(DerivativeAttackOptimizer::new(
+                map.clone(),
+                units.clone(),
+                optimizer.best().cloned(),
+            ));
+        }
+
         optimizer = spawn_blocking(move || {
             optimizer.step();
 
