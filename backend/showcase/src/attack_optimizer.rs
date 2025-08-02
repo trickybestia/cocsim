@@ -2,20 +2,17 @@ mod consts;
 mod utils;
 
 use cocsim::{
-    AttackOptimizer,
     AttackPlanExecutor,
     DragonModel,
     Game,
+    GeneticAttackOptimizer,
     UnitModelEnum,
     consts::RNG_INITIAL_STATE,
     utils::load_test_map,
     validate_units,
 };
 use rand_pcg::Pcg64Mcg;
-use textplots::{
-    Plot,
-    Shape,
-};
+use textplots::Plot;
 
 use crate::utils::macroquad_run_game;
 
@@ -42,7 +39,7 @@ async fn main() {
 
     map.validate().unwrap();
 
-    let mut optimizer = AttackOptimizer::new(map, units);
+    let mut optimizer = GeneticAttackOptimizer::new(map, units);
 
     for i in 0..10 {
         let (_, best_plan_stats) = optimizer.step();
