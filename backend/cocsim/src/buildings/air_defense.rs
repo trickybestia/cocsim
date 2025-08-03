@@ -12,9 +12,12 @@ use crate::{
     UsizeWithMax,
     buildings::utils::active_building::create_active_building,
     consts::MAX_BUILDING_POS,
-    game::features::actions::{
-        BuildingFindTarget,
-        TargetProjectileAttack,
+    game::features::{
+        actions::{
+            BuildingFindTarget,
+            TargetProjectileAttack,
+        },
+        attack::BuildingRetargetCondition,
     },
 };
 
@@ -126,13 +129,18 @@ impl BuildingModel for AirDefenseModel {
             level.health,
             Vector2::new(*self.x, *self.y),
             AIR_DEFENSE.size,
-            AIR_DEFENSE_MIN_ATTACK_RANGE,
-            AIR_DEFENSE_MAX_ATTACK_RANGE,
             AIR_DEFENSE_ATTACK_COOLDOWN,
             BuildingFindTarget {
                 attack_air: true,
                 attack_ground: false,
                 rotation_angle: None,
+                min_attack_range: AIR_DEFENSE_MIN_ATTACK_RANGE,
+                max_attack_range: AIR_DEFENSE_MAX_ATTACK_RANGE,
+            }
+            .into(),
+            BuildingRetargetCondition {
+                min_attack_range: AIR_DEFENSE_MIN_ATTACK_RANGE,
+                max_attack_range: AIR_DEFENSE_MAX_ATTACK_RANGE,
             }
             .into(),
             TargetProjectileAttack {

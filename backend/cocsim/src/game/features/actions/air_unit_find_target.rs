@@ -91,6 +91,7 @@ pub enum TargetPrioritizerEnum {
 #[derive(Clone, Debug)]
 pub struct AirUnitFindTarget {
     pub prioritizer: TargetPrioritizerEnum,
+    pub attack_range: f32,
 }
 
 impl Action for AirUnitFindTarget {
@@ -113,8 +114,6 @@ impl Action for AirUnitFindTarget {
         let mut nearest_target: Option<NearestTarget> = None;
 
         for (target_id, (attack_target, team)) in (&v_attack_target, &v_team).iter().with_id() {
-            assert!(attacker.min_attack_range == 0.0);
-
             if *team == attacker_team || !self.prioritizer.can_attack(attack_target.flags) {
                 continue;
             }
@@ -122,7 +121,7 @@ impl Action for AirUnitFindTarget {
             let nearest_point = attack_target
                 .collider
                 .translate(v_position[target_id].0)
-                .attack_area(attacker.max_attack_range)
+                .attack_area(self.attack_range)
                 .nearest_point(attacker_position);
             let distance = nearest_point.metric_distance(&attacker_position);
 
@@ -158,7 +157,7 @@ impl Action for AirUnitFindTarget {
                 v_attack_target[nearest_target.id]
                     .collider
                     .translate(v_position[nearest_target.id].0)
-                    .attack_area(attacker.max_attack_range)
+                    .attack_area(self.attack_range)
                     .random_near_point(attacker_position, &mut rng.0),
             ];
             attacker.target = nearest_target.id;

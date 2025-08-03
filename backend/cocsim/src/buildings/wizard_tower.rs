@@ -12,9 +12,12 @@ use crate::{
     UsizeWithMax,
     buildings::utils::active_building::create_active_building,
     consts::MAX_BUILDING_POS,
-    game::features::actions::{
-        BuildingFindTarget,
-        SplashProjectileAttack,
+    game::features::{
+        actions::{
+            BuildingFindTarget,
+            SplashProjectileAttack,
+        },
+        attack::BuildingRetargetCondition,
     },
 };
 
@@ -135,13 +138,18 @@ impl BuildingModel for WizardTowerModel {
             level.health,
             Vector2::new(*self.x, *self.y),
             WIZARD_TOWER.size,
-            WIZARD_TOWER_MIN_ATTACK_RANGE,
-            WIZARD_TOWER_MAX_ATTACK_RANGE,
             WIZARD_TOWER_ATTACK_COOLDOWN,
             BuildingFindTarget {
                 attack_air: true,
                 attack_ground: true,
                 rotation_angle: None,
+                min_attack_range: WIZARD_TOWER_MIN_ATTACK_RANGE,
+                max_attack_range: WIZARD_TOWER_MAX_ATTACK_RANGE,
+            }
+            .into(),
+            BuildingRetargetCondition {
+                min_attack_range: WIZARD_TOWER_MIN_ATTACK_RANGE,
+                max_attack_range: WIZARD_TOWER_MAX_ATTACK_RANGE,
             }
             .into(),
             SplashProjectileAttack {

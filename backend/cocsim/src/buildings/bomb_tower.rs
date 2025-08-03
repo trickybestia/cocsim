@@ -19,6 +19,7 @@ use crate::{
             SplashDamage,
             SplashProjectileAttack,
         },
+        attack::BuildingRetargetCondition,
         to_be_deleted::OnDelete,
     },
 };
@@ -135,13 +136,18 @@ impl BuildingModel for BombTowerModel {
             level.health,
             Vector2::new(*self.x, *self.y),
             BOMB_TOWER.size,
-            BOMB_TOWER_MIN_ATTACK_RANGE,
-            BOMB_TOWER_MAX_ATTACK_RANGE,
             BOMB_TOWER_ATTACK_COOLDOWN,
             BuildingFindTarget {
                 attack_air: false,
                 attack_ground: true,
                 rotation_angle: None,
+                min_attack_range: BOMB_TOWER_MIN_ATTACK_RANGE,
+                max_attack_range: BOMB_TOWER_MAX_ATTACK_RANGE,
+            }
+            .into(),
+            BuildingRetargetCondition {
+                min_attack_range: BOMB_TOWER_MIN_ATTACK_RANGE,
+                max_attack_range: BOMB_TOWER_MAX_ATTACK_RANGE,
             }
             .into(),
             SplashProjectileAttack {

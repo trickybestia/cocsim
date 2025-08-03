@@ -12,9 +12,12 @@ use crate::{
     UsizeWithMax,
     buildings::utils::active_building::create_active_building,
     consts::MAX_BUILDING_POS,
-    game::features::actions::{
-        BuildingFindTarget,
-        SplashProjectileAttack,
+    game::features::{
+        actions::{
+            BuildingFindTarget,
+            SplashProjectileAttack,
+        },
+        attack::BuildingRetargetCondition,
     },
 };
 
@@ -135,13 +138,18 @@ impl BuildingModel for MortarModel {
             level.health,
             Vector2::new(*self.x, *self.y),
             MORTAR.size,
-            MORTAR_MIN_ATTACK_RANGE,
-            MORTAR_MAX_ATTACK_RANGE,
             MORTAR_ATTACK_COOLDOWN,
             BuildingFindTarget {
                 attack_air: false,
                 attack_ground: true,
                 rotation_angle: None,
+                min_attack_range: MORTAR_MIN_ATTACK_RANGE,
+                max_attack_range: MORTAR_MAX_ATTACK_RANGE,
+            }
+            .into(),
+            BuildingRetargetCondition {
+                min_attack_range: MORTAR_MIN_ATTACK_RANGE,
+                max_attack_range: MORTAR_MAX_ATTACK_RANGE,
             }
             .into(),
             SplashProjectileAttack {

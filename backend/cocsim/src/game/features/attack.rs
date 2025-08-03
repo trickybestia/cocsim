@@ -1,4 +1,6 @@
 use bitflags::bitflags;
+use enum_dispatch::enum_dispatch;
+use nalgebra::Vector2;
 use shipyard::{
     AllStoragesViewMut,
     Component,
@@ -27,16 +29,95 @@ use crate::{
         trapped::Trapped,
         waypoint_mover::WaypointMover,
     },
+    utils::arc_contains_angle,
 };
+
+#[enum_dispatch]
+pub trait RetargetCondition {
+    fn need_retarget(
+        &self,
+        attacker_position: Vector2<f32>,
+        target_position: Vector2<f32>,
+        target_collider: &ColliderEnum,
+    ) -> bool;
+}
+
+pub struct AirSweeperRetargetCondition {
+    pub max_attack_range: f32,
+    pub rotation: f32,
+    pub angle: f32,
+}
+
+impl RetargetCondition for AirSweeperRetargetCondition {
+    fn need_retarget(
+        &self,
+        attacker_position: Vector2<f32>,
+        target_position: Vector2<f32>,
+        target_collider: &ColliderEnum,
+    ) -> bool {
+        if !target_collider
+            .translate(target_position)
+            .attack_area(self.max_attack_range + UNIT_DISTANCE_TO_WAYPOINT_EPS)
+            .contains(attacker_position)
+        {
+            return true;
+        }
+
+        let target_offset = target_position - attacker_position;
+        let target_angle = target_offset.y.atan2(target_offset.x).to_degrees();
+
+        !arc_contains_angle(self.rotation, self.angle, target_angle)
+    }
+}
+
+pub struct BuildingRetargetCondition {
+    pub min_attack_range: f32,
+    pub max_attack_range: f32,
+}
+
+impl RetargetCondition for BuildingRetargetCondition {
+    fn need_retarget(
+        &self,
+        attacker_position: Vector2<f32>,
+        target_position: Vector2<f32>,
+        target_collider: &ColliderEnum,
+    ) -> bool {
+        let target_collider = target_collider.translate(target_position);
+
+        attacker_position.metric_distance(&target_position) < self.min_attack_range
+            || !target_collider
+                .attack_area(self.max_attack_range + UNIT_DISTANCE_TO_WAYPOINT_EPS)
+                .contains(attacker_position)
+    }
+}
+
+pub struct UnitRetargetCondition;
+
+impl RetargetCondition for UnitRetargetCondition {
+    fn need_retarget(
+        &self,
+        _attacker_position: Vector2<f32>,
+        _target_position: Vector2<f32>,
+        _target_collider: &ColliderEnum,
+    ) -> bool {
+        false
+    }
+}
+
+#[enum_dispatch(RetargetCondition)]
+pub enum RetargetConditionEnum {
+    AirSweeperRetargetCondition,
+    BuildingRetargetCondition,
+    UnitRetargetCondition,
+}
 
 #[derive(Component)]
 pub struct Attacker {
-    pub min_attack_range: f32,
-    pub max_attack_range: f32,
     pub attack_cooldown: f32,
-    pub target: EntityId,
     pub remaining_attack_cooldown: f32,
+    pub target: EntityId,
     pub find_target: ActionEnum,
+    pub retarget_condition: RetargetConditionEnum,
     pub attack: ActionEnum,
 }
 
@@ -88,7 +169,6 @@ fn create_find_target_queue(
     v_attack_target: View<AttackTarget>,
     v_position: View<Position>,
     entities: EntitiesView,
-    v_waypoint_mover: View<WaypointMover>,
     v_trapped: View<Trapped>,
 ) -> Vec<(ActionEnum, EntityId)> {
     let mut result = Vec::new();
@@ -104,24 +184,16 @@ fn create_find_target_queue(
 
         let retarget = if !entities.is_alive(attacker.target) {
             true
-        } else if v_waypoint_mover.get(attacker_id).is_ok() {
-            // attacker is unit, it's moving to target, just wait
-
-            false
         } else {
-            // attacker is building
-
             let attacker_position = v_position[attacker_id].0;
             let target_position = v_position[attacker.target].0;
             let attack_target = &v_attack_target[attacker.target];
-            let attack_target_collider = attack_target.collider.translate(target_position);
 
-            attack_target_collider
-                .attack_area(attacker.min_attack_range)
-                .contains(attacker_position)
-                || !attack_target_collider
-                    .attack_area(attacker.max_attack_range + UNIT_DISTANCE_TO_WAYPOINT_EPS)
-                    .contains(attacker_position)
+            attacker.retarget_condition.need_retarget(
+                attacker_position,
+                target_position,
+                &attack_target.collider,
+            )
         };
 
         if retarget {
@@ -138,29 +210,20 @@ fn create_attack_queue(
     time: UniqueView<Time>,
     mut v_attacker: ViewMut<Attacker>,
     entities: EntitiesView,
-    v_attack_target: View<AttackTarget>,
-    v_position: View<Position>,
     v_waypoint_mover: View<WaypointMover>,
 ) -> Vec<(ActionEnum, EntityId)> {
     let mut result = Vec::new();
 
     for (attacker_id, attacker) in (&mut v_attacker).iter().with_id() {
         if entities.is_alive(attacker.target) {
-            let attacker_position = v_position[attacker_id].0;
-            let attack_target = &v_attack_target[attacker.target];
-            let attack_target_position = v_position[attacker.target].0;
-            let attack_target_collider = attack_target.collider.translate(attack_target_position);
-
             let can_attack = if let Ok(waypoint_mover) = v_waypoint_mover.get(attacker_id) {
                 // attacker is unit
+
                 waypoint_mover.waypoints.is_empty()
             } else {
                 // attacker is building
-                attacker_position.metric_distance(&attack_target_position)
-                    >= attacker.min_attack_range
-                    && attack_target_collider
-                        .attack_area(attacker.max_attack_range + UNIT_DISTANCE_TO_WAYPOINT_EPS)
-                        .contains(attacker_position) // target is in attack range
+
+                true
             };
 
             if can_attack {

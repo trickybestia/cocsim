@@ -12,9 +12,12 @@ use crate::{
     UsizeWithMax,
     buildings::utils::active_building::create_active_building,
     consts::MAX_BUILDING_POS,
-    game::features::actions::{
-        BuildingFindTarget,
-        TargetProjectileAttack,
+    game::features::{
+        actions::{
+            BuildingFindTarget,
+            TargetProjectileAttack,
+        },
+        attack::BuildingRetargetCondition,
     },
 };
 
@@ -150,13 +153,18 @@ impl BuildingModel for ArcherTowerModel {
             level.health,
             Vector2::new(*self.x, *self.y),
             ARCHER_TOWER.size,
-            ARCHER_TOWER_MIN_ATTACK_RANGE,
-            ARCHER_TOWER_MAX_ATTACK_RANGE,
             ARCHER_TOWER_ATTACK_COOLDOWN,
             BuildingFindTarget {
                 attack_air: true,
                 attack_ground: true,
                 rotation_angle: None,
+                min_attack_range: ARCHER_TOWER_MIN_ATTACK_RANGE,
+                max_attack_range: ARCHER_TOWER_MAX_ATTACK_RANGE,
+            }
+            .into(),
+            BuildingRetargetCondition {
+                min_attack_range: ARCHER_TOWER_MIN_ATTACK_RANGE,
+                max_attack_range: ARCHER_TOWER_MAX_ATTACK_RANGE,
             }
             .into(),
             TargetProjectileAttack {

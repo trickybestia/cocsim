@@ -13,9 +13,12 @@ use crate::{
     UsizeWithMax,
     buildings::utils::active_building::create_active_building,
     consts::MAX_BUILDING_POS,
-    game::features::actions::{
-        BuildingFindTarget,
-        TargetProjectileAttack,
+    game::features::{
+        actions::{
+            BuildingFindTarget,
+            TargetProjectileAttack,
+        },
+        attack::BuildingRetargetCondition,
     },
 };
 
@@ -132,13 +135,18 @@ impl BuildingModel for XBowModel {
             level.health,
             Vector2::new(*self.x, *self.y),
             X_BOW.size,
-            X_BOW_MIN_ATTACK_RANGE,
-            max_attack_range,
             X_BOW_ATTACK_COOLDOWN,
             BuildingFindTarget {
                 attack_air: self.target == XBowTargetType::AirAndGround,
                 attack_ground: true,
                 rotation_angle: None,
+                min_attack_range: X_BOW_MIN_ATTACK_RANGE,
+                max_attack_range,
+            }
+            .into(),
+            BuildingRetargetCondition {
+                min_attack_range: X_BOW_MIN_ATTACK_RANGE,
+                max_attack_range,
             }
             .into(),
             TargetProjectileAttack {

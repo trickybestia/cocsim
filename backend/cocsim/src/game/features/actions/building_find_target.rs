@@ -27,6 +27,8 @@ pub struct BuildingFindTarget {
     pub attack_air: bool,
     pub attack_ground: bool,
     pub rotation_angle: Option<(f32, f32)>,
+    pub min_attack_range: f32,
+    pub max_attack_range: f32,
 }
 
 impl Action for BuildingFindTarget {
@@ -67,9 +69,9 @@ impl Action for BuildingFindTarget {
 
             let attack_target_collider = attack_target.collider.translate(target_position.0);
             let min_attack_range_collider =
-                attack_target_collider.attack_area(attacker.min_attack_range);
+                attack_target_collider.attack_area(self.min_attack_range);
             let max_attack_range_collider = attack_target_collider
-                .attack_area(attacker.max_attack_range + UNIT_DISTANCE_TO_WAYPOINT_EPS);
+                .attack_area(self.max_attack_range + UNIT_DISTANCE_TO_WAYPOINT_EPS);
 
             if min_attack_range_collider.contains(attacker_position)
                 || !max_attack_range_collider.contains(attacker_position)

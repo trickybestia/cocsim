@@ -133,10 +133,10 @@ impl UnitModel for BalloonModel {
             position,
             level.health,
             BALLOON_SPEED,
-            BALLOON_ATTACK_RANGE,
             BALLOON_ATTACK_COOLDOWN,
             AirUnitFindTarget {
                 prioritizer: ActiveBuildingTargetPrioritizer.into(),
+                attack_range: BALLOON_ATTACK_RANGE,
             }
             .into(),
             SplashDamage {

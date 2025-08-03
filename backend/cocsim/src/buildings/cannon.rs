@@ -12,9 +12,12 @@ use crate::{
     UsizeWithMax,
     buildings::utils::active_building::create_active_building,
     consts::MAX_BUILDING_POS,
-    game::features::actions::{
-        BuildingFindTarget,
-        TargetProjectileAttack,
+    game::features::{
+        actions::{
+            BuildingFindTarget,
+            TargetProjectileAttack,
+        },
+        attack::BuildingRetargetCondition,
     },
 };
 
@@ -150,13 +153,18 @@ impl BuildingModel for CannonModel {
             level.health,
             Vector2::new(*self.x, *self.y),
             CANNON.size,
-            CANNON_MIN_ATTACK_RANGE,
-            CANNON_MAX_ATTACK_RANGE,
             CANNON_ATTACK_COOLDOWN,
             BuildingFindTarget {
                 attack_air: false,
                 attack_ground: true,
                 rotation_angle: None,
+                min_attack_range: CANNON_MIN_ATTACK_RANGE,
+                max_attack_range: CANNON_MAX_ATTACK_RANGE,
+            }
+            .into(),
+            BuildingRetargetCondition {
+                min_attack_range: CANNON_MIN_ATTACK_RANGE,
+                max_attack_range: CANNON_MAX_ATTACK_RANGE,
             }
             .into(),
             TargetProjectileAttack {

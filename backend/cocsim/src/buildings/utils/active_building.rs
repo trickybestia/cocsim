@@ -15,6 +15,7 @@ use crate::{
             AttackTarget,
             AttackTargetFlags,
             Attacker,
+            RetargetConditionEnum,
             Team,
         },
         buildings::{
@@ -30,10 +31,9 @@ pub fn create_active_building(
     health: f32,
     position: Vector2<usize>,
     size: Vector2<usize>,
-    min_attack_range: f32,
-    max_attack_range: f32,
     attack_cooldown: f32,
     find_target: ActionEnum,
+    retarget_condition: RetargetConditionEnum,
     attack: ActionEnum,
 ) -> EntityId {
     world.add_entity((
@@ -43,12 +43,11 @@ pub fn create_active_building(
         default_pathfinding_collider(size),
         Team::Defense,
         Attacker {
-            min_attack_range,
-            max_attack_range,
             attack_cooldown,
+            remaining_attack_cooldown: attack_cooldown,
             target: EntityId::dead(),
-            remaining_attack_cooldown: 0.0,
             find_target,
+            retarget_condition,
             attack,
         },
         AttackTarget {

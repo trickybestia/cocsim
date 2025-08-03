@@ -123,10 +123,10 @@ impl UnitModel for DragonModel {
             position,
             level.health,
             DRAGON_SPEED,
-            DRAGON_ATTACK_RANGE,
             DRAGON_ATTACK_COOLDOWN,
             AirUnitFindTarget {
                 prioritizer: CountedBuildingTargetPrioritizer.into(),
+                attack_range: DRAGON_ATTACK_RANGE,
             }
             .into(),
             MeleeAttack {
