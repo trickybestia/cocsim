@@ -1,6 +1,6 @@
 use axum::Json;
 use cocsim::{
-    DragonModel,
+    BalloonModel,
     Game,
     utils::load_test_map,
 };
@@ -27,13 +27,13 @@ fn get_showcase_attack_internal() -> Json<Value> {
 
     let mut game = Game::new(&map, true, None);
 
-    for i in 0..10 {
+    for _i in 0..10 {
         game.spawn_unit(
-            &DragonModel {
+            &BalloonModel {
                 level: 10.try_into().unwrap(),
             }
             .into(),
-            Vector2::new(0.5, i as f32 + 0.5),
+            Vector2::new(0.5, 0.5),
         );
     }
 
