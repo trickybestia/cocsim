@@ -11,8 +11,8 @@ use crate::{
     consts::*,
     game::features::{
         position::Position,
+        stunned::Stunned,
         time::Time,
-        trapped::Trapped,
     },
 };
 
@@ -26,12 +26,12 @@ pub struct WaypointMover {
 
 pub fn r#move(
     time: UniqueView<Time>,
-    v_trapped: View<Trapped>,
+    v_stunned: View<Stunned>,
     mut v_position: ViewMut<Position>,
     mut v_waypoint_mover: ViewMut<WaypointMover>,
 ) {
     for (mut position, waypoint_mover, _) in
-        (&mut v_position, &mut v_waypoint_mover, !&v_trapped).iter()
+        (&mut v_position, &mut v_waypoint_mover, !&v_stunned).iter()
     {
         if waypoint_mover.waypoints.is_empty() {
             continue;

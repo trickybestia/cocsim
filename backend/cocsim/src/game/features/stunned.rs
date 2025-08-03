@@ -1,4 +1,4 @@
 use shipyard::Component;
 
 #[derive(Component)]
-pub struct Trapped;
+pub struct Stunned;

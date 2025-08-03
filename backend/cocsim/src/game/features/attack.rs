@@ -25,8 +25,8 @@ use crate::{
             ActionEnum,
         },
         position::Position,
+        stunned::Stunned,
         time::Time,
-        trapped::Trapped,
         waypoint_mover::WaypointMover,
     },
     utils::arc_contains_angle,
@@ -169,14 +169,14 @@ fn create_find_target_queue(
     v_attack_target: View<AttackTarget>,
     v_position: View<Position>,
     entities: EntitiesView,
-    v_trapped: View<Trapped>,
+    v_stunned: View<Stunned>,
 ) -> Vec<(ActionEnum, EntityId)> {
     let mut result = Vec::new();
 
-    for (attacker_id, (attacker, trapped)) in
-        (&mut v_attacker, v_trapped.as_optional()).iter().with_id()
+    for (attacker_id, (attacker, stunned)) in
+        (&mut v_attacker, v_stunned.as_optional()).iter().with_id()
     {
-        if trapped.is_some() {
+        if stunned.is_some() {
             attacker.target = EntityId::dead();
 
             continue;
