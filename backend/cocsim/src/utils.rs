@@ -10,7 +10,10 @@ use std::{
     path::PathBuf,
 };
 
-use nalgebra::DMatrix;
+use nalgebra::{
+    DMatrix,
+    Vector2,
+};
 use zip::ZipArchive;
 
 use crate::{
@@ -164,4 +167,44 @@ pub fn arc_contains_angle(mut arc_start: f32, arc_angle: f32, mut angle: f32) ->
     angle = angle.rem_euclid(360.0);
 
     (arc_start..arc_end).contains(&angle) || (arc_start..arc_end).contains(&(angle + 360.0))
+}
+
+/// All args in degrees.
+pub fn distance_on_circle(a: f32, b: f32) -> f32 {
+    let result = (a - b).abs();
+
+    if result < 180.0 {
+        result
+    } else {
+        360.0 - result
+    }
+}
+
+/// Angles in degrees.
+pub fn nearest_point_on_arc(
+    point: Vector2<f32>,
+    arc_center: Vector2<f32>,
+    arc_radius: f32,
+    arc_start: f32,
+    arc_angle: f32,
+) -> Vector2<f32> {
+    let delta = point - arc_center;
+
+    let angle = delta.y.atan2(delta.x).to_degrees().rem_euclid(360.0);
+
+    let angle_clipped = if arc_contains_angle(arc_start, arc_angle, angle) {
+        angle
+    } else {
+        let arc_end = (arc_start + arc_angle).rem_euclid(360.0);
+
+        if distance_on_circle(angle, arc_start) < distance_on_circle(angle, arc_end) {
+            arc_start
+        } else {
+            arc_end
+        }
+    };
+
+    let (sin, cos) = angle_clipped.to_radians().sin_cos();
+
+    arc_center + Vector2::new(cos, sin) * arc_radius
 }

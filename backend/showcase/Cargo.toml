@@ -11,6 +11,10 @@ path = "src/simple.rs"
 name = "attack-optimizer"
 path = "src/attack_optimizer.rs"
 
+[[bin]]
+name = "nearest-point-on-arc"
+path = "src/math/nearest_point_on_arc.rs"
+
 [dependencies]
 cocsim = { path = "../cocsim" }
 image = { version = "0.24", default-features = false, features = ["jpeg"] }
