@@ -48,6 +48,16 @@ type UnitType = {
  */
 type Shape =
   | [
+      name: "arc",
+      x: number,
+      y: number,
+      radius: number,
+      rotation: number,
+      angle: number,
+      width: number,
+      color: string
+    ]
+  | [
       name: "rect",
       x: number,
       y: number,

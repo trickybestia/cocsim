@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { Circle, Line, Rect } from "react-konva";
+import { Arc, Circle, Line, Rect } from "react-konva";
 
 import type { Shape } from "../../types";
 
@@ -8,6 +8,19 @@ type Props = { shape: Shape; pixelsPerTile: number; opacity: number };
 const ShapeRenderer: React.FC<Props> = memo(
   ({ shape, pixelsPerTile, opacity }: Props) => {
     switch (shape[0]) {
+      case "arc":
+        return (
+          <Arc
+            x={shape[1] * pixelsPerTile}
+            y={shape[2] * pixelsPerTile}
+            innerRadius={(shape[3] - shape[6] / 2.0) * pixelsPerTile}
+            outerRadius={(shape[3] + shape[6] / 2.0) * pixelsPerTile}
+            rotation={shape[4]}
+            angle={shape[5]}
+            fill={shape[7]}
+            opacity={opacity}
+          />
+        );
       case "rect":
         return (
           <Rect
