@@ -11,8 +11,15 @@ use crate::{
     BuildingOption,
     BuildingType,
     UsizeWithMax,
-    buildings::utils::passive_building::create_passive_building,
+    buildings::utils::active_building::create_active_building,
     consts::MAX_BUILDING_POS,
+    game::features::{
+        actions::{
+            AirSweeperAttack,
+            BuildingFindTarget,
+        },
+        attack::BuildingRetargetCondition,
+    },
 };
 
 struct AirSweeperLevel {
@@ -74,6 +81,11 @@ const AIR_SWEEPER: BuildingType = BuildingType {
 
 inventory::submit! {AIR_SWEEPER}
 
+const AIR_SWEEPER_MIN_ATTACK_RANGE: f32 = 1.0;
+const AIR_SWEEPER_MAX_ATTACK_RANGE: f32 = 15.0;
+const AIR_SWEEPER_ATTACK_COOLDOWN: f32 = 5.0;
+const AIR_SWEEPER_PROJECTILE_SPEED: f32 = 4.0;
+
 #[derive(Serialize, Deserialize, Debug, Arbitrary, Clone)]
 pub enum AirSweeperRotation {
     Right,
@@ -104,11 +116,47 @@ impl BuildingModel for AirSweeperModel {
     }
 
     fn create_building(&self, world: &mut World) {
-        create_passive_building(
+        let level = &AIR_SWEEPER_LEVELS[*self.level];
+        let rotation = match self.rotation {
+            AirSweeperRotation::Right => 300.0,
+            AirSweeperRotation::RightUp => 255.0,
+            AirSweeperRotation::Up => 210.0,
+            AirSweeperRotation::LeftUp => 165.0,
+            AirSweeperRotation::Left => 120.0,
+            AirSweeperRotation::LeftDown => 75.0,
+            AirSweeperRotation::Down => 30.0,
+            AirSweeperRotation::RightDown => -15.0,
+        };
+        let rotation_angle = Some((rotation, 120.0));
+
+        create_active_building(
             world,
-            AIR_SWEEPER_LEVELS[*self.level].health,
-            Vector2::new(*self.x, *self.y),
+            level.health,
+            self.position(),
             AIR_SWEEPER.size,
+            AIR_SWEEPER_ATTACK_COOLDOWN,
+            BuildingFindTarget {
+                attack_air: true,
+                attack_ground: false,
+                rotation_angle,
+                min_attack_range: AIR_SWEEPER_MIN_ATTACK_RANGE,
+                max_attack_range: AIR_SWEEPER_MAX_ATTACK_RANGE,
+            }
+            .into(),
+            BuildingRetargetCondition {
+                min_attack_range: AIR_SWEEPER_MIN_ATTACK_RANGE,
+                max_attack_range: AIR_SWEEPER_MAX_ATTACK_RANGE,
+                rotation_angle,
+            }
+            .into(),
+            AirSweeperAttack {
+                push_strength: level.push_strength,
+                projectile_speed: AIR_SWEEPER_PROJECTILE_SPEED,
+                start_radius: AIR_SWEEPER_MIN_ATTACK_RANGE,
+                max_radius: AIR_SWEEPER_MAX_ATTACK_RANGE,
+                angle: 60.0,
+            }
+            .into(),
         );
     }
 }

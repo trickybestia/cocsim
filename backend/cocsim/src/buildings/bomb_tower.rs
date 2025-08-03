@@ -148,6 +148,7 @@ impl BuildingModel for BombTowerModel {
             BuildingRetargetCondition {
                 min_attack_range: BOMB_TOWER_MIN_ATTACK_RANGE,
                 max_attack_range: BOMB_TOWER_MAX_ATTACK_RANGE,
+                rotation_angle: None,
             }
             .into(),
             SplashProjectileAttack {

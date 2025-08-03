@@ -147,6 +147,7 @@ impl BuildingModel for XBowModel {
             BuildingRetargetCondition {
                 min_attack_range: X_BOW_MIN_ATTACK_RANGE,
                 max_attack_range,
+                rotation_angle: None,
             }
             .into(),
             TargetProjectileAttack {

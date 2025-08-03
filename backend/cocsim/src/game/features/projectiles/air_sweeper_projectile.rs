@@ -19,6 +19,7 @@ use crate::{
 
 #[derive(Component)]
 pub struct AirSweeperProjectile {
+    pub push_strength: f32,
     pub rotation: f32,
     pub angle: f32,
     pub radius: f32,

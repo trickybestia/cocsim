@@ -141,6 +141,7 @@ impl BuildingModel for AirDefenseModel {
             BuildingRetargetCondition {
                 min_attack_range: AIR_DEFENSE_MIN_ATTACK_RANGE,
                 max_attack_range: AIR_DEFENSE_MAX_ATTACK_RANGE,
+                rotation_angle: None,
             }
             .into(),
             TargetProjectileAttack {

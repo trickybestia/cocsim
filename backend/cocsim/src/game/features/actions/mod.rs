@@ -1,3 +1,4 @@
+mod air_sweeper_attack;
 mod air_unit_find_target;
 mod building_find_target;
 mod delayed;
@@ -7,6 +8,7 @@ mod splash_damage;
 mod splash_projectile_attack;
 mod target_projectile_attack;
 
+pub use air_sweeper_attack::AirSweeperAttack;
 pub use air_unit_find_target::*;
 pub use building_find_target::BuildingFindTarget;
 pub use delayed::Delayed;
@@ -29,6 +31,7 @@ pub trait Action {
 #[enum_dispatch(Action)]
 #[derive(Clone, Debug)]
 pub enum ActionEnum {
+    AirSweeperAttack,
     AirUnitFindTarget,
     BuildingFindTarget,
     Delayed,

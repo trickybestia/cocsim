@@ -165,6 +165,7 @@ impl BuildingModel for CannonModel {
             BuildingRetargetCondition {
                 min_attack_range: CANNON_MIN_ATTACK_RANGE,
                 max_attack_range: CANNON_MAX_ATTACK_RANGE,
+                rotation_angle: None,
             }
             .into(),
             TargetProjectileAttack {

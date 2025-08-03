@@ -165,6 +165,7 @@ impl BuildingModel for ArcherTowerModel {
             BuildingRetargetCondition {
                 min_attack_range: ARCHER_TOWER_MIN_ATTACK_RANGE,
                 max_attack_range: ARCHER_TOWER_MAX_ATTACK_RANGE,
+                rotation_angle: None,
             }
             .into(),
             TargetProjectileAttack {

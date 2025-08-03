@@ -42,37 +42,10 @@ pub trait RetargetCondition {
     ) -> bool;
 }
 
-pub struct AirSweeperRetargetCondition {
-    pub max_attack_range: f32,
-    pub rotation: f32,
-    pub angle: f32,
-}
-
-impl RetargetCondition for AirSweeperRetargetCondition {
-    fn need_retarget(
-        &self,
-        attacker_position: Vector2<f32>,
-        target_position: Vector2<f32>,
-        target_collider: &ColliderEnum,
-    ) -> bool {
-        if !target_collider
-            .translate(target_position)
-            .attack_area(self.max_attack_range + UNIT_DISTANCE_TO_WAYPOINT_EPS)
-            .contains(attacker_position)
-        {
-            return true;
-        }
-
-        let target_offset = target_position - attacker_position;
-        let target_angle = target_offset.y.atan2(target_offset.x).to_degrees();
-
-        !arc_contains_angle(self.rotation, self.angle, target_angle)
-    }
-}
-
 pub struct BuildingRetargetCondition {
     pub min_attack_range: f32,
     pub max_attack_range: f32,
+    pub rotation_angle: Option<(f32, f32)>,
 }
 
 impl RetargetCondition for BuildingRetargetCondition {
@@ -84,10 +57,24 @@ impl RetargetCondition for BuildingRetargetCondition {
     ) -> bool {
         let target_collider = target_collider.translate(target_position);
 
-        attacker_position.metric_distance(&target_position) < self.min_attack_range
+        if attacker_position.metric_distance(&target_position) < self.min_attack_range
             || !target_collider
                 .attack_area(self.max_attack_range + UNIT_DISTANCE_TO_WAYPOINT_EPS)
                 .contains(attacker_position)
+        {
+            return true;
+        }
+
+        if let Some((rotation, angle)) = self.rotation_angle {
+            let target_offset = target_position - attacker_position;
+            let target_angle = target_offset.y.atan2(target_offset.x).to_degrees();
+
+            if !arc_contains_angle(rotation, angle, target_angle) {
+                return true;
+            }
+        }
+
+        false
     }
 }
 
@@ -106,7 +93,6 @@ impl RetargetCondition for UnitRetargetCondition {
 
 #[enum_dispatch(RetargetCondition)]
 pub enum RetargetConditionEnum {
-    AirSweeperRetargetCondition,
     BuildingRetargetCondition,
     UnitRetargetCondition,
 }
