@@ -171,7 +171,7 @@ pub fn arc_contains_angle(mut arc_start: f32, arc_angle: f32, mut angle: f32) ->
 
 /// All args in degrees.
 pub fn distance_on_circle(a: f32, b: f32) -> f32 {
-    let result = (a - b).abs();
+    let result = (a.rem_euclid(360.0) - b.rem_euclid(360.0)).abs();
 
     if result < 180.0 {
         result

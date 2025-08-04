@@ -1,4 +1,7 @@
-use std::collections::HashMap;
+use std::{
+    collections::HashMap,
+    f32::consts::PI,
+};
 
 use shipyard::{
     AddComponent,
@@ -31,11 +34,20 @@ use crate::{
 pub struct AirSweeperProjectile {
     pub push_strength: f32,
     pub rotation: f32,
-    pub angle: f32,
+    pub start_angle: f32,
     pub radius: f32,
     pub max_radius: f32,
     pub speed: f32,
     pub applied_push_strength: HashMap<EntityId, f32>,
+    pub max_arc_length: f32,
+}
+
+impl AirSweeperProjectile {
+    pub fn angle(&self) -> f32 {
+        let angle_for_this_arc_length = self.max_arc_length * 180.0 / PI / self.radius;
+
+        self.start_angle.min(angle_for_this_arc_length)
+    }
 }
 
 pub fn update(
@@ -67,8 +79,8 @@ pub fn update(
                 attack_target_position.0,
                 projectile_position,
                 air_sweeper_projectile.radius,
-                air_sweeper_projectile.rotation,
-                air_sweeper_projectile.angle,
+                air_sweeper_projectile.rotation - air_sweeper_projectile.angle() / 2.0,
+                air_sweeper_projectile.angle(),
             )
             .metric_distance(&attack_target_position.0);
 
@@ -123,8 +135,8 @@ pub fn draw(
             x: position.0.x,
             y: position.0.y,
             radius: air_sweeper_projectile.radius,
-            rotation: air_sweeper_projectile.rotation,
-            angle: air_sweeper_projectile.angle,
+            rotation: air_sweeper_projectile.rotation - air_sweeper_projectile.angle() / 2.0,
+            angle: air_sweeper_projectile.angle(),
             width: 0.2,
             color: ShapeColor::new(255, 255, 255),
         });

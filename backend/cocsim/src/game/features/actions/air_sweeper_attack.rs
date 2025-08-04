@@ -23,6 +23,7 @@ pub struct AirSweeperAttack {
     pub start_radius: f32,
     pub max_radius: f32,
     pub angle: f32,
+    pub max_arc_length: f32,
 }
 
 impl Action for AirSweeperAttack {
@@ -44,12 +45,13 @@ impl Action for AirSweeperAttack {
         all_storages.add_entity((
             AirSweeperProjectile {
                 push_strength: self.push_strength,
-                rotation: target_angle - self.angle / 2.0,
-                angle: self.angle,
+                rotation: target_angle,
+                start_angle: self.angle,
                 radius: self.start_radius,
                 max_radius: self.max_radius,
                 speed: self.projectile_speed,
                 applied_push_strength: HashMap::new(),
+                max_arc_length: self.max_arc_length,
             },
             Position(attacker_position),
             attacker_team,
