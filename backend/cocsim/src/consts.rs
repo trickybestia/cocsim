@@ -2,6 +2,7 @@ use crate::ShapeColor;
 
 pub const MIN_BASE_SIZE: usize = 1;
 pub const MAX_BASE_SIZE: usize = 44;
+pub const MIN_BORDER_SIZE: usize = 1;
 pub const MAX_BORDER_SIZE: usize = 4;
 pub const MAX_BUILDINGS_COUNT: usize = 1000;
 pub const MAX_UNITS_COUNT: usize = 100;

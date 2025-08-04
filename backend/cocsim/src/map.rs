@@ -14,6 +14,7 @@ use crate::{
         MAX_BORDER_SIZE,
         MAX_BUILDINGS_COUNT,
         MIN_BASE_SIZE,
+        MIN_BORDER_SIZE,
     },
 };
 
@@ -29,7 +30,7 @@ pub struct Map {
 impl Map {
     pub fn validate(&self) -> anyhow::Result<()> {
         ensure!(self.base_size >= MIN_BASE_SIZE && self.base_size <= MAX_BASE_SIZE);
-        ensure!(self.border_size <= MAX_BORDER_SIZE);
+        ensure!(self.border_size >= MIN_BORDER_SIZE && self.border_size <= MAX_BORDER_SIZE);
         ensure!(self.buildings.len() <= MAX_BUILDINGS_COUNT);
 
         let mut has_town_hall = false;

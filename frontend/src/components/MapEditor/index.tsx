@@ -371,7 +371,7 @@ const MapEditor: React.FC<Props> = ({
             />
             <IntegerNumberInput
               text="Border size:"
-              min={0}
+              min={1}
               max={4}
               defaultValue={borderSize}
               onChange={setBorderSize}
