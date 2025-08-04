@@ -27,12 +27,15 @@ impl Action for TargetProjectileAttack {
 
         drop(v_position);
 
+        let relative_position = attacker_position - target_position;
+
         all_storages.add_entity((
             TargetProjectile {
                 damage: self.damage,
                 target,
-                relative_position: attacker_position - target_position,
+                relative_position,
                 speed: self.projectile_speed,
+                remaining_time: relative_position.norm() / self.projectile_speed,
             },
             Position(attacker_position),
         ));

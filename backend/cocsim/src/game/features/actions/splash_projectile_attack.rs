@@ -44,6 +44,8 @@ impl Action for SplashProjectileAttack {
                 damage_ground: self.damage_ground,
                 target: target_position,
                 speed: self.projectile_speed,
+                remaining_time: (attacker_position - target_position).norm()
+                    / self.projectile_speed,
             },
             Position(attacker_position),
             attacker_team,

@@ -13,7 +13,6 @@ use shipyard::{
 use crate::{
     Shape,
     ShapeColor,
-    consts::PROJECTILE_DISTANCE_TO_TARGET_EPS,
     game::features::{
         health::EntityDamageEvent,
         position::Position,
@@ -28,6 +27,7 @@ pub struct TargetProjectile {
     pub target: EntityId,
     pub relative_position: Vector2<f32>,
     pub speed: f32,
+    pub remaining_time: f32,
 }
 
 pub fn update(
@@ -53,7 +53,10 @@ pub fn update(
         v_position[id].0 =
             v_position[target_projectile.target].0 + target_projectile.relative_position;
 
-        if target_projectile.relative_position.norm() <= PROJECTILE_DISTANCE_TO_TARGET_EPS {
+        target_projectile.remaining_time =
+            0.0f32.max(target_projectile.remaining_time - time.delta);
+
+        if target_projectile.remaining_time == 0.0 {
             entities.add_entity(
                 &mut v_entity_damage_event,
                 EntityDamageEvent {

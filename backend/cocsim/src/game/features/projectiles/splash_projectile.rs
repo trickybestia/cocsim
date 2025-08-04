@@ -12,7 +12,6 @@ use shipyard::{
 use crate::{
     Shape,
     ShapeColor,
-    consts::PROJECTILE_DISTANCE_TO_TARGET_EPS,
     game::features::{
         attack::Team,
         health::SplashDamageEvent,
@@ -30,6 +29,7 @@ pub struct SplashProjectile {
     pub damage_ground: bool,
     pub target: Vector2<f32>,
     pub speed: f32,
+    pub remaining_time: f32,
 }
 
 pub fn update(
@@ -50,7 +50,10 @@ pub fn update(
 
         position.0 += speed * time.delta;
 
-        if (splash_projectile.target - position.0).norm() <= PROJECTILE_DISTANCE_TO_TARGET_EPS {
+        splash_projectile.remaining_time =
+            0.0f32.max(splash_projectile.remaining_time - time.delta);
+
+        if splash_projectile.remaining_time == 0.0 {
             entities.add_entity(
                 &mut v_splash_damage_event,
                 SplashDamageEvent {
