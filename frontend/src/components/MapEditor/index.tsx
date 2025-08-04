@@ -453,7 +453,7 @@ const MapEditor: React.FC<Props> = ({
             <Layer>
               <Image
                 scaleX={canvasSize / image.width}
-                scaleY={canvasSize / image.width}
+                scaleY={canvasSize / image.height}
                 crop={{
                   x: startX,
                   y: startY,
