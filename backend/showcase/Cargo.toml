@@ -3,6 +3,9 @@ name = "showcase"
 version = "0.1.0"
 edition = "2024"
 
+[features]
+rayon = ["cocsim/rayon"]
+
 [[bin]]
 name = "simple"
 path = "src/simple.rs"

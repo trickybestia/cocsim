@@ -11,7 +11,7 @@ Attack optimizer:
 
 ```bash
 # cd to project root
-TEST_MAPS_PATH="test_maps" RUST_BACKTRACE=1 cargo run --manifest-path=backend/showcase/Cargo.toml --bin=attack-optimizer
+TEST_MAPS_PATH="test_maps" RUST_BACKTRACE=1 cargo run --manifest-path=backend/showcase/Cargo.toml --bin=attack-optimizer --release --features=rayon
 ```
 
 Math: nearest point on arc:
