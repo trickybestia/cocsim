@@ -67,7 +67,7 @@ fn main() {
             .map(|(time_elapsed, count)| {
                 (
                     *time_elapsed as f32,
-                    *count as f32 / best_plan_stats.time_elapsed.len() as f32,
+                    *count as f32 / best_plan_stats.executions.len() as f32,
                 )
             })
             .collect::<Vec<_>>();

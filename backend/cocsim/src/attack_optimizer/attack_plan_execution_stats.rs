@@ -1,5 +1,4 @@
 use rand_pcg::Pcg64Mcg;
-use rayon::prelude::*;
 
 use crate::{
     AttackPlan,
@@ -13,21 +12,53 @@ use crate::{
 };
 
 #[derive(Clone, Debug)]
+pub struct AttackPlanExecution {
+    pub time_elapsed: f32,
+    /// In range [0.0; 100.0]
+    pub percentage_destroyed: f32,
+}
+
+#[derive(Clone, Debug)]
 pub struct AttackPlanExecutionStats {
+    pub executions: Vec<AttackPlanExecution>,
     pub avg_time_elapsed: f32,
-    pub time_elapsed: Vec<f32>,
     pub avg_percentage_destroyed: f32,
-    /// Each item in range [0.0; 100.0]
-    pub percentage_destroyed: Vec<f32>,
 }
 
 impl AttackPlanExecutionStats {
+    pub fn new(executions: Vec<AttackPlanExecution>) -> Self {
+        let mut avg_time_elapsed = 0.0;
+        let mut avg_percentage_destroyed = 0.0;
+
+        for execution in &executions {
+            avg_time_elapsed += execution.time_elapsed;
+            avg_percentage_destroyed += execution.percentage_destroyed;
+        }
+
+        avg_time_elapsed /= executions.len() as f32;
+        avg_percentage_destroyed /= executions.len() as f32;
+
+        Self {
+            executions,
+            avg_time_elapsed,
+            avg_percentage_destroyed,
+        }
+    }
+
     pub fn min_time_elapsed(&self) -> f32 {
-        self.time_elapsed.iter().cloned().reduce(f32::min).unwrap()
+        self.executions
+            .iter()
+            .map(|e| e.time_elapsed)
+            .reduce(f32::min)
+            .unwrap()
     }
 
     pub fn max_time_elapsed(&self) -> f32 {
-        self.time_elapsed.iter().cloned().reduce(f32::max).unwrap()
+        self.executions
+            .iter()
+            .map(|e| e.time_elapsed)
+            .reduce(f32::max)
+            .unwrap()
     }
 
     pub fn avg_time_left(&self) -> f32 {
@@ -48,67 +79,49 @@ impl AttackPlanExecutionStats {
             .map(|time_elapsed| (time_elapsed, 0usize))
             .collect::<Vec<_>>();
 
-        for time_elapsed in &self.time_elapsed {
-            result[time_elapsed.round() as usize - min_time_elapsed].1 += 1;
+        for execution in &self.executions {
+            result[execution.time_elapsed.round() as usize - min_time_elapsed].1 += 1;
         }
 
         result
     }
 }
 
-pub fn execute_attack_plan(
+pub fn execute_attack_plan_single(
     map: &Map,
     plan: &AttackPlan,
-    executions_count: usize,
-    tps: usize,
-) -> AttackPlanExecutionStats {
-    let mut time_elapsed = Vec::with_capacity(executions_count);
-    let mut percentage_destroyed = Vec::with_capacity(executions_count);
-    let delta_time = 1.0 / tps as f32;
+    i: usize,
+    delta_time: f32,
+) -> AttackPlanExecution {
+    // maybe set enable_collision_grid to true in future (when ground units will be
+    // added)
+    let mut game = Game::new(
+        map,
+        false,
+        Some(Pcg64Mcg::new(RNG_INITIAL_STATE + i as u128)),
+    );
+    let mut attack_plan_executor = AttackPlanExecutor::new(&plan.units);
+    let mut early_loose = false;
 
-    for (time_elapsed_item, percentage_destroyed_item) in (0..executions_count)
-        .into_par_iter()
-        .map(|i| {
-            // maybe set enable_collision_grid to true in future (when ground units will be
-            // added)
-            let mut game = Game::new(
-                map,
-                false,
-                Some(Pcg64Mcg::new(RNG_INITIAL_STATE + i as u128)),
-            );
-            let mut attack_plan_executor = AttackPlanExecutor::new(&plan.units);
-            let mut early_loose = false;
+    while !game.done() {
+        if !game.is_attacker_team_present() && attack_plan_executor.is_empty() {
+            early_loose = true;
 
-            while !game.done() {
-                if !game.is_attacker_team_present() && attack_plan_executor.is_empty() {
-                    early_loose = true;
+            break;
+        }
 
-                    break;
-                }
-
-                attack_plan_executor.tick(&mut game);
-                game.tick(delta_time);
-            }
-
-            let time_elapsed = if early_loose {
-                MAX_ATTACK_DURATION
-            } else {
-                game.time_elapsed()
-            };
-
-            (time_elapsed, game.percentage_destroyed())
-        })
-        .collect::<Vec<(f32, f32)>>()
-    {
-        time_elapsed.push(time_elapsed_item);
-        percentage_destroyed.push(percentage_destroyed_item);
+        attack_plan_executor.tick(&mut game);
+        game.tick(delta_time);
     }
 
-    AttackPlanExecutionStats {
-        avg_time_elapsed: time_elapsed.iter().sum::<f32>() / time_elapsed.len() as f32,
+    let time_elapsed = if early_loose {
+        MAX_ATTACK_DURATION
+    } else {
+        game.time_elapsed()
+    };
+
+    AttackPlanExecution {
         time_elapsed,
-        avg_percentage_destroyed: percentage_destroyed.iter().sum::<f32>()
-            / percentage_destroyed.len() as f32,
-        percentage_destroyed,
+        percentage_destroyed: game.percentage_destroyed(),
     }
 }
