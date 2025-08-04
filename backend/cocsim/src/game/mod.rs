@@ -69,6 +69,11 @@ impl Game {
             || self.stars() == 3
     }
 
+    pub fn percentage_destroyed(&self) -> f32 {
+        self.destroyed_counted_buildings_count() as f32 * 100.0
+            / self.initial_counted_buildings_count as f32
+    }
+
     pub fn stars(&self) -> u32 {
         let destroyed_buildings_count = self.destroyed_counted_buildings_count();
 

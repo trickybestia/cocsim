@@ -8,13 +8,13 @@ use crate::{
     AttackPlanExecutionStats,
     Map,
     UnitModelEnum,
-    attack_optimizer::execute_attack_plan,
     consts::{
         ATTACK_PLAN_EXECUTIONS_COUNT,
         ATTACK_PLAN_EXECUTOR_TPS,
         MAX_UNIT_DROP_TIME,
         RNG_INITIAL_STATE,
     },
+    execute_attack_plan,
 };
 
 pub struct DerivativeAttackOptimizer {
@@ -80,9 +80,9 @@ impl AttackOptimizer for DerivativeAttackOptimizer {
                 ATTACK_PLAN_EXECUTOR_TPS,
             );
 
-            let time_elapsed_delta = new_stats.avg_time_elapsed - stats.avg_time_elapsed; // > 0 is worse, < 0 is better
+            let score_delta = new_stats.score() - stats.score(); // > 0 is better, < 0 is worse
 
-            if time_elapsed_delta < 0.0 {
+            if score_delta >= 0.0 {
                 *stats = new_stats;
             } else {
                 plan.units[i].drop_time = prev_drop_time;
@@ -104,9 +104,9 @@ impl AttackOptimizer for DerivativeAttackOptimizer {
                 ATTACK_PLAN_EXECUTOR_TPS,
             );
 
-            let time_elapsed_delta = new_stats.avg_time_elapsed - stats.avg_time_elapsed; // > 0 is worse, < 0 is better
+            let score_delta = new_stats.score() - stats.score(); // > 0 is better, < 0 is worse
 
-            if time_elapsed_delta < 0.0 {
+            if score_delta >= 0.0 {
                 *stats = new_stats;
             } else {
                 plan.units[i].distance = prev_distance;
@@ -126,9 +126,9 @@ impl AttackOptimizer for DerivativeAttackOptimizer {
                 ATTACK_PLAN_EXECUTOR_TPS,
             );
 
-            let time_elapsed_delta = new_stats.avg_time_elapsed - stats.avg_time_elapsed; // > 0 is worse, < 0 is better
+            let score_delta = new_stats.score() - stats.score(); // > 0 is better, < 0 is worse
 
-            if time_elapsed_delta < 0.0 {
+            if score_delta >= 0.0 {
                 *stats = new_stats;
             } else {
                 plan.units[i].angle = prev_angle;

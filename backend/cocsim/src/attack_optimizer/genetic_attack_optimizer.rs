@@ -105,8 +105,8 @@ impl AttackOptimizer for GeneticAttackOptimizer {
             }
         }
 
-        new_population
-            .sort_unstable_by(|a, b| a.1.avg_time_elapsed.total_cmp(&b.1.avg_time_elapsed));
+        // sort by score reversed, so highest score will be at index 0
+        new_population.sort_unstable_by(|a, b| b.1.score().total_cmp(&a.1.score()));
 
         new_population.truncate(POPULATION_SIZE);
 

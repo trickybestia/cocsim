@@ -21,7 +21,7 @@ use crate::utils::macroquad_run_game;
 fn main() {
     let units: Vec<UnitModelEnum> = vec![
         BalloonModel {
-            level: 6.try_into().unwrap(),
+            level: 10.try_into().unwrap(),
         }
         .into();
         10
@@ -29,7 +29,7 @@ fn main() {
 
     validate_units(&units).unwrap();
 
-    let (map, map_image) = load_test_map("single_player/goblin_gauntlet").unwrap();
+    let (map, map_image) = load_test_map("single_player/no_flight_zone").unwrap();
 
     map.validate().unwrap();
 
@@ -54,10 +54,11 @@ fn main() {
         let (_, best_plan_stats) = optimizer.step();
 
         println!(
-            "Gen. #{i} best plan finished in {:.1} <= {:.1} <= {:.1} seconds",
+            "Gen. #{i} best plan finished in {:.1} <= {:.1} <= {:.1} seconds (avg. percentage destroyed = {})",
             best_plan_stats.min_time_elapsed(),
             best_plan_stats.avg_time_elapsed,
-            best_plan_stats.max_time_elapsed()
+            best_plan_stats.max_time_elapsed(),
+            best_plan_stats.avg_percentage_destroyed
         );
 
         let plot_data = best_plan_stats
