@@ -157,6 +157,10 @@ pub fn compose_base_images(left: &[RgbImage], right: &[RgbImage]) -> RgbImage {
         );
     }
 
+    let min_height = min(height(&left_composed), height(&right_composed));
+
+    let mut left_composed = crop(&left_composed, 0, 0, width(&left_composed), min_height);
+
     const HORIZONTAL_IGNORE_BORDERS: usize = 150;
     const X_SKIP_FIRST: usize = 400;
     const X_SKIP_LAST: usize = 400;
@@ -166,7 +170,7 @@ pub fn compose_base_images(left: &[RgbImage], right: &[RgbImage]) -> RgbImage {
         width(&right_composed) / 2,
         0,
         width(&right_composed) - width(&right_composed) / 2,
-        height(&right_composed),
+        min_height,
     );
 
     right_composed.swap_axes(1, 2);
@@ -263,6 +267,8 @@ where
     S1: Data<Elem = u8>,
     S2: Data<Elem = u8>,
 {
+    assert!(width(top) == width(bottom));
+
     const WINDOW_HEIGHT: usize = 100;
 
     let top = crop(
