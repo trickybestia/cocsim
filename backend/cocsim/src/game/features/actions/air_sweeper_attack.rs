@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use shipyard::{
     AllStoragesViewMut,
     EntityId,
@@ -47,6 +49,7 @@ impl Action for AirSweeperAttack {
                 radius: self.start_radius,
                 max_radius: self.max_radius,
                 speed: self.projectile_speed,
+                applied_push_strength: HashMap::new(),
             },
             Position(attacker_position),
             attacker_team,

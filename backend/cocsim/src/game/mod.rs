@@ -161,6 +161,7 @@ impl Game {
             .run(features::projectiles::target_projectile::update);
         self.world
             .run(features::projectiles::splash_projectile::update);
+        self.world.run(features::stunned::clear);
         self.world
             .run(features::projectiles::air_sweeper_projectile::update);
         self.world.run(features::waypoint_mover::r#move);
