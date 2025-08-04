@@ -17,6 +17,10 @@ impl AttackPlanExecutor {
         Self { units }
     }
 
+    pub fn is_empty(&self) -> bool {
+        self.units.is_empty()
+    }
+
     pub fn tick(&mut self, game: &mut Game) {
         while !self.units.is_empty() && self.units.last().unwrap().drop_time <= game.time_elapsed()
         {

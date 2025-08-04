@@ -4,7 +4,9 @@ use nalgebra::Vector2;
 use rand_pcg::Pcg64Mcg;
 use shipyard::{
     EntitiesView,
+    IntoIter,
     UniqueView,
+    View,
     World,
 };
 
@@ -20,6 +22,7 @@ use crate::{
         MAX_ATTACK_DURATION,
     },
     game::features::{
+        attack::Team,
         buildings::{
             BuildingsGrid,
             CountedBuilding,
@@ -72,6 +75,17 @@ impl Game {
     pub fn percentage_destroyed(&self) -> f32 {
         self.destroyed_counted_buildings_count() as f32 * 100.0
             / self.initial_counted_buildings_count as f32
+    }
+
+    /// Check if there is any entity with Team::Attack.
+    pub fn is_attacker_team_present(&self) -> bool {
+        for team in self.world.borrow::<View<Team>>().unwrap().iter() {
+            if *team == Team::Attack {
+                return true;
+            }
+        }
+
+        false
     }
 
     pub fn stars(&self) -> u32 {

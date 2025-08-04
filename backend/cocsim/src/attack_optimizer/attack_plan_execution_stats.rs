@@ -74,13 +74,24 @@ pub fn execute_attack_plan(
             Some(Pcg64Mcg::new(RNG_INITIAL_STATE + i as u128)),
         );
         let mut attack_plan_executor = AttackPlanExecutor::new(&plan.units);
+        let mut early_loose = false;
 
         while !game.done() {
+            if !game.is_attacker_team_present() && attack_plan_executor.is_empty() {
+                early_loose = true;
+
+                break;
+            }
+
             attack_plan_executor.tick(&mut game);
             game.tick(delta_time);
         }
 
-        time_elapsed.push(game.time_elapsed());
+        time_elapsed.push(if early_loose {
+            MAX_ATTACK_DURATION
+        } else {
+            game.time_elapsed()
+        });
         percentage_destroyed.push(game.percentage_destroyed());
     }
 
