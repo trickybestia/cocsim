@@ -1,21 +1,3 @@
-## Benchmarks
-
-To run benchmarks:
-
-```bash
-# cd to project root
-cd backend/cocsim
-TEST_MAPS_PATH="../../test_maps" cargo bench
-```
-
-To create flamegraph for benchmark:
-
-```bash
-# cd to project root
-cd backend/cocsim
-CARGO_PROFILE_BENCH_DEBUG=true TEST_MAPS_PATH="../../test_maps" cargo flamegraph --bench bench_1 -- --bench
-```
-
 ## Fuzzing
 
 At first:
