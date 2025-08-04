@@ -1,3 +1,6 @@
 [workspace]
 members = ["cocsim", "cocsim/fuzz", "compose_base_images", "showcase", "webserver"]
 resolver = "3"
+
+[profile.release]
+lto = true
