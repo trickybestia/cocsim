@@ -33,7 +33,7 @@ const BackgroundLayer: React.FC<Props> = memo(
         {baseImage !== undefined && (
           <Image
             scaleX={canvasSize / baseImage.width}
-            scaleY={canvasSize / baseImage.width}
+            scaleY={canvasSize / baseImage.height}
             image={baseImage}
           />
         )}
