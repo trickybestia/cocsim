@@ -1,4 +1,5 @@
 use rand_pcg::Pcg64Mcg;
+use rayon::prelude::*;
 
 use crate::{
     AttackPlan,
@@ -65,34 +66,42 @@ pub fn execute_attack_plan(
     let mut percentage_destroyed = Vec::with_capacity(executions_count);
     let delta_time = 1.0 / tps as f32;
 
-    for i in 0..executions_count {
-        // maybe set enable_collision_grid to true in future (when ground units will be
-        // added)
-        let mut game = Game::new(
-            map,
-            false,
-            Some(Pcg64Mcg::new(RNG_INITIAL_STATE + i as u128)),
-        );
-        let mut attack_plan_executor = AttackPlanExecutor::new(&plan.units);
-        let mut early_loose = false;
+    for (time_elapsed_item, percentage_destroyed_item) in (0..executions_count)
+        .into_par_iter()
+        .map(|i| {
+            // maybe set enable_collision_grid to true in future (when ground units will be
+            // added)
+            let mut game = Game::new(
+                map,
+                false,
+                Some(Pcg64Mcg::new(RNG_INITIAL_STATE + i as u128)),
+            );
+            let mut attack_plan_executor = AttackPlanExecutor::new(&plan.units);
+            let mut early_loose = false;
 
-        while !game.done() {
-            if !game.is_attacker_team_present() && attack_plan_executor.is_empty() {
-                early_loose = true;
+            while !game.done() {
+                if !game.is_attacker_team_present() && attack_plan_executor.is_empty() {
+                    early_loose = true;
 
-                break;
+                    break;
+                }
+
+                attack_plan_executor.tick(&mut game);
+                game.tick(delta_time);
             }
 
-            attack_plan_executor.tick(&mut game);
-            game.tick(delta_time);
-        }
+            let time_elapsed = if early_loose {
+                MAX_ATTACK_DURATION
+            } else {
+                game.time_elapsed()
+            };
 
-        time_elapsed.push(if early_loose {
-            MAX_ATTACK_DURATION
-        } else {
-            game.time_elapsed()
-        });
-        percentage_destroyed.push(game.percentage_destroyed());
+            (time_elapsed, game.percentage_destroyed())
+        })
+        .collect::<Vec<(f32, f32)>>()
+    {
+        time_elapsed.push(time_elapsed_item);
+        percentage_destroyed.push(percentage_destroyed_item);
     }
 
     AttackPlanExecutionStats {
