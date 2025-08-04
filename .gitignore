@@ -1,2 +1,5 @@
 # I have .vscode in my global .gitignore
 !/.vscode
+
+/flamegraph.svg
+/perf.data*
