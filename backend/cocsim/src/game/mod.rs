@@ -278,7 +278,6 @@ impl Game {
     fn tick_cleanup(world: &mut World) {
         world.run(features::buildings::cleanup_tracking);
         world.run(features::collision::cleanup_tracking);
-        world.run(features::position::cleanup_tracking);
 
         world.run(features::health::cleanup_events);
     }

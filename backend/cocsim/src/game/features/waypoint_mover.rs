@@ -30,7 +30,7 @@ pub fn r#move(
     mut v_position: ViewMut<Position>,
     mut v_waypoint_mover: ViewMut<WaypointMover>,
 ) {
-    for (mut position, waypoint_mover, _) in
+    for (position, waypoint_mover, _) in
         (&mut v_position, &mut v_waypoint_mover, !&v_stunned).iter()
     {
         if waypoint_mover.waypoints.is_empty() {

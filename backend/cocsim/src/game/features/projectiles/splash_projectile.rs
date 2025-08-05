@@ -41,7 +41,7 @@ pub fn update(
     mut v_splash_damage_event: ViewMut<SplashDamageEvent>,
     v_team: View<Team>,
 ) {
-    for (id, (splash_projectile, mut position, team)) in
+    for (id, (splash_projectile, position, team)) in
         (&mut v_splash_projectile, &mut v_position, &v_team)
             .iter()
             .with_id()

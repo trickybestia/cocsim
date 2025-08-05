@@ -63,7 +63,7 @@ pub fn update(
         let projectile_team = v_team[id];
         let projectile_position = v_position[id].0;
 
-        for (attack_target_id, (attack_target, attack_target_team, mut attack_target_position)) in
+        for (attack_target_id, (attack_target, attack_target_team, attack_target_position)) in
             (&v_attack_target, &v_team, &mut v_position)
                 .iter()
                 .with_id()
