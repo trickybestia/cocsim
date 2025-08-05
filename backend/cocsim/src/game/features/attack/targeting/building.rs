@@ -16,7 +16,10 @@ use crate::{
         },
         position::Position,
     },
-    utils::arc_contains_angle,
+    utils::{
+        AnyMapExt,
+        arc_contains_angle,
+    },
 };
 
 pub struct BuildingFindTarget {
@@ -27,13 +30,22 @@ pub struct BuildingFindTarget {
     pub max_attack_range: f32,
 }
 
-pub fn handle_retarget(game: &mut Game) {
-    let mut query = PreparedQuery::<(&AttackTarget, &Team, &Position)>::default();
+#[derive(Default)]
+struct HandleRetargetCache<'a> {
+    pub attacker_query: PreparedQuery<(
+        &'a BuildingFindTarget,
+        &'a mut Attacker,
+        &'a Team,
+        &'a Position,
+    )>,
+    pub target_query: PreparedQuery<(&'a AttackTarget, &'a Team, &'a Position)>,
+}
 
-    for (_attacker_id, (building_find_target, attacker, attacker_team, attacker_position)) in game
-        .world
-        .query::<(&BuildingFindTarget, &mut Attacker, &Team, &Position)>()
-        .iter()
+pub fn handle_retarget(game: &mut Game) {
+    let cache = game.cache.get_mut_or_default::<HandleRetargetCache>();
+
+    for (_attacker_id, (building_find_target, attacker, attacker_team, attacker_position)) in
+        cache.attacker_query.query(&game.world).iter()
     {
         if !attacker.retarget {
             continue;
@@ -45,7 +57,7 @@ pub fn handle_retarget(game: &mut Game) {
         let mut nearest_target_distance_squared = f32::INFINITY;
 
         for (target_id, (attack_target, target_team, target_position)) in
-            query.query(&game.world).iter()
+            cache.target_query.query(&game.world).iter()
         {
             if target_team == attacker_team {
                 continue;

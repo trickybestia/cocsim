@@ -1,5 +1,6 @@
 pub mod features;
 
+use anymap::AnyMap;
 use hecs::World;
 use nalgebra::Vector2;
 use rand_pcg::Pcg64Mcg;
@@ -34,6 +35,7 @@ use crate::{
 
 pub struct Game {
     pub(crate) world: World,
+    pub(crate) cache: AnyMap,
 
     pub(crate) map_size: MapSize,
     pub(crate) rng: Pcg64Mcg,
@@ -147,6 +149,7 @@ impl Game {
 
         let mut result = Self {
             world,
+            cache: AnyMap::new(),
 
             map_size,
             rng,

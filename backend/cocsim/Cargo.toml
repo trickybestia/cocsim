@@ -8,6 +8,7 @@ rayon = ["dep:rayon"]
 
 [dependencies]
 anyhow = "1"
+anymap = "0.12"
 arbitrary = { version = "1", features = ["derive"] }
 bitflags = "2.9"
 enum_dispatch = "0.3"

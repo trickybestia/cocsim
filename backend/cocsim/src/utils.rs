@@ -1,4 +1,5 @@
 use std::{
+    any::Any,
     collections::HashSet,
     env,
     fs::File,
@@ -10,6 +11,7 @@ use std::{
     path::PathBuf,
 };
 
+use anymap::AnyMap;
 use nalgebra::{
     DMatrix,
     Vector2,
@@ -207,4 +209,29 @@ pub fn nearest_point_on_arc(
     let (sin, cos) = angle_clipped.to_radians().sin_cos();
 
     arc_center + Vector2::new(cos, sin) * arc_radius
+}
+
+pub trait AnyMapExt {
+    fn get_mut_or_default<A: Any + Default>(&mut self) -> &mut A;
+
+    fn get_mut_or_init<A: Any>(&mut self, f: impl FnOnce() -> A) -> &mut A;
+}
+
+impl AnyMapExt for AnyMap {
+    fn get_mut_or_default<A: Any + Default>(&mut self) -> &mut A {
+        self.get_mut_or_init(Default::default)
+    }
+
+    fn get_mut_or_init<A: Any>(&mut self, f: impl FnOnce() -> A) -> &mut A {
+        if !self.contains::<A>() {
+            anymap_init(self, f);
+        }
+
+        self.get_mut::<A>().unwrap()
+    }
+}
+
+#[cold]
+fn anymap_init<A: Any>(map: &mut AnyMap, f: impl FnOnce() -> A) {
+    map.insert(f());
 }
