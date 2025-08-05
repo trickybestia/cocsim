@@ -1,7 +1,10 @@
 pub mod features;
 
 use anymap::AnyMap;
-use hecs::World;
+use hecs::{
+    PreparedQuery,
+    World,
+};
 use nalgebra::Vector2;
 use rand_pcg::Pcg64Mcg;
 
@@ -28,6 +31,7 @@ use crate::{
         map_size::MapSize,
     },
     utils::{
+        AnyMapExt,
         draw_bool_grid,
         get_tile_color,
     },
@@ -68,18 +72,22 @@ impl Game {
         &self.drop_zone
     }
 
-    pub fn done(&self) -> bool {
+    pub fn done(&mut self) -> bool {
         self.time_elapsed == MAX_ATTACK_DURATION || self.stars() == 3
     }
 
-    pub fn percentage_destroyed(&self) -> f32 {
+    pub fn percentage_destroyed(&mut self) -> f32 {
         self.destroyed_counted_buildings_count() as f32 * 100.0
             / self.initial_counted_buildings_count as f32
     }
 
     /// Check if there is any entity with Team::Attack.
-    pub fn is_attacker_team_present(&self) -> bool {
-        for (_, team) in self.world.query::<&Team>().iter() {
+    pub fn is_attacker_team_present(&mut self) -> bool {
+        for (_, team) in self
+            .cache
+            .get_mut_or_default::<PreparedQuery<&Team>>()
+            .query_mut(&mut self.world)
+        {
             if *team == Team::Attack {
                 return true;
             }
@@ -88,7 +96,7 @@ impl Game {
         false
     }
 
-    pub fn stars(&self) -> u32 {
+    pub fn stars(&mut self) -> u32 {
         let destroyed_buildings_count = self.destroyed_counted_buildings_count();
 
         let half_buildings_destroyed = (destroyed_buildings_count as f32 * 100.0
@@ -97,12 +105,18 @@ impl Game {
             >= 50.0;
         let all_buildings_destroyed =
             destroyed_buildings_count == self.initial_counted_buildings_count;
-        let townhall_destroyed = self.world.query::<&TownHall>().into_iter().count() == 0;
+        let townhall_destroyed = self
+            .cache
+            .get_mut_or_default::<PreparedQuery<&TownHall>>()
+            .query_mut(&mut self.world)
+            .into_iter()
+            .count()
+            == 0;
 
         townhall_destroyed as u32 + half_buildings_destroyed as u32 + all_buildings_destroyed as u32
     }
 
-    pub fn progress_info(&self) -> String {
+    pub fn progress_info(&mut self) -> String {
         let total_seconds = self.time_left() as u32;
         let minutes = total_seconds / 60;
 
@@ -128,6 +142,7 @@ impl Game {
 
     pub fn new(map: &Map, enable_collision_grid: bool, rng: Option<Pcg64Mcg>) -> Self {
         let mut world = World::new();
+        let mut cache = AnyMap::new();
 
         let map_size = MapSize {
             base_size: map.base_size as i32,
@@ -140,7 +155,7 @@ impl Game {
             building.create_building(&mut world);
         }
 
-        let initial_counted_buildings_count = Self::counted_buildings_count(&world);
+        let initial_counted_buildings_count = Self::counted_buildings_count(&mut cache, &mut world);
 
         let buildings_grid = BuildingsGrid::new(&map_size, &mut world);
         let drop_zone = DropZone::new(&map_size, &buildings_grid);
@@ -149,7 +164,7 @@ impl Game {
 
         let mut result = Self {
             world,
-            cache: AnyMap::new(),
+            cache,
 
             map_size,
             rng,
@@ -175,8 +190,6 @@ impl Game {
     }
 
     pub fn tick(&mut self, delta_time: f32) {
-        assert!(!self.done());
-
         self.delta_time = delta_time;
 
         features::attack::check_retarget(self);
@@ -203,7 +216,7 @@ impl Game {
         self.time_elapsed = MAX_ATTACK_DURATION.min(self.time_elapsed + self.delta_time);
     }
 
-    pub fn draw_entities(&self) -> Vec<Shape> {
+    pub fn draw_entities(&mut self) -> Vec<Shape> {
         let mut result = Vec::new();
 
         features::drawable::draw(&mut result, self);
@@ -262,11 +275,16 @@ impl Game {
         features::health::cleanup_events(self);
     }
 
-    fn counted_buildings_count(world: &World) -> usize {
-        world.query::<&CountedBuilding>().into_iter().count()
+    fn counted_buildings_count(cache: &mut AnyMap, world: &mut World) -> usize {
+        cache
+            .get_mut_or_default::<PreparedQuery<&CountedBuilding>>()
+            .query_mut(world)
+            .into_iter()
+            .count()
     }
 
-    fn destroyed_counted_buildings_count(&self) -> usize {
-        self.initial_counted_buildings_count - Self::counted_buildings_count(&self.world)
+    fn destroyed_counted_buildings_count(&mut self) -> usize {
+        self.initial_counted_buildings_count
+            - Self::counted_buildings_count(&mut self.cache, &mut self.world)
     }
 }

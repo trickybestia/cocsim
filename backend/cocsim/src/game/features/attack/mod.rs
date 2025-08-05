@@ -1,6 +1,9 @@
 use bitflags::bitflags;
 use enum_dispatch::enum_dispatch;
-use hecs::Entity;
+use hecs::{
+    Entity,
+    PreparedQuery,
+};
 use nalgebra::Vector2;
 pub mod targeting;
 use crate::{
@@ -19,7 +22,10 @@ use crate::{
         stunned::Stunned,
         waypoint_mover::WaypointMover,
     },
-    utils::arc_contains_angle,
+    utils::{
+        AnyMapExt,
+        arc_contains_angle,
+    },
 };
 
 #[enum_dispatch]
@@ -124,8 +130,9 @@ pub enum Team {
 
 pub fn check_retarget(game: &mut Game) {
     for (attacker_id, (attacker, stunned)) in game
-        .world
-        .query::<(&mut Attacker, Option<&Stunned>)>()
+        .cache
+        .get_mut_or_default::<PreparedQuery<(&mut Attacker, Option<&Stunned>)>>()
+        .query(&game.world)
         .iter()
     {
         if stunned.is_some() {
@@ -168,8 +175,9 @@ fn create_attack_queue(game: &mut Game) -> Vec<(ActionEnum, Entity)> {
     let mut result = Vec::new();
 
     for (attacker_id, (attacker, waypoint_mover)) in game
-        .world
-        .query::<(&mut Attacker, Option<&WaypointMover>)>()
+        .cache
+        .get_mut_or_default::<PreparedQuery<(&mut Attacker, Option<&WaypointMover>)>>()
+        .query(&game.world)
         .iter()
     {
         if game.world.contains(attacker.target) {

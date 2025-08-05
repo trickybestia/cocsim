@@ -1,5 +1,6 @@
 use hecs::{
     Entity,
+    PreparedQuery,
     With,
 };
 
@@ -9,6 +10,7 @@ use crate::{
         Action,
         ActionEnum,
     },
+    utils::AnyMapExt,
 };
 
 pub struct ToBeDeleted;
@@ -26,16 +28,18 @@ pub fn handle_to_be_deleted(game: &mut Game) {
 }
 
 fn create_on_delete_queue(game: &mut Game) -> Vec<(Entity, ActionEnum)> {
-    game.world
-        .query_mut::<With<&OnDelete, &ToBeDeleted>>()
+    game.cache
+        .get_mut_or_default::<PreparedQuery<With<&OnDelete, &ToBeDeleted>>>()
+        .query_mut(&mut game.world)
         .into_iter()
         .map(|(id, on_delete)| (id, on_delete.0.clone()))
         .collect::<Vec<_>>()
 }
 
 fn create_despawn_queue(game: &mut Game) -> Vec<Entity> {
-    game.world
-        .query_mut::<With<(), &ToBeDeleted>>()
+    game.cache
+        .get_mut_or_default::<PreparedQuery<With<(), &ToBeDeleted>>>()
+        .query_mut(&mut game.world)
         .into_iter()
         .map(|(id, _)| id)
         .collect::<Vec<_>>()

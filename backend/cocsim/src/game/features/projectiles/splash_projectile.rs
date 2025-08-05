@@ -1,4 +1,7 @@
-use hecs::With;
+use hecs::{
+    PreparedQuery,
+    With,
+};
 use nalgebra::Vector2;
 
 use crate::{
@@ -11,6 +14,7 @@ use crate::{
         position::Position,
         to_be_deleted::ToBeDeleted,
     },
+    utils::AnyMapExt,
 };
 
 pub struct SplashProjectile {
@@ -28,9 +32,9 @@ pub fn update(game: &mut Game) {
     let mut splash_damage_event = Vec::new();
 
     for (id, (projectile, position, team)) in game
-        .world
-        .query::<(&mut SplashProjectile, &mut Position, &Team)>()
-        .iter()
+        .cache
+        .get_mut_or_default::<PreparedQuery<(&mut SplashProjectile, &mut Position, &Team)>>()
+        .query_mut(&mut game.world)
     {
         let speed = (projectile.target - position.0).normalize() * projectile.speed;
 
@@ -58,11 +62,11 @@ pub fn update(game: &mut Game) {
     game.world.spawn_batch(splash_damage_event);
 }
 
-pub fn draw(result: &mut Vec<Shape>, game: &Game) {
+pub fn draw(result: &mut Vec<Shape>, game: &mut Game) {
     for (_, position) in game
-        .world
-        .query::<With<&Position, &SplashProjectile>>()
-        .iter()
+        .cache
+        .get_mut_or_default::<PreparedQuery<With<&Position, &SplashProjectile>>>()
+        .query_mut(&mut game.world)
     {
         result.push(Shape::Circle {
             x: position.0.x,

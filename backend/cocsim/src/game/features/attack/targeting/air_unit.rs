@@ -1,5 +1,8 @@
 use enum_dispatch::enum_dispatch;
-use hecs::Entity;
+use hecs::{
+    Entity,
+    PreparedQuery,
+};
 
 use crate::{
     Game,
@@ -14,6 +17,7 @@ use crate::{
         position::Position,
         waypoint_mover::WaypointMover,
     },
+    utils::AnyMapExt,
 };
 
 #[enum_dispatch]
@@ -85,6 +89,18 @@ pub struct AirUnitFindTarget {
     pub attack_range: f32,
 }
 
+#[derive(Default)]
+struct HandleRetargetCache<'a> {
+    pub attacker_query: PreparedQuery<(
+        &'a AirUnitFindTarget,
+        &'a mut Attacker,
+        &'a Team,
+        &'a Position,
+        &'a mut WaypointMover,
+    )>,
+    pub target_query: PreparedQuery<(&'a AttackTarget, &'a Team, &'a Position)>,
+}
+
 pub fn handle_retarget(game: &mut Game) {
     struct NearestTarget {
         pub id: Entity,
@@ -92,19 +108,12 @@ pub fn handle_retarget(game: &mut Game) {
         pub distance: f32,
     }
 
+    let cache = game.cache.get_mut_or_default::<HandleRetargetCache>();
+
     for (
         _attacker_id,
         (air_unit_find_target, attacker, attacker_team, attacker_position, attacker_waypoint_mover),
-    ) in game
-        .world
-        .query::<(
-            &AirUnitFindTarget,
-            &mut Attacker,
-            &Team,
-            &Position,
-            &mut WaypointMover,
-        )>()
-        .iter()
+    ) in cache.attacker_query.query(&game.world).iter()
     {
         if !attacker.retarget {
             continue;
@@ -114,10 +123,8 @@ pub fn handle_retarget(game: &mut Game) {
 
         let mut nearest_target: Option<NearestTarget> = None;
 
-        for (target_id, (attack_target, target_team, target_position)) in game
-            .world
-            .query::<(&AttackTarget, &Team, &Position)>()
-            .iter()
+        for (target_id, (attack_target, target_team, target_position)) in
+            cache.target_query.query(&game.world).iter()
         {
             if target_team == attacker_team
                 || !air_unit_find_target

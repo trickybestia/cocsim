@@ -1,4 +1,7 @@
-use hecs::Without;
+use hecs::{
+    PreparedQuery,
+    Without,
+};
 use nalgebra::Vector2;
 
 use crate::{
@@ -8,6 +11,7 @@ use crate::{
         position::Position,
         stunned::Stunned,
     },
+    utils::AnyMapExt,
 };
 
 pub struct WaypointMover {
@@ -18,9 +22,7 @@ pub struct WaypointMover {
 }
 
 pub fn r#move(game: &mut Game) {
-    for (_id, (position, waypoint_mover)) in game
-        .world
-        .query_mut::<Without<(&mut Position, &mut WaypointMover), &Stunned>>()
+    for (_id, (position, waypoint_mover)) in game.cache.get_mut_or_default::<PreparedQuery<Without<(&mut Position, &mut WaypointMover), &Stunned>>>().query_mut(&mut game.world)
     {
         if waypoint_mover.waypoints.is_empty() {
             continue;

@@ -1,5 +1,6 @@
 use hecs::{
     Entity,
+    PreparedQuery,
     With,
 };
 use nalgebra::Vector2;
@@ -13,6 +14,7 @@ use crate::{
         position::Position,
         to_be_deleted::ToBeDeleted,
     },
+    utils::AnyMapExt,
 };
 
 pub struct TargetProjectile {
@@ -28,8 +30,9 @@ pub fn update(game: &mut Game) {
     let mut entity_damage_event = Vec::new();
 
     for (id, (projectile, position)) in game
-        .world
-        .query::<(&mut TargetProjectile, &mut Position)>()
+        .cache
+        .get_mut_or_default::<PreparedQuery<(&mut TargetProjectile, &mut Position)>>()
+        .query(&game.world)
         .iter()
     {
         if !game.world.contains(projectile.target) {
@@ -63,11 +66,11 @@ pub fn update(game: &mut Game) {
     game.world.spawn_batch(entity_damage_event);
 }
 
-pub fn draw(result: &mut Vec<Shape>, game: &Game) {
+pub fn draw(result: &mut Vec<Shape>, game: &mut Game) {
     for (_, position) in game
-        .world
-        .query::<With<&Position, &TargetProjectile>>()
-        .iter()
+        .cache
+        .get_mut_or_default::<PreparedQuery<With<&Position, &TargetProjectile>>>()
+        .query_mut(&mut game.world)
     {
         result.push(Shape::Circle {
             x: position.0.x,

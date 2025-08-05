@@ -3,7 +3,10 @@ use std::{
     f32::consts::PI,
 };
 
-use hecs::Entity;
+use hecs::{
+    Entity,
+    PreparedQuery,
+};
 
 use crate::{
     Game,
@@ -19,7 +22,10 @@ use crate::{
         stunned::Stunned,
         to_be_deleted::ToBeDeleted,
     },
-    utils::nearest_point_on_arc,
+    utils::{
+        AnyMapExt,
+        nearest_point_on_arc,
+    },
 };
 
 pub struct AirSweeperProjectile {
@@ -41,19 +47,23 @@ impl AirSweeperProjectile {
     }
 }
 
+#[derive(Default)]
+struct UpdateCache<'a> {
+    pub projectile_query: PreparedQuery<(&'a mut AirSweeperProjectile, &'a Team, &'a Position)>,
+    pub target_query: PreparedQuery<(&'a AttackTarget, &'a Team, &'a mut Position)>,
+}
+
 pub fn update(game: &mut Game) {
+    let cache = game.cache.get_mut_or_default::<UpdateCache>();
+
     let mut to_be_deleted = Vec::new();
     let mut stunned = Vec::new();
 
-    for (id, (projectile, projectile_team, projectile_position)) in game
-        .world
-        .query::<(&mut AirSweeperProjectile, &Team, &Position)>()
-        .iter()
+    for (id, (projectile, projectile_team, projectile_position)) in
+        cache.projectile_query.query(&game.world).iter()
     {
-        for (attack_target_id, (attack_target, attack_target_team, attack_target_position)) in game
-            .world
-            .query::<(&AttackTarget, &Team, &mut Position)>()
-            .iter()
+        for (attack_target_id, (attack_target, attack_target_team, attack_target_position)) in
+            cache.target_query.query(&game.world).iter()
         {
             if attack_target_team == projectile_team
                 || !attack_target.flags.contains(AttackTargetFlags::UNIT)
@@ -119,11 +129,11 @@ pub fn update(game: &mut Game) {
     }
 }
 
-pub fn draw(result: &mut Vec<Shape>, game: &Game) {
+pub fn draw(result: &mut Vec<Shape>, game: &mut Game) {
     for (_, (projectile, position)) in game
-        .world
-        .query::<(&AirSweeperProjectile, &Position)>()
-        .iter()
+        .cache
+        .get_mut_or_default::<PreparedQuery<(&AirSweeperProjectile, &Position)>>()
+        .query_mut(&mut game.world)
     {
         result.push(Shape::Arc {
             x: position.0.x,

@@ -1,6 +1,7 @@
 use hecs::{
     Entity,
     Or,
+    PreparedQuery,
 };
 use nalgebra::Vector2;
 
@@ -16,6 +17,7 @@ use crate::{
         position::Position,
         to_be_deleted::ToBeDeleted,
     },
+    utils::AnyMapExt,
 };
 
 pub struct Health(pub f32);
@@ -35,15 +37,21 @@ pub struct SplashDamageEvent {
 }
 
 pub fn handle_entity_damage_events(game: &mut Game) {
-    for (_, damage_event) in game.world.query::<&EntityDamageEvent>().iter() {
+    for (_, damage_event) in game
+        .cache
+        .get_mut_or_default::<PreparedQuery<&EntityDamageEvent>>()
+        .query(&game.world)
+        .iter()
+    {
         let mut target_health = game.world.get::<&mut Health>(damage_event.target).unwrap();
 
         target_health.0 -= damage_event.damage;
     }
 
     let to_be_deleted = game
-        .world
-        .query_mut::<&Health>()
+        .cache
+        .get_mut_or_default::<PreparedQuery<&Health>>()
+        .query_mut(&mut game.world)
         .into_iter()
         .filter(|(_, health)| health.0 <= 0.0)
         .map(|(id, _)| id)
@@ -54,15 +62,21 @@ pub fn handle_entity_damage_events(game: &mut Game) {
     }
 }
 
+#[derive(Default)]
+struct HandleSplashDamageEventsCache<'a> {
+    pub event_query: PreparedQuery<&'a SplashDamageEvent>,
+    pub target_query: PreparedQuery<(&'a AttackTarget, &'a Position, &'a Team)>,
+}
+
 pub fn handle_splash_damage_events(game: &mut Game) {
+    let cache = game
+        .cache
+        .get_mut_or_default::<HandleSplashDamageEventsCache>();
+
     let mut damage_queue = Vec::new();
 
-    for (_, splash_damage_event) in game.world.query::<&SplashDamageEvent>().iter() {
-        for (id, (position, team, attack_target)) in game
-            .world
-            .query::<(&Position, &Team, &AttackTarget)>()
-            .iter()
-        {
+    for (_, splash_damage_event) in cache.event_query.query(&game.world).iter() {
+        for (id, (attack_target, position, team)) in cache.target_query.query(&game.world).iter() {
             if splash_damage_event.attacker_team == *team {
                 continue;
             }
@@ -94,8 +108,9 @@ pub fn handle_splash_damage_events(game: &mut Game) {
 
 pub fn cleanup_events(game: &mut Game) {
     let despawn_queue = game
-        .world
-        .query_mut::<Or<&EntityDamageEvent, &SplashDamageEvent>>()
+        .cache
+        .get_mut_or_default::<PreparedQuery<Or<&EntityDamageEvent, &SplashDamageEvent>>>()
+        .query_mut(&mut game.world)
         .into_iter()
         .map(|(id, _)| id)
         .collect::<Vec<_>>();

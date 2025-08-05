@@ -1,5 +1,6 @@
 use hecs::{
     Entity,
+    PreparedQuery,
     With,
     World,
 };
@@ -18,6 +19,7 @@ use crate::{
             to_be_deleted::ToBeDeleted,
         },
     },
+    utils::AnyMapExt,
 };
 
 pub struct PathfindingCollider {
@@ -54,8 +56,10 @@ impl PathfindingCollisionGrid {
 
 pub fn check_need_redraw_collision(game: &mut Game) {
     if game
-        .world
-        .query_mut::<With<(&Building, &PathfindingCollider), &ToBeDeleted>>()
+        .cache
+        .get_mut_or_default::<PreparedQuery<With<(&Building, &PathfindingCollider), &ToBeDeleted>>>(
+        )
+        .query_mut(&mut game.world)
         .into_iter()
         .count()
         != 0

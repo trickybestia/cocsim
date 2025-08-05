@@ -1,13 +1,20 @@
-use hecs::Entity;
+use hecs::{
+    Entity,
+    PreparedQuery,
+};
 
-use crate::Game;
+use crate::{
+    Game,
+    utils::AnyMapExt,
+};
 
 pub struct Stunned;
 
 pub fn clear(game: &mut Game) {
     let stunned = game
-        .world
-        .query_mut::<&Stunned>()
+        .cache
+        .get_mut_or_default::<PreparedQuery<&Stunned>>()
+        .query_mut(&mut game.world)
         .into_iter()
         .map(|(id, _)| id)
         .collect::<Vec<Entity>>();
