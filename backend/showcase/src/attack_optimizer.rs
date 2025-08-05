@@ -41,6 +41,10 @@ fn main() {
     ));
 
     for i in 0..40 {
+        if i == 4 {
+            return;
+        }
+
         if i == 20 {
             println!("Switching to DerivativeAttackOptimizer");
 
