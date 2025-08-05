@@ -123,15 +123,15 @@ impl BuildingModel for AirSweeperModel {
         let level = &AIR_SWEEPER_LEVELS[*self.level];
         let rotation = match self.rotation {
             AirSweeperRotation::Right => 0.0,
-            AirSweeperRotation::RightUp => 45.0,
-            AirSweeperRotation::Up => 90.0,
-            AirSweeperRotation::LeftUp => 135.0,
+            AirSweeperRotation::RightUp => 315.0,
+            AirSweeperRotation::Up => 270.0,
+            AirSweeperRotation::LeftUp => 225.0,
             AirSweeperRotation::Left => 180.0,
-            AirSweeperRotation::LeftDown => 225.0,
-            AirSweeperRotation::Down => 270.0,
-            AirSweeperRotation::RightDown => 315.0,
+            AirSweeperRotation::LeftDown => 135.0,
+            AirSweeperRotation::Down => 90.0,
+            AirSweeperRotation::RightDown => 45.0,
         };
-        let rotation_angle = Some((rotation, 120.0));
+        let rotation_angle = Some((rotation - 60.0, 120.0));
 
         create_active_building(
             world,
