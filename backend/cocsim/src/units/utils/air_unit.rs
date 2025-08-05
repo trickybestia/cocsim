@@ -46,6 +46,7 @@ pub fn create_air_unit(
             remaining_attack_cooldown: attack_cooldown,
             target: Entity::DANGLING,
             retarget_condition: UnitRetargetCondition.into(),
+            retarget: true,
             attack,
         },
         AttackTarget {

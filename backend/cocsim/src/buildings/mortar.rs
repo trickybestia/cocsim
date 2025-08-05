@@ -14,8 +14,10 @@ use crate::{
     consts::MAX_BUILDING_POS,
     game::features::{
         actions::SplashProjectileAttack,
-        attack::BuildingRetargetCondition,
-        targeting::building::BuildingFindTarget,
+        attack::{
+            BuildingRetargetCondition,
+            targeting::building::BuildingFindTarget,
+        },
     },
 };
 

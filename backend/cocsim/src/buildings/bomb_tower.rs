@@ -18,8 +18,10 @@ use crate::{
             SplashDamage,
             SplashProjectileAttack,
         },
-        attack::BuildingRetargetCondition,
-        targeting::building::BuildingFindTarget,
+        attack::{
+            BuildingRetargetCondition,
+            targeting::building::BuildingFindTarget,
+        },
         to_be_deleted::OnDelete,
     },
 };

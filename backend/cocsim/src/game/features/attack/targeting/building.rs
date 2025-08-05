@@ -1,6 +1,6 @@
 use hecs::{
     Entity,
-    With,
+    PreparedQuery,
 };
 
 use crate::{
@@ -15,7 +15,6 @@ use crate::{
             Team,
         },
         position::Position,
-        targeting::FindTargetRequest,
     },
     utils::arc_contains_angle,
 };
@@ -28,19 +27,25 @@ pub struct BuildingFindTarget {
     pub max_attack_range: f32,
 }
 
-pub fn handle_find_target_requests(game: &mut Game) {
+pub fn handle_retarget(game: &mut Game) {
+    let mut query = PreparedQuery::<(&AttackTarget, &Team, &Position)>::default();
+
     for (_attacker_id, (building_find_target, attacker, attacker_team, attacker_position)) in game
         .world
-        .query::<With<(&BuildingFindTarget, &mut Attacker, &Team, &Position), &FindTargetRequest>>()
+        .query::<(&BuildingFindTarget, &mut Attacker, &Team, &Position)>()
         .iter()
     {
+        if !attacker.retarget {
+            continue;
+        }
+
+        attacker.retarget = false;
+
         let mut nearest_target = Entity::DANGLING;
         let mut nearest_target_distance_squared = f32::INFINITY;
 
-        for (target_id, (attack_target, target_team, target_position)) in game
-            .world
-            .query::<(&AttackTarget, &Team, &Position)>()
-            .iter()
+        for (target_id, (attack_target, target_team, target_position)) in
+            query.query(&game.world).iter()
         {
             if target_team == attacker_team {
                 continue;

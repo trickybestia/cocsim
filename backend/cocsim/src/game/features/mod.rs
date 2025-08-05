@@ -9,6 +9,5 @@ pub mod map_size;
 pub mod position;
 pub mod projectiles;
 pub mod stunned;
-pub mod targeting;
 pub mod to_be_deleted;
 pub mod waypoint_mover;

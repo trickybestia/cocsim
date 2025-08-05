@@ -3,4 +3,4 @@ members = ["cocsim", "cocsim/fuzz", "compose_base_images", "showcase", "webserve
 resolver = "3"
 
 [profile.release]
-lto = true
+lto = "thin"

@@ -176,8 +176,8 @@ impl Game {
 
         self.delta_time = delta_time;
 
-        features::attack::create_find_target_requests(self);
-        features::targeting::handle_find_target_requests(self);
+        features::attack::check_retarget(self);
+        features::attack::targeting::handle_retarget(self);
         features::attack::attack(self);
         features::projectiles::target_projectile::update(self);
         features::projectiles::splash_projectile::update(self);

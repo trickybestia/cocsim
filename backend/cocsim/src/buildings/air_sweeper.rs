@@ -15,8 +15,10 @@ use crate::{
     consts::MAX_BUILDING_POS,
     game::features::{
         actions::AirSweeperAttack,
-        attack::BuildingRetargetCondition,
-        targeting::building::BuildingFindTarget,
+        attack::{
+            BuildingRetargetCondition,
+            targeting::building::BuildingFindTarget,
+        },
     },
 };
 

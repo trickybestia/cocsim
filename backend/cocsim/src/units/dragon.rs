@@ -17,11 +17,11 @@ use crate::{
     UnitType,
     game::features::{
         actions::MeleeAttack,
-        position::Position,
-        targeting::air_unit::{
+        attack::targeting::air_unit::{
             AirUnitFindTarget,
             CountedBuildingTargetPrioritizer,
         },
+        position::Position,
     },
     units::utils::air_unit::create_air_unit,
     usize_with_max::UsizeWithMax,

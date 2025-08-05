@@ -2,7 +2,7 @@ use bitflags::bitflags;
 use enum_dispatch::enum_dispatch;
 use hecs::Entity;
 use nalgebra::Vector2;
-
+pub mod targeting;
 use crate::{
     Game,
     colliders::{
@@ -17,7 +17,6 @@ use crate::{
         },
         position::Position,
         stunned::Stunned,
-        targeting::FindTargetRequest,
         waypoint_mover::WaypointMover,
     },
     utils::arc_contains_angle,
@@ -93,6 +92,7 @@ pub struct Attacker {
     pub remaining_attack_cooldown: f32,
     pub target: Entity,
     pub retarget_condition: RetargetConditionEnum,
+    pub retarget: bool,
     pub attack: ActionEnum,
 }
 
@@ -122,9 +122,7 @@ pub enum Team {
     Defense,
 }
 
-pub fn create_find_target_requests(game: &mut Game) {
-    let mut find_target_request = Vec::new();
-
+pub fn check_retarget(game: &mut Game) {
     for (attacker_id, (attacker, stunned)) in game
         .world
         .query::<(&mut Attacker, Option<&Stunned>)>()
@@ -153,13 +151,8 @@ pub fn create_find_target_requests(game: &mut Game) {
         if retarget {
             attacker.target = Entity::DANGLING;
             attacker.remaining_attack_cooldown = attacker.attack_cooldown;
-
-            find_target_request.push(attacker_id);
+            attacker.retarget = true;
         }
-    }
-
-    for id in find_target_request {
-        game.world.insert(id, (FindTargetRequest,)).unwrap();
     }
 }
 

@@ -17,11 +17,11 @@ use crate::{
     UnitType,
     game::features::{
         actions::SplashDamage,
-        position::Position,
-        targeting::air_unit::{
+        attack::targeting::air_unit::{
             ActiveBuildingTargetPrioritizer,
             AirUnitFindTarget,
         },
+        position::Position,
         to_be_deleted::OnDelete,
     },
     units::utils::air_unit::create_air_unit,

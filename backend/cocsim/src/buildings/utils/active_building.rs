@@ -46,6 +46,7 @@ pub fn create_active_building(
             remaining_attack_cooldown: attack_cooldown,
             target: Entity::DANGLING,
             retarget_condition,
+            retarget: true,
             attack,
         },
         AttackTarget {

@@ -1,8 +1,5 @@
 use enum_dispatch::enum_dispatch;
-use hecs::{
-    Entity,
-    With,
-};
+use hecs::Entity;
 
 use crate::{
     Game,
@@ -15,7 +12,6 @@ use crate::{
             Team,
         },
         position::Position,
-        targeting::FindTargetRequest,
         waypoint_mover::WaypointMover,
     },
 };
@@ -89,7 +85,7 @@ pub struct AirUnitFindTarget {
     pub attack_range: f32,
 }
 
-pub fn handle_find_target_requests(game: &mut Game) {
+pub fn handle_retarget(game: &mut Game) {
     struct NearestTarget {
         pub id: Entity,
         pub flags: AttackTargetFlags,
@@ -101,18 +97,21 @@ pub fn handle_find_target_requests(game: &mut Game) {
         (air_unit_find_target, attacker, attacker_team, attacker_position, attacker_waypoint_mover),
     ) in game
         .world
-        .query::<With<
-            (
-                &AirUnitFindTarget,
-                &mut Attacker,
-                &Team,
-                &Position,
-                &mut WaypointMover,
-            ),
-            &FindTargetRequest,
-        >>()
+        .query::<(
+            &AirUnitFindTarget,
+            &mut Attacker,
+            &Team,
+            &Position,
+            &mut WaypointMover,
+        )>()
         .iter()
     {
+        if !attacker.retarget {
+            continue;
+        }
+
+        attacker.retarget = false;
+
         let mut nearest_target: Option<NearestTarget> = None;
 
         for (target_id, (attack_target, target_team, target_position)) in game
