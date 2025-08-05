@@ -14,12 +14,12 @@ use crate::{
     consts::MAX_BUILDING_POS,
     game::features::{
         actions::{
-            BuildingFindTarget,
             Delayed,
             SplashDamage,
             SplashProjectileAttack,
         },
         attack::BuildingRetargetCondition,
+        targeting::building::BuildingFindTarget,
         to_be_deleted::OnDelete,
     },
 };
@@ -137,14 +137,6 @@ impl BuildingModel for BombTowerModel {
             Vector2::new(*self.x, *self.y),
             BOMB_TOWER.size,
             BOMB_TOWER_ATTACK_COOLDOWN,
-            BuildingFindTarget {
-                attack_air: false,
-                attack_ground: true,
-                rotation_angle: None,
-                min_attack_range: BOMB_TOWER_MIN_ATTACK_RANGE,
-                max_attack_range: BOMB_TOWER_MAX_ATTACK_RANGE,
-            }
-            .into(),
             BuildingRetargetCondition {
                 min_attack_range: BOMB_TOWER_MIN_ATTACK_RANGE,
                 max_attack_range: BOMB_TOWER_MAX_ATTACK_RANGE,
@@ -163,20 +155,29 @@ impl BuildingModel for BombTowerModel {
 
         world.add_component(
             id,
-            OnDelete(
-                Delayed {
-                    time: BOMB_TOWER_DEATH_DAMAGE_DELAY,
-                    action: Box::new(
-                        SplashDamage {
-                            damage_ground: true,
-                            damage_air: false,
-                            damage: level.death_damage,
-                            radius: BOMB_TOWER_DEATH_DAMAGE_ATTACK_RADIUS,
-                        }
-                        .into(),
-                    ),
-                }
-                .into(),
+            (
+                BuildingFindTarget {
+                    attack_air: false,
+                    attack_ground: true,
+                    rotation_angle: None,
+                    min_attack_range: BOMB_TOWER_MIN_ATTACK_RANGE,
+                    max_attack_range: BOMB_TOWER_MAX_ATTACK_RANGE,
+                },
+                OnDelete(
+                    Delayed {
+                        time: BOMB_TOWER_DEATH_DAMAGE_DELAY,
+                        action: Box::new(
+                            SplashDamage {
+                                damage_ground: true,
+                                damage_air: false,
+                                damage: level.death_damage,
+                                radius: BOMB_TOWER_DEATH_DAMAGE_ATTACK_RADIUS,
+                            }
+                            .into(),
+                        ),
+                    }
+                    .into(),
+                ),
             ),
         );
     }

@@ -2,6 +2,7 @@ use bitflags::bitflags;
 use enum_dispatch::enum_dispatch;
 use nalgebra::Vector2;
 use shipyard::{
+    AddComponent,
     AllStoragesViewMut,
     Component,
     EntitiesView,
@@ -26,6 +27,7 @@ use crate::{
         },
         position::Position,
         stunned::Stunned,
+        targeting::FindTargetRequest,
         time::Time,
         waypoint_mover::WaypointMover,
     },
@@ -102,7 +104,6 @@ pub struct Attacker {
     pub attack_cooldown: f32,
     pub remaining_attack_cooldown: f32,
     pub target: EntityId,
-    pub find_target: ActionEnum,
     pub retarget_condition: RetargetConditionEnum,
     pub attack: ActionEnum,
 }
@@ -134,31 +135,14 @@ pub enum Team {
     Defense,
 }
 
-pub fn find_target(mut all_storages: AllStoragesViewMut) {
-    let find_target_queue = all_storages.run(create_find_target_queue);
-
-    for (find_target, id) in find_target_queue {
-        find_target.call(id, &mut all_storages);
-    }
-}
-
-pub fn attack(mut all_storages: AllStoragesViewMut) {
-    let attack_queue = all_storages.run(create_attack_queue);
-
-    for (attack, attacker_id) in attack_queue {
-        attack.call(attacker_id, &mut all_storages);
-    }
-}
-
-fn create_find_target_queue(
+pub fn create_find_target_requests(
     mut v_attacker: ViewMut<Attacker>,
     v_attack_target: View<AttackTarget>,
     v_position: View<Position>,
     entities: EntitiesView,
     v_stunned: View<Stunned>,
-) -> Vec<(ActionEnum, EntityId)> {
-    let mut result = Vec::new();
-
+    mut v_find_target_request: ViewMut<FindTargetRequest>,
+) {
     for (attacker_id, (attacker, stunned)) in
         (&mut v_attacker, v_stunned.as_optional()).iter().with_id()
     {
@@ -183,13 +167,20 @@ fn create_find_target_queue(
         };
 
         if retarget {
-            result.push((attacker.find_target.clone(), attacker_id));
-
+            attacker.target = EntityId::dead();
             attacker.remaining_attack_cooldown = attacker.attack_cooldown;
+
+            v_find_target_request.add_component_unchecked(attacker_id, FindTargetRequest);
         }
     }
+}
 
-    result
+pub fn attack(mut all_storages: AllStoragesViewMut) {
+    let attack_queue = all_storages.run(create_attack_queue);
+
+    for (attack, attacker_id) in attack_queue {
+        attack.call(attacker_id, &mut all_storages);
+    }
 }
 
 fn create_attack_queue(

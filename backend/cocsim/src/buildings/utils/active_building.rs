@@ -32,7 +32,6 @@ pub fn create_active_building(
     position: Vector2<usize>,
     size: Vector2<usize>,
     attack_cooldown: f32,
-    find_target: ActionEnum,
     retarget_condition: RetargetConditionEnum,
     attack: ActionEnum,
 ) -> EntityId {
@@ -46,7 +45,6 @@ pub fn create_active_building(
             attack_cooldown,
             remaining_attack_cooldown: attack_cooldown,
             target: EntityId::dead(),
-            find_target,
             retarget_condition,
             attack,
         },

@@ -13,11 +13,9 @@ use crate::{
     buildings::utils::active_building::create_active_building,
     consts::MAX_BUILDING_POS,
     game::features::{
-        actions::{
-            BuildingFindTarget,
-            SplashProjectileAttack,
-        },
+        actions::SplashProjectileAttack,
         attack::BuildingRetargetCondition,
+        targeting::building::BuildingFindTarget,
     },
 };
 
@@ -133,20 +131,12 @@ impl BuildingModel for WizardTowerModel {
         let projectile_speed = if *self.level >= 4 { 9.0 } else { 5.0 };
         let level = &WIZARD_TOWER_LEVELS[*self.level];
 
-        create_active_building(
+        let id = create_active_building(
             world,
             level.health,
             Vector2::new(*self.x, *self.y),
             WIZARD_TOWER.size,
             WIZARD_TOWER_ATTACK_COOLDOWN,
-            BuildingFindTarget {
-                attack_air: true,
-                attack_ground: true,
-                rotation_angle: None,
-                min_attack_range: WIZARD_TOWER_MIN_ATTACK_RANGE,
-                max_attack_range: WIZARD_TOWER_MAX_ATTACK_RANGE,
-            }
-            .into(),
             BuildingRetargetCondition {
                 min_attack_range: WIZARD_TOWER_MIN_ATTACK_RANGE,
                 max_attack_range: WIZARD_TOWER_MAX_ATTACK_RANGE,
@@ -161,6 +151,17 @@ impl BuildingModel for WizardTowerModel {
                 projectile_speed,
             }
             .into(),
+        );
+
+        world.add_component(
+            id,
+            BuildingFindTarget {
+                attack_air: true,
+                attack_ground: true,
+                rotation_angle: None,
+                min_attack_range: WIZARD_TOWER_MIN_ATTACK_RANGE,
+                max_attack_range: WIZARD_TOWER_MAX_ATTACK_RANGE,
+            },
         );
     }
 }

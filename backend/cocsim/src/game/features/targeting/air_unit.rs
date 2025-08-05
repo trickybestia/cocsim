@@ -1,6 +1,6 @@
 use enum_dispatch::enum_dispatch;
 use shipyard::{
-    AllStoragesViewMut,
+    Component,
     EntityId,
     IntoIter,
     UniqueViewMut,
@@ -11,7 +11,6 @@ use shipyard::{
 use crate::{
     colliders::Collider,
     game::features::{
-        actions::Action,
         attack::{
             AttackTarget,
             AttackTargetFlags,
@@ -20,6 +19,7 @@ use crate::{
         },
         position::Position,
         rng::RngUnique,
+        targeting::FindTargetRequest,
         waypoint_mover::WaypointMover,
     },
 };
@@ -88,47 +88,62 @@ pub enum TargetPrioritizerEnum {
     CountedBuildingTargetPrioritizer,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Component)]
 pub struct AirUnitFindTarget {
     pub prioritizer: TargetPrioritizerEnum,
     pub attack_range: f32,
 }
 
-impl Action for AirUnitFindTarget {
-    fn call(&self, actor: EntityId, all_storages: &mut AllStoragesViewMut) {
-        let mut v_attacker = all_storages.borrow::<ViewMut<Attacker>>().unwrap();
-        let v_attack_target = all_storages.borrow::<View<AttackTarget>>().unwrap();
-        let v_team = all_storages.borrow::<View<Team>>().unwrap();
-        let v_position = all_storages.borrow::<View<Position>>().unwrap();
+pub fn handle_find_target_requests(
+    mut rng: UniqueViewMut<RngUnique>,
+    v_find_target_request: ViewMut<FindTargetRequest>,
+    v_air_unit_find_target: View<AirUnitFindTarget>,
+    mut v_attacker: ViewMut<Attacker>,
+    v_attack_target: View<AttackTarget>,
+    v_team: View<Team>,
+    v_position: View<Position>,
+    mut v_waypoint_mover: ViewMut<WaypointMover>,
+) {
+    struct NearestTarget {
+        pub id: EntityId,
+        pub flags: AttackTargetFlags,
+        pub distance: f32,
+    }
 
-        let attacker = &mut v_attacker[actor];
-        let attacker_team = v_team[actor];
-        let attacker_position = v_position[actor].0;
-
-        struct NearestTarget {
-            pub id: EntityId,
-            pub flags: AttackTargetFlags,
-            pub distance: f32,
-        }
-
+    for (attacker_id, (_, air_unit_find_target, attacker, attacker_team, attacker_position)) in (
+        &v_find_target_request,
+        &v_air_unit_find_target,
+        &mut v_attacker,
+        &v_team,
+        &v_position,
+    )
+        .iter()
+        .with_id()
+    {
         let mut nearest_target: Option<NearestTarget> = None;
 
-        for (target_id, (attack_target, team)) in (&v_attack_target, &v_team).iter().with_id() {
-            if *team == attacker_team || !self.prioritizer.can_attack(attack_target.flags) {
+        for (target_id, (attack_target, target_team)) in
+            (&v_attack_target, &v_team).iter().with_id()
+        {
+            if target_team == attacker_team
+                || !air_unit_find_target
+                    .prioritizer
+                    .can_attack(attack_target.flags)
+            {
                 continue;
             }
 
             let nearest_point = attack_target
                 .collider
                 .translate(v_position[target_id].0)
-                .attack_area(self.attack_range)
-                .nearest_point(attacker_position);
-            let distance = nearest_point.metric_distance(&attacker_position);
+                .attack_area(air_unit_find_target.attack_range)
+                .nearest_point(attacker_position.0);
+            let distance = nearest_point.metric_distance(&attacker_position.0);
 
             let mut update_target = false;
 
             if let Some(nearest_target) = &mut nearest_target {
-                if self.prioritizer.is_better(
+                if air_unit_find_target.prioritizer.is_better(
                     nearest_target.flags,
                     nearest_target.distance,
                     attack_target.flags,
@@ -150,15 +165,12 @@ impl Action for AirUnitFindTarget {
         }
 
         if let Some(nearest_target) = nearest_target {
-            let mut v_waypoint_mover = all_storages.borrow::<ViewMut<WaypointMover>>().unwrap();
-            let mut rng = all_storages.borrow::<UniqueViewMut<RngUnique>>().unwrap();
-
-            v_waypoint_mover[actor].waypoints = vec![
+            v_waypoint_mover[attacker_id].waypoints = vec![
                 v_attack_target[nearest_target.id]
                     .collider
                     .translate(v_position[nearest_target.id].0)
-                    .attack_area(self.attack_range)
-                    .random_near_point(attacker_position, &mut rng.0),
+                    .attack_area(air_unit_find_target.attack_range)
+                    .random_near_point(attacker_position.0, &mut rng.0),
             ];
             attacker.target = nearest_target.id;
         }

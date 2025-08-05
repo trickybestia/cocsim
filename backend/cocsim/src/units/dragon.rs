@@ -17,12 +17,12 @@ use crate::{
     UnitModel,
     UnitType,
     game::features::{
-        actions::{
+        actions::MeleeAttack,
+        position::Position,
+        targeting::air_unit::{
             AirUnitFindTarget,
             CountedBuildingTargetPrioritizer,
-            MeleeAttack,
         },
-        position::Position,
     },
     units::utils::air_unit::create_air_unit,
     usize_with_max::UsizeWithMax,
@@ -118,22 +118,25 @@ impl UnitModel for DragonModel {
     fn create_unit(&self, world: &mut World, position: Vector2<f32>) {
         let level = &DRAGON_LEVELS[*self.level];
 
-        create_air_unit(
+        let id = create_air_unit(
             world,
             position,
             level.health,
             DRAGON_SPEED,
             DRAGON_ATTACK_COOLDOWN,
-            AirUnitFindTarget {
-                prioritizer: CountedBuildingTargetPrioritizer.into(),
-                attack_range: DRAGON_ATTACK_RANGE,
-            }
-            .into(),
             MeleeAttack {
                 damage: level.attack_damage,
             }
             .into(),
             draw_dragon,
+        );
+
+        world.add_component(
+            id,
+            AirUnitFindTarget {
+                prioritizer: CountedBuildingTargetPrioritizer.into(),
+                attack_range: DRAGON_ATTACK_RANGE,
+            },
         );
     }
 }

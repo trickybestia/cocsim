@@ -30,7 +30,6 @@ pub fn create_air_unit(
     health: f32,
     speed: f32,
     attack_cooldown: f32,
-    find_target: ActionEnum,
     attack: ActionEnum,
     draw: fn(EntityId, &AllStoragesView, &mut Vec<Shape>),
 ) -> EntityId {
@@ -46,7 +45,6 @@ pub fn create_air_unit(
             attack_cooldown,
             remaining_attack_cooldown: attack_cooldown,
             target: EntityId::dead(),
-            find_target,
             retarget_condition: UnitRetargetCondition.into(),
             attack,
         },

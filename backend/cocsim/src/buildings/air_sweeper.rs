@@ -14,11 +14,9 @@ use crate::{
     buildings::utils::active_building::create_active_building,
     consts::MAX_BUILDING_POS,
     game::features::{
-        actions::{
-            AirSweeperAttack,
-            BuildingFindTarget,
-        },
+        actions::AirSweeperAttack,
         attack::BuildingRetargetCondition,
+        targeting::building::BuildingFindTarget,
     },
 };
 
@@ -133,20 +131,12 @@ impl BuildingModel for AirSweeperModel {
         };
         let rotation_angle = Some((rotation - 60.0, 120.0));
 
-        create_active_building(
+        let id = create_active_building(
             world,
             level.health,
             self.position(),
             AIR_SWEEPER.size,
             AIR_SWEEPER_ATTACK_COOLDOWN,
-            BuildingFindTarget {
-                attack_air: true,
-                attack_ground: false,
-                rotation_angle,
-                min_attack_range: AIR_SWEEPER_MIN_ATTACK_RANGE,
-                max_attack_range: AIR_SWEEPER_MAX_ATTACK_RANGE,
-            }
-            .into(),
             BuildingRetargetCondition {
                 min_attack_range: AIR_SWEEPER_MIN_ATTACK_RANGE,
                 max_attack_range: AIR_SWEEPER_MAX_ATTACK_RANGE,
@@ -162,6 +152,17 @@ impl BuildingModel for AirSweeperModel {
                 max_arc_length: AIR_SWEEPER_PROJECTILE_MAX_ARC_LENGTH,
             }
             .into(),
+        );
+
+        world.add_component(
+            id,
+            BuildingFindTarget {
+                attack_air: true,
+                attack_ground: false,
+                rotation_angle,
+                min_attack_range: AIR_SWEEPER_MIN_ATTACK_RANGE,
+                max_attack_range: AIR_SWEEPER_MAX_ATTACK_RANGE,
+            },
         );
     }
 }

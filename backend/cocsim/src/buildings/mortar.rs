@@ -13,11 +13,9 @@ use crate::{
     buildings::utils::active_building::create_active_building,
     consts::MAX_BUILDING_POS,
     game::features::{
-        actions::{
-            BuildingFindTarget,
-            SplashProjectileAttack,
-        },
+        actions::SplashProjectileAttack,
         attack::BuildingRetargetCondition,
+        targeting::building::BuildingFindTarget,
     },
 };
 
@@ -133,20 +131,12 @@ impl BuildingModel for MortarModel {
     fn create_building(&self, world: &mut World) {
         let level = &MORTAR_LEVELS[*self.level];
 
-        create_active_building(
+        let id = create_active_building(
             world,
             level.health,
             Vector2::new(*self.x, *self.y),
             MORTAR.size,
             MORTAR_ATTACK_COOLDOWN,
-            BuildingFindTarget {
-                attack_air: false,
-                attack_ground: true,
-                rotation_angle: None,
-                min_attack_range: MORTAR_MIN_ATTACK_RANGE,
-                max_attack_range: MORTAR_MAX_ATTACK_RANGE,
-            }
-            .into(),
             BuildingRetargetCondition {
                 min_attack_range: MORTAR_MIN_ATTACK_RANGE,
                 max_attack_range: MORTAR_MAX_ATTACK_RANGE,
@@ -161,6 +151,17 @@ impl BuildingModel for MortarModel {
                 projectile_speed: MORTAR_PROJECTILE_SPEED,
             }
             .into(),
+        );
+
+        world.add_component(
+            id,
+            BuildingFindTarget {
+                attack_air: false,
+                attack_ground: true,
+                rotation_angle: None,
+                min_attack_range: MORTAR_MIN_ATTACK_RANGE,
+                max_attack_range: MORTAR_MAX_ATTACK_RANGE,
+            },
         );
     }
 }

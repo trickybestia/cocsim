@@ -13,11 +13,9 @@ use crate::{
     buildings::utils::active_building::create_active_building,
     consts::MAX_BUILDING_POS,
     game::features::{
-        actions::{
-            BuildingFindTarget,
-            TargetProjectileAttack,
-        },
+        actions::TargetProjectileAttack,
         attack::BuildingRetargetCondition,
+        targeting::building::BuildingFindTarget,
     },
 };
 
@@ -148,20 +146,12 @@ impl BuildingModel for CannonModel {
     fn create_building(&self, world: &mut World) {
         let level = &CANNON_LEVELS[*self.level];
 
-        create_active_building(
+        let id = create_active_building(
             world,
             level.health,
             Vector2::new(*self.x, *self.y),
             CANNON.size,
             CANNON_ATTACK_COOLDOWN,
-            BuildingFindTarget {
-                attack_air: false,
-                attack_ground: true,
-                rotation_angle: None,
-                min_attack_range: CANNON_MIN_ATTACK_RANGE,
-                max_attack_range: CANNON_MAX_ATTACK_RANGE,
-            }
-            .into(),
             BuildingRetargetCondition {
                 min_attack_range: CANNON_MIN_ATTACK_RANGE,
                 max_attack_range: CANNON_MAX_ATTACK_RANGE,
@@ -173,6 +163,17 @@ impl BuildingModel for CannonModel {
                 projectile_speed: CANNON_PROJECTILE_SPEED,
             }
             .into(),
+        );
+
+        world.add_component(
+            id,
+            BuildingFindTarget {
+                attack_air: false,
+                attack_ground: true,
+                rotation_angle: None,
+                min_attack_range: CANNON_MIN_ATTACK_RANGE,
+                max_attack_range: CANNON_MAX_ATTACK_RANGE,
+            },
         );
     }
 }

@@ -17,12 +17,12 @@ use crate::{
     UnitModel,
     UnitType,
     game::features::{
-        actions::{
+        actions::SplashDamage,
+        position::Position,
+        targeting::air_unit::{
             ActiveBuildingTargetPrioritizer,
             AirUnitFindTarget,
-            SplashDamage,
         },
-        position::Position,
         to_be_deleted::OnDelete,
     },
     units::utils::air_unit::create_air_unit,
@@ -134,11 +134,6 @@ impl UnitModel for BalloonModel {
             level.health,
             BALLOON_SPEED,
             BALLOON_ATTACK_COOLDOWN,
-            AirUnitFindTarget {
-                prioritizer: ActiveBuildingTargetPrioritizer.into(),
-                attack_range: BALLOON_ATTACK_RANGE,
-            }
-            .into(),
             SplashDamage {
                 damage_ground: true,
                 damage_air: false,
@@ -151,14 +146,20 @@ impl UnitModel for BalloonModel {
 
         world.add_component(
             id,
-            OnDelete(
-                SplashDamage {
-                    damage_ground: true,
-                    damage_air: false,
-                    damage: level.death_damage,
-                    radius: BALLOON_SPLASH_ATTACK_RADIUS,
-                }
-                .into(),
+            (
+                AirUnitFindTarget {
+                    prioritizer: ActiveBuildingTargetPrioritizer.into(),
+                    attack_range: BALLOON_ATTACK_RANGE,
+                },
+                OnDelete(
+                    SplashDamage {
+                        damage_ground: true,
+                        damage_air: false,
+                        damage: level.death_damage,
+                        radius: BALLOON_SPLASH_ATTACK_RADIUS,
+                    }
+                    .into(),
+                ),
             ),
         );
     }

@@ -10,6 +10,7 @@ pub mod position;
 pub mod projectiles;
 pub mod rng;
 pub mod stunned;
+pub mod targeting;
 pub mod time;
 pub mod to_be_deleted;
 pub mod waypoint_mover;

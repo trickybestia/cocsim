@@ -174,7 +174,10 @@ impl Game {
         self.world
             .run_with_data(features::time::set_delta_time, delta_time);
 
-        self.world.run(features::attack::find_target);
+        self.world
+            .run(features::attack::create_find_target_requests);
+        self.world
+            .run(features::targeting::handle_find_target_requests);
         self.world.run(features::attack::attack);
         self.world
             .run(features::projectiles::target_projectile::update);
