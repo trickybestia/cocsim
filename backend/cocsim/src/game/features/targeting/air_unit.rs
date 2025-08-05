@@ -1,14 +1,11 @@
 use enum_dispatch::enum_dispatch;
-use shipyard::{
-    Component,
-    EntityId,
-    IntoIter,
-    UniqueViewMut,
-    View,
-    ViewMut,
+use hecs::{
+    Entity,
+    With,
 };
 
 use crate::{
+    Game,
     colliders::Collider,
     game::features::{
         attack::{
@@ -18,7 +15,6 @@ use crate::{
             Team,
         },
         position::Position,
-        rng::RngUnique,
         targeting::FindTargetRequest,
         waypoint_mover::WaypointMover,
     },
@@ -88,42 +84,41 @@ pub enum TargetPrioritizerEnum {
     CountedBuildingTargetPrioritizer,
 }
 
-#[derive(Component)]
 pub struct AirUnitFindTarget {
     pub prioritizer: TargetPrioritizerEnum,
     pub attack_range: f32,
 }
 
-pub fn handle_find_target_requests(
-    mut rng: UniqueViewMut<RngUnique>,
-    v_find_target_request: ViewMut<FindTargetRequest>,
-    v_air_unit_find_target: View<AirUnitFindTarget>,
-    mut v_attacker: ViewMut<Attacker>,
-    v_attack_target: View<AttackTarget>,
-    v_team: View<Team>,
-    v_position: View<Position>,
-    mut v_waypoint_mover: ViewMut<WaypointMover>,
-) {
+pub fn handle_find_target_requests(game: &mut Game) {
     struct NearestTarget {
-        pub id: EntityId,
+        pub id: Entity,
         pub flags: AttackTargetFlags,
         pub distance: f32,
     }
 
-    for (attacker_id, (_, air_unit_find_target, attacker, attacker_team, attacker_position)) in (
-        &v_find_target_request,
-        &v_air_unit_find_target,
-        &mut v_attacker,
-        &v_team,
-        &v_position,
-    )
+    for (
+        _attacker_id,
+        (air_unit_find_target, attacker, attacker_team, attacker_position, attacker_waypoint_mover),
+    ) in game
+        .world
+        .query::<With<
+            (
+                &AirUnitFindTarget,
+                &mut Attacker,
+                &Team,
+                &Position,
+                &mut WaypointMover,
+            ),
+            &FindTargetRequest,
+        >>()
         .iter()
-        .with_id()
     {
         let mut nearest_target: Option<NearestTarget> = None;
 
-        for (target_id, (attack_target, target_team)) in
-            (&v_attack_target, &v_team).iter().with_id()
+        for (target_id, (attack_target, target_team, target_position)) in game
+            .world
+            .query::<(&AttackTarget, &Team, &Position)>()
+            .iter()
         {
             if target_team == attacker_team
                 || !air_unit_find_target
@@ -135,7 +130,7 @@ pub fn handle_find_target_requests(
 
             let nearest_point = attack_target
                 .collider
-                .translate(v_position[target_id].0)
+                .translate(target_position.0)
                 .attack_area(air_unit_find_target.attack_range)
                 .nearest_point(attacker_position.0);
             let distance = nearest_point.metric_distance(&attacker_position.0);
@@ -165,12 +160,14 @@ pub fn handle_find_target_requests(
         }
 
         if let Some(nearest_target) = nearest_target {
-            v_waypoint_mover[attacker_id].waypoints = vec![
-                v_attack_target[nearest_target.id]
+            attacker_waypoint_mover.waypoints = vec![
+                game.world
+                    .get::<&AttackTarget>(nearest_target.id)
+                    .unwrap()
                     .collider
-                    .translate(v_position[nearest_target.id].0)
+                    .translate(game.world.get::<&Position>(nearest_target.id).unwrap().0)
                     .attack_area(air_unit_find_target.attack_range)
-                    .random_near_point(attacker_position.0, &mut rng.0),
+                    .random_near_point(attacker_position.0, &mut game.rng),
             ];
             attacker.target = nearest_target.id;
         }

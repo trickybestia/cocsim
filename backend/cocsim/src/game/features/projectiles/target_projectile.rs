@@ -1,80 +1,74 @@
-use nalgebra::Vector2;
-use shipyard::{
-    AddComponent,
-    Component,
-    EntitiesViewMut,
-    EntityId,
-    IntoIter,
-    UniqueView,
-    View,
-    ViewMut,
+use hecs::{
+    Entity,
+    With,
 };
+use nalgebra::Vector2;
 
 use crate::{
+    Game,
     Shape,
     ShapeColor,
     game::features::{
         health::EntityDamageEvent,
         position::Position,
-        time::Time,
         to_be_deleted::ToBeDeleted,
     },
 };
 
-#[derive(Component)]
 pub struct TargetProjectile {
     pub damage: f32,
-    pub target: EntityId,
+    pub target: Entity,
     pub relative_position: Vector2<f32>,
     pub speed: f32,
     pub remaining_time: f32,
 }
 
-pub fn update(
-    time: UniqueView<Time>,
-    mut entities: EntitiesViewMut,
-    mut v_target_projectile: ViewMut<TargetProjectile>,
-    mut v_position: ViewMut<Position>,
-    mut v_to_be_deleted: ViewMut<ToBeDeleted>,
-    mut v_entity_damage_event: ViewMut<EntityDamageEvent>,
-) {
-    for (id, target_projectile) in (&mut v_target_projectile).iter().with_id() {
-        if !entities.is_alive(target_projectile.target) {
-            v_to_be_deleted.add_component_unchecked(id, ToBeDeleted);
+pub fn update(game: &mut Game) {
+    let mut to_be_deleted = Vec::new();
+    let mut entity_damage_event = Vec::new();
+
+    for (id, (projectile, position)) in game
+        .world
+        .query::<(&mut TargetProjectile, &mut Position)>()
+        .iter()
+    {
+        if !game.world.contains(projectile.target) {
+            to_be_deleted.push(id);
 
             continue;
         }
 
-        let relative_speed =
-            -target_projectile.relative_position.normalize() * target_projectile.speed;
+        let relative_speed = -projectile.relative_position.normalize() * projectile.speed;
 
-        target_projectile.relative_position += relative_speed * time.delta;
+        projectile.relative_position += relative_speed * game.delta_time;
 
-        v_position[id].0 =
-            v_position[target_projectile.target].0 + target_projectile.relative_position;
+        position.0 = game.world.get::<&Position>(projectile.target).unwrap().0
+            + projectile.relative_position;
 
-        target_projectile.remaining_time =
-            0.0f32.max(target_projectile.remaining_time - time.delta);
+        projectile.remaining_time = 0.0f32.max(projectile.remaining_time - game.delta_time);
 
-        if target_projectile.remaining_time == 0.0 {
-            entities.add_entity(
-                &mut v_entity_damage_event,
-                EntityDamageEvent {
-                    target: target_projectile.target,
-                    damage: target_projectile.damage,
-                },
-            );
-            v_to_be_deleted.add_component_unchecked(id, ToBeDeleted);
+        if projectile.remaining_time == 0.0 {
+            entity_damage_event.push((EntityDamageEvent {
+                target: projectile.target,
+                damage: projectile.damage,
+            },));
+            to_be_deleted.push(id);
         }
     }
+
+    for id in to_be_deleted {
+        game.world.insert_one(id, ToBeDeleted).unwrap();
+    }
+
+    game.world.spawn_batch(entity_damage_event);
 }
 
-pub fn draw(
-    result: &mut Vec<Shape>,
-    v_target_projectile: View<TargetProjectile>,
-    v_position: View<Position>,
-) {
-    for (_, position) in (&v_target_projectile, &v_position).iter() {
+pub fn draw(result: &mut Vec<Shape>, game: &Game) {
+    for (_, position) in game
+        .world
+        .query::<With<&Position, &TargetProjectile>>()
+        .iter()
+    {
         result.push(Shape::Circle {
             x: position.0.x,
             y: position.0.y,

@@ -1,17 +1,11 @@
-use nalgebra::Vector2;
-use shipyard::{
-    AddComponent,
-    AllStoragesViewMut,
-    Component,
-    EntitiesViewMut,
-    EntityId,
-    IntoIter,
-    View,
-    ViewMut,
-    sparse_set::SparseSet,
+use hecs::{
+    Entity,
+    Or,
 };
+use nalgebra::Vector2;
 
 use crate::{
+    Game,
     colliders::Collider,
     game::features::{
         attack::{
@@ -24,16 +18,13 @@ use crate::{
     },
 };
 
-#[derive(Component)]
 pub struct Health(pub f32);
 
-#[derive(Component)]
 pub struct EntityDamageEvent {
-    pub target: EntityId,
+    pub target: Entity,
     pub damage: f32,
 }
 
-#[derive(Component)]
 pub struct SplashDamageEvent {
     pub attacker_team: Team,
     pub damage_ground: bool,
@@ -43,35 +34,34 @@ pub struct SplashDamageEvent {
     pub radius: f32,
 }
 
-pub fn handle_entity_damage_events(
-    mut v_health: ViewMut<Health>,
-    mut v_to_be_deleted: ViewMut<ToBeDeleted>,
-    v_entity_damage_event: View<EntityDamageEvent>,
-) {
-    for damage_event in v_entity_damage_event.iter() {
-        let target_health = &mut v_health[damage_event.target];
+pub fn handle_entity_damage_events(game: &mut Game) {
+    for (_, damage_event) in game.world.query::<&EntityDamageEvent>().iter() {
+        let mut target_health = game.world.get::<&mut Health>(damage_event.target).unwrap();
 
         target_health.0 -= damage_event.damage;
     }
 
-    for (id, health) in v_health.iter().with_id() {
-        if health.0 <= 0.0 {
-            v_to_be_deleted.add_component_unchecked(id, ToBeDeleted);
-        }
+    let to_be_deleted = game
+        .world
+        .query_mut::<&Health>()
+        .into_iter()
+        .filter(|(_, health)| health.0 <= 0.0)
+        .map(|(id, _)| id)
+        .collect::<Vec<_>>();
+
+    for id in to_be_deleted {
+        game.world.insert_one(id, ToBeDeleted).unwrap();
     }
 }
 
-pub fn handle_splash_damage_events(
-    mut entities: EntitiesViewMut,
-    mut v_entity_damage_event: ViewMut<EntityDamageEvent>,
-    v_splash_damage_event: View<SplashDamageEvent>,
-    v_position: View<Position>,
-    v_team: View<Team>,
-    v_attack_target: View<AttackTarget>,
-) {
-    for splash_damage_event in v_splash_damage_event.iter() {
-        for (id, (position, team, attack_target)) in
-            (&v_position, &v_team, &v_attack_target).iter().with_id()
+pub fn handle_splash_damage_events(game: &mut Game) {
+    let mut damage_queue = Vec::new();
+
+    for (_, splash_damage_event) in game.world.query::<&SplashDamageEvent>().iter() {
+        for (id, (position, team, attack_target)) in game
+            .world
+            .query::<(&Position, &Team, &AttackTarget)>()
+            .iter()
         {
             if splash_damage_event.attacker_team == *team {
                 continue;
@@ -91,19 +81,26 @@ pub fn handle_splash_damage_events(
                 .attack_area(splash_damage_event.radius)
                 .contains(splash_damage_event.target)
             {
-                entities.add_entity(
-                    &mut v_entity_damage_event,
-                    EntityDamageEvent {
-                        target: id,
-                        damage: splash_damage_event.damage,
-                    },
-                );
+                damage_queue.push((EntityDamageEvent {
+                    target: id,
+                    damage: splash_damage_event.damage,
+                },));
             }
         }
     }
+
+    game.world.spawn_batch(damage_queue);
 }
 
-pub fn cleanup_events(mut all_storages: AllStoragesViewMut) {
-    all_storages.delete_any::<SparseSet<EntityDamageEvent>>();
-    all_storages.delete_any::<SparseSet<SplashDamageEvent>>();
+pub fn cleanup_events(game: &mut Game) {
+    let despawn_queue = game
+        .world
+        .query_mut::<Or<&EntityDamageEvent, &SplashDamageEvent>>()
+        .into_iter()
+        .map(|(id, _)| id)
+        .collect::<Vec<_>>();
+
+    for id in despawn_queue {
+        game.world.despawn(id).unwrap();
+    }
 }

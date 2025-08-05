@@ -1,10 +1,10 @@
 use arbitrary::Arbitrary;
+use hecs::World;
 use nalgebra::Vector2;
 use serde::{
     Deserialize,
     Serialize,
 };
-use shipyard::World;
 
 use crate::{
     BuildingModel,
@@ -73,6 +73,8 @@ impl BuildingModel for TownHallModel {
             TOWN_HALL.size,
         );
 
-        world.add_component(id, crate::game::features::buildings::TownHall);
+        world
+            .insert_one(id, crate::game::features::buildings::TownHall)
+            .unwrap();
     }
 }

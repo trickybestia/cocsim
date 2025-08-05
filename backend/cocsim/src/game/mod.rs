@@ -1,14 +1,8 @@
 pub mod features;
 
+use hecs::World;
 use nalgebra::Vector2;
 use rand_pcg::Pcg64Mcg;
-use shipyard::{
-    EntitiesView,
-    IntoIter,
-    UniqueView,
-    View,
-    World,
-};
 
 use crate::{
     BuildingModel,
@@ -29,13 +23,8 @@ use crate::{
             DropZone,
             TownHall,
         },
-        collision::{
-            NeedRedrawCollision,
-            PathfindingCollisionGrid,
-        },
-        map::MapSize,
-        rng::RngUnique,
-        time::Time,
+        collision::PathfindingCollisionGrid,
+        map_size::MapSize,
     },
     utils::{
         draw_bool_grid,
@@ -44,32 +33,41 @@ use crate::{
 };
 
 pub struct Game {
-    world: World,
+    pub(crate) world: World,
 
-    initial_counted_buildings_count: usize,
-    enable_collision_grid: bool,
+    pub(crate) map_size: MapSize,
+    pub(crate) rng: Pcg64Mcg,
+    pub(crate) buildings_grid: BuildingsGrid,
+    pub(crate) drop_zone: DropZone,
+    pub(crate) collision_grid: Option<PathfindingCollisionGrid>,
+
+    pub(crate) time_elapsed: f32,
+    pub(crate) delta_time: f32,
+
+    pub(crate) need_redraw_collision: bool,
+
+    pub(crate) initial_counted_buildings_count: usize,
 }
 
 impl Game {
     pub fn time_elapsed(&self) -> f32 {
-        self.world.get_unique::<&Time>().unwrap().elapsed
+        self.time_elapsed
     }
 
     pub fn time_left(&self) -> f32 {
-        MAX_ATTACK_DURATION - self.time_elapsed()
+        MAX_ATTACK_DURATION - self.time_elapsed
     }
 
-    pub fn map_size(&self) -> UniqueView<MapSize> {
-        self.world.get_unique::<&MapSize>().unwrap()
+    pub fn map_size(&self) -> &MapSize {
+        &self.map_size
     }
 
-    pub fn drop_zone(&self) -> UniqueView<DropZone> {
-        self.world.get_unique::<&DropZone>().unwrap()
+    pub fn drop_zone(&self) -> &DropZone {
+        &self.drop_zone
     }
 
     pub fn done(&self) -> bool {
-        self.world.get_unique::<&Time>().unwrap().elapsed == MAX_ATTACK_DURATION
-            || self.stars() == 3
+        self.time_elapsed == MAX_ATTACK_DURATION || self.stars() == 3
     }
 
     pub fn percentage_destroyed(&self) -> f32 {
@@ -79,7 +77,7 @@ impl Game {
 
     /// Check if there is any entity with Team::Attack.
     pub fn is_attacker_team_present(&self) -> bool {
-        for team in self.world.borrow::<View<Team>>().unwrap().iter() {
+        for (_, team) in self.world.query::<&Team>().iter() {
             if *team == Team::Attack {
                 return true;
             }
@@ -97,7 +95,7 @@ impl Game {
             >= 50.0;
         let all_buildings_destroyed =
             destroyed_buildings_count == self.initial_counted_buildings_count;
-        let townhall_destroyed = self.world.iter::<&TownHall>().iter().count() == 0;
+        let townhall_destroyed = self.world.query::<&TownHall>().into_iter().count() == 0;
 
         townhall_destroyed as u32 + half_buildings_destroyed as u32 + all_buildings_destroyed as u32
     }
@@ -123,21 +121,18 @@ impl Game {
     }
 
     pub fn need_redraw_collision(&self) -> bool {
-        self.world.get_unique::<&NeedRedrawCollision>().unwrap().0
+        self.need_redraw_collision
     }
 
     pub fn new(map: &Map, enable_collision_grid: bool, rng: Option<Pcg64Mcg>) -> Self {
         let mut world = World::new();
 
-        world.add_unique(MapSize {
+        let map_size = MapSize {
             base_size: map.base_size as i32,
             border_size: map.border_size as i32,
-        });
-        world.add_unique(Time {
-            elapsed: 0.0,
-            delta: 0.0,
-        });
-        world.add_unique(RngUnique(rng.unwrap_or(Pcg64Mcg::new(rand::random()))));
+        };
+
+        let rng = rng.unwrap_or(Pcg64Mcg::new(rand::random()));
 
         for building in &map.buildings {
             building.create_building(&mut world);
@@ -145,23 +140,31 @@ impl Game {
 
         let initial_counted_buildings_count = Self::counted_buildings_count(&world);
 
-        world.run(features::buildings::init_buildings_grid);
-        world.run(features::buildings::handle_building_changes);
+        let buildings_grid = BuildingsGrid::new(&map_size, &mut world);
+        let drop_zone = DropZone::new(&map_size, &buildings_grid);
+        let collision_grid =
+            enable_collision_grid.then(|| PathfindingCollisionGrid::new(&map_size, &world));
 
-        world.run(features::buildings::init_drop_zone);
-
-        if enable_collision_grid {
-            world.run(features::collision::init_collision_grid);
-            world.run(features::collision::update_collision);
-        }
-
-        Self::tick_cleanup(&mut world);
-
-        Self {
+        let mut result = Self {
             world,
+
+            map_size,
+            rng,
+            buildings_grid,
+            drop_zone,
+            collision_grid,
+
+            time_elapsed: 0.0,
+            delta_time: 0.0,
+
+            need_redraw_collision: true,
+
             initial_counted_buildings_count,
-            enable_collision_grid,
-        }
+        };
+
+        result.tick_cleanup();
+
+        result
     }
 
     pub fn spawn_unit(&mut self, model: &UnitModelEnum, position: Vector2<f32>) {
@@ -171,68 +174,48 @@ impl Game {
     pub fn tick(&mut self, delta_time: f32) {
         assert!(!self.done());
 
-        self.world
-            .run_with_data(features::time::set_delta_time, delta_time);
+        self.delta_time = delta_time;
 
-        self.world
-            .run(features::attack::create_find_target_requests);
-        self.world
-            .run(features::targeting::handle_find_target_requests);
-        self.world.run(features::attack::attack);
-        self.world
-            .run(features::projectiles::target_projectile::update);
-        self.world
-            .run(features::projectiles::splash_projectile::update);
-        self.world.run(features::stunned::clear);
-        self.world
-            .run(features::projectiles::air_sweeper_projectile::update);
-        self.world.run(features::waypoint_mover::r#move);
-        self.world
-            .run(features::health::handle_splash_damage_events);
-        self.world
-            .run(features::health::handle_entity_damage_events);
+        features::attack::create_find_target_requests(self);
+        features::targeting::handle_find_target_requests(self);
+        features::attack::attack(self);
+        features::projectiles::target_projectile::update(self);
+        features::projectiles::splash_projectile::update(self);
+        features::stunned::clear(self);
+        features::projectiles::air_sweeper_projectile::update(self);
+        features::waypoint_mover::r#move(self);
+        features::health::handle_splash_damage_events(self);
+        features::health::handle_entity_damage_events(self);
         // TODO: run system: remove DeathRequest and use hero ability if not used
-        self.world.run(features::delay::update);
-        self.world
-            .run(features::to_be_deleted::handle_to_be_deleted);
-        self.world.run(features::buildings::handle_building_changes);
+        features::delay::update(self);
 
-        if self.enable_collision_grid {
-            self.world.run(features::collision::update_collision);
+        if self.collision_grid.is_some() {
+            features::collision::check_need_redraw_collision(self);
         }
 
-        Self::tick_cleanup(&mut self.world);
+        features::to_be_deleted::handle_to_be_deleted(self);
 
-        self.world.run(features::time::update_elapsed_time);
+        self.tick_cleanup();
+
+        self.time_elapsed = MAX_ATTACK_DURATION.min(self.time_elapsed + self.delta_time);
     }
 
     pub fn draw_entities(&self) -> Vec<Shape> {
         let mut result = Vec::new();
 
-        self.world
-            .run_with_data(features::drawable::draw, &mut result);
-        self.world
-            .run_with_data(features::projectiles::target_projectile::draw, &mut result);
-        self.world
-            .run_with_data(features::projectiles::splash_projectile::draw, &mut result);
-        self.world.run_with_data(
-            features::projectiles::air_sweeper_projectile::draw,
-            &mut result,
-        );
+        features::drawable::draw(&mut result, self);
+        features::projectiles::target_projectile::draw(&mut result, self);
+        features::projectiles::splash_projectile::draw(&mut result, self);
+        features::projectiles::air_sweeper_projectile::draw(&mut result, self);
 
         result
     }
 
     pub fn draw_grid(&self) -> Vec<Shape> {
-        let map_size = self.world.get_unique::<&MapSize>().unwrap();
-        let drop_zone = self.world.get_unique::<&DropZone>().unwrap();
-        let buildings_grid = self.world.get_unique::<&BuildingsGrid>().unwrap();
-        let entities = self.world.borrow::<EntitiesView>().unwrap();
-
         let mut result = Vec::new();
 
-        for x in 0..map_size.total_size() {
-            for y in 0..map_size.total_size() {
+        for x in 0..self.map_size.total_size() {
+            for y in 0..self.map_size.total_size() {
                 result.push(Shape::Rect {
                     x: x as f32,
                     y: y as f32,
@@ -240,9 +223,10 @@ impl Game {
                     height: 1.0,
                     color: get_tile_color(
                         (y ^ x) % 2 == 0,
-                        map_size.is_border(Vector2::new(x, y)),
-                        drop_zone.0[(x as usize, y as usize)],
-                        entities.is_alive(buildings_grid.0[(x as usize, y as usize)]),
+                        self.map_size.is_border(Vector2::new(x, y)),
+                        self.drop_zone.0[(x as usize, y as usize)],
+                        self.world
+                            .contains(self.buildings_grid.0[(x as usize, y as usize)]),
                     ),
                 });
             }
@@ -252,38 +236,31 @@ impl Game {
     }
 
     pub fn draw_collision(&mut self) -> Vec<Shape> {
-        if !self.enable_collision_grid {
-            return Vec::new();
+        match &self.collision_grid {
+            Some(collision_grid) => {
+                self.need_redraw_collision = false;
+
+                draw_bool_grid(
+                    collision_grid
+                        .0
+                        .map(|building_id| self.world.contains(building_id)),
+                    COLLISION_TILE_SIZE,
+                    COLLISION_TILE_COLOR,
+                )
+            }
+            None => Vec::new(),
         }
-
-        let collision_grid = self
-            .world
-            .get_unique::<&PathfindingCollisionGrid>()
-            .unwrap();
-        let mut need_redraw_collision =
-            self.world.get_unique::<&mut NeedRedrawCollision>().unwrap();
-        let entities = self.world.borrow::<EntitiesView>().unwrap();
-
-        need_redraw_collision.0 = false;
-
-        draw_bool_grid(
-            collision_grid
-                .0
-                .map(|building_id| entities.is_alive(building_id)),
-            COLLISION_TILE_SIZE,
-            COLLISION_TILE_COLOR,
-        )
     }
 
-    fn tick_cleanup(world: &mut World) {
-        world.run(features::buildings::cleanup_tracking);
-        world.run(features::collision::cleanup_tracking);
+    fn tick_cleanup(&mut self) {
+        //features::buildings::cleanup_tracking(self);
+        //features::collision::cleanup_tracking(self);
 
-        world.run(features::health::cleanup_events);
+        features::health::cleanup_events(self);
     }
 
     fn counted_buildings_count(world: &World) -> usize {
-        world.iter::<&CountedBuilding>().iter().count()
+        world.query::<&CountedBuilding>().into_iter().count()
     }
 
     fn destroyed_counted_buildings_count(&self) -> usize {

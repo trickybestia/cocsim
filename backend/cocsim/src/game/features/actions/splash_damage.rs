@@ -1,14 +1,13 @@
-use shipyard::{
-    AllStoragesViewMut,
-    EntityId,
-    View,
-};
+use hecs::Entity;
 
-use crate::game::features::{
-    actions::Action,
-    attack::Team,
-    health::SplashDamageEvent,
-    position::Position,
+use crate::{
+    Game,
+    game::features::{
+        actions::Action,
+        attack::Team,
+        health::SplashDamageEvent,
+        position::Position,
+    },
 };
 
 #[derive(Clone, Debug)]
@@ -20,17 +19,17 @@ pub struct SplashDamage {
 }
 
 impl Action for SplashDamage {
-    fn call(&self, actor: EntityId, all_storages: &mut AllStoragesViewMut) {
-        let attacker_position = all_storages.borrow::<View<Position>>().unwrap()[actor].0;
-        let attacker_team = all_storages.borrow::<View<Team>>().unwrap()[actor];
+    fn call(&self, actor: Entity, game: &mut Game) {
+        let attacker_position = game.world.get::<&Position>(actor).unwrap().0;
+        let attacker_team = *game.world.get::<&Team>(actor).unwrap();
 
-        all_storages.add_entity(SplashDamageEvent {
+        game.world.spawn((SplashDamageEvent {
             attacker_team,
             damage_ground: self.damage_ground,
             damage_air: self.damage_air,
             target: attacker_position,
             damage: self.damage,
             radius: self.radius,
-        });
+        },));
     }
 }

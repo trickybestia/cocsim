@@ -1,10 +1,10 @@
 use arbitrary::Arbitrary;
+use hecs::World;
 use nalgebra::Vector2;
 use serde::{
     Deserialize,
     Serialize,
 };
-use shipyard::World;
 
 use crate::{
     BuildingModel,

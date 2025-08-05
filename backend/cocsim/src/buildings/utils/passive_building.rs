@@ -1,8 +1,8 @@
-use nalgebra::Vector2;
-use shipyard::{
-    EntityId,
+use hecs::{
+    Entity,
     World,
 };
+use nalgebra::Vector2;
 
 use crate::{
     colliders::{
@@ -65,8 +65,8 @@ pub fn create_passive_building(
     health: f32,
     position: Vector2<usize>,
     size: Vector2<usize>,
-) -> EntityId {
-    world.add_entity((
+) -> Entity {
+    world.spawn((
         Health(health),
         Building { position, size },
         CountedBuilding,

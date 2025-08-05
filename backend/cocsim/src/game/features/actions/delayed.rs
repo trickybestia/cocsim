@@ -1,21 +1,19 @@
 use std::ops::Deref;
 
-use shipyard::{
-    AllStoragesViewMut,
-    EntityId,
-    Get,
-    View,
-};
+use hecs::Entity;
 
-use crate::game::features::{
-    actions::{
-        Action,
-        ActionEnum,
+use crate::{
+    Game,
+    game::features::{
+        actions::{
+            Action,
+            ActionEnum,
+        },
+        attack::Team,
+        delay::Delay,
+        position::Position,
+        to_be_deleted::OnDelete,
     },
-    attack::Team,
-    delay::Delay,
-    position::Position,
-    to_be_deleted::OnDelete,
 };
 
 #[derive(Clone, Debug)]
@@ -25,32 +23,24 @@ pub struct Delayed {
 }
 
 impl Action for Delayed {
-    fn call(&self, actor: EntityId, all_storages: &mut AllStoragesViewMut) {
-        let id = all_storages.add_entity((
+    fn call(&self, actor: Entity, game: &mut Game) {
+        let id = game.world.spawn((
             Delay {
                 time_left: self.time,
             },
             OnDelete(self.action.deref().clone()),
         ));
 
-        let team = all_storages
-            .borrow::<View<Team>>()
-            .unwrap()
-            .get(actor)
-            .map(|team| *team);
+        let team = game.world.get::<&Team>(actor).map(|team| *team);
 
         if let Ok(team) = team {
-            all_storages.add_component(id, (team,));
+            game.world.insert_one(id, team).unwrap();
         }
 
-        let position = all_storages
-            .borrow::<View<Position>>()
-            .unwrap()
-            .get(actor)
-            .map(|position| position.0);
+        let position = game.world.get::<&Position>(actor).map(|position| *position);
 
         if let Ok(position) = position {
-            all_storages.add_component(id, (Position(position),));
+            game.world.insert_one(id, position).unwrap();
         }
     }
 }

@@ -10,18 +10,17 @@ pub use air_sweeper_attack::AirSweeperAttack;
 pub use delayed::Delayed;
 pub use empty_action::EmptyAction;
 use enum_dispatch::enum_dispatch;
+use hecs::Entity;
 pub use melee_attack::MeleeAttack;
-use shipyard::{
-    AllStoragesViewMut,
-    EntityId,
-};
 pub use splash_damage::SplashDamage;
 pub use splash_projectile_attack::SplashProjectileAttack;
 pub use target_projectile_attack::TargetProjectileAttack;
 
+use crate::Game;
+
 #[enum_dispatch]
 pub trait Action {
-    fn call(&self, actor: EntityId, all_storages: &mut AllStoragesViewMut);
+    fn call(&self, actor: Entity, game: &mut Game);
 }
 
 #[enum_dispatch(Action)]

@@ -3,17 +3,10 @@ use std::{
     f32::consts::PI,
 };
 
-use shipyard::{
-    AddComponent,
-    Component,
-    EntityId,
-    IntoIter,
-    UniqueView,
-    View,
-    ViewMut,
-};
+use hecs::Entity;
 
 use crate::{
+    Game,
     Shape,
     ShapeColor,
     game::features::{
@@ -24,13 +17,11 @@ use crate::{
         },
         position::Position,
         stunned::Stunned,
-        time::Time,
         to_be_deleted::ToBeDeleted,
     },
     utils::nearest_point_on_arc,
 };
 
-#[derive(Component)]
 pub struct AirSweeperProjectile {
     pub push_strength: f32,
     pub rotation: f32,
@@ -38,7 +29,7 @@ pub struct AirSweeperProjectile {
     pub radius: f32,
     pub max_radius: f32,
     pub speed: f32,
-    pub applied_push_strength: HashMap<EntityId, f32>,
+    pub applied_push_strength: HashMap<Entity, f32>,
     pub max_arc_length: f32,
 }
 
@@ -50,25 +41,21 @@ impl AirSweeperProjectile {
     }
 }
 
-pub fn update(
-    time: UniqueView<Time>,
-    v_attack_target: View<AttackTarget>,
-    v_team: View<Team>,
-    mut v_position: ViewMut<Position>,
-    mut v_stunned: ViewMut<Stunned>,
-    mut v_air_sweeper_projectile: ViewMut<AirSweeperProjectile>,
-    mut v_to_be_deleted: ViewMut<ToBeDeleted>,
-) {
-    for (id, air_sweeper_projectile) in (&mut v_air_sweeper_projectile).iter().with_id() {
-        let projectile_team = v_team[id];
-        let projectile_position = v_position[id].0;
+pub fn update(game: &mut Game) {
+    let mut to_be_deleted = Vec::new();
+    let mut stunned = Vec::new();
 
-        for (attack_target_id, (attack_target, attack_target_team, attack_target_position)) in
-            (&v_attack_target, &v_team, &mut v_position)
-                .iter()
-                .with_id()
+    for (id, (projectile, projectile_team, projectile_position)) in game
+        .world
+        .query::<(&mut AirSweeperProjectile, &Team, &Position)>()
+        .iter()
+    {
+        for (attack_target_id, (attack_target, attack_target_team, attack_target_position)) in game
+            .world
+            .query::<(&AttackTarget, &Team, &mut Position)>()
+            .iter()
         {
-            if *attack_target_team == projectile_team
+            if attack_target_team == projectile_team
                 || !attack_target.flags.contains(AttackTargetFlags::UNIT)
                 || !attack_target.flags.contains(AttackTargetFlags::AIR)
             {
@@ -77,66 +64,73 @@ pub fn update(
 
             let distance = nearest_point_on_arc(
                 attack_target_position.0,
-                projectile_position,
-                air_sweeper_projectile.radius,
-                air_sweeper_projectile.rotation - air_sweeper_projectile.angle() / 2.0,
-                air_sweeper_projectile.angle(),
+                projectile_position.0,
+                projectile.radius,
+                projectile.rotation - projectile.angle() / 2.0,
+                projectile.angle(),
             )
             .metric_distance(&attack_target_position.0);
 
             if distance < 0.1 {
-                let apply_push = if let Some(applied_push_strength) = air_sweeper_projectile
-                    .applied_push_strength
-                    .get_mut(&attack_target_id)
+                let apply_push = if let Some(applied_push_strength) =
+                    projectile.applied_push_strength.get_mut(&attack_target_id)
                 {
-                    if *applied_push_strength < air_sweeper_projectile.push_strength {
-                        *applied_push_strength += air_sweeper_projectile.speed * time.delta;
+                    if *applied_push_strength < projectile.push_strength {
+                        *applied_push_strength += projectile.speed * game.delta_time;
 
                         true
                     } else {
                         false
                     }
                 } else {
-                    air_sweeper_projectile
+                    projectile
                         .applied_push_strength
-                        .insert(attack_target_id, air_sweeper_projectile.speed * time.delta);
+                        .insert(attack_target_id, projectile.speed * game.delta_time);
 
                     true
                 };
 
                 if apply_push {
-                    let push = (attack_target_position.0 - projectile_position).normalize()
-                        * air_sweeper_projectile.speed
-                        * time.delta;
+                    let push = (attack_target_position.0 - projectile_position.0).normalize()
+                        * projectile.speed
+                        * game.delta_time;
                     attack_target_position.0 += push;
 
-                    v_stunned.add_component_unchecked(attack_target_id, Stunned);
+                    stunned.push(attack_target_id);
                 }
             }
         }
 
-        air_sweeper_projectile.radius = air_sweeper_projectile
+        projectile.radius = projectile
             .max_radius
-            .min(air_sweeper_projectile.radius + air_sweeper_projectile.speed * time.delta);
+            .min(projectile.radius + projectile.speed * game.delta_time);
 
-        if air_sweeper_projectile.radius == air_sweeper_projectile.max_radius {
-            v_to_be_deleted.add_component_unchecked(id, ToBeDeleted);
+        if projectile.radius == projectile.max_radius {
+            to_be_deleted.push(id);
         }
+    }
+
+    for id in to_be_deleted {
+        game.world.insert_one(id, ToBeDeleted).unwrap();
+    }
+
+    for id in stunned {
+        game.world.insert_one(id, Stunned).unwrap();
     }
 }
 
-pub fn draw(
-    result: &mut Vec<Shape>,
-    v_air_sweeper_projectile: View<AirSweeperProjectile>,
-    v_position: View<Position>,
-) {
-    for (air_sweeper_projectile, position) in (&v_air_sweeper_projectile, &v_position).iter() {
+pub fn draw(result: &mut Vec<Shape>, game: &Game) {
+    for (_, (projectile, position)) in game
+        .world
+        .query::<(&AirSweeperProjectile, &Position)>()
+        .iter()
+    {
         result.push(Shape::Arc {
             x: position.0.x,
             y: position.0.y,
-            radius: air_sweeper_projectile.radius,
-            rotation: air_sweeper_projectile.rotation - air_sweeper_projectile.angle() / 2.0,
-            angle: air_sweeper_projectile.angle(),
+            radius: projectile.radius,
+            rotation: projectile.rotation - projectile.angle() / 2.0,
+            angle: projectile.angle(),
             width: 0.2,
             color: ShapeColor::new(255, 255, 255),
         });

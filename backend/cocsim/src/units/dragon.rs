@@ -1,17 +1,16 @@
 use arbitrary::Arbitrary;
+use hecs::{
+    Entity,
+    World,
+};
 use nalgebra::Vector2;
 use serde::{
     Deserialize,
     Serialize,
 };
-use shipyard::{
-    AllStoragesView,
-    EntityId,
-    View,
-    World,
-};
 
 use crate::{
+    Game,
     Shape,
     ShapeColor,
     UnitModel,
@@ -98,8 +97,8 @@ const DRAGON_SPEED: f32 = 2.0;
 const DRAGON_ATTACK_COOLDOWN: f32 = 1.25;
 const DRAGON_ATTACK_RANGE: f32 = 1.0;
 
-fn draw_dragon(id: EntityId, all_storages: &AllStoragesView, result: &mut Vec<Shape>) {
-    let position = all_storages.borrow::<View<Position>>().unwrap()[id].0;
+fn draw_dragon(id: Entity, game: &Game, result: &mut Vec<Shape>) {
+    let position = game.world.get::<&Position>(id).unwrap().0;
 
     result.push(Shape::Circle {
         x: position.x,
@@ -131,12 +130,14 @@ impl UnitModel for DragonModel {
             draw_dragon,
         );
 
-        world.add_component(
-            id,
-            AirUnitFindTarget {
-                prioritizer: CountedBuildingTargetPrioritizer.into(),
-                attack_range: DRAGON_ATTACK_RANGE,
-            },
-        );
+        world
+            .insert_one(
+                id,
+                AirUnitFindTarget {
+                    prioritizer: CountedBuildingTargetPrioritizer.into(),
+                    attack_range: DRAGON_ATTACK_RANGE,
+                },
+            )
+            .unwrap();
     }
 }

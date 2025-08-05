@@ -1,5 +1,4 @@
 use nalgebra::Vector2;
-use shipyard::Component;
 
-#[derive(Component)]
+#[derive(Clone, Copy)]
 pub struct Position(pub Vector2<f32>);

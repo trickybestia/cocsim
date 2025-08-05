@@ -1,10 +1,10 @@
 use arbitrary::Arbitrary;
+use hecs::World;
 use nalgebra::Vector2;
 use serde::{
     Deserialize,
     Serialize,
 };
-use shipyard::World;
 
 use crate::{
     BuildingModel,
@@ -79,7 +79,7 @@ impl BuildingModel for WallModel {
     }
 
     fn create_building(&self, world: &mut World) {
-        world.add_entity((
+        world.spawn((
             Health(WALL_LEVELS[*self.level].health),
             Building {
                 position: Vector2::new(*self.x, *self.y),

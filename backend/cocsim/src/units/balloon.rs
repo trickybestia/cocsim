@@ -1,17 +1,16 @@
 use arbitrary::Arbitrary;
+use hecs::{
+    Entity,
+    World,
+};
 use nalgebra::Vector2;
 use serde::{
     Deserialize,
     Serialize,
 };
-use shipyard::{
-    AllStoragesView,
-    EntityId,
-    View,
-    World,
-};
 
 use crate::{
+    Game,
     Shape,
     ShapeColor,
     UnitModel,
@@ -108,8 +107,8 @@ const BALLOON_ATTACK_COOLDOWN: f32 = 3.0;
 const BALLOON_ATTACK_RANGE: f32 = 0.0;
 const BALLOON_SPLASH_ATTACK_RADIUS: f32 = 1.2;
 
-fn draw_balloon(id: EntityId, all_storages: &AllStoragesView, result: &mut Vec<Shape>) {
-    let position = all_storages.borrow::<View<Position>>().unwrap()[id].0;
+fn draw_balloon(id: Entity, game: &Game, result: &mut Vec<Shape>) {
+    let position = game.world.get::<&Position>(id).unwrap().0;
 
     result.push(Shape::Circle {
         x: position.x,
@@ -144,23 +143,25 @@ impl UnitModel for BalloonModel {
             draw_balloon,
         );
 
-        world.add_component(
-            id,
-            (
-                AirUnitFindTarget {
-                    prioritizer: ActiveBuildingTargetPrioritizer.into(),
-                    attack_range: BALLOON_ATTACK_RANGE,
-                },
-                OnDelete(
-                    SplashDamage {
-                        damage_ground: true,
-                        damage_air: false,
-                        damage: level.death_damage,
-                        radius: BALLOON_SPLASH_ATTACK_RADIUS,
-                    }
-                    .into(),
+        world
+            .insert(
+                id,
+                (
+                    AirUnitFindTarget {
+                        prioritizer: ActiveBuildingTargetPrioritizer.into(),
+                        attack_range: BALLOON_ATTACK_RANGE,
+                    },
+                    OnDelete(
+                        SplashDamage {
+                            damage_ground: true,
+                            damage_air: false,
+                            damage: level.death_damage,
+                            radius: BALLOON_SPLASH_ATTACK_RADIUS,
+                        }
+                        .into(),
+                    ),
                 ),
-            ),
-        );
+            )
+            .unwrap();
     }
 }

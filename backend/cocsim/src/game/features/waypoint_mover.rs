@@ -1,22 +1,15 @@
+use hecs::Without;
 use nalgebra::Vector2;
-use shipyard::{
-    Component,
-    IntoIter,
-    UniqueView,
-    View,
-    ViewMut,
-};
 
 use crate::{
+    Game,
     consts::*,
     game::features::{
         position::Position,
         stunned::Stunned,
-        time::Time,
     },
 };
 
-#[derive(Component)]
 pub struct WaypointMover {
     pub speed: f32,
     /// waypoints[0] - last waypoint (farthest), waypoints[waypoints.len() - 1]
@@ -24,14 +17,10 @@ pub struct WaypointMover {
     pub waypoints: Vec<Vector2<f32>>,
 }
 
-pub fn r#move(
-    time: UniqueView<Time>,
-    v_stunned: View<Stunned>,
-    mut v_position: ViewMut<Position>,
-    mut v_waypoint_mover: ViewMut<WaypointMover>,
-) {
-    for (position, waypoint_mover, _) in
-        (&mut v_position, &mut v_waypoint_mover, !&v_stunned).iter()
+pub fn r#move(game: &mut Game) {
+    for (_id, (position, waypoint_mover)) in game
+        .world
+        .query_mut::<Without<(&mut Position, &mut WaypointMover), &Stunned>>()
     {
         if waypoint_mover.waypoints.is_empty() {
             continue;
@@ -44,7 +33,7 @@ pub fn r#move(
         } else {
             let direction = (next_waypoint - position.0).normalize();
 
-            position.0 += direction * waypoint_mover.speed * time.delta;
+            position.0 += direction * waypoint_mover.speed * game.delta_time;
         }
     }
 }

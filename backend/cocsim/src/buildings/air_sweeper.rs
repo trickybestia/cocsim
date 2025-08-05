@@ -1,10 +1,10 @@
 use arbitrary::Arbitrary;
+use hecs::World;
 use nalgebra::Vector2;
 use serde::{
     Deserialize,
     Serialize,
 };
-use shipyard::World;
 
 use crate::{
     BuildingModel,
@@ -154,15 +154,17 @@ impl BuildingModel for AirSweeperModel {
             .into(),
         );
 
-        world.add_component(
-            id,
-            BuildingFindTarget {
-                attack_air: true,
-                attack_ground: false,
-                rotation_angle,
-                min_attack_range: AIR_SWEEPER_MIN_ATTACK_RANGE,
-                max_attack_range: AIR_SWEEPER_MAX_ATTACK_RANGE,
-            },
-        );
+        world
+            .insert_one(
+                id,
+                BuildingFindTarget {
+                    attack_air: true,
+                    attack_ground: false,
+                    rotation_angle,
+                    min_attack_range: AIR_SWEEPER_MIN_ATTACK_RANGE,
+                    max_attack_range: AIR_SWEEPER_MAX_ATTACK_RANGE,
+                },
+            )
+            .unwrap();
     }
 }

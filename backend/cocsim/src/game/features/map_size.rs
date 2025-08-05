@@ -1,7 +1,5 @@
 use nalgebra::Vector2;
-use shipyard::Unique;
 
-#[derive(Unique)]
 pub struct MapSize {
     pub base_size: i32,
     pub border_size: i32,

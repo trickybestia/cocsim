@@ -1,19 +1,18 @@
 use std::collections::HashMap;
 
-use shipyard::{
-    AllStoragesViewMut,
-    EntityId,
-    View,
-};
+use hecs::Entity;
 
-use crate::game::features::{
-    actions::Action,
-    attack::{
-        Attacker,
-        Team,
+use crate::{
+    Game,
+    game::features::{
+        actions::Action,
+        attack::{
+            Attacker,
+            Team,
+        },
+        position::Position,
+        projectiles::air_sweeper_projectile::AirSweeperProjectile,
     },
-    position::Position,
-    projectiles::air_sweeper_projectile::AirSweeperProjectile,
 };
 
 #[derive(Clone, Debug)]
@@ -27,22 +26,16 @@ pub struct AirSweeperAttack {
 }
 
 impl Action for AirSweeperAttack {
-    fn call(&self, actor: EntityId, all_storages: &mut AllStoragesViewMut) {
-        let target = all_storages.borrow::<View<Attacker>>().unwrap()[actor].target;
-        let v_position = all_storages.borrow::<View<Position>>().unwrap();
-        let v_team = all_storages.borrow::<View<Team>>().unwrap();
-
-        let attacker_position = v_position[actor].0;
-        let target_position = v_position[target].0;
-        let attacker_team = v_team[actor];
-
-        drop(v_position);
-        drop(v_team);
+    fn call(&self, actor: Entity, game: &mut Game) {
+        let attacker_position = game.world.get::<&Position>(actor).unwrap().0;
+        let attacker_team = *game.world.get::<&Team>(actor).unwrap();
+        let target = game.world.get::<&Attacker>(actor).unwrap().target;
+        let target_position = game.world.get::<&Position>(target).unwrap().0;
 
         let target_offset = target_position - attacker_position;
         let target_angle = target_offset.y.atan2(target_offset.x).to_degrees();
 
-        all_storages.add_entity((
+        game.world.spawn((
             AirSweeperProjectile {
                 push_strength: self.push_strength,
                 rotation: target_angle,

@@ -7,12 +7,12 @@ use arbitrary::Arbitrary;
 pub use balloon::*;
 pub use dragon::*;
 use enum_dispatch::enum_dispatch;
+use hecs::World;
 use nalgebra::Vector2;
 use serde::{
     Deserialize,
     Serialize,
 };
-use shipyard::World;
 
 use crate::consts::MAX_UNITS_COUNT;
 

@@ -1,10 +1,10 @@
 use arbitrary::Arbitrary;
+use hecs::World;
 use nalgebra::Vector2;
 use serde::{
     Deserialize,
     Serialize,
 };
-use shipyard::World;
 
 use crate::{
     BuildingModel,
@@ -147,15 +147,17 @@ impl BuildingModel for XBowModel {
             .into(),
         );
 
-        world.add_component(
-            id,
-            BuildingFindTarget {
-                attack_air: self.target == XBowTargetType::AirAndGround,
-                attack_ground: true,
-                rotation_angle: None,
-                min_attack_range: X_BOW_MIN_ATTACK_RANGE,
-                max_attack_range,
-            },
-        );
+        world
+            .insert_one(
+                id,
+                BuildingFindTarget {
+                    attack_air: self.target == XBowTargetType::AirAndGround,
+                    attack_ground: true,
+                    rotation_angle: None,
+                    min_attack_range: X_BOW_MIN_ATTACK_RANGE,
+                    max_attack_range,
+                },
+            )
+            .unwrap();
     }
 }

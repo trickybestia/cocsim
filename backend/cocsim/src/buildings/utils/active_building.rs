@@ -1,8 +1,8 @@
-use nalgebra::Vector2;
-use shipyard::{
-    EntityId,
+use hecs::{
+    Entity,
     World,
 };
+use nalgebra::Vector2;
 
 use crate::{
     buildings::utils::passive_building::{
@@ -34,8 +34,8 @@ pub fn create_active_building(
     attack_cooldown: f32,
     retarget_condition: RetargetConditionEnum,
     attack: ActionEnum,
-) -> EntityId {
-    world.add_entity((
+) -> Entity {
+    world.spawn((
         Health(health),
         Building { position, size },
         CountedBuilding,
@@ -44,7 +44,7 @@ pub fn create_active_building(
         Attacker {
             attack_cooldown,
             remaining_attack_cooldown: attack_cooldown,
-            target: EntityId::dead(),
+            target: Entity::DANGLING,
             retarget_condition,
             attack,
         },

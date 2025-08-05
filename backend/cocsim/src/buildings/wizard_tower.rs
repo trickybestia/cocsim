@@ -1,10 +1,10 @@
 use arbitrary::Arbitrary;
+use hecs::World;
 use nalgebra::Vector2;
 use serde::{
     Deserialize,
     Serialize,
 };
-use shipyard::World;
 
 use crate::{
     BuildingModel,
@@ -153,15 +153,17 @@ impl BuildingModel for WizardTowerModel {
             .into(),
         );
 
-        world.add_component(
-            id,
-            BuildingFindTarget {
-                attack_air: true,
-                attack_ground: true,
-                rotation_angle: None,
-                min_attack_range: WIZARD_TOWER_MIN_ATTACK_RANGE,
-                max_attack_range: WIZARD_TOWER_MAX_ATTACK_RANGE,
-            },
-        );
+        world
+            .insert_one(
+                id,
+                BuildingFindTarget {
+                    attack_air: true,
+                    attack_ground: true,
+                    rotation_angle: None,
+                    min_attack_range: WIZARD_TOWER_MIN_ATTACK_RANGE,
+                    max_attack_range: WIZARD_TOWER_MAX_ATTACK_RANGE,
+                },
+            )
+            .unwrap();
     }
 }

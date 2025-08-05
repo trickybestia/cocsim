@@ -1,14 +1,13 @@
-use shipyard::{
-    AllStoragesViewMut,
-    EntityId,
-    View,
-};
+use hecs::Entity;
 
-use crate::game::features::{
-    actions::Action,
-    attack::Attacker,
-    position::Position,
-    projectiles::target_projectile::TargetProjectile,
+use crate::{
+    Game,
+    game::features::{
+        actions::Action,
+        attack::Attacker,
+        position::Position,
+        projectiles::target_projectile::TargetProjectile,
+    },
 };
 
 #[derive(Clone, Debug)]
@@ -18,18 +17,14 @@ pub struct TargetProjectileAttack {
 }
 
 impl Action for TargetProjectileAttack {
-    fn call(&self, actor: EntityId, all_storages: &mut AllStoragesViewMut) {
-        let target = all_storages.borrow::<View<Attacker>>().unwrap()[actor].target;
-        let v_position = all_storages.borrow::<View<Position>>().unwrap();
-
-        let attacker_position = v_position[actor].0;
-        let target_position = v_position[target].0;
-
-        drop(v_position);
+    fn call(&self, actor: Entity, game: &mut Game) {
+        let attacker_position = game.world.get::<&Position>(actor).unwrap().0;
+        let target = game.world.get::<&Attacker>(actor).unwrap().target;
+        let target_position = game.world.get::<&Position>(target).unwrap().0;
 
         let relative_position = attacker_position - target_position;
 
-        all_storages.add_entity((
+        game.world.spawn((
             TargetProjectile {
                 damage: self.damage,
                 target,

@@ -1,11 +1,11 @@
-use nalgebra::Vector2;
-use shipyard::{
-    AllStoragesView,
-    EntityId,
+use hecs::{
+    Entity,
     World,
 };
+use nalgebra::Vector2;
 
 use crate::{
+    Game,
     Shape,
     colliders::PointCollider,
     game::features::{
@@ -31,9 +31,9 @@ pub fn create_air_unit(
     speed: f32,
     attack_cooldown: f32,
     attack: ActionEnum,
-    draw: fn(EntityId, &AllStoragesView, &mut Vec<Shape>),
-) -> EntityId {
-    world.add_entity((
+    draw: fn(Entity, &Game, &mut Vec<Shape>),
+) -> Entity {
+    world.spawn((
         Position(position),
         WaypointMover {
             speed,
@@ -44,7 +44,7 @@ pub fn create_air_unit(
         Attacker {
             attack_cooldown,
             remaining_attack_cooldown: attack_cooldown,
-            target: EntityId::dead(),
+            target: Entity::DANGLING,
             retarget_condition: UnitRetargetCondition.into(),
             attack,
         },

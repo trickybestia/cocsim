@@ -1,20 +1,10 @@
 use bitflags::bitflags;
 use enum_dispatch::enum_dispatch;
+use hecs::Entity;
 use nalgebra::Vector2;
-use shipyard::{
-    AddComponent,
-    AllStoragesViewMut,
-    Component,
-    EntitiesView,
-    EntityId,
-    Get,
-    IntoIter,
-    UniqueView,
-    View,
-    ViewMut,
-};
 
 use crate::{
+    Game,
     colliders::{
         Collider,
         ColliderEnum,
@@ -28,7 +18,6 @@ use crate::{
         position::Position,
         stunned::Stunned,
         targeting::FindTargetRequest,
-        time::Time,
         waypoint_mover::WaypointMover,
     },
     utils::arc_contains_angle,
@@ -99,16 +88,14 @@ pub enum RetargetConditionEnum {
     UnitRetargetCondition,
 }
 
-#[derive(Component)]
 pub struct Attacker {
     pub attack_cooldown: f32,
     pub remaining_attack_cooldown: f32,
-    pub target: EntityId,
+    pub target: Entity,
     pub retarget_condition: RetargetConditionEnum,
     pub attack: ActionEnum,
 }
 
-#[derive(Component)]
 pub struct AttackTarget {
     pub collider: ColliderEnum,
     pub flags: AttackTargetFlags,
@@ -129,35 +116,32 @@ bitflags! {
     }
 }
 
-#[derive(Component, PartialEq, Eq, Clone, Copy, Debug)]
+#[derive(PartialEq, Eq, Clone, Copy, Debug)]
 pub enum Team {
     Attack,
     Defense,
 }
 
-pub fn create_find_target_requests(
-    mut v_attacker: ViewMut<Attacker>,
-    v_attack_target: View<AttackTarget>,
-    v_position: View<Position>,
-    entities: EntitiesView,
-    v_stunned: View<Stunned>,
-    mut v_find_target_request: ViewMut<FindTargetRequest>,
-) {
-    for (attacker_id, (attacker, stunned)) in
-        (&mut v_attacker, v_stunned.as_optional()).iter().with_id()
+pub fn create_find_target_requests(game: &mut Game) {
+    let mut find_target_request = Vec::new();
+
+    for (attacker_id, (attacker, stunned)) in game
+        .world
+        .query::<(&mut Attacker, Option<&Stunned>)>()
+        .iter()
     {
         if stunned.is_some() {
-            attacker.target = EntityId::dead();
+            attacker.target = Entity::DANGLING;
 
             continue;
         }
 
-        let retarget = if !entities.is_alive(attacker.target) {
+        let retarget = if !game.world.contains(attacker.target) {
             true
         } else {
-            let attacker_position = v_position[attacker_id].0;
-            let target_position = v_position[attacker.target].0;
-            let attack_target = &v_attack_target[attacker.target];
+            let attacker_position = game.world.get::<&Position>(attacker_id).unwrap().0;
+            let target_position = game.world.get::<&Position>(attacker.target).unwrap().0;
+            let attack_target = game.world.get::<&AttackTarget>(attacker.target).unwrap();
 
             attacker.retarget_condition.need_retarget(
                 attacker_position,
@@ -167,33 +151,36 @@ pub fn create_find_target_requests(
         };
 
         if retarget {
-            attacker.target = EntityId::dead();
+            attacker.target = Entity::DANGLING;
             attacker.remaining_attack_cooldown = attacker.attack_cooldown;
 
-            v_find_target_request.add_component_unchecked(attacker_id, FindTargetRequest);
+            find_target_request.push(attacker_id);
         }
     }
-}
 
-pub fn attack(mut all_storages: AllStoragesViewMut) {
-    let attack_queue = all_storages.run(create_attack_queue);
-
-    for (attack, attacker_id) in attack_queue {
-        attack.call(attacker_id, &mut all_storages);
+    for id in find_target_request {
+        game.world.insert(id, (FindTargetRequest,)).unwrap();
     }
 }
 
-fn create_attack_queue(
-    time: UniqueView<Time>,
-    mut v_attacker: ViewMut<Attacker>,
-    entities: EntitiesView,
-    v_waypoint_mover: View<WaypointMover>,
-) -> Vec<(ActionEnum, EntityId)> {
+pub fn attack(game: &mut Game) {
+    let attack_queue = create_attack_queue(game);
+
+    for (attack, attacker_id) in attack_queue {
+        attack.call(attacker_id, game);
+    }
+}
+
+fn create_attack_queue(game: &mut Game) -> Vec<(ActionEnum, Entity)> {
     let mut result = Vec::new();
 
-    for (attacker_id, attacker) in (&mut v_attacker).iter().with_id() {
-        if entities.is_alive(attacker.target) {
-            let can_attack = if let Ok(waypoint_mover) = v_waypoint_mover.get(attacker_id) {
+    for (attacker_id, (attacker, waypoint_mover)) in game
+        .world
+        .query::<(&mut Attacker, Option<&WaypointMover>)>()
+        .iter()
+    {
+        if game.world.contains(attacker.target) {
+            let can_attack = if let Some(waypoint_mover) = waypoint_mover {
                 // attacker is unit
 
                 waypoint_mover.waypoints.is_empty()
@@ -205,7 +192,7 @@ fn create_attack_queue(
 
             if can_attack {
                 attacker.remaining_attack_cooldown =
-                    0.0f32.max(attacker.remaining_attack_cooldown - time.delta);
+                    0.0f32.max(attacker.remaining_attack_cooldown - game.delta_time);
 
                 if attacker.remaining_attack_cooldown == 0.0 {
                     result.push((attacker.attack.clone(), attacker_id));

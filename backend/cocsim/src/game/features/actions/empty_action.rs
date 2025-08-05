@@ -1,13 +1,13 @@
-use shipyard::{
-    AllStoragesViewMut,
-    EntityId,
-};
+use hecs::Entity;
 
-use crate::game::features::actions::Action;
+use crate::{
+    Game,
+    game::features::actions::Action,
+};
 
 #[derive(Clone, Debug)]
 pub struct EmptyAction;
 
 impl Action for EmptyAction {
-    fn call(&self, _actor: EntityId, _all_storages: &mut AllStoragesViewMut) {}
+    fn call(&self, _actor: Entity, _game: &mut Game) {}
 }

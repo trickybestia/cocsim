@@ -4,7 +4,7 @@ use serde::{
     Deserialize,
     Serialize,
 };
-use shipyard::World;
+use hecs::World;
 
 use crate::{
     BuildingModel,

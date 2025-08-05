@@ -1,13 +1,12 @@
-use shipyard::{
-    AllStoragesViewMut,
-    EntityId,
-    View,
-};
+use hecs::Entity;
 
-use crate::game::features::{
-    actions::Action,
-    attack::Attacker,
-    health::EntityDamageEvent,
+use crate::{
+    Game,
+    game::features::{
+        actions::Action,
+        attack::Attacker,
+        health::EntityDamageEvent,
+    },
 };
 
 #[derive(Clone, Debug)]
@@ -16,10 +15,10 @@ pub struct MeleeAttack {
 }
 
 impl Action for MeleeAttack {
-    fn call(&self, actor: EntityId, all_storages: &mut AllStoragesViewMut) {
-        let target = all_storages.borrow::<View<Attacker>>().unwrap()[actor].target;
+    fn call(&self, actor: Entity, game: &mut Game) {
+        let target = game.world.get::<&Attacker>(actor).unwrap().target;
 
-        all_storages.add_entity((EntityDamageEvent {
+        game.world.spawn((EntityDamageEvent {
             target,
             damage: self.damage,
         },));

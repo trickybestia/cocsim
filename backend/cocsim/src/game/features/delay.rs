@@ -1,32 +1,25 @@
-use shipyard::{
-    AddComponent,
-    Component,
-    IntoIter,
-    UniqueView,
-    ViewMut,
-};
-
-use crate::game::features::{
-    time::Time,
-    to_be_deleted::ToBeDeleted,
+use crate::{
+    Game,
+    game::features::to_be_deleted::ToBeDeleted,
 };
 
 /// Despawn entity after time
-#[derive(Component)]
 pub struct Delay {
     pub time_left: f32,
 }
 
-pub fn update(
-    time: UniqueView<Time>,
-    mut v_delay: ViewMut<Delay>,
-    mut v_to_be_deleted: ViewMut<ToBeDeleted>,
-) {
-    for (id, delay) in (&mut v_delay).iter().with_id() {
-        delay.time_left = 0.0f32.max(delay.time_left - time.delta);
+pub fn update(game: &mut Game) {
+    let mut to_be_deleted = Vec::new();
+
+    for (id, delay) in game.world.query_mut::<&mut Delay>() {
+        delay.time_left = 0.0f32.max(delay.time_left - game.delta_time);
 
         if delay.time_left == 0.0 {
-            v_to_be_deleted.add_component_unchecked(id, ToBeDeleted);
+            to_be_deleted.push(id);
         }
+    }
+
+    for id in to_be_deleted {
+        game.world.insert_one(id, ToBeDeleted).unwrap();
     }
 }

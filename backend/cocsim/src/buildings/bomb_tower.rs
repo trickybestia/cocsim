@@ -1,10 +1,10 @@
 use arbitrary::Arbitrary;
+use hecs::World;
 use nalgebra::Vector2;
 use serde::{
     Deserialize,
     Serialize,
 };
-use shipyard::World;
 
 use crate::{
     BuildingModel,
@@ -153,32 +153,34 @@ impl BuildingModel for BombTowerModel {
             .into(),
         );
 
-        world.add_component(
-            id,
-            (
-                BuildingFindTarget {
-                    attack_air: false,
-                    attack_ground: true,
-                    rotation_angle: None,
-                    min_attack_range: BOMB_TOWER_MIN_ATTACK_RANGE,
-                    max_attack_range: BOMB_TOWER_MAX_ATTACK_RANGE,
-                },
-                OnDelete(
-                    Delayed {
-                        time: BOMB_TOWER_DEATH_DAMAGE_DELAY,
-                        action: Box::new(
-                            SplashDamage {
-                                damage_ground: true,
-                                damage_air: false,
-                                damage: level.death_damage,
-                                radius: BOMB_TOWER_DEATH_DAMAGE_ATTACK_RADIUS,
-                            }
-                            .into(),
-                        ),
-                    }
-                    .into(),
+        world
+            .insert(
+                id,
+                (
+                    BuildingFindTarget {
+                        attack_air: false,
+                        attack_ground: true,
+                        rotation_angle: None,
+                        min_attack_range: BOMB_TOWER_MIN_ATTACK_RANGE,
+                        max_attack_range: BOMB_TOWER_MAX_ATTACK_RANGE,
+                    },
+                    OnDelete(
+                        Delayed {
+                            time: BOMB_TOWER_DEATH_DAMAGE_DELAY,
+                            action: Box::new(
+                                SplashDamage {
+                                    damage_ground: true,
+                                    damage_air: false,
+                                    damage: level.death_damage,
+                                    radius: BOMB_TOWER_DEATH_DAMAGE_ATTACK_RADIUS,
+                                }
+                                .into(),
+                            ),
+                        }
+                        .into(),
+                    ),
                 ),
-            ),
-        );
+            )
+            .unwrap();
     }
 }

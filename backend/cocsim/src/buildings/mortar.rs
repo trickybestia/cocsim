@@ -1,10 +1,10 @@
 use arbitrary::Arbitrary;
+use hecs::World;
 use nalgebra::Vector2;
 use serde::{
     Deserialize,
     Serialize,
 };
-use shipyard::World;
 
 use crate::{
     BuildingModel,
@@ -153,15 +153,17 @@ impl BuildingModel for MortarModel {
             .into(),
         );
 
-        world.add_component(
-            id,
-            BuildingFindTarget {
-                attack_air: false,
-                attack_ground: true,
-                rotation_angle: None,
-                min_attack_range: MORTAR_MIN_ATTACK_RANGE,
-                max_attack_range: MORTAR_MAX_ATTACK_RANGE,
-            },
-        );
+        world
+            .insert_one(
+                id,
+                BuildingFindTarget {
+                    attack_air: false,
+                    attack_ground: true,
+                    rotation_angle: None,
+                    min_attack_range: MORTAR_MIN_ATTACK_RANGE,
+                    max_attack_range: MORTAR_MAX_ATTACK_RANGE,
+                },
+            )
+            .unwrap();
     }
 }

@@ -1,12 +1,10 @@
-use shipyard::{
-    Component,
-    EntityId,
-    IntoIter,
-    View,
-    ViewMut,
+use hecs::{
+    Entity,
+    With,
 };
 
 use crate::{
+    Game,
     colliders::Collider,
     consts::UNIT_DISTANCE_TO_WAYPOINT_EPS,
     game::features::{
@@ -22,7 +20,6 @@ use crate::{
     utils::arc_contains_angle,
 };
 
-#[derive(Component)]
 pub struct BuildingFindTarget {
     pub attack_air: bool,
     pub attack_ground: bool,
@@ -31,28 +28,19 @@ pub struct BuildingFindTarget {
     pub max_attack_range: f32,
 }
 
-pub fn handle_find_target_requests(
-    v_find_target_request: ViewMut<FindTargetRequest>,
-    v_building_find_target: View<BuildingFindTarget>,
-    mut v_attacker: ViewMut<Attacker>,
-    v_attack_target: View<AttackTarget>,
-    v_team: View<Team>,
-    v_position: View<Position>,
-) {
-    for (_, building_find_target, attacker, attacker_team, attacker_position) in (
-        &v_find_target_request,
-        &v_building_find_target,
-        &mut v_attacker,
-        &v_team,
-        &v_position,
-    )
+pub fn handle_find_target_requests(game: &mut Game) {
+    for (_attacker_id, (building_find_target, attacker, attacker_team, attacker_position)) in game
+        .world
+        .query::<With<(&BuildingFindTarget, &mut Attacker, &Team, &Position), &FindTargetRequest>>()
         .iter()
     {
-        let mut nearest_target = EntityId::dead();
+        let mut nearest_target = Entity::DANGLING;
         let mut nearest_target_distance_squared = f32::INFINITY;
 
-        for (target_id, (attack_target, target_team, target_position)) in
-            (&v_attack_target, &v_team, &v_position).iter().with_id()
+        for (target_id, (attack_target, target_team, target_position)) in game
+            .world
+            .query::<(&AttackTarget, &Team, &Position)>()
+            .iter()
         {
             if target_team == attacker_team {
                 continue;

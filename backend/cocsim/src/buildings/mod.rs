@@ -40,6 +40,7 @@ use enum_dispatch::enum_dispatch;
 pub use goblin_hut::*;
 pub use gold_mine::*;
 pub use gold_storage::*;
+use hecs::World;
 pub use laboratory::*;
 pub use mortar::*;
 use nalgebra::Vector2;
@@ -47,7 +48,6 @@ use serde::{
     Deserialize,
     Serialize,
 };
-use shipyard::World;
 pub use town_hall::*;
 pub use wall::*;
 pub use wizard_tower::*;

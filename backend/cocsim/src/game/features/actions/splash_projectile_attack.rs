@@ -1,17 +1,16 @@
-use shipyard::{
-    AllStoragesViewMut,
-    EntityId,
-    View,
-};
+use hecs::Entity;
 
-use crate::game::features::{
-    actions::Action,
-    attack::{
-        Attacker,
-        Team,
+use crate::{
+    Game,
+    game::features::{
+        actions::Action,
+        attack::{
+            Attacker,
+            Team,
+        },
+        position::Position,
+        projectiles::splash_projectile::SplashProjectile,
     },
-    position::Position,
-    projectiles::splash_projectile::SplashProjectile,
 };
 
 #[derive(Clone, Debug)]
@@ -24,19 +23,13 @@ pub struct SplashProjectileAttack {
 }
 
 impl Action for SplashProjectileAttack {
-    fn call(&self, actor: EntityId, all_storages: &mut AllStoragesViewMut) {
-        let target = all_storages.borrow::<View<Attacker>>().unwrap()[actor].target;
-        let v_position = all_storages.borrow::<View<Position>>().unwrap();
-        let v_team = all_storages.borrow::<View<Team>>().unwrap();
+    fn call(&self, actor: Entity, game: &mut Game) {
+        let attacker_position = game.world.get::<&Position>(actor).unwrap().0;
+        let attacker_team = *game.world.get::<&Team>(actor).unwrap();
+        let target = game.world.get::<&Attacker>(actor).unwrap().target;
+        let target_position = game.world.get::<&Position>(target).unwrap().0;
 
-        let attacker_position = v_position[actor].0;
-        let target_position = v_position[target].0;
-        let attacker_team = v_team[actor];
-
-        drop(v_position);
-        drop(v_team);
-
-        all_storages.add_entity((
+        game.world.spawn((
             SplashProjectile {
                 damage: self.damage,
                 damage_radius: self.damage_radius,
