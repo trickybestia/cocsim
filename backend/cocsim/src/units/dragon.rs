@@ -17,9 +17,12 @@ use crate::{
     UnitType,
     game::features::{
         actions::MeleeAttack,
-        attack::targeting::air_unit::{
-            AirUnitFindTarget,
-            CountedBuildingTargetPrioritizer,
+        attack::{
+            Team,
+            targeting::air_unit::{
+                AirUnitFindTarget,
+                CountedBuildingTargetPrioritizer,
+            },
         },
         position::Position,
     },
@@ -114,7 +117,7 @@ pub struct DragonModel {
 }
 
 impl UnitModel for DragonModel {
-    fn create_unit(&self, world: &mut World, position: Vector2<f32>) {
+    fn spawn(&self, world: &mut World, position: Vector2<f32>, team: Team) {
         let level = &DRAGON_LEVELS[*self.level];
 
         let id = create_air_unit(
@@ -128,6 +131,7 @@ impl UnitModel for DragonModel {
             }
             .into(),
             draw_dragon,
+            team,
         );
 
         world

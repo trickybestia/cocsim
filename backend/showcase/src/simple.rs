@@ -18,7 +18,7 @@ fn main() {
     let mut game = Game::new(&map, true, None);
 
     for _i in 0..10 {
-        game.spawn_unit(
+        game.spawn_attack_unit(
             &BalloonModel {
                 level: 10.try_into().unwrap(),
             }

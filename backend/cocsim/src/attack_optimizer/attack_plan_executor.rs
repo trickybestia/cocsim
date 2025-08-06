@@ -27,7 +27,7 @@ impl AttackPlanExecutor {
             let unit = self.units.pop().unwrap();
             let position = unit.cartesian_position(&game.map_size(), &game.drop_zone().0);
 
-            game.spawn_unit(&unit.unit_model, position);
+            game.spawn_attack_unit(&unit.unit_model, position);
         }
     }
 }

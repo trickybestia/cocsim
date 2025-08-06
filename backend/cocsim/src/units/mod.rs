@@ -14,11 +14,14 @@ use serde::{
     Serialize,
 };
 
-use crate::consts::MAX_UNITS_COUNT;
+use crate::{
+    consts::MAX_UNITS_COUNT,
+    game::features::attack::Team,
+};
 
 #[enum_dispatch]
 pub trait UnitModel {
-    fn create_unit(&self, world: &mut World, position: Vector2<f32>);
+    fn spawn(&self, world: &mut World, position: Vector2<f32>, team: Team);
 }
 
 #[derive(Serialize)]

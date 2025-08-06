@@ -17,9 +17,12 @@ use crate::{
     UnitType,
     game::features::{
         actions::SplashDamage,
-        attack::targeting::air_unit::{
-            ActiveBuildingTargetPrioritizer,
-            AirUnitFindTarget,
+        attack::{
+            Team,
+            targeting::air_unit::{
+                ActiveBuildingTargetPrioritizer,
+                AirUnitFindTarget,
+            },
         },
         position::Position,
         to_be_deleted::OnDelete,
@@ -124,7 +127,7 @@ pub struct BalloonModel {
 }
 
 impl UnitModel for BalloonModel {
-    fn create_unit(&self, world: &mut World, position: Vector2<f32>) {
+    fn spawn(&self, world: &mut World, position: Vector2<f32>, team: Team) {
         let level = &BALLOON_LEVELS[*self.level];
 
         let id = create_air_unit(
@@ -141,6 +144,7 @@ impl UnitModel for BalloonModel {
             }
             .into(),
             draw_balloon,
+            team,
         );
 
         world

@@ -32,6 +32,7 @@ pub fn create_air_unit(
     attack_cooldown: f32,
     attack: ActionEnum,
     draw: fn(Entity, &Game, &mut Vec<Shape>),
+    team: Team,
 ) -> Entity {
     world.spawn((
         Position(position),
@@ -40,7 +41,7 @@ pub fn create_air_unit(
             waypoints: Vec::new(),
         },
         Health(health),
-        Team::Attack,
+        team,
         Attacker {
             attack_cooldown,
             remaining_attack_cooldown: attack_cooldown,

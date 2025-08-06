@@ -185,8 +185,8 @@ impl Game {
         result
     }
 
-    pub fn spawn_unit(&mut self, model: &UnitModelEnum, position: Vector2<f32>) {
-        model.create_unit(&mut self.world, position);
+    pub fn spawn_attack_unit(&mut self, model: &UnitModelEnum, position: Vector2<f32>) {
+        model.spawn(&mut self.world, position, Team::Attack);
     }
 
     pub fn tick(&mut self, delta_time: f32) {
