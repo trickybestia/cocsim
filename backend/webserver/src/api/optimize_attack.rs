@@ -124,7 +124,7 @@ async fn optimize_attack_internal(mut socket: WebSocket) -> anyhow::Result<()> {
         plan_executor.tick(&mut game);
         renderer.draw(&mut game);
 
-        while !game.done() {
+        while !game.done() && (!plan_executor.is_empty() || game.is_attacker_team_present()) {
             plan_executor.tick(&mut game); // no problem calling it twice on first loop iteration
             game.tick(1.0 / FPS as f32);
             renderer.draw(&mut game);

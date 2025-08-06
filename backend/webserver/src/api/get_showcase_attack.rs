@@ -41,7 +41,7 @@ fn get_showcase_attack_internal() -> Json<Value> {
 
     renderer.draw(&mut game);
 
-    while !game.done() {
+    while !game.done() && game.is_attacker_team_present() {
         game.tick(1.0 / FPS as f32);
         renderer.draw(&mut game);
     }
