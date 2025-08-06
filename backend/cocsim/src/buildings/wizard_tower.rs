@@ -129,7 +129,7 @@ impl BuildingModel for WizardTowerModel {
         Vector2::new(*self.x, *self.y)
     }
 
-    fn create_building(&self, world: &mut World) {
+    fn spawn(&self, world: &mut World) {
         let projectile_speed = if *self.level >= 4 { 9.0 } else { 5.0 };
         let level = &WIZARD_TOWER_LEVELS[*self.level];
 

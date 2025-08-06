@@ -118,7 +118,7 @@ impl BuildingModel for XBowModel {
         Vector2::new(*self.x, *self.y)
     }
 
-    fn create_building(&self, world: &mut World) {
+    fn spawn(&self, world: &mut World) {
         let max_attack_range = match self.target {
             XBowTargetType::Ground => 14.0,
             XBowTargetType::AirAndGround => 11.5,

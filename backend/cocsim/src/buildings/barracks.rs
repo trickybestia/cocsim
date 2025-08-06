@@ -1,10 +1,10 @@
 use arbitrary::Arbitrary;
+use hecs::World;
 use nalgebra::Vector2;
 use serde::{
     Deserialize,
     Serialize,
 };
-use hecs::World;
 
 use crate::{
     BuildingModel,
@@ -66,7 +66,7 @@ impl BuildingModel for BarracksModel {
         Vector2::new(*self.x, *self.y)
     }
 
-    fn create_building(&self, world: &mut World) {
+    fn spawn(&self, world: &mut World) {
         create_passive_building(
             world,
             BARRACKS_LEVELS[*self.level].health,

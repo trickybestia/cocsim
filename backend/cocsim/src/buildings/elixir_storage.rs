@@ -66,7 +66,7 @@ impl BuildingModel for ElixirStorageModel {
         Vector2::new(*self.x, *self.y)
     }
 
-    fn create_building(&self, world: &mut World) {
+    fn spawn(&self, world: &mut World) {
         create_passive_building(
             world,
             ELIXIR_STORAGE_LEVELS[*self.level].health,

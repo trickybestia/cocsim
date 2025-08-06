@@ -119,7 +119,7 @@ impl BuildingModel for AirSweeperModel {
         Vector2::new(*self.x, *self.y)
     }
 
-    fn create_building(&self, world: &mut World) {
+    fn spawn(&self, world: &mut World) {
         let level = &AIR_SWEEPER_LEVELS[*self.level];
         let rotation = match self.rotation {
             AirSweeperRotation::Right => 0.0,

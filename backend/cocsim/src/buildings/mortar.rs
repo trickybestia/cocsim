@@ -130,7 +130,7 @@ impl BuildingModel for MortarModel {
         Vector2::new(*self.x, *self.y)
     }
 
-    fn create_building(&self, world: &mut World) {
+    fn spawn(&self, world: &mut World) {
         let level = &MORTAR_LEVELS[*self.level];
 
         let id = create_active_building(

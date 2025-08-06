@@ -60,7 +60,7 @@ impl BuildingModel for DarkElixirStorageModel {
         Vector2::new(*self.x, *self.y)
     }
 
-    fn create_building(&self, world: &mut World) {
+    fn spawn(&self, world: &mut World) {
         create_passive_building(
             world,
             DARK_ELIXIR_STORAGE_LEVELS[*self.level].health,

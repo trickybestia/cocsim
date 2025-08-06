@@ -152,7 +152,7 @@ impl Game {
         let rng = rng.unwrap_or(Pcg64Mcg::new(rand::random()));
 
         for building in &map.buildings {
-            building.create_building(&mut world);
+            building.spawn(&mut world);
         }
 
         let initial_counted_buildings_count = Self::counted_buildings_count(&mut cache, &mut world);

@@ -75,7 +75,7 @@ pub trait BuildingModel {
 
     fn position(&self) -> Vector2<usize>;
 
-    fn create_building(&self, world: &mut World);
+    fn spawn(&self, world: &mut World);
 }
 
 #[enum_dispatch(BuildingModel)]

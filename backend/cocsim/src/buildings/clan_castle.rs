@@ -61,7 +61,7 @@ impl BuildingModel for ClanCastleModel {
         Vector2::new(*self.x, *self.y)
     }
 
-    fn create_building(&self, world: &mut World) {
+    fn spawn(&self, world: &mut World) {
         create_passive_building(
             world,
             CLAN_CASTLE_LEVELS[*self.level].health,
