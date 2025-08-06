@@ -2,7 +2,5 @@
     "rust-analyzer.rustfmt.extraArgs": [
         "+nightly"
     ],
-    "rust-analyzer.cargo.features": [
-        "rayon"
-    ],
+    "rust-analyzer.cargo.features": "all"
 }
