@@ -26,7 +26,7 @@ fuzz_target!(|inputs: FuzzInputs| {
         let mut game = Game::new(&inputs.map, false, None);
         let mut plan_executor = AttackPlanExecutor::new(&inputs.plan.units);
 
-        while !game.done() {
+        while !game.done() && (game.is_attacker_team_present() || !plan_executor.is_empty()) {
             plan_executor.tick(&mut game);
             game.tick(1.0 / 60.0 as f32);
         }
