@@ -101,6 +101,7 @@ const BALLOON: UnitType = UnitType {
     name: "Balloon",
     housing_space: 5,
     levels: BALLOON_LEVELS.len(),
+    clan_castle_deployment_priority: 1,
 };
 
 inventory::submit! {BALLOON}
@@ -127,6 +128,14 @@ pub struct BalloonModel {
 }
 
 impl UnitModel for BalloonModel {
+    fn r#type(&self) -> &'static UnitType {
+        &BALLOON
+    }
+
+    fn level(&self) -> usize {
+        *self.level
+    }
+
     fn spawn(&self, world: &mut World, position: Vector2<f32>, team: Team) {
         let level = &BALLOON_LEVELS[*self.level];
 

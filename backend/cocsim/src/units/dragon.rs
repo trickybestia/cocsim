@@ -92,6 +92,7 @@ const DRAGON: UnitType = UnitType {
     name: "Dragon",
     housing_space: 20,
     levels: DRAGON_LEVELS.len(),
+    clan_castle_deployment_priority: 0,
 };
 
 inventory::submit! {DRAGON}
@@ -117,6 +118,14 @@ pub struct DragonModel {
 }
 
 impl UnitModel for DragonModel {
+    fn r#type(&self) -> &'static UnitType {
+        &DRAGON
+    }
+
+    fn level(&self) -> usize {
+        *self.level
+    }
+
     fn spawn(&self, world: &mut World, position: Vector2<f32>, team: Team) {
         let level = &DRAGON_LEVELS[*self.level];
 
