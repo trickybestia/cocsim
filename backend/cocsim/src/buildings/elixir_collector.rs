@@ -1,16 +1,16 @@
 use arbitrary::Arbitrary;
+use hecs::World;
 use nalgebra::Vector2;
 use serde::{
     Deserialize,
     Serialize,
 };
-use hecs::World;
 
 use crate::{
     BuildingModel,
     BuildingType,
     UsizeWithMax,
-    buildings::utils::other_building::spawn_other_building,
+    buildings::utils::resource_building::spawn_resource_building,
     consts::MAX_BUILDING_POS,
 };
 
@@ -65,7 +65,7 @@ impl BuildingModel for ElixirCollectorModel {
     }
 
     fn spawn(&self, world: &mut World) {
-        spawn_other_building(
+        spawn_resource_building(
             world,
             ELIXIR_COLLECTOR_LEVELS[*self.level].health,
             Vector2::new(*self.x, *self.y),

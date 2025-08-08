@@ -38,7 +38,7 @@ pub struct CountedBuildingTargetPrioritizer;
 
 impl TargetPrioritizer for CountedBuildingTargetPrioritizer {
     fn can_attack(&self, flags: AttackTargetFlags) -> bool {
-        flags.contains(AttackTargetFlags::COUNTED_BUILDING)
+        flags.is_counted_building()
     }
 
     fn is_better(
@@ -57,7 +57,7 @@ pub struct DefensiveBuildingTargetPrioritizer;
 
 impl TargetPrioritizer for DefensiveBuildingTargetPrioritizer {
     fn can_attack(&self, flags: AttackTargetFlags) -> bool {
-        flags.contains(AttackTargetFlags::COUNTED_BUILDING)
+        flags.is_counted_building()
     }
 
     fn is_better(

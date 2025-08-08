@@ -10,12 +10,9 @@ use crate::{
         default_pathfinding_collider,
     },
     game::features::{
-        actions::ActionEnum,
         attack::{
             AttackTarget,
             AttackTargetFlags,
-            Attacker,
-            RetargetConditionEnum,
             Team,
         },
         buildings::{
@@ -26,14 +23,11 @@ use crate::{
     },
 };
 
-pub fn spawn_defensive_building(
+pub fn spawn_resource_building(
     world: &mut World,
     health: f32,
     position: Vector2<usize>,
     size: Vector2<usize>,
-    attack_cooldown: f32,
-    retarget_condition: RetargetConditionEnum,
-    attack: ActionEnum,
 ) -> Entity {
     world.spawn((
         Health(health),
@@ -41,17 +35,9 @@ pub fn spawn_defensive_building(
         CountedBuilding,
         default_pathfinding_collider(size),
         Team::Defense,
-        Attacker {
-            attack_cooldown,
-            remaining_attack_cooldown: attack_cooldown,
-            target: Entity::DANGLING,
-            retarget_condition,
-            retarget: true,
-            attack,
-        },
         AttackTarget {
             collider: default_attack_collider(size),
-            flags: AttackTargetFlags::GROUND | AttackTargetFlags::DEFENSIVE_BUILDING,
+            flags: AttackTargetFlags::GROUND | AttackTargetFlags::RESOURCE_BUILDING,
         },
     ))
 }

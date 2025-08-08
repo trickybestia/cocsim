@@ -10,7 +10,7 @@ use crate::{
     BuildingModel,
     BuildingType,
     UsizeWithMax,
-    buildings::utils::other_building::spawn_other_building,
+    buildings::utils::resource_building::spawn_resource_building,
     consts::MAX_BUILDING_POS,
 };
 
@@ -67,7 +67,7 @@ impl BuildingModel for GoldStorageModel {
     }
 
     fn spawn(&self, world: &mut World) {
-        spawn_other_building(
+        spawn_resource_building(
             world,
             GOLD_STORAGE_LEVELS[*self.level].health,
             Vector2::new(*self.x, *self.y),

@@ -66,7 +66,7 @@ pub fn update(game: &mut Game) {
             cache.target_query.query(&game.world).iter()
         {
             if attack_target_team == projectile_team
-                || !attack_target.flags.contains(AttackTargetFlags::UNIT)
+                || !attack_target.flags.is_unit()
                 || !attack_target.flags.contains(AttackTargetFlags::AIR)
             {
                 continue;

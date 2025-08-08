@@ -74,9 +74,7 @@ pub fn spawn_other_building(
         Team::Defense,
         AttackTarget {
             collider: default_attack_collider(size),
-            flags: AttackTargetFlags::GROUND
-                | AttackTargetFlags::BUILDING
-                | AttackTargetFlags::COUNTED_BUILDING,
+            flags: AttackTargetFlags::GROUND | AttackTargetFlags::OTHER_BUILDING,
         },
     ))
 }

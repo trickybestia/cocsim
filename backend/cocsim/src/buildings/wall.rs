@@ -89,7 +89,7 @@ impl BuildingModel for WallModel {
             Team::Defense,
             AttackTarget {
                 collider: default_attack_collider(WALL.size),
-                flags: AttackTargetFlags::GROUND | AttackTargetFlags::BUILDING,
+                flags: AttackTargetFlags::GROUND | AttackTargetFlags::WALL_BUILDING,
             },
         ));
     }

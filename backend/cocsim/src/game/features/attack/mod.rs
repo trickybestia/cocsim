@@ -102,24 +102,41 @@ pub struct Attacker {
     pub attack: ActionEnum,
 }
 
-pub struct AttackTarget {
-    pub collider: ColliderEnum,
-    pub flags: AttackTargetFlags,
-}
-
 bitflags! {
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub struct AttackTargetFlags: u8 {
-        const BUILDING = 1;
-        const UNIT = 1 << 1;
+        const AIR = 1;
+        const GROUND = 1 << 1;
 
-        const AIR = 1 << 2;
-        const GROUND = 1 << 3;
+        const UNIT = 1 << 2;
 
-        const COUNTED_BUILDING = 1 << 4;
-
-        const DEFENSIVE_BUILDING = 1 << 5;
+        const DEFENSIVE_BUILDING = 1 << 3;
+        const RESOURCE_BUILDING = 1 << 4;
+        const WALL_BUILDING = 1 << 5;
+        const OTHER_BUILDING = 1 << 6;
     }
+}
+
+impl AttackTargetFlags {
+    pub fn is_unit(&self) -> bool {
+        self.contains(Self::UNIT)
+    }
+
+    pub fn is_building(&self) -> bool {
+        self.contains(Self::DEFENSIVE_BUILDING)
+            || self.contains(Self::RESOURCE_BUILDING)
+            || self.contains(Self::WALL_BUILDING)
+            || self.contains(Self::OTHER_BUILDING)
+    }
+
+    pub fn is_counted_building(&self) -> bool {
+        !self.contains(Self::WALL_BUILDING) && self.is_building()
+    }
+}
+
+pub struct AttackTarget {
+    pub collider: ColliderEnum,
+    pub flags: AttackTargetFlags,
 }
 
 #[derive(PartialEq, Eq, Clone, Copy, Debug)]
