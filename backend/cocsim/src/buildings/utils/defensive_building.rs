@@ -5,7 +5,7 @@ use hecs::{
 use nalgebra::Vector2;
 
 use crate::{
-    buildings::utils::passive_building::{
+    buildings::utils::other_building::{
         default_attack_collider,
         default_pathfinding_collider,
     },
@@ -26,7 +26,7 @@ use crate::{
     },
 };
 
-pub fn create_active_building(
+pub fn spawn_defensive_building(
     world: &mut World,
     health: f32,
     position: Vector2<usize>,
@@ -54,7 +54,7 @@ pub fn create_active_building(
             flags: AttackTargetFlags::GROUND
                 | AttackTargetFlags::BUILDING
                 | AttackTargetFlags::COUNTED_BUILDING
-                | AttackTargetFlags::ACTIVE_BUILDING,
+                | AttackTargetFlags::DEFENSIVE_BUILDING,
         },
     ))
 }

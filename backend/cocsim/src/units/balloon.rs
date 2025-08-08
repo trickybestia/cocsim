@@ -20,8 +20,8 @@ use crate::{
         attack::{
             Team,
             targeting::air_unit::{
-                ActiveBuildingTargetPrioritizer,
                 AirUnitFindTarget,
+                DefensiveBuildingTargetPrioritizer,
             },
         },
         position::Position,
@@ -161,7 +161,7 @@ impl UnitModel for BalloonModel {
                 id,
                 (
                     AirUnitFindTarget {
-                        prioritizer: ActiveBuildingTargetPrioritizer.into(),
+                        prioritizer: DefensiveBuildingTargetPrioritizer.into(),
                         attack_range: BALLOON_ATTACK_RANGE,
                     },
                     OnDelete(

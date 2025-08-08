@@ -1,16 +1,16 @@
 use arbitrary::Arbitrary;
+use hecs::World;
 use nalgebra::Vector2;
 use serde::{
     Deserialize,
     Serialize,
 };
-use hecs::World;
 
 use crate::{
     BuildingModel,
     BuildingType,
     UsizeWithMax,
-    buildings::utils::passive_building::create_passive_building,
+    buildings::utils::other_building::spawn_other_building,
     consts::MAX_BUILDING_POS,
 };
 
@@ -67,7 +67,7 @@ impl BuildingModel for GoldStorageModel {
     }
 
     fn spawn(&self, world: &mut World) {
-        create_passive_building(
+        spawn_other_building(
             world,
             GOLD_STORAGE_LEVELS[*self.level].health,
             Vector2::new(*self.x, *self.y),

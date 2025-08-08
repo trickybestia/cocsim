@@ -60,7 +60,7 @@ pub fn default_attack_collider(size: Vector2<usize>) -> ColliderEnum {
     }
 }
 
-pub fn create_passive_building(
+pub fn spawn_other_building(
     world: &mut World,
     health: f32,
     position: Vector2<usize>,

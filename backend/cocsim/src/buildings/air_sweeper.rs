@@ -11,7 +11,7 @@ use crate::{
     BuildingOption,
     BuildingType,
     UsizeWithMax,
-    buildings::utils::active_building::create_active_building,
+    buildings::utils::defensive_building::spawn_defensive_building,
     consts::MAX_BUILDING_POS,
     game::features::{
         actions::AirSweeperAttack,
@@ -133,7 +133,7 @@ impl BuildingModel for AirSweeperModel {
         };
         let rotation_angle = Some((rotation - 60.0, 120.0));
 
-        let id = create_active_building(
+        let id = spawn_defensive_building(
             world,
             level.health,
             self.position(),

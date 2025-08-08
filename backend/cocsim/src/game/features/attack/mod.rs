@@ -118,7 +118,7 @@ bitflags! {
 
         const COUNTED_BUILDING = 1 << 4;
 
-        const ACTIVE_BUILDING = 1 << 5;
+        const DEFENSIVE_BUILDING = 1 << 5;
     }
 }
 

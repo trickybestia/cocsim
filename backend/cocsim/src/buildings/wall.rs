@@ -10,7 +10,7 @@ use crate::{
     BuildingModel,
     BuildingType,
     UsizeWithMax,
-    buildings::utils::passive_building::{
+    buildings::utils::other_building::{
         default_attack_collider,
         default_pathfinding_collider,
     },

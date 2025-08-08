@@ -10,7 +10,7 @@ use crate::{
     BuildingModel,
     BuildingType,
     UsizeWithMax,
-    buildings::utils::active_building::create_active_building,
+    buildings::utils::defensive_building::spawn_defensive_building,
     consts::MAX_BUILDING_POS,
     game::features::{
         actions::{
@@ -133,7 +133,7 @@ impl BuildingModel for BombTowerModel {
     fn spawn(&self, world: &mut World) {
         let level = &BOMB_TOWER_LEVELS[*self.level];
 
-        let id = create_active_building(
+        let id = spawn_defensive_building(
             world,
             level.health,
             Vector2::new(*self.x, *self.y),

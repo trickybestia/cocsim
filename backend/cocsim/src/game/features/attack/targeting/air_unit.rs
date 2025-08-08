@@ -53,9 +53,9 @@ impl TargetPrioritizer for CountedBuildingTargetPrioritizer {
 }
 
 #[derive(Clone, Debug)]
-pub struct ActiveBuildingTargetPrioritizer;
+pub struct DefensiveBuildingTargetPrioritizer;
 
-impl TargetPrioritizer for ActiveBuildingTargetPrioritizer {
+impl TargetPrioritizer for DefensiveBuildingTargetPrioritizer {
     fn can_attack(&self, flags: AttackTargetFlags) -> bool {
         flags.contains(AttackTargetFlags::COUNTED_BUILDING)
     }
@@ -67,11 +67,11 @@ impl TargetPrioritizer for ActiveBuildingTargetPrioritizer {
         other_flags: AttackTargetFlags,
         other_distance: f32,
     ) -> bool {
-        if current_flags.contains(AttackTargetFlags::ACTIVE_BUILDING) {
-            other_flags.contains(AttackTargetFlags::ACTIVE_BUILDING)
+        if current_flags.contains(AttackTargetFlags::DEFENSIVE_BUILDING) {
+            other_flags.contains(AttackTargetFlags::DEFENSIVE_BUILDING)
                 && other_distance < current_distance
         } else {
-            other_flags.contains(AttackTargetFlags::ACTIVE_BUILDING)
+            other_flags.contains(AttackTargetFlags::DEFENSIVE_BUILDING)
                 || other_distance < current_distance
         }
     }
@@ -80,7 +80,7 @@ impl TargetPrioritizer for ActiveBuildingTargetPrioritizer {
 #[enum_dispatch(TargetPrioritizer)]
 #[derive(Clone, Debug)]
 pub enum TargetPrioritizerEnum {
-    ActiveBuildingTargetPrioritizer,
+    DefensiveBuildingTargetPrioritizer,
     CountedBuildingTargetPrioritizer,
 }
 

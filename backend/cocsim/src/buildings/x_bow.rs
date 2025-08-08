@@ -11,7 +11,7 @@ use crate::{
     BuildingOption,
     BuildingType,
     UsizeWithMax,
-    buildings::utils::active_building::create_active_building,
+    buildings::utils::defensive_building::spawn_defensive_building,
     consts::MAX_BUILDING_POS,
     game::features::{
         actions::TargetProjectileAttack,
@@ -130,7 +130,7 @@ impl BuildingModel for XBowModel {
         };
         let level = &X_BOW_LEVELS[*self.level];
 
-        let id = create_active_building(
+        let id = spawn_defensive_building(
             world,
             level.health,
             Vector2::new(*self.x, *self.y),

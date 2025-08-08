@@ -10,7 +10,7 @@ use crate::{
     BuildingModel,
     BuildingType,
     UsizeWithMax,
-    buildings::utils::passive_building::create_passive_building,
+    buildings::utils::other_building::spawn_other_building,
     consts::MAX_BUILDING_POS,
 };
 
@@ -62,7 +62,7 @@ impl BuildingModel for ArmyCampModel {
     }
 
     fn spawn(&self, world: &mut World) {
-        create_passive_building(
+        spawn_other_building(
             world,
             ARMY_CAMP_LEVELS[*self.level].health,
             Vector2::new(*self.x, *self.y),

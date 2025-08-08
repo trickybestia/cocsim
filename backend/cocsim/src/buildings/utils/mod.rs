@@ -1,2 +1,2 @@
-pub mod active_building;
-pub mod passive_building;
+pub mod defensive_building;
+pub mod other_building;

@@ -10,7 +10,7 @@ use crate::{
     BuildingModel,
     BuildingType,
     UsizeWithMax,
-    buildings::utils::passive_building::create_passive_building,
+    buildings::utils::other_building::spawn_other_building,
     consts::MAX_BUILDING_POS,
 };
 
@@ -66,7 +66,7 @@ impl BuildingModel for TownHallModel {
     }
 
     fn spawn(&self, world: &mut World) {
-        let id = create_passive_building(
+        let id = spawn_other_building(
             world,
             TOWN_HALL_LEVELS[*self.level].health,
             Vector2::new(*self.x, *self.y),
