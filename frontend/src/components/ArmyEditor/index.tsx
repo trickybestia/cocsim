@@ -1,5 +1,6 @@
 import { create } from "mutative";
 import { useState } from "react";
+import { twMerge } from "tailwind-merge";
 
 import useUnitTypes from "../../hooks/use-unit-types";
 import type { UnitType, UnitWithCount } from "../../types";
@@ -7,12 +8,13 @@ import UnitCreationModal from "./UnitCreationModal";
 import UnitView from "./UnitView";
 
 type Props = {
-  onOk: (units: UnitWithCount[]) => void;
+  className?: string;
+  units: UnitWithCount[];
+  setUnits: (units: UnitWithCount[]) => void;
 };
 
-const ArmyEditor: React.FC<Props> = ({ onOk }: Props) => {
+const ArmyEditor: React.FC<Props> = ({ className, units, setUnits }: Props) => {
   const { getUnitType } = useUnitTypes();
-  const [units, setUnits] = useState<UnitWithCount[]>([]);
 
   const [isUnitCreationModalOpen, setIsUnitCreationModalOpen] = useState(false);
 
@@ -44,10 +46,6 @@ const ArmyEditor: React.FC<Props> = ({ onOk }: Props) => {
     />
   ));
 
-  const onOkButtonClick = () => {
-    onOk(units);
-  };
-
   const onAddUnitButtonClick = () => {
     setIsUnitCreationModalOpen(true);
   };
@@ -70,7 +68,7 @@ const ArmyEditor: React.FC<Props> = ({ onOk }: Props) => {
   };
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className={twMerge("flex flex-col gap-2", className)}>
       <div className="flex flex-wrap gap-2">
         {unitViews}
         <button
@@ -82,12 +80,6 @@ const ArmyEditor: React.FC<Props> = ({ onOk }: Props) => {
         </button>
       </div>
       <p>Occupied space: {occupiedSpace}</p>
-      <button
-        onClick={onOkButtonClick}
-        className="w-min cursor-pointer bg-blue-400 px-2 py-1 text-sm font-bold text-white hover:bg-blue-600"
-      >
-        OK
-      </button>
 
       <UnitCreationModal
         isOpen={isUnitCreationModalOpen}

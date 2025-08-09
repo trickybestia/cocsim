@@ -5,6 +5,7 @@ pub mod utils;
 use std::{
     cmp::Ordering,
     fmt::Display,
+    iter::repeat,
     ops::Deref,
 };
 
@@ -78,12 +79,23 @@ impl UnitModelEnum {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-#[serde(try_from = "Vec<UnitModelEnum>", into = "Box<[UnitModelEnum]>")]
-pub struct Units<const MAX_HOUSING_SPACE: usize>(Box<[UnitModelEnum]>);
+pub struct UnitWithCount {
+    pub unit: UnitModelEnum,
+    pub count: usize,
+}
 
-impl<const MAX_HOUSING_SPACE: usize> Units<MAX_HOUSING_SPACE> {
-    pub fn new(units: &[UnitModelEnum]) -> Result<Self, HousingSpaceError> {
-        let housing_space = units.iter().map(|unit| unit.r#type().housing_space).sum();
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(try_from = "Vec<UnitWithCount>", into = "Box<[UnitWithCount]>")]
+pub struct UnitsWithCount<const MAX_HOUSING_SPACE: usize>(Box<[UnitWithCount]>);
+
+impl<const MAX_HOUSING_SPACE: usize> UnitsWithCount<MAX_HOUSING_SPACE> {
+    pub fn new(units: &[UnitWithCount]) -> Result<Self, HousingSpaceError> {
+        let housing_space = units
+            .iter()
+            .map(|unit_with_count| {
+                unit_with_count.unit.r#type().housing_space * unit_with_count.count
+            })
+            .sum();
 
         if housing_space <= MAX_HOUSING_SPACE {
             Ok(Self(units.into()))
@@ -94,49 +106,62 @@ impl<const MAX_HOUSING_SPACE: usize> Units<MAX_HOUSING_SPACE> {
             })
         }
     }
+
+    pub fn flatten(&self) -> impl Iterator<Item = UnitModelEnum> {
+        self.0
+            .iter()
+            .map(|unit_with_count| repeat(unit_with_count.unit.clone()).take(unit_with_count.count))
+            .flatten()
+    }
 }
 
-impl<const MAX_HOUSING_SPACE: usize> Deref for Units<MAX_HOUSING_SPACE> {
-    type Target = [UnitModelEnum];
+impl<const MAX_HOUSING_SPACE: usize> Deref for UnitsWithCount<MAX_HOUSING_SPACE> {
+    type Target = [UnitWithCount];
 
     fn deref(&self) -> &Self::Target {
         &self.0
     }
 }
 
-impl<const MAX_HOUSING_SPACE: usize> Into<Box<[UnitModelEnum]>> for Units<MAX_HOUSING_SPACE> {
-    fn into(self) -> Box<[UnitModelEnum]> {
+impl<const MAX_HOUSING_SPACE: usize> Into<Box<[UnitWithCount]>>
+    for UnitsWithCount<MAX_HOUSING_SPACE>
+{
+    fn into(self) -> Box<[UnitWithCount]> {
         self.0
     }
 }
 
-impl<const MAX_HOUSING_SPACE: usize> TryFrom<&[UnitModelEnum]> for Units<MAX_HOUSING_SPACE> {
+impl<const MAX_HOUSING_SPACE: usize> TryFrom<&[UnitWithCount]>
+    for UnitsWithCount<MAX_HOUSING_SPACE>
+{
     type Error = HousingSpaceError;
 
-    fn try_from(value: &[UnitModelEnum]) -> Result<Self, Self::Error> {
+    fn try_from(value: &[UnitWithCount]) -> Result<Self, Self::Error> {
         Self::new(value)
     }
 }
 
-impl<const MAX_HOUSING_SPACE: usize> TryFrom<Vec<UnitModelEnum>> for Units<MAX_HOUSING_SPACE> {
+impl<const MAX_HOUSING_SPACE: usize> TryFrom<Vec<UnitWithCount>>
+    for UnitsWithCount<MAX_HOUSING_SPACE>
+{
     type Error = HousingSpaceError;
 
-    fn try_from(value: Vec<UnitModelEnum>) -> Result<Self, Self::Error> {
+    fn try_from(value: Vec<UnitWithCount>) -> Result<Self, Self::Error> {
         Self::new(&value)
     }
 }
 
-impl<'a, const MAX_HOUSING_SPACE: usize> Arbitrary<'a> for Units<MAX_HOUSING_SPACE> {
+impl<'a, const MAX_HOUSING_SPACE: usize> Arbitrary<'a> for UnitsWithCount<MAX_HOUSING_SPACE> {
     fn arbitrary(u: &mut arbitrary::Unstructured<'a>) -> arbitrary::Result<Self> {
         let mut result = Vec::new();
         let mut housing_space = 0;
 
         loop {
-            let new_unit = UnitModelEnum::arbitrary(u)?;
+            let unit = UnitModelEnum::arbitrary(u)?;
 
-            if housing_space + new_unit.r#type().housing_space <= MAX_HOUSING_SPACE {
-                housing_space += new_unit.r#type().housing_space;
-                result.push(new_unit);
+            if housing_space + unit.r#type().housing_space <= MAX_HOUSING_SPACE {
+                housing_space += unit.r#type().housing_space;
+                result.push(UnitWithCount { unit, count: 1 });
             } else {
                 return Ok(Self(result.into_boxed_slice()));
             }

@@ -16,7 +16,7 @@ use cocsim::{
     Game,
     GeneticAttackOptimizer,
     Map,
-    Units,
+    UnitsWithCount,
     consts::MAX_ARMY_HOUSING_SPACE,
 };
 use log::warn;
@@ -47,7 +47,8 @@ async fn optimize_attack_internal(mut socket: WebSocket) -> anyhow::Result<()> {
     map.validate()?;
 
     let units_message = socket.recv().await.context("Expected message")??;
-    let units = serde_json::from_str::<Units<MAX_ARMY_HOUSING_SPACE>>(units_message.to_text()?)?;
+    let units =
+        serde_json::from_str::<UnitsWithCount<MAX_ARMY_HOUSING_SPACE>>(units_message.to_text()?)?;
 
     socket
         .send(Message::text(
@@ -61,7 +62,7 @@ async fn optimize_attack_internal(mut socket: WebSocket) -> anyhow::Result<()> {
 
     let mut optimizer: Box<dyn AttackOptimizer> = Box::new(GeneticAttackOptimizer::new(
         map.clone(),
-        (*units).into(),
+        units.flatten().collect(),
         0.02,
         0.05,
     ));
@@ -70,7 +71,7 @@ async fn optimize_attack_internal(mut socket: WebSocket) -> anyhow::Result<()> {
         if i == OPTIMIZE_ATTACK_ITERATIONS / 2 {
             optimizer = Box::new(DerivativeAttackOptimizer::new(
                 map.clone(),
-                (*units).into(),
+                units.flatten().collect(),
                 optimizer.best().cloned(),
             ));
         }

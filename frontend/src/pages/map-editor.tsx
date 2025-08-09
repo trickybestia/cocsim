@@ -5,6 +5,8 @@ import Header from "../components/Header";
 import MapEditor from "../components/MapEditor";
 import { BuildingTypesContext } from "../hooks/use-building-types";
 import useBuildingTypesSWR from "../hooks/use-building-types-swr";
+import { UnitTypesContext } from "../hooks/use-unit-types";
+import useUnitTypesSWR from "../hooks/use-unit-types-swr";
 import type { Map } from "../types";
 import { exportToZip, importFromZip } from "../utils/map-editor";
 import readFiles from "../utils/read-files";
@@ -15,6 +17,7 @@ const MapEditorPage: React.FC = () => {
     | undefined
   >(undefined);
   const buildingTypes = useBuildingTypesSWR();
+  const unitTypes = useUnitTypesSWR();
 
   const onCreateNewButtonClick = () => {
     readFiles(
@@ -93,23 +96,26 @@ const MapEditorPage: React.FC = () => {
             </div>
           </div>
         ) : (
-          buildingTypes !== undefined && (
+          buildingTypes !== undefined &&
+          unitTypes !== undefined && (
             <div className="flex h-full flex-col items-center">
               <div className="w-full grow lg:max-w-[var(--breakpoint-lg)]">
                 <BuildingTypesContext value={buildingTypes}>
-                  <MapEditor
-                    image={loadedData.image}
-                    imageBlob={loadedData.imageBlob}
-                    map={loadedData.map}
-                    onExport={(map, imageUrl) =>
-                      exportToZip(map, imageUrl).then((zip) => {
-                        saveAs(
-                          zip,
-                          `cocsim-map-${new Date().toISOString()}.zip`
-                        );
-                      })
-                    }
-                  />
+                  <UnitTypesContext value={unitTypes}>
+                    <MapEditor
+                      image={loadedData.image}
+                      imageBlob={loadedData.imageBlob}
+                      map={loadedData.map}
+                      onExport={(map, imageUrl) =>
+                        exportToZip(map, imageUrl).then((zip) => {
+                          saveAs(
+                            zip,
+                            `cocsim-map-${new Date().toISOString()}.zip`
+                          );
+                        })
+                      }
+                    />
+                  </UnitTypesContext>
                 </BuildingTypesContext>
               </div>
             </div>

@@ -4,10 +4,7 @@ type Map = {
   buildings: Building[];
 };
 
-/**
- * Building instance type.
- */
-type Building = {
+type GenericBuilding = {
   name: string;
   x: number;
   y: number;
@@ -15,6 +12,16 @@ type Building = {
 
   [option: string]: string | number;
 };
+
+type ClanCastleBuilding = GenericBuilding & {
+  name: "ClanCastle";
+  units: UnitWithCount[];
+};
+
+/**
+ * Building instance type.
+ */
+type Building = GenericBuilding | ClanCastleBuilding;
 
 /**
  * Building type type. Returned by getBuildingTypes() api to get all possible buildings.
@@ -101,6 +108,8 @@ type OptimizeAttackMessage =
 export type {
   Map,
   BuildingType,
+  GenericBuilding,
+  ClanCastleBuilding,
   Building,
   Shape,
   Frame,

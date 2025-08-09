@@ -8,15 +8,14 @@ import GameRenderer from "../components/GameRenderer";
 import Header from "../components/Header";
 import { UnitTypesContext } from "../hooks/use-unit-types";
 import useUnitTypesSWR from "../hooks/use-unit-types-swr";
-import type { Map, OptimizeAttackMessage, Unit, UnitWithCount } from "../types";
+import type { Map, OptimizeAttackMessage, UnitWithCount } from "../types";
 import { importFromZip } from "../utils/map-editor";
 import readFiles from "../utils/read-files";
 
 const AttackOptimizerPage: React.FC = () => {
   const unitTypes = useUnitTypesSWR();
-  const [unitsWithCount, setUnitsWithCOunt] = useState<
-    UnitWithCount[] | undefined
-  >(undefined);
+  const [units, setUnits] = useState<UnitWithCount[] | undefined>(undefined);
+  const [optimizationStarted, setOptimizationStarted] = useState(false);
   const [progressMessageHistory, setMessageHistory] = useState<string[]>([]);
   const [mapData, setMapData] = useState<
     { map: Map; image: HTMLImageElement } | undefined
@@ -29,19 +28,11 @@ const AttackOptimizerPage: React.FC = () => {
         const webSocket: WebSocket = event.target as WebSocket;
 
         webSocket.send(JSON.stringify(mapData!.map));
-
-        const units: Unit[] = [];
-
-        unitsWithCount!.forEach((unit) => {
-          for (let i = 0; i != unit.count; i++) {
-            units.push(unit.unit);
-          }
-        });
-
         webSocket.send(JSON.stringify(units));
+        console.log(units);
       }
     },
-    unitsWithCount !== undefined
+    optimizationStarted
   );
 
   const gameRendererFrames =
@@ -93,12 +84,25 @@ const AttackOptimizerPage: React.FC = () => {
         ) : (
           <div className="flex h-full flex-col items-center">
             <div className="w-full grow lg:max-w-[var(--breakpoint-lg)]">
-              {unitsWithCount === undefined ? (
+              {!optimizationStarted ? (
                 unitTypes !== undefined && (
                   <div className="flex flex-col gap-2">
                     <h3 className="text-xl">Choose troops</h3>
                     <UnitTypesContext value={unitTypes}>
-                      <ArmyEditor onOk={setUnitsWithCOunt} />
+                      <ArmyEditor
+                        units={units === undefined ? [] : units}
+                        setUnits={setUnits}
+                      />
+                      <button
+                        onClick={() => {
+                          if (units !== undefined && units.length != 0) {
+                            setOptimizationStarted(true);
+                          }
+                        }}
+                        className="w-min cursor-pointer bg-blue-400 px-2 py-1 text-sm font-bold text-white hover:bg-blue-600"
+                      >
+                        OK
+                      </button>
                     </UnitTypesContext>
                   </div>
                 )
@@ -108,7 +112,7 @@ const AttackOptimizerPage: React.FC = () => {
                     <div className="flex flex-col gap-2">
                       <h4 className="text-lg">Troops:</h4>
                       <div>
-                        {unitsWithCount.map((unitWithCount, index) => (
+                        {units!.map((unit, index) => (
                           <p
                             key={index}
                             className={twJoin(
@@ -116,8 +120,8 @@ const AttackOptimizerPage: React.FC = () => {
                               "px-1 py-0.5"
                             )}
                           >
-                            {unitWithCount.count}x {unitWithCount.unit.name}{" "}
-                            lvl. {unitWithCount.unit.level + 1}
+                            {unit.count}x {unit.unit.name} lvl.{" "}
+                            {unit.unit.level + 1}
                           </p>
                         ))}
                       </div>

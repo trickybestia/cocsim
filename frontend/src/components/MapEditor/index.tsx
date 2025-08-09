@@ -312,11 +312,15 @@ const MapEditor: React.FC<Props> = ({
         }
       }
     } else {
-      const options: { [option: string]: string | number } = {};
+      const options: { [option: string]: unknown } = {};
 
       building.buildingType.options.forEach(({ name, values }) => {
         options[name] = values[0];
       });
+
+      if (building.buildingType.name === "ClanCastle") {
+        options["units"] = [];
+      }
 
       newBuildings.push({
         name: building.buildingType.name,
@@ -348,7 +352,7 @@ const MapEditor: React.FC<Props> = ({
         )}
         {...props}
       >
-        <div className="flex flex-col gap-1">
+        <div className="flex grow-[0.3] basis-0 flex-col gap-1">
           <div className="grid-col grid grid-cols-[auto_min-content] gap-1 text-end text-nowrap">
             <p>Draw grid:</p>
             <input
@@ -437,7 +441,7 @@ const MapEditor: React.FC<Props> = ({
         </div>
 
         <div
-          className="relative flex grow justify-around"
+          className="relative flex grow-[0.7] justify-around"
           ref={canvasWrapperRef}
         >
           <Stage

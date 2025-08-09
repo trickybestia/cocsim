@@ -2,7 +2,8 @@ import { create } from "mutative";
 import { Fragment } from "react";
 
 import useBuildingTypes from "../../hooks/use-building-types";
-import type { Building } from "../../types";
+import type { Building, UnitWithCount } from "../../types";
+import ArmyEditor from "../ArmyEditor";
 import IntegerNumberInput from "../IntegerNumberInput";
 
 type Props = {
@@ -53,6 +54,22 @@ const BuildingOptionsEditor: React.FC<Props> = ({
           </select>
         </Fragment>
       ))}
+      {building.name === "ClanCastle" && (
+        <>
+          <p className="col-span-2 text-start">Troops inside:</p>
+          <ArmyEditor
+            className="col-span-2"
+            units={building.units as UnitWithCount[]}
+            setUnits={(units) =>
+              onChange(
+                create(building, (draft) => {
+                  draft.units = units;
+                })
+              )
+            }
+          />
+        </>
+      )}
     </fieldset>
   );
 };

@@ -9,9 +9,13 @@ use serde::{
 use crate::{
     BuildingModel,
     BuildingType,
+    UnitsWithCount,
     UsizeWithMax,
     buildings::utils::resource_building::spawn_resource_building,
-    consts::MAX_BUILDING_POS,
+    consts::{
+        MAX_BUILDING_POS,
+        MAX_CLAN_CASTLE_HOUSING_SPACE,
+    },
 };
 
 struct ClanCastleLevel {
@@ -50,6 +54,7 @@ pub struct ClanCastleModel {
     pub x: UsizeWithMax<MAX_BUILDING_POS>,
     pub y: UsizeWithMax<MAX_BUILDING_POS>,
     pub level: UsizeWithMax<CLAN_CASTLE_LEVEL_INDEX_MAX>,
+    pub units: UnitsWithCount<MAX_CLAN_CASTLE_HOUSING_SPACE>,
 }
 
 impl BuildingModel for ClanCastleModel {
