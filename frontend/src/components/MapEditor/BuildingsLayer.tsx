@@ -1,5 +1,6 @@
 import { type ReactNode, memo } from "react";
-import { Layer, Rect } from "react-konva";
+import React from "react";
+import { Layer, Line, Rect } from "react-konva";
 
 import useBuildingTypes from "../../hooks/use-building-types";
 import type { Building } from "../../types";
@@ -24,15 +25,26 @@ const BuildingsLayer: React.FC<Props> = memo(
       const buildingType = getBuildingType(building);
 
       shapes.push(
-        <Rect
-          key={`${building.x}:${building.y}`}
-          x={building.x * pixelsPerTile}
-          y={building.y * pixelsPerTile}
-          width={buildingType.width * pixelsPerTile}
-          height={buildingType.height * pixelsPerTile}
-          stroke="yellow"
-          strokeWidth={3}
-        />
+        <React.Fragment key={`${building.x}:${building.y}`}>
+          <Rect
+            x={building.x * pixelsPerTile}
+            y={building.y * pixelsPerTile}
+            width={buildingType.width * pixelsPerTile}
+            height={buildingType.height * pixelsPerTile}
+            stroke="yellow"
+            strokeWidth={2}
+          />
+          <Line
+            points={[
+              building.x * pixelsPerTile,
+              building.y * pixelsPerTile,
+              (building.x + buildingType.width) * pixelsPerTile,
+              (building.y + buildingType.height) * pixelsPerTile
+            ]}
+            stroke="yellow"
+            strokeWidth={2}
+          />
+        </React.Fragment>
       );
     });
 
