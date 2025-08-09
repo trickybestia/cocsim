@@ -348,7 +348,7 @@ const MapEditor: React.FC<Props> = ({
         )}
         {...props}
       >
-        <div>
+        <div className="flex flex-col gap-1">
           <div className="grid-col grid grid-cols-[auto_min-content] gap-1 text-end text-nowrap">
             <p>Draw grid:</p>
             <input
@@ -419,20 +419,21 @@ const MapEditor: React.FC<Props> = ({
             >
               Export
             </button>
-            {selectedBuilding !== undefined && (
-              <BuildingOptionsEditor
-                key={`${selectedBuilding.x},${selectedBuilding.y}`} // to reset <input/> values on selected building change
-                building={selectedBuilding}
-                onChange={(value) =>
-                  setBuildings(
-                    create(buildings, (draft) => {
-                      draft[selectedBuildingIndex!] = value;
-                    })
-                  )
-                }
-              />
-            )}
           </div>
+
+          {selectedBuilding !== undefined && (
+            <BuildingOptionsEditor
+              key={`${selectedBuilding.x},${selectedBuilding.y}`} // to reset <input/> values on selected building change
+              building={selectedBuilding}
+              onChange={(value) =>
+                setBuildings(
+                  create(buildings, (draft) => {
+                    draft[selectedBuildingIndex!] = value;
+                  })
+                )
+              }
+            />
+          )}
         </div>
 
         <div

@@ -17,9 +17,8 @@ const BuildingOptionsEditor: React.FC<Props> = ({
   const buildingType = useBuildingTypes().getBuildingType(building);
 
   return (
-    <>
-      <p>Selected:</p>
-      <p>{building.name}</p>
+    <fieldset className="grid-col grid grid-cols-[auto_min-content] gap-1 border-2 pr-1 pb-1 pl-1 text-end text-nowrap">
+      <legend className="px-1">{building.name}</legend>
       <IntegerNumberInput
         text="Level:"
         min={1}
@@ -54,7 +53,7 @@ const BuildingOptionsEditor: React.FC<Props> = ({
           </select>
         </Fragment>
       ))}
-    </>
+    </fieldset>
   );
 };
 
