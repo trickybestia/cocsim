@@ -11,7 +11,6 @@ use cocsim::{
     UnitModelEnum,
     consts::RNG_INITIAL_STATE,
     utils::load_test_map,
-    validate_units,
 };
 use rand_pcg::Pcg64Mcg;
 use textplots::Plot;
@@ -26,8 +25,6 @@ fn main() {
         .into();
         10
     ];
-
-    validate_units(&units).unwrap();
 
     let (map, map_image) = load_test_map("single_player/no_flight_zone").unwrap();
 

@@ -6,7 +6,8 @@ use cocsim::{
     AttackPlanExecutor,
     Game,
     Map,
-    validate_units,
+    UnitModel,
+    consts::MAX_ARMY_HOUSING_SPACE,
 };
 use libfuzzer_sys::fuzz_target;
 
@@ -18,7 +19,13 @@ struct FuzzInputs {
 
 fuzz_target!(|inputs: FuzzInputs| {
     if inputs.map.validate().is_ok()
-        && validate_units(inputs.plan.units.iter().map(|unit| &unit.unit_model)).is_ok()
+        && inputs
+            .plan
+            .units
+            .iter()
+            .map(|unit| unit.unit_model.r#type().housing_space)
+            .sum::<usize>()
+            <= MAX_ARMY_HOUSING_SPACE
     {
         // uncomment next line when debugging crash
         //dbg!(inputs);
