@@ -12,6 +12,7 @@ use crate::{
     Game,
     Shape,
     ShapeColor,
+    consts::AIR_SWEEPER_COLLIDER_SIZE,
     game::features::{
         attack::{
             AttackTarget,
@@ -81,7 +82,7 @@ pub fn update(game: &mut Game) {
             )
             .metric_distance(&attack_target_position.0);
 
-            if distance < 0.1 {
+            if distance < AIR_SWEEPER_COLLIDER_SIZE {
                 let apply_push = if let Some(applied_push_strength) =
                     projectile.applied_push_strength.get_mut(&attack_target_id)
                 {
