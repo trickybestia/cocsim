@@ -30,6 +30,12 @@ pub struct UnitType {
     /// https://clashofclans.fandom.com/wiki/Clan_Castle#Deployment_Order
     #[serde(skip)]
     pub clan_castle_deployment_priority: u8,
+    /// Used by ClanCastle.
+    #[serde(skip)]
+    pub attack_air: bool,
+    /// Used by ClanCastle.
+    #[serde(skip)]
+    pub attack_ground: bool,
 }
 
 inventory::collect!(UnitType);

@@ -192,14 +192,15 @@ impl Game {
     pub fn tick(&mut self, delta_time: f32) {
         self.delta_time = delta_time;
 
+        features::clan_castle::update(self);
         features::attack::check_retarget(self);
-        features::attack::targeting::handle_retarget(self);
+        features::attack::targeting::update(self);
         features::attack::attack(self);
         features::projectiles::target_projectile::update(self);
         features::projectiles::splash_projectile::update(self);
         features::stunned::clear(self);
         features::projectiles::air_sweeper_projectile::update(self);
-        features::waypoint_mover::r#move(self);
+        features::mover::r#move(self);
         features::health::handle_splash_damage_events(self);
         features::health::handle_entity_damage_events(self);
         // TODO: run system: remove DeathRequest and use hero ability if not used

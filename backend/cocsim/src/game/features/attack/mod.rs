@@ -18,9 +18,9 @@ use crate::{
             Action,
             ActionEnum,
         },
+        mover::Mover,
         position::Position,
         stunned::Stunned,
-        waypoint_mover::WaypointMover,
     },
     utils::{
         AnyMapExt,
@@ -191,17 +191,17 @@ pub fn attack(game: &mut Game) {
 fn create_attack_queue(game: &mut Game) -> Vec<(ActionEnum, Entity)> {
     let mut result = Vec::new();
 
-    for (attacker_id, (attacker, waypoint_mover)) in game
+    for (attacker_id, (attacker, mover)) in game
         .cache
-        .get_mut_or_default::<PreparedQuery<(&mut Attacker, Option<&WaypointMover>)>>()
+        .get_mut_or_default::<PreparedQuery<(&mut Attacker, Option<&Mover>)>>()
         .query(&game.world)
         .iter()
     {
         if game.world.contains(attacker.target) {
-            let can_attack = if let Some(waypoint_mover) = waypoint_mover {
+            let can_attack = if let Some(mover) = mover {
                 // attacker is unit
 
-                waypoint_mover.waypoints.is_empty()
+                mover.arrived // one tick delay here, I hope nothing will be wrong
             } else {
                 // attacker is building
 
@@ -217,6 +217,8 @@ fn create_attack_queue(game: &mut Game) -> Vec<(ActionEnum, Entity)> {
 
                     attacker.remaining_attack_cooldown = attacker.attack_cooldown;
                 }
+            } else {
+                attacker.remaining_attack_cooldown = attacker.attack_cooldown;
             }
         }
     }

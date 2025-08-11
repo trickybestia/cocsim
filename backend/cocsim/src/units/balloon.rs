@@ -102,6 +102,8 @@ const BALLOON: UnitType = UnitType {
     housing_space: 5,
     levels: BALLOON_LEVELS.len(),
     clan_castle_deployment_priority: 1,
+    attack_air: false,
+    attack_ground: true,
 };
 
 inventory::submit! {BALLOON}

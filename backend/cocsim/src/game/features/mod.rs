@@ -1,13 +1,14 @@
 pub mod actions;
 pub mod attack;
 pub mod buildings;
+pub mod clan_castle;
 pub mod collision;
 pub mod delay;
 pub mod drawable;
 pub mod health;
 pub mod map_size;
+pub mod mover;
 pub mod position;
 pub mod projectiles;
 pub mod stunned;
 pub mod to_be_deleted;
-pub mod waypoint_mover;

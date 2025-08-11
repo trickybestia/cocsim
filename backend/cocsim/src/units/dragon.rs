@@ -21,7 +21,7 @@ use crate::{
             Team,
             targeting::air_unit::{
                 AirUnitFindTarget,
-                CountedBuildingTargetPrioritizer,
+                DragonTargetPrioritizer,
             },
         },
         position::Position,
@@ -93,6 +93,8 @@ const DRAGON: UnitType = UnitType {
     housing_space: 20,
     levels: DRAGON_LEVELS.len(),
     clan_castle_deployment_priority: 0,
+    attack_air: true,
+    attack_ground: true,
 };
 
 inventory::submit! {DRAGON}
@@ -147,7 +149,7 @@ impl UnitModel for DragonModel {
             .insert_one(
                 id,
                 AirUnitFindTarget {
-                    prioritizer: CountedBuildingTargetPrioritizer.into(),
+                    prioritizer: DragonTargetPrioritizer.into(),
                     attack_range: DRAGON_ATTACK_RANGE,
                 },
             )

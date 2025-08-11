@@ -3,7 +3,7 @@ use crate::Game;
 pub mod air_unit;
 pub mod building;
 
-pub fn handle_retarget(game: &mut Game) {
-    air_unit::handle_retarget(game);
-    building::handle_retarget(game);
+pub fn update(game: &mut Game) {
+    air_unit::update(game);
+    building::update(game);
 }

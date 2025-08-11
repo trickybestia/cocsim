@@ -19,8 +19,8 @@ use crate::{
         },
         drawable::Drawable,
         health::Health,
+        mover::Mover,
         position::Position,
-        waypoint_mover::WaypointMover,
     },
 };
 
@@ -36,9 +36,10 @@ pub fn create_air_unit(
 ) -> Entity {
     world.spawn((
         Position(position),
-        WaypointMover {
+        Mover {
             speed,
-            waypoints: Vec::new(),
+            arrived: true,
+            target: position,
         },
         Health(health),
         team,

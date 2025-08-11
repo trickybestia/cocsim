@@ -31,7 +31,7 @@ pub struct BuildingFindTarget {
 }
 
 #[derive(Default)]
-struct HandleRetargetCache<'a> {
+struct UpdateCache<'a> {
     pub attacker_query: PreparedQuery<(
         &'a BuildingFindTarget,
         &'a mut Attacker,
@@ -41,8 +41,8 @@ struct HandleRetargetCache<'a> {
     pub target_query: PreparedQuery<(&'a AttackTarget, &'a Team, &'a Position)>,
 }
 
-pub fn handle_retarget(game: &mut Game) {
-    let cache = game.cache.get_mut_or_default::<HandleRetargetCache>();
+pub fn update(game: &mut Game) {
+    let cache = game.cache.get_mut_or_default::<UpdateCache>();
 
     for (_attacker_id, (building_find_target, attacker, attacker_team, attacker_position)) in
         cache.attacker_query.query(&game.world).iter()

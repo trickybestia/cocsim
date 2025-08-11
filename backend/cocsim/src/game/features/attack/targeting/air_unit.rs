@@ -14,8 +14,8 @@ use crate::{
             Attacker,
             Team,
         },
+        mover::Mover,
         position::Position,
-        waypoint_mover::WaypointMover,
     },
     utils::AnyMapExt,
 };
@@ -34,11 +34,11 @@ pub trait TargetPrioritizer {
 }
 
 #[derive(Clone, Debug)]
-pub struct CountedBuildingTargetPrioritizer;
+pub struct DragonTargetPrioritizer;
 
-impl TargetPrioritizer for CountedBuildingTargetPrioritizer {
+impl TargetPrioritizer for DragonTargetPrioritizer {
     fn can_attack(&self, flags: AttackTargetFlags) -> bool {
-        flags.is_counted_building()
+        flags.is_unit() || flags.is_counted_building()
     }
 
     fn is_better(
@@ -81,7 +81,7 @@ impl TargetPrioritizer for DefensiveBuildingTargetPrioritizer {
 #[derive(Clone, Debug)]
 pub enum TargetPrioritizerEnum {
     DefensiveBuildingTargetPrioritizer,
-    CountedBuildingTargetPrioritizer,
+    DragonTargetPrioritizer,
 }
 
 pub struct AirUnitFindTarget {
@@ -90,32 +90,50 @@ pub struct AirUnitFindTarget {
 }
 
 #[derive(Default)]
-struct HandleRetargetCache<'a> {
+struct UpdateCache<'a> {
     pub attacker_query: PreparedQuery<(
         &'a AirUnitFindTarget,
         &'a mut Attacker,
         &'a Team,
         &'a Position,
-        &'a mut WaypointMover,
+        &'a mut Mover,
     )>,
     pub target_query: PreparedQuery<(&'a AttackTarget, &'a Team, &'a Position)>,
 }
 
-pub fn handle_retarget(game: &mut Game) {
+pub fn update(game: &mut Game) {
     struct NearestTarget {
         pub id: Entity,
         pub flags: AttackTargetFlags,
         pub distance: f32,
     }
 
-    let cache = game.cache.get_mut_or_default::<HandleRetargetCache>();
+    let cache = game.cache.get_mut_or_default::<UpdateCache>();
 
     for (
         _attacker_id,
-        (air_unit_find_target, attacker, attacker_team, attacker_position, attacker_waypoint_mover),
+        (air_unit_find_target, attacker, attacker_team, attacker_position, attacker_mover),
     ) in cache.attacker_query.query(&game.world).iter()
     {
         if !attacker.retarget {
+            if attacker.target != Entity::DANGLING {
+                // !attacker.retarget && attacker.target == Entity::DANGLING is
+                // true when attacker has Stunned component
+                let attack_target = game.world.get::<&AttackTarget>(attacker.target).unwrap();
+
+                if !attack_target.flags.contains(AttackTargetFlags::AIR) {
+                    continue; // the following code updates mover.target if target is air unit
+                }
+
+                let target_position = game.world.get::<&Position>(attacker.target).unwrap().0;
+
+                attacker_mover.target = attack_target
+                    .collider
+                    .translate(target_position)
+                    .attack_area(air_unit_find_target.attack_range)
+                    .nearest_point(attacker_position.0);
+            }
+
             continue;
         }
 
@@ -166,15 +184,15 @@ pub fn handle_retarget(game: &mut Game) {
         }
 
         if let Some(nearest_target) = nearest_target {
-            attacker_waypoint_mover.waypoints = vec![
-                game.world
-                    .get::<&AttackTarget>(nearest_target.id)
-                    .unwrap()
-                    .collider
-                    .translate(game.world.get::<&Position>(nearest_target.id).unwrap().0)
-                    .attack_area(air_unit_find_target.attack_range)
-                    .random_near_point(attacker_position.0, &mut game.rng),
-            ];
+            attacker_mover.target = game
+                .world
+                .get::<&AttackTarget>(nearest_target.id)
+                .unwrap()
+                .collider
+                .translate(game.world.get::<&Position>(nearest_target.id).unwrap().0)
+                .attack_area(air_unit_find_target.attack_range)
+                .random_near_point(attacker_position.0, &mut game.rng);
+            attacker_mover.arrived = false;
             attacker.target = nearest_target.id;
         }
     }

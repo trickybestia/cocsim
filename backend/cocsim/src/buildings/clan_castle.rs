@@ -16,6 +16,7 @@ use crate::{
         MAX_BUILDING_POS,
         MAX_CLAN_CASTLE_HOUSING_SPACE,
     },
+    game::features::clan_castle::ClanCastle,
 };
 
 struct ClanCastleLevel {
@@ -49,6 +50,9 @@ const CLAN_CASTLE: BuildingType = BuildingType {
 
 inventory::submit! {CLAN_CASTLE}
 
+const CLAN_CASTLE_UNIT_DEPLOY_TRIGGER_RANGE: f32 = 30.0;
+const CLAN_CASTLE_UNIT_DEPLOY_COOLDOWN: f32 = 0.25;
+
 #[derive(Serialize, Deserialize, Debug, Arbitrary, Clone)]
 pub struct ClanCastleModel {
     pub x: UsizeWithMax<MAX_BUILDING_POS>,
@@ -67,11 +71,26 @@ impl BuildingModel for ClanCastleModel {
     }
 
     fn spawn(&self, world: &mut World) {
-        spawn_resource_building(
+        let id = spawn_resource_building(
             world,
             CLAN_CASTLE_LEVELS[*self.level].health,
             Vector2::new(*self.x, *self.y),
             CLAN_CASTLE.size,
         );
+
+        let mut units = self.units.flatten().collect::<Vec<_>>();
+        units.sort_unstable_by(|a, b| b.clan_castle_deployment_cmp(a));
+
+        world
+            .insert_one(
+                id,
+                ClanCastle {
+                    units,
+                    unit_deploy_cooldown: CLAN_CASTLE_UNIT_DEPLOY_COOLDOWN,
+                    remaining_unit_deploy_cooldown: 0.0,
+                    unit_deploy_trigger_range: CLAN_CASTLE_UNIT_DEPLOY_TRIGGER_RANGE,
+                },
+            )
+            .unwrap();
     }
 }

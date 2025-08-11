@@ -30,10 +30,11 @@ impl RectCollider {
 
 impl Collider for RectCollider {
     fn attack_area(&self, attack_range: f32) -> ColliderEnum {
-        ColliderEnum::RectCollider(RectCollider {
-            position: self.position - Vector2::from_element(attack_range),
-            size: self.size + Vector2::from_element(attack_range * 2.0),
-        })
+        Self::new(
+            self.position - Vector2::from_element(attack_range),
+            self.size + Vector2::from_element(attack_range * 2.0),
+        )
+        .into()
     }
 
     fn nearest_point(&self, point: Vector2<f32>) -> Vector2<f32> {
