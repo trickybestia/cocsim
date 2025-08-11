@@ -28,8 +28,6 @@ fn main() {
 
     let (map, map_image) = load_test_map("single_player/no_flight_zone").unwrap();
 
-    map.validate().unwrap();
-
     let mut optimizer: Box<dyn AttackOptimizer> = Box::new(GeneticAttackOptimizer::new(
         map.clone(),
         units.clone(),

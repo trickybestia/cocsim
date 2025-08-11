@@ -3,12 +3,12 @@ use rayon::prelude::*;
 use crate::{
     AttackPlan,
     AttackPlanExecutionStats,
-    Map,
+    ValidatedMap,
     attack_optimizer::attack_plan_execution_stats::execute_attack_plan_single,
 };
 
 pub fn execute_attack_plan(
-    map: &Map,
+    map: &ValidatedMap,
     plan: &AttackPlan,
     executions_count: usize,
     tps: usize,

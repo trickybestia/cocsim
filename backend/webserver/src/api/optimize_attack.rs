@@ -17,6 +17,7 @@ use cocsim::{
     GeneticAttackOptimizer,
     Map,
     UnitsWithCount,
+    ValidatedMap,
     consts::MAX_ARMY_HOUSING_SPACE,
 };
 use log::warn;
@@ -43,8 +44,7 @@ pub async fn optimize_attack(ws: WebSocketUpgrade) -> Response {
 async fn optimize_attack_internal(mut socket: WebSocket) -> anyhow::Result<()> {
     let map_message = socket.recv().await.context("Expected message")??;
     let map: Map = serde_json::from_str(map_message.to_text()?)?;
-
-    map.validate()?;
+    let map = ValidatedMap::try_from(map)?;
 
     let units_message = socket.recv().await.context("Expected message")??;
     let units =

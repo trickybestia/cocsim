@@ -13,8 +13,6 @@ use crate::utils::macroquad_run_game;
 fn main() {
     let (map, map_image) = load_test_map("single_player/no_flight_zone").unwrap();
 
-    map.validate().unwrap();
-
     let mut game = Game::new(&map, true, None);
 
     for _i in 0..10 {

@@ -10,7 +10,6 @@ use rand_pcg::Pcg64Mcg;
 
 use crate::{
     BuildingModel,
-    Map,
     Shape,
     UnitModel,
     UnitModelEnum,
@@ -30,6 +29,7 @@ use crate::{
         collision::PathfindingCollisionGrid,
         map_size::MapSize,
     },
+    map::ValidatedMap,
     utils::{
         AnyMapExt,
         draw_bool_grid,
@@ -140,7 +140,7 @@ impl Game {
         self.need_redraw_collision
     }
 
-    pub fn new(map: &Map, enable_collision_grid: bool, rng: Option<Pcg64Mcg>) -> Self {
+    pub fn new(map: &ValidatedMap, enable_collision_grid: bool, rng: Option<Pcg64Mcg>) -> Self {
         let mut world = World::new();
         let mut cache = AnyMap::new();
 

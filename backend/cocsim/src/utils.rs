@@ -22,6 +22,7 @@ use crate::{
     Map,
     Shape,
     ShapeColor,
+    ValidatedMap,
     consts::*,
 };
 
@@ -43,10 +44,13 @@ pub fn load_test_map_raw(name: &str) -> anyhow::Result<(String, Vec<u8>)> {
     Ok((map_json, map_image))
 }
 
-pub fn load_test_map(name: &str) -> anyhow::Result<(Map, Vec<u8>)> {
+pub fn load_test_map(name: &str) -> anyhow::Result<(ValidatedMap, Vec<u8>)> {
     let (map_json, map_image) = load_test_map_raw(name)?;
 
-    Ok((serde_json::from_str(&map_json)?, map_image))
+    let map = serde_json::from_str::<Map>(&map_json)?;
+    let validated_map = ValidatedMap::try_from(map)?;
+
+    Ok((validated_map, map_image))
 }
 
 pub fn get_tile_color(even: bool, border: bool, drop_zone: bool, occupied: bool) -> ShapeColor {

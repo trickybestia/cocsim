@@ -23,8 +23,6 @@ use crate::{
 fn get_showcase_attack_internal() -> Json<Value> {
     let (map, _) = load_test_map(SHOWCASE_MAP).expect("Map should be loaded successfully");
 
-    map.validate().expect("Test map should be valid");
-
     let mut game = Game::new(&map, true, None);
 
     for _i in 0..10 {

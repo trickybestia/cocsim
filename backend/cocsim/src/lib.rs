@@ -13,7 +13,7 @@ pub mod utils;
 pub use attack_optimizer::*;
 pub use buildings::*;
 pub use game::Game;
-pub use map::Map;
+pub use map::*;
 pub use shape::{
     Shape,
     ShapeColor,

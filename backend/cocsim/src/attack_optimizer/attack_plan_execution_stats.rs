@@ -4,7 +4,7 @@ use crate::{
     AttackPlan,
     AttackPlanExecutor,
     Game,
-    Map,
+    ValidatedMap,
     consts::{
         MAX_ATTACK_DURATION,
         RNG_INITIAL_STATE,
@@ -88,7 +88,7 @@ impl AttackPlanExecutionStats {
 }
 
 pub fn execute_attack_plan_single(
-    map: &Map,
+    map: &ValidatedMap,
     plan: &AttackPlan,
     i: usize,
     delta_time: f32,

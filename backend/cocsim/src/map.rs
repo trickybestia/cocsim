@@ -1,3 +1,5 @@
+use std::ops::Deref;
+
 use anyhow::ensure;
 use arbitrary::Arbitrary;
 use nalgebra::DMatrix;
@@ -27,16 +29,21 @@ pub struct Map {
     pub buildings: Vec<BuildingModelEnum>,
 }
 
-impl Map {
-    pub fn validate(&self) -> anyhow::Result<()> {
-        ensure!(self.base_size >= MIN_BASE_SIZE && self.base_size <= MAX_BASE_SIZE);
-        ensure!(self.border_size >= MIN_BORDER_SIZE && self.border_size <= MAX_BORDER_SIZE);
-        ensure!(self.buildings.len() <= MAX_BUILDINGS_COUNT);
+#[derive(Clone, Debug)]
+pub struct ValidatedMap(Map);
+
+impl TryFrom<Map> for ValidatedMap {
+    type Error = anyhow::Error;
+
+    fn try_from(value: Map) -> anyhow::Result<Self> {
+        ensure!(value.base_size >= MIN_BASE_SIZE && value.base_size <= MAX_BASE_SIZE);
+        ensure!(value.border_size >= MIN_BORDER_SIZE && value.border_size <= MAX_BORDER_SIZE);
+        ensure!(value.buildings.len() <= MAX_BUILDINGS_COUNT);
 
         let mut has_town_hall = false;
-        let mut buildings_grid = DMatrix::from_element(self.base_size, self.base_size, false);
+        let mut buildings_grid = DMatrix::from_element(value.base_size, value.base_size, false);
 
-        for building in &self.buildings {
+        for building in &value.buildings {
             if let BuildingModelEnum::TownHallModel(_) = building {
                 ensure!(!has_town_hall);
 
@@ -46,18 +53,18 @@ impl Map {
             let start_x = building.position().x;
             let start_y = building.position().y;
 
-            ensure!(start_x >= self.border_size && start_x < self.base_size + self.border_size);
-            ensure!(start_y >= self.border_size && start_y < self.base_size + self.border_size);
+            ensure!(start_x >= value.border_size && start_x < value.base_size + value.border_size);
+            ensure!(start_y >= value.border_size && start_y < value.base_size + value.border_size);
 
             let end_x = start_x + building.r#type().size.x;
             let end_y = start_y + building.r#type().size.y;
 
-            ensure!(end_x <= self.base_size + self.border_size);
-            ensure!(end_y <= self.base_size + self.border_size);
+            ensure!(end_x <= value.base_size + value.border_size);
+            ensure!(end_y <= value.base_size + value.border_size);
 
             for x in start_x..end_x {
                 for y in start_y..end_y {
-                    let tile = &mut buildings_grid[(x - self.border_size, y - self.border_size)];
+                    let tile = &mut buildings_grid[(x - value.border_size, y - value.border_size)];
 
                     ensure!(!*tile);
 
@@ -68,6 +75,14 @@ impl Map {
 
         ensure!(has_town_hall);
 
-        Ok(())
+        Ok(Self(value))
+    }
+}
+
+impl Deref for ValidatedMap {
+    type Target = Map;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
     }
 }
