@@ -50,7 +50,7 @@ const CLAN_CASTLE: BuildingType = BuildingType {
 
 inventory::submit! {CLAN_CASTLE}
 
-const CLAN_CASTLE_UNIT_DEPLOY_TRIGGER_RANGE: f32 = 30.0;
+const CLAN_CASTLE_UNIT_DEPLOY_TRIGGER_RANGE: f32 = 12.0;
 const CLAN_CASTLE_UNIT_DEPLOY_COOLDOWN: f32 = 0.25;
 
 #[derive(Serialize, Deserialize, Debug, Arbitrary, Clone)]
