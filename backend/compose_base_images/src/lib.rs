@@ -5,19 +5,16 @@ use std::{
     io::Cursor,
 };
 
-use anyhow::ensure;
 use image::{
     ImageFormat,
     ImageReader,
     RgbImage,
 };
 use magick_rust::{
+    FilterType,
+    GravityType,
     MagickWand,
-    bindings::{
-        DistortMethod,
-        MagickBooleanType,
-        MagickDistortImage,
-    },
+    PixelWand,
     magick_wand_genesis,
 };
 use ndarray::{
@@ -46,71 +43,24 @@ use crate::utils::{
 const VIGNETTE_STRENGTH: f32 = 0.26;
 
 pub fn reverse_projection<T: AsRef<[u8]>>(image: T) -> anyhow::Result<RgbImage> {
-    const RESIZE_WIDTH: usize = 2498;
-    const RESIZE_HEIGHT: usize = 1756;
-    const RESIZE_ASPECT_RATIO: f32 = RESIZE_WIDTH as f32 / RESIZE_HEIGHT as f32;
-
     magick_wand_genesis();
 
     let mut wand = MagickWand::new();
 
     wand.read_image_blob(image)?;
 
-    let aspect_ratio = wand.get_image_width() as f32 / wand.get_image_height() as f32;
+    wand.resize_image(
+        wand.get_image_width(),
+        wand.get_image_height() * 4 / 3,
+        FilterType::Triangle,
+    )?;
 
-    if aspect_ratio > RESIZE_ASPECT_RATIO {
-        wand.crop_image(
-            (wand.get_image_height() as f32 * RESIZE_ASPECT_RATIO).round() as usize,
-            wand.get_image_height(),
-            0,
-            0,
-        )?;
-    } else {
-        wand.crop_image(
-            wand.get_image_width(),
-            (wand.get_image_width() as f32 / RESIZE_ASPECT_RATIO).round() as usize,
-            0,
-            0,
-        )?;
-    }
+    wand.set_image_gravity(GravityType::Center)?;
 
-    const TOP_CORNER_POS: (f64, f64) = (1250.0, 41.0);
-    const BOTTOM_CORNER_POS: (f64, f64) = (1247.0, 1572.0);
-    const LEFT_CORNER_POS: (f64, f64) = (223.0, 810.0);
+    let mut background = PixelWand::new();
+    background.set_color("black")?;
 
-    wand.set_image_artifact("distort:viewport", "1800x1800+0+0")?;
-
-    let args = [
-        TOP_CORNER_POS.0,
-        TOP_CORNER_POS.1,
-        1500.0,
-        300.0,
-        BOTTOM_CORNER_POS.0,
-        BOTTOM_CORNER_POS.1,
-        300.0,
-        1500.0,
-        LEFT_CORNER_POS.0,
-        LEFT_CORNER_POS.1,
-        300.0,
-        300.0,
-    ];
-
-    let ok;
-
-    unsafe {
-        ok = MagickDistortImage(
-            wand.wand,
-            DistortMethod::Affine,
-            args.len(),
-            args.as_ptr(),
-            MagickBooleanType::MagickFalse,
-        );
-    }
-
-    ensure!(
-        ok == MagickBooleanType::MagickTrue,
-        "MagickBooleanType_MagickTrue expected"
-    );
+    wand.rotate_image(&background, 45.0)?;
 
     Ok(
         ImageReader::with_format(Cursor::new(wand.write_image_blob("BMP")?), ImageFormat::Bmp)
