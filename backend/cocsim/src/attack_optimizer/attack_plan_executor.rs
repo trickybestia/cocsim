@@ -47,10 +47,12 @@ impl AttackPlanExecutor {
             groups.sort_unstable_by(|a, b| a.drop_time.total_cmp(&b.drop_time));
 
             let mut units = Vec::new();
-            let mut next_drop_time = 0.0;
+            let mut next_drop_time = 0.0f32;
 
             for group in groups {
                 let position = group.cartesian_position(&game.map_size, &game.drop_zone.0);
+
+                next_drop_time = next_drop_time.max(group.drop_time);
 
                 for _ in 0..group.count {
                     units.push(AttackPlanExecutorUnit {
