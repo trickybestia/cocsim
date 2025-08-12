@@ -62,7 +62,7 @@ async fn optimize_attack_internal(mut socket: WebSocket) -> anyhow::Result<()> {
 
     let mut optimizer: Box<dyn AttackOptimizer> = Box::new(GeneticAttackOptimizer::new(
         map.clone(),
-        units.flatten().collect(),
+        units.to_vec(),
         0.02,
         0.05,
     ));
@@ -71,7 +71,7 @@ async fn optimize_attack_internal(mut socket: WebSocket) -> anyhow::Result<()> {
         if i == OPTIMIZE_ATTACK_ITERATIONS / 2 {
             optimizer = Box::new(DerivativeAttackOptimizer::new(
                 map.clone(),
-                units.flatten().collect(),
+                units.to_vec(),
                 optimizer.best().cloned(),
             ));
         }
@@ -115,8 +115,14 @@ async fn optimize_attack_internal(mut socket: WebSocket) -> anyhow::Result<()> {
 
     let result = spawn_blocking(move || {
         let mut game = Game::new(&map, true, None);
-        let mut plan_executor =
-            AttackPlanExecutor::new(&optimizer.best().expect("Best plan exists here").0.units);
+        let mut plan_executor = AttackPlanExecutor::new(
+            optimizer
+                .best()
+                .expect("Best plan exists here")
+                .0
+                .units
+                .clone(),
+        );
 
         let mut renderer = DtoGameRenderer::new(1);
 

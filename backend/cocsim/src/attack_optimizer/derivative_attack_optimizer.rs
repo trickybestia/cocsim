@@ -6,7 +6,7 @@ use crate::{
     AttackOptimizer,
     AttackPlan,
     AttackPlanExecutionStats,
-    UnitModelEnum,
+    UnitWithCount,
     ValidatedMap,
     consts::{
         ATTACK_PLAN_EXECUTIONS_COUNT,
@@ -19,7 +19,7 @@ use crate::{
 
 pub struct DerivativeAttackOptimizer {
     map: ValidatedMap,
-    units: Vec<UnitModelEnum>,
+    units: Vec<UnitWithCount>,
     rng: Pcg64Mcg,
     plan: Option<(AttackPlan, AttackPlanExecutionStats)>,
 }
@@ -27,7 +27,7 @@ pub struct DerivativeAttackOptimizer {
 impl DerivativeAttackOptimizer {
     pub fn new(
         map: ValidatedMap,
-        units: Vec<UnitModelEnum>,
+        units: Vec<UnitWithCount>,
         initial_plan: Option<(AttackPlan, AttackPlanExecutionStats)>,
     ) -> Self {
         Self {

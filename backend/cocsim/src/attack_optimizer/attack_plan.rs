@@ -5,21 +5,21 @@ use rand::{
 };
 
 use crate::{
-    UnitModelEnum,
-    attack_optimizer::AttackPlanUnit,
+    UnitWithCount,
+    attack_optimizer::AttackPlanUnitGroup,
 };
 
 #[derive(Clone, Arbitrary, Debug)]
 pub struct AttackPlan {
-    pub units: Vec<AttackPlanUnit>,
+    pub units: Vec<AttackPlanUnitGroup>,
 }
 
 impl AttackPlan {
-    pub fn new_randomized(units: &[UnitModelEnum], rng: &mut impl Rng) -> Self {
+    pub fn new_randomized(units: &[UnitWithCount], rng: &mut impl Rng) -> Self {
         Self {
             units: units
                 .iter()
-                .map(|unit_model| AttackPlanUnit::new_randomized(unit_model.clone(), rng))
+                .map(|unit| AttackPlanUnitGroup::new_randomized(unit.unit.clone(), unit.count, rng))
                 .collect(),
         }
     }

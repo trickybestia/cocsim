@@ -8,7 +8,7 @@ use cocsim::{
     DerivativeAttackOptimizer,
     Game,
     GeneticAttackOptimizer,
-    UnitModelEnum,
+    UnitWithCount,
     consts::RNG_INITIAL_STATE,
     utils::load_test_map,
 };
@@ -18,13 +18,13 @@ use textplots::Plot;
 use crate::utils::macroquad_run_game;
 
 fn main() {
-    let units: Vec<UnitModelEnum> = vec![
-        BalloonModel {
+    let units: Vec<UnitWithCount> = vec![UnitWithCount {
+        unit: BalloonModel {
             level: 10.try_into().unwrap(),
         }
-        .into();
-        10
-    ];
+        .into(),
+        count: 10,
+    }];
 
     let (map, map_image) = load_test_map("single_player/no_flight_zone").unwrap();
 
@@ -85,7 +85,7 @@ fn main() {
     }
 
     let game = Game::new(&map, true, Some(Pcg64Mcg::new(RNG_INITIAL_STATE)));
-    let mut plan_executor = AttackPlanExecutor::new(&optimizer.best().unwrap().0.units);
+    let mut plan_executor = AttackPlanExecutor::new(optimizer.best().unwrap().0.units.clone());
 
     macroquad_run_game(
         game,

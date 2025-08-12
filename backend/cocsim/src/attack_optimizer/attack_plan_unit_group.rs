@@ -23,8 +23,9 @@ use crate::{
 };
 
 #[derive(Clone, Debug)]
-pub struct AttackPlanUnit {
+pub struct AttackPlanUnitGroup {
     pub unit_model: UnitModelEnum,
+    pub count: usize,
     /// radians
     pub angle: f32,
     /// from 0 to 1
@@ -32,10 +33,11 @@ pub struct AttackPlanUnit {
     pub drop_time: f32,
 }
 
-impl<'a> Arbitrary<'a> for AttackPlanUnit {
+impl<'a> Arbitrary<'a> for AttackPlanUnitGroup {
     fn arbitrary(u: &mut Unstructured<'a>) -> arbitrary::Result<Self> {
         Ok(Self {
             unit_model: u.arbitrary()?,
+            count: 1,
             angle: (u.int_in_range::<u8>(0u8..=255u8)? as f32) / 255.0 * 2.0 * PI,
             distance: (u.int_in_range::<u8>(0u8..=100u8)? as f32) / 100.0,
             drop_time: (u.int_in_range::<u8>(0u8..=100u8)? as f32) / 100.0 * MAX_UNIT_DROP_TIME,
@@ -43,10 +45,11 @@ impl<'a> Arbitrary<'a> for AttackPlanUnit {
     }
 }
 
-impl AttackPlanUnit {
-    pub fn new_randomized(unit_model: UnitModelEnum, rng: &mut impl Rng) -> Self {
+impl AttackPlanUnitGroup {
+    pub fn new_randomized(unit_model: UnitModelEnum, count: usize, rng: &mut impl Rng) -> Self {
         Self {
             unit_model,
+            count,
             angle: rng.random_range(0.0..(2.0 * PI)),
             distance: rng.random_range(0.0..=1.0),
             drop_time: rng.random_range(0.0..=MAX_UNIT_DROP_TIME),
@@ -56,6 +59,7 @@ impl AttackPlanUnit {
     pub fn mutate(&self, rng: &mut impl Rng) -> Self {
         Self {
             unit_model: self.unit_model.clone(),
+            count: self.count,
             angle: self.angle + rng.random_range((-1.0)..=1.0),
             distance: clamp(self.distance + rng.random_range((-0.2)..=0.2), 0.0, 1.0),
             drop_time: clamp(

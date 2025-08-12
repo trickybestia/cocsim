@@ -12,7 +12,7 @@ use crate::{
     AttackOptimizer,
     AttackPlan,
     AttackPlanExecutionStats,
-    UnitModelEnum,
+    UnitWithCount,
     ValidatedMap,
     attack_optimizer::execute_attack_plan,
     consts::{
@@ -27,7 +27,7 @@ use crate::{
 
 pub struct GeneticAttackOptimizer {
     map: ValidatedMap,
-    units: Vec<UnitModelEnum>,
+    units: Vec<UnitWithCount>,
     rng: Pcg64Mcg,
     population: Vec<(AttackPlan, AttackPlanExecutionStats)>,
     pub mutation_probability: f64,
@@ -39,7 +39,7 @@ pub struct GeneticAttackOptimizer {
 impl GeneticAttackOptimizer {
     pub fn new(
         map: ValidatedMap,
-        units: Vec<UnitModelEnum>,
+        units: Vec<UnitWithCount>,
         mutation_probability_decay: f64,
         merge_probability_decay: f64,
     ) -> Self {
