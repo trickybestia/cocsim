@@ -26,12 +26,24 @@ const GameRenderer: React.FC<Props> = ({
   const [speed, setSpeed] = useState(1.0);
   const [isPaused, setIsPaused] = useState(true);
   const [isSliderDragged, setIsSliderDragged] = useState(false); // user is interacting with timeline slider
+  const [gameLikeRotation, setGameLikeRotation] = useState(false);
 
   let collision = null;
 
   for (let i = frameIndex; collision === null; i--) {
     collision = frames[i].collision;
   }
+
+  const layerProps = {
+    rotation: gameLikeRotation ? -45 : 0,
+    x: canvasSize / 2,
+    y: canvasSize / 2,
+    offset: { x: canvasSize / 2, y: canvasSize / 2 },
+    scale: {
+      x: gameLikeRotation ? Math.SQRT1_2 : 1,
+      y: gameLikeRotation ? Math.SQRT1_2 : 1
+    }
+  };
 
   useEffect(() => {
     const onResize = () => {
@@ -135,6 +147,12 @@ const GameRenderer: React.FC<Props> = ({
             defaultValue={1.0}
             onChange={setSpeed}
           />
+          <p>Rotate as in game:</p>
+          <input
+            type="checkbox"
+            checked={gameLikeRotation}
+            onChange={(e) => setGameLikeRotation(e.target.checked)}
+          ></input>
         </div>
       </div>
 
@@ -144,19 +162,23 @@ const GameRenderer: React.FC<Props> = ({
           width={canvasSize}
           height={canvasSize}
           listening={false}
+          scaleY={gameLikeRotation ? 0.75 : 1}
         >
           <BackgroundLayer
+            layerProps={layerProps}
             totalBaseSize={frames[0].totalBaseSize}
             grid={frames[0].grid!}
             baseImage={baseImage}
             canvasSize={canvasSize}
           />
           <CollisionLayer
+            layerProps={layerProps}
             totalBaseSize={frames[frameIndex].totalBaseSize}
             collision={collision}
             canvasSize={canvasSize}
           />
           <EntitiesLayer
+            layerProps={layerProps}
             totalBaseSize={frames[frameIndex].totalBaseSize}
             entities={frames[frameIndex].entities}
             canvasSize={canvasSize}

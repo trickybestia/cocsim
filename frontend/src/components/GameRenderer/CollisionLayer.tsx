@@ -1,3 +1,4 @@
+import type { LayerConfig } from "konva/lib/Layer";
 import { memo } from "react";
 import { Layer } from "react-konva";
 
@@ -5,6 +6,7 @@ import type { Shape } from "../../types";
 import ShapeRenderer from "./ShapeRenderer";
 
 type Props = {
+  layerProps: LayerConfig;
   totalBaseSize: number;
   canvasSize: number;
   collision: Shape[];
@@ -13,7 +15,7 @@ type Props = {
 const COLLISION_OPACITY = 0.4;
 
 const CollisionLayer: React.FC<Props> = memo(
-  ({ totalBaseSize, canvasSize, collision }: Props) => {
+  ({ layerProps, totalBaseSize, canvasSize, collision }: Props) => {
     const pixelsPerTile = canvasSize / totalBaseSize;
 
     const shapes = collision.map((shape, index) => (
@@ -25,7 +27,7 @@ const CollisionLayer: React.FC<Props> = memo(
       />
     ));
 
-    return <Layer>{shapes}</Layer>;
+    return <Layer {...layerProps}>{shapes}</Layer>;
   }
 );
 

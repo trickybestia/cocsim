@@ -1,3 +1,4 @@
+import type { LayerConfig } from "konva/lib/Layer";
 import { memo } from "react";
 import { Layer } from "react-konva";
 
@@ -5,6 +6,7 @@ import type { Shape } from "../../types";
 import ShapeRenderer from "./ShapeRenderer";
 
 type Props = {
+  layerProps: LayerConfig;
   totalBaseSize: number;
   canvasSize: number;
   entities: Shape[];
@@ -13,7 +15,7 @@ type Props = {
 const ENTITIES_OPACITY = 1;
 
 const EntitiesLayer: React.FC<Props> = memo(
-  ({ totalBaseSize, canvasSize, entities }: Props) => {
+  ({ layerProps, totalBaseSize, canvasSize, entities }: Props) => {
     const pixelsPerTile = canvasSize / totalBaseSize;
 
     const shapes = entities.map((shape, index) => (
@@ -25,7 +27,7 @@ const EntitiesLayer: React.FC<Props> = memo(
       />
     ));
 
-    return <Layer>{shapes}</Layer>;
+    return <Layer {...layerProps}>{shapes}</Layer>;
   }
 );
 

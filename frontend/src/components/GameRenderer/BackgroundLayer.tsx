@@ -1,3 +1,4 @@
+import type { LayerConfig } from "konva/lib/Layer";
 import { memo } from "react";
 import { Image, Layer } from "react-konva";
 
@@ -5,6 +6,7 @@ import type { Shape } from "../../types";
 import ShapeRenderer from "./ShapeRenderer";
 
 type Props = {
+  layerProps: LayerConfig;
   totalBaseSize: number;
   canvasSize: number;
   grid: Shape[];
@@ -14,7 +16,7 @@ type Props = {
 const GRID_OPACITY = 0.3;
 
 const BackgroundLayer: React.FC<Props> = memo(
-  ({ totalBaseSize, canvasSize, grid, baseImage }: Props) => {
+  ({ layerProps, totalBaseSize, canvasSize, grid, baseImage }: Props) => {
     const pixelsPerTile = canvasSize / totalBaseSize;
 
     const opacity = baseImage === undefined ? 1 : GRID_OPACITY;
@@ -29,7 +31,7 @@ const BackgroundLayer: React.FC<Props> = memo(
     ));
 
     return (
-      <Layer>
+      <Layer {...layerProps}>
         {baseImage !== undefined && (
           <Image
             scaleX={canvasSize / baseImage.width}
