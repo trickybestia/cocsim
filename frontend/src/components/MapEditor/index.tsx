@@ -161,6 +161,7 @@ const MapEditor: React.FC<Props> = ({
     if (stage === null) return;
 
     if (e.evt.buttons === 0) {
+      // no buttons pressed
       const pointer = stage.getRelativePointerPosition();
 
       if (pointer === null) return;
@@ -185,6 +186,7 @@ const MapEditor: React.FC<Props> = ({
     }
 
     if ((e.evt.buttons & 0x4) !== 0) {
+      // mouse wheel pressed
       e.evt.preventDefault();
 
       const position = stage.getPosition();

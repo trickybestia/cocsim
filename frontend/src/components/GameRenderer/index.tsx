@@ -1,8 +1,11 @@
+import type Konva from "konva";
+import type { KonvaEventObject } from "konva/lib/Node";
 import { useEffect, useRef, useState } from "react";
 import { Stage } from "react-konva";
 import { twMerge } from "tailwind-merge";
 
 import type { Frame } from "../../types";
+import clamp from "../../utils/clamp";
 import FloatNumberInput from "../FloatNumberInput";
 import BackgroundLayer from "./BackgroundLayer";
 import CollisionLayer from "./CollisionLayer";
@@ -20,6 +23,7 @@ const GameRenderer: React.FC<Props> = ({
   baseImage
 }: Props) => {
   const canvasWrapperRef = useRef<HTMLDivElement | null>(null);
+  const canvasRef = useRef<Konva.Stage>(null);
   const [canvasSize, setCanvasSize] = useState(1);
 
   const [frameIndex, setFrameIndex] = useState(0);
@@ -91,8 +95,77 @@ const GameRenderer: React.FC<Props> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [speed, isPaused, isSliderDragged]);
 
+  const resetCamera = (gameLikeRotation: boolean) => {
+    if (canvasRef.current === null) return;
+
+    canvasRef.current.scale({ x: 1, y: gameLikeRotation ? 0.75 : 1 });
+    canvasRef.current.setPosition({ x: 0, y: 0 });
+  };
+
   const onPauseButtonClick = () => {
     setIsPaused(!isPaused);
+  };
+
+  const canvasOnWheel = (e: KonvaEventObject<WheelEvent>) => {
+    const stage = e.target.getStage();
+
+    if (stage === null) return;
+
+    e.evt.preventDefault();
+
+    const oldXScale = stage.scaleX();
+    const oldYScale = stage.scaleY();
+    const pointer = stage.getPointerPosition()!;
+
+    const mousePointTo = {
+      x: (pointer.x - stage.x()) / oldXScale,
+      y: (pointer.y - stage.y()) / oldYScale
+    };
+
+    // how to scale? Zoom in? Or zoom out?
+    const direction = e.evt.deltaY > 0 ? -1 : 1;
+
+    const STAGE_SCALE_FACTOR = 1.1;
+
+    const newXScale = clamp(
+      0.5,
+      direction > 0
+        ? oldXScale * STAGE_SCALE_FACTOR
+        : oldXScale / STAGE_SCALE_FACTOR,
+      10
+    );
+    const newYScale = (newXScale * oldYScale) / oldXScale;
+    stage.scale({ x: newXScale, y: newYScale });
+
+    const newPos = {
+      x: pointer.x - mousePointTo.x * newXScale,
+      y: pointer.y - mousePointTo.y * newYScale
+    };
+
+    stage.position(newPos);
+  };
+
+  const canvasOnMouseDown = (e: KonvaEventObject<MouseEvent>) => {
+    // to prevent auto scrolling on middle mouse button press
+    e.evt.preventDefault();
+  };
+
+  const canvasOnPointerMove = (e: KonvaEventObject<PointerEvent>) => {
+    const stage = e.target.getStage();
+
+    if (stage === null) return;
+
+    if ((e.evt.buttons & 0x4) !== 0) {
+      // mouse wheel pressed
+      e.evt.preventDefault();
+
+      const position = stage.getPosition();
+
+      stage.position({
+        x: position.x + e.evt.movementX,
+        y: position.y + e.evt.movementY
+      });
+    }
   };
 
   return (
@@ -151,18 +224,25 @@ const GameRenderer: React.FC<Props> = ({
           <input
             type="checkbox"
             checked={gameLikeRotation}
-            onChange={(e) => setGameLikeRotation(e.target.checked)}
+            onChange={(e) => {
+              setGameLikeRotation(e.target.checked);
+              resetCamera(e.target.checked);
+            }}
           ></input>
         </div>
       </div>
 
       <div className="relative flex grow justify-around" ref={canvasWrapperRef}>
         <Stage
-          className="absolute"
+          ref={canvasRef}
+          className="absolute bg-green-900"
           width={canvasSize}
           height={canvasSize}
           listening={false}
           scaleY={gameLikeRotation ? 0.75 : 1}
+          onPointerMove={canvasOnPointerMove}
+          onWheel={canvasOnWheel}
+          onMouseDown={canvasOnMouseDown}
         >
           <BackgroundLayer
             layerProps={layerProps}
