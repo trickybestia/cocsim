@@ -68,8 +68,6 @@ pub fn update(game: &mut Game) {
 
         let collider_size = (new_radius - projectile.radius) * 1.1; // 110% of expansion seems enough
 
-        dbg!(collider_size);
-
         for (attack_target_id, (attack_target, attack_target_team, attack_target_position)) in
             cache.target_query.query(&game.world).iter()
         {
