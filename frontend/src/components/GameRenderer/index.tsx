@@ -25,6 +25,7 @@ const GameRenderer: React.FC<Props> = ({
   const [frameIndex, setFrameIndex] = useState(0);
   const [speed, setSpeed] = useState(1.0);
   const [isPaused, setIsPaused] = useState(true);
+  const [isSliderDragged, setIsSliderDragged] = useState(false); // user is interacting with timeline slider
 
   let collision = null;
 
@@ -54,7 +55,7 @@ const GameRenderer: React.FC<Props> = ({
   }, []);
 
   useEffect(() => {
-    if (isPaused) return;
+    if (isPaused || isSliderDragged) return;
 
     const frameTime = frames[1].timeElapsed;
 
@@ -76,7 +77,7 @@ const GameRenderer: React.FC<Props> = ({
       clearInterval(intervalId);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [speed, isPaused]);
+  }, [speed, isPaused, isSliderDragged]);
 
   const onPauseButtonClick = () => {
     setIsPaused(!isPaused);
@@ -94,6 +95,8 @@ const GameRenderer: React.FC<Props> = ({
         max={frames.length - 1}
         value={frameIndex}
         onChange={(e) => setFrameIndex(parseInt(e.target.value))}
+        onMouseDown={() => setIsSliderDragged(true)}
+        onMouseUp={() => setIsSliderDragged(false)}
         className="h-2 w-full cursor-pointer appearance-none bg-gray-200 dark:bg-gray-700"
       ></input>
       <div className="flex items-center gap-2">
