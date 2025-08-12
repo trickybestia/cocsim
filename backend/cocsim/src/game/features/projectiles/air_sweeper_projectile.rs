@@ -12,7 +12,6 @@ use crate::{
     Game,
     Shape,
     ShapeColor,
-    consts::AIR_SWEEPER_COLLIDER_SIZE,
     game::features::{
         attack::{
             AttackTarget,
@@ -63,6 +62,14 @@ pub fn update(game: &mut Game) {
     for (id, (projectile, projectile_team, projectile_position)) in
         cache.projectile_query.query(&game.world).iter()
     {
+        let new_radius = projectile
+            .max_radius
+            .min(projectile.radius + projectile.speed * game.delta_time);
+
+        let collider_size = (new_radius - projectile.radius) * 1.1; // 110% of expansion seems enough
+
+        dbg!(collider_size);
+
         for (attack_target_id, (attack_target, attack_target_team, attack_target_position)) in
             cache.target_query.query(&game.world).iter()
         {
@@ -82,7 +89,7 @@ pub fn update(game: &mut Game) {
             )
             .metric_distance(&attack_target_position.0);
 
-            if distance < AIR_SWEEPER_COLLIDER_SIZE {
+            if distance < collider_size {
                 let apply_push = if let Some(applied_push_strength) =
                     projectile.applied_push_strength.get_mut(&attack_target_id)
                 {
@@ -112,9 +119,7 @@ pub fn update(game: &mut Game) {
             }
         }
 
-        projectile.radius = projectile
-            .max_radius
-            .min(projectile.radius + projectile.speed * game.delta_time);
+        projectile.radius = new_radius;
 
         if projectile.radius == projectile.max_radius {
             to_be_deleted.push(id);
