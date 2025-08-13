@@ -165,6 +165,7 @@ impl BuildingModel for AirSweeperModel {
                     rotation_angle,
                     min_attack_range: AIR_SWEEPER_MIN_ATTACK_RANGE,
                     max_attack_range: AIR_SWEEPER_MAX_ATTACK_RANGE,
+                    min_housing_space: 0,
                 },
             )
             .unwrap();

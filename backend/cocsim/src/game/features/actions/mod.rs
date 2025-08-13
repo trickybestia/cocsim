@@ -5,6 +5,7 @@ mod melee_attack;
 mod splash_damage;
 mod splash_projectile_attack;
 mod target_projectile_attack;
+mod with_despawn;
 
 pub use air_sweeper_attack::AirSweeperAttack;
 pub use delayed::Delayed;
@@ -15,6 +16,7 @@ pub use melee_attack::MeleeAttack;
 pub use splash_damage::SplashDamage;
 pub use splash_projectile_attack::SplashProjectileAttack;
 pub use target_projectile_attack::TargetProjectileAttack;
+pub use with_despawn::WithDespawn;
 
 use crate::Game;
 
@@ -33,4 +35,5 @@ pub enum ActionEnum {
     SplashDamage,
     SplashProjectileAttack,
     TargetProjectileAttack,
+    WithDespawn,
 }

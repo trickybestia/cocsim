@@ -12,6 +12,13 @@ use crate::{
     UsizeWithMax,
     buildings::utils::trap::spawn_trap,
     consts::MAX_BUILDING_POS,
+    game::features::{
+        actions::{
+            TargetProjectileAttack,
+            WithDespawn,
+        },
+        attack::targeting::building::BuildingFindTarget,
+    },
 };
 
 struct SeekingAirMineLevel {
@@ -59,6 +66,32 @@ impl BuildingModel for SeekingAirMineModel {
     }
 
     fn spawn(&self, world: &mut World) {
-        spawn_trap(world, self.position(), SEEKING_AIR_MINE.size);
+        let id = spawn_trap(
+            world,
+            self.position(),
+            SEEKING_AIR_MINE.size,
+            WithDespawn(Box::new(
+                TargetProjectileAttack {
+                    damage: SEEKING_AIR_MINE_LEVELS[*self.level].damage,
+                    projectile_speed: SEEKING_AIR_MINE_SPEED,
+                }
+                .into(),
+            ))
+            .into(),
+        );
+
+        world
+            .insert_one(
+                id,
+                BuildingFindTarget {
+                    attack_air: true,
+                    attack_ground: false,
+                    rotation_angle: None,
+                    min_attack_range: 0.0,
+                    max_attack_range: SEEKING_AIR_MINE_TRIGGER_RADIUS,
+                    min_housing_space: 5,
+                },
+            )
+            .unwrap();
     }
 }

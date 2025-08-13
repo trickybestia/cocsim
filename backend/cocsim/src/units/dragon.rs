@@ -143,6 +143,7 @@ impl UnitModel for DragonModel {
             .into(),
             draw_dragon,
             team,
+            DRAGON.housing_space,
         );
 
         world

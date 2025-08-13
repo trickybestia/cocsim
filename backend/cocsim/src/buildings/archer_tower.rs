@@ -176,6 +176,7 @@ impl BuildingModel for ArcherTowerModel {
                     rotation_angle: None,
                     min_attack_range: ARCHER_TOWER_MIN_ATTACK_RANGE,
                     max_attack_range: ARCHER_TOWER_MAX_ATTACK_RANGE,
+                    min_housing_space: 0,
                 },
             )
             .unwrap();

@@ -15,6 +15,7 @@ use crate::{
             Team,
         },
         position::Position,
+        unit::Unit,
     },
     utils::{
         AnyMapExt,
@@ -28,6 +29,7 @@ pub struct BuildingFindTarget {
     pub rotation_angle: Option<(f32, f32)>,
     pub min_attack_range: f32,
     pub max_attack_range: f32,
+    pub min_housing_space: usize,
 }
 
 #[derive(Default)]
@@ -38,7 +40,7 @@ struct UpdateCache<'a> {
         &'a Team,
         &'a Position,
     )>,
-    pub target_query: PreparedQuery<(&'a AttackTarget, &'a Team, &'a Position)>,
+    pub target_query: PreparedQuery<(&'a AttackTarget, &'a Unit, &'a Team, &'a Position)>,
 }
 
 pub fn update(game: &mut Game) {
@@ -56,7 +58,7 @@ pub fn update(game: &mut Game) {
         let mut nearest_target = Entity::DANGLING;
         let mut nearest_target_distance_squared = f32::INFINITY;
 
-        for (target_id, (attack_target, target_team, target_position)) in
+        for (target_id, (attack_target, unit, target_team, target_position)) in
             cache.target_query.query(&game.world).iter()
         {
             if target_team == attacker_team {
@@ -68,6 +70,10 @@ pub fn update(game: &mut Game) {
                 || (building_find_target.attack_ground
                     && attack_target.flags.contains(AttackTargetFlags::GROUND)))
             {
+                continue;
+            }
+
+            if unit.housing_space < building_find_target.min_housing_space {
                 continue;
             }
 

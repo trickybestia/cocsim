@@ -12,6 +12,10 @@ use crate::{
     UsizeWithMax,
     buildings::utils::trap::spawn_trap,
     consts::MAX_BUILDING_POS,
+    game::features::{
+        actions::SplashProjectileAttack,
+        attack::targeting::building::BuildingFindTarget,
+    },
 };
 
 struct AirBombLevel {
@@ -65,6 +69,32 @@ impl BuildingModel for AirBombModel {
     }
 
     fn spawn(&self, world: &mut World) {
-        spawn_trap(world, self.position(), AIR_BOMB.size);
+        let id = spawn_trap(
+            world,
+            self.position(),
+            AIR_BOMB.size,
+            SplashProjectileAttack {
+                damage: AIR_BOMB_LEVELS[*self.level].damage,
+                damage_radius: AIR_BOMB_DAMAGE_RADIUS,
+                damage_air: true,
+                damage_ground: false,
+                projectile_speed: AIR_BOMB_SPEED,
+            }
+            .into(),
+        );
+
+        world
+            .insert_one(
+                id,
+                BuildingFindTarget {
+                    attack_air: true,
+                    attack_ground: false,
+                    rotation_angle: None,
+                    min_attack_range: 0.0,
+                    max_attack_range: AIR_BOMB_TRIGGER_RADIUS,
+                    min_housing_space: 0,
+                },
+            )
+            .unwrap();
     }
 }

@@ -164,6 +164,7 @@ impl BuildingModel for MortarModel {
                     rotation_angle: None,
                     min_attack_range: MORTAR_MIN_ATTACK_RANGE,
                     max_attack_range: MORTAR_MAX_ATTACK_RANGE,
+                    min_housing_space: 0,
                 },
             )
             .unwrap();

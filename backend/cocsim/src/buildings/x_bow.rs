@@ -158,6 +158,7 @@ impl BuildingModel for XBowModel {
                     rotation_angle: None,
                     min_attack_range: X_BOW_MIN_ATTACK_RANGE,
                     max_attack_range,
+                    min_housing_space: 0,
                 },
             )
             .unwrap();

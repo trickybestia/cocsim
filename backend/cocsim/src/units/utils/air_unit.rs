@@ -14,13 +14,14 @@ use crate::{
             AttackTarget,
             AttackTargetFlags,
             Attacker,
+            FalseRetargetCondition,
             Team,
-            UnitRetargetCondition,
         },
         drawable::Drawable,
         health::Health,
         mover::Mover,
         position::Position,
+        unit::Unit,
     },
 };
 
@@ -33,9 +34,11 @@ pub fn create_air_unit(
     attack: ActionEnum,
     draw: fn(Entity, &Game, &mut Vec<Shape>),
     team: Team,
+    housing_space: usize,
 ) -> Entity {
     world.spawn((
         Position(position),
+        Unit { housing_space },
         Mover {
             speed,
             arrived: true,
@@ -47,7 +50,7 @@ pub fn create_air_unit(
             attack_cooldown,
             remaining_attack_cooldown: attack_cooldown,
             target: Entity::DANGLING,
-            retarget_condition: UnitRetargetCondition.into(),
+            retarget_condition: FalseRetargetCondition.into(),
             retarget: true,
             attack,
         },

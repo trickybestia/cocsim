@@ -4,8 +4,8 @@ mod utils;
 use cocsim::{
     AttackOptimizer,
     AttackPlanExecutor,
-    BalloonModel,
     DerivativeAttackOptimizer,
+    DragonModel,
     Game,
     GeneticAttackOptimizer,
     UnitWithCount,
@@ -18,13 +18,22 @@ use textplots::Plot;
 use crate::utils::macroquad_run_game;
 
 fn main() {
-    let units: Vec<UnitWithCount> = vec![UnitWithCount {
-        unit: BalloonModel {
-            level: 10.try_into().unwrap(),
-        }
-        .into(),
-        count: 10,
-    }];
+    let units: Vec<UnitWithCount> = vec![
+        UnitWithCount {
+            unit: DragonModel {
+                level: 5.try_into().unwrap(),
+            }
+            .into(),
+            count: 6,
+        },
+        UnitWithCount {
+            unit: DragonModel {
+                level: 5.try_into().unwrap(),
+            }
+            .into(),
+            count: 7,
+        },
+    ];
 
     let (map, map_image) = load_test_map("single_player/no_flight_zone").unwrap();
 

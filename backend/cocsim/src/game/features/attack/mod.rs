@@ -74,9 +74,9 @@ impl RetargetCondition for BuildingRetargetCondition {
     }
 }
 
-pub struct UnitRetargetCondition;
+pub struct FalseRetargetCondition;
 
-impl RetargetCondition for UnitRetargetCondition {
+impl RetargetCondition for FalseRetargetCondition {
     fn need_retarget(
         &self,
         _attacker_position: Vector2<f32>,
@@ -90,7 +90,7 @@ impl RetargetCondition for UnitRetargetCondition {
 #[enum_dispatch(RetargetCondition)]
 pub enum RetargetConditionEnum {
     BuildingRetargetCondition,
-    UnitRetargetCondition,
+    FalseRetargetCondition,
 }
 
 pub struct Attacker {

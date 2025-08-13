@@ -156,6 +156,7 @@ impl UnitModel for BalloonModel {
             .into(),
             draw_balloon,
             team,
+            BALLOON.housing_space,
         );
 
         world

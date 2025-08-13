@@ -165,6 +165,7 @@ impl BuildingModel for BombTowerModel {
                         rotation_angle: None,
                         min_attack_range: BOMB_TOWER_MIN_ATTACK_RANGE,
                         max_attack_range: BOMB_TOWER_MAX_ATTACK_RANGE,
+                        min_housing_space: 0,
                     },
                     OnDelete(
                         Delayed {
