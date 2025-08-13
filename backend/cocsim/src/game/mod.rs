@@ -21,8 +21,8 @@ use crate::{
     game::features::{
         attack::Team,
         buildings::{
+            Building,
             BuildingsGrid,
-            CountedBuilding,
             DropZone,
             TownHall,
         },
@@ -270,17 +270,15 @@ impl Game {
     }
 
     fn tick_cleanup(&mut self) {
-        //features::buildings::cleanup_tracking(self);
-        //features::collision::cleanup_tracking(self);
-
         features::health::cleanup_events(self);
     }
 
     fn counted_buildings_count(cache: &mut AnyMap, world: &mut World) -> usize {
         cache
-            .get_mut_or_default::<PreparedQuery<&CountedBuilding>>()
+            .get_mut_or_default::<PreparedQuery<&Building>>()
             .query_mut(world)
             .into_iter()
+            .filter(|(_, building)| building.affects_percentage_destroyed)
             .count()
     }
 

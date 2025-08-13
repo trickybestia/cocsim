@@ -1,3 +1,4 @@
+pub mod air_bomb;
 mod air_defense;
 mod air_sweeper;
 mod archer_tower;
@@ -16,12 +17,14 @@ mod gold_mine;
 mod gold_storage;
 mod laboratory;
 mod mortar;
+pub mod seeking_air_mine;
 mod town_hall;
 pub mod utils;
 mod wall;
 mod wizard_tower;
 mod x_bow;
 
+pub use air_bomb::*;
 pub use air_defense::*;
 pub use air_sweeper::*;
 use arbitrary::Arbitrary;
@@ -44,6 +47,7 @@ use hecs::World;
 pub use laboratory::*;
 pub use mortar::*;
 use nalgebra::Vector2;
+pub use seeking_air_mine::*;
 use serde::{
     Deserialize,
     Serialize,
@@ -82,6 +86,8 @@ pub trait BuildingModel {
 #[derive(Serialize, Deserialize, Debug, Arbitrary, Clone)]
 #[serde(tag = "name")]
 pub enum BuildingModelEnum {
+    #[serde(rename = "AirBomb")]
+    AirBombModel,
     #[serde(rename = "AirDefense")]
     AirDefenseModel,
     #[serde(rename = "AirSweeper")]
@@ -118,6 +124,8 @@ pub enum BuildingModelEnum {
     LaboratoryModel,
     #[serde(rename = "Mortar")]
     MortarModel,
+    #[serde(rename = "SeekingAirMine")]
+    SeekingAirMineModel,
     #[serde(rename = "TownHall")]
     TownHallModel,
     #[serde(rename = "Wall")]

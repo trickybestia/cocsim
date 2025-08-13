@@ -1,0 +1,24 @@
+use hecs::{
+    Entity,
+    World,
+};
+use nalgebra::Vector2;
+
+use crate::game::features::{
+    attack::Team,
+    buildings::Building,
+    position::Position,
+};
+
+pub fn spawn_trap(world: &mut World, position: Vector2<usize>, size: Vector2<usize>) -> Entity {
+    world.spawn((
+        Position(position.cast() + size.cast() / 2.0),
+        Building {
+            position,
+            size,
+            affects_drop_zone: false,
+            affects_percentage_destroyed: false,
+        },
+        Team::Defense,
+    ))
+}

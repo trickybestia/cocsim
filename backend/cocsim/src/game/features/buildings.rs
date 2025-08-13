@@ -1,5 +1,4 @@
 use hecs::{
-    CommandBuffer,
     Entity,
     World,
 };
@@ -8,18 +7,16 @@ use nalgebra::{
     Vector2,
 };
 
-use crate::game::features::{
-    map_size::MapSize,
-    position::Position,
-};
+use crate::game::features::map_size::MapSize;
 
 pub struct Building {
     pub position: Vector2<usize>,
     pub size: Vector2<usize>,
+    /// `true` for most buildings, `false` for traps.
+    pub affects_drop_zone: bool,
+    /// `true` for most buildings, `false` for walls and traps.
+    pub affects_percentage_destroyed: bool,
 }
-
-/// "Counted" means that this building impacts destroyed buildings percentage.
-pub struct CountedBuilding;
 
 pub struct TownHall;
 
@@ -33,13 +30,10 @@ impl BuildingsGrid {
             Entity::DANGLING,
         );
 
-        let mut commands = CommandBuffer::new();
-
-        for (id, building) in world.query::<&Building>().iter() {
-            commands.insert_one(
-                id,
-                Position(building.position.cast() + building.size.cast() / 2.0),
-            );
+        for (id, building) in world.query_mut::<&Building>() {
+            if !building.affects_drop_zone {
+                continue;
+            }
 
             for rel_x in 0..building.size.x {
                 let abs_x = building.position.x + rel_x;
@@ -51,8 +45,6 @@ impl BuildingsGrid {
                 }
             }
         }
-
-        commands.run_on(world);
 
         Self(result)
     }

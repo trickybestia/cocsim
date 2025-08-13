@@ -15,11 +15,9 @@ use crate::{
             AttackTargetFlags,
             Team,
         },
-        buildings::{
-            Building,
-            CountedBuilding,
-        },
+        buildings::Building,
         health::Health,
+        position::Position,
     },
 };
 
@@ -31,8 +29,13 @@ pub fn spawn_resource_building(
 ) -> Entity {
     world.spawn((
         Health(health),
-        Building { position, size },
-        CountedBuilding,
+        Position(position.cast() + size.cast() / 2.0),
+        Building {
+            position,
+            size,
+            affects_drop_zone: true,
+            affects_percentage_destroyed: true,
+        },
         default_pathfinding_collider(size),
         Team::Defense,
         AttackTarget {
