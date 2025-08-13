@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use hecs::{
     Entity,
     PreparedQuery,
@@ -6,16 +8,13 @@ use hecs::{
 
 use crate::{
     Game,
-    game::features::actions::{
-        Action,
-        ActionEnum,
-    },
+    game::features::actions::Action,
     utils::AnyMapExt,
 };
 
 pub struct ToBeDespawned;
 
-pub struct OnDespawn(pub ActionEnum);
+pub struct OnDespawn(pub Arc<dyn Action>);
 
 pub fn handle_to_be_despawned(game: &mut Game) {
     for (id, action) in create_on_despawn_queue(game) {
@@ -27,7 +26,7 @@ pub fn handle_to_be_despawned(game: &mut Game) {
     }
 }
 
-fn create_on_despawn_queue(game: &mut Game) -> Vec<(Entity, ActionEnum)> {
+fn create_on_despawn_queue(game: &mut Game) -> Vec<(Entity, Arc<dyn Action>)> {
     game.cache
         .get_mut_or_default::<PreparedQuery<With<&OnDespawn, &ToBeDespawned>>>()
         .query_mut(&mut game.world)

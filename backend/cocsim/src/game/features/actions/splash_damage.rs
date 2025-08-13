@@ -10,7 +10,7 @@ use crate::{
     },
 };
 
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub struct SplashDamage {
     pub damage_ground: bool,
     pub damage_air: bool,

@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use arbitrary::Arbitrary;
 use hecs::World;
 use nalgebra::Vector2;
@@ -145,14 +147,13 @@ impl BuildingModel for BombTowerModel {
                 rotation_angle: None,
             }
             .into(),
-            SplashProjectileAttack {
+            Arc::new(SplashProjectileAttack {
                 damage: level.attack_damage,
                 damage_radius: BOMB_TOWER_SPLASH_ATTACK_RADIUS,
                 damage_air: false,
                 damage_ground: true,
                 projectile_speed: BOMB_TOWER_PROJECTILE_SPEED,
-            }
-            .into(),
+            }),
         );
 
         world
@@ -167,21 +168,15 @@ impl BuildingModel for BombTowerModel {
                         max_attack_range: BOMB_TOWER_MAX_ATTACK_RANGE,
                         min_housing_space: 0,
                     },
-                    OnDespawn(
-                        WithDelay {
-                            time: BOMB_TOWER_DEATH_DAMAGE_DELAY,
-                            action: Box::new(
-                                SplashDamage {
-                                    damage_ground: true,
-                                    damage_air: false,
-                                    damage: level.death_damage,
-                                    radius: BOMB_TOWER_DEATH_DAMAGE_ATTACK_RADIUS,
-                                }
-                                .into(),
-                            ),
-                        }
-                        .into(),
-                    ),
+                    OnDespawn(Arc::new(WithDelay {
+                        time: BOMB_TOWER_DEATH_DAMAGE_DELAY,
+                        action: Arc::new(SplashDamage {
+                            damage_ground: true,
+                            damage_air: false,
+                            damage: level.death_damage,
+                            radius: BOMB_TOWER_DEATH_DAMAGE_ATTACK_RADIUS,
+                        }),
+                    })),
                 ),
             )
             .unwrap();

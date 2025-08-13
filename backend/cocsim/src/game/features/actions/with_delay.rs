@@ -1,14 +1,11 @@
-use std::ops::Deref;
+use std::sync::Arc;
 
 use hecs::Entity;
 
 use crate::{
     Game,
     game::features::{
-        actions::{
-            Action,
-            ActionEnum,
-        },
+        actions::Action,
         attack::Team,
         delay::Delay,
         position::Position,
@@ -16,10 +13,10 @@ use crate::{
     },
 };
 
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub struct WithDelay {
     pub time: f32,
-    pub action: Box<ActionEnum>,
+    pub action: Arc<dyn Action>,
 }
 
 impl Action for WithDelay {
@@ -28,7 +25,7 @@ impl Action for WithDelay {
             Delay {
                 time_left: self.time,
             },
-            OnDespawn(self.action.deref().clone()),
+            OnDespawn(self.action.clone()),
         ));
 
         let team = game.world.get::<&Team>(actor).map(|team| *team);

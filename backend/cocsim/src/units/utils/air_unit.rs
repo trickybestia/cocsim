@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use hecs::{
     Entity,
     World,
@@ -9,7 +11,7 @@ use crate::{
     Shape,
     colliders::PointCollider,
     game::features::{
-        actions::ActionEnum,
+        actions::Action,
         attack::{
             AttackTarget,
             AttackTargetFlags,
@@ -31,7 +33,7 @@ pub fn create_air_unit(
     health: f32,
     speed: f32,
     attack_cooldown: f32,
-    attack: ActionEnum,
+    attack: Arc<dyn Action>,
     draw: fn(Entity, &Game, &mut Vec<Shape>),
     team: Team,
     housing_space: usize,

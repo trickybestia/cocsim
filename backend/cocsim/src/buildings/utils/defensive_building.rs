@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use hecs::{
     Entity,
     World,
@@ -10,7 +12,7 @@ use crate::{
         default_pathfinding_collider,
     },
     game::features::{
-        actions::ActionEnum,
+        actions::Action,
         attack::{
             AttackTarget,
             AttackTargetFlags,
@@ -31,7 +33,7 @@ pub fn spawn_defensive_building(
     size: Vector2<usize>,
     attack_cooldown: f32,
     retarget_condition: RetargetConditionEnum,
-    attack: ActionEnum,
+    attack: Arc<dyn Action>,
 ) -> Entity {
     world.spawn((
         Health(health),

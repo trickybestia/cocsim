@@ -1,18 +1,17 @@
+use std::sync::Arc;
+
 use hecs::Entity;
 
 use crate::{
     Game,
     game::features::{
-        actions::{
-            Action,
-            ActionEnum,
-        },
+        actions::Action,
         to_be_despawned::ToBeDespawned,
     },
 };
 
-#[derive(Clone, Debug)]
-pub struct WithDespawn(pub Box<ActionEnum>);
+#[derive(Debug)]
+pub struct WithDespawn(pub Arc<dyn Action>);
 
 impl Action for WithDespawn {
     fn call(&self, actor: Entity, game: &mut Game) {

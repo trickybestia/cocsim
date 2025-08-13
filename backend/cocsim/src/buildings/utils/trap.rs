@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use hecs::{
     Entity,
     World,
@@ -5,7 +7,7 @@ use hecs::{
 use nalgebra::Vector2;
 
 use crate::game::features::{
-    actions::ActionEnum,
+    actions::Action,
     attack::{
         Attacker,
         FalseRetargetCondition,
@@ -19,7 +21,7 @@ pub fn spawn_trap(
     world: &mut World,
     position: Vector2<usize>,
     size: Vector2<usize>,
-    attack: ActionEnum,
+    attack: Arc<dyn Action>,
 ) -> Entity {
     world.spawn((
         Position(position.cast() + size.cast() / 2.0),

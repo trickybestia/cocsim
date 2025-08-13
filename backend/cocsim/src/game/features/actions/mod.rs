@@ -1,5 +1,4 @@
 mod air_sweeper_attack;
-mod empty_action;
 mod melee_attack;
 mod splash_damage;
 mod splash_projectile_attack;
@@ -7,9 +6,9 @@ mod target_projectile_attack;
 mod with_delay;
 mod with_despawn;
 
+use std::fmt::Debug;
+
 pub use air_sweeper_attack::AirSweeperAttack;
-pub use empty_action::EmptyAction;
-use enum_dispatch::enum_dispatch;
 use hecs::Entity;
 pub use melee_attack::MeleeAttack;
 pub use splash_damage::SplashDamage;
@@ -20,20 +19,6 @@ pub use with_despawn::WithDespawn;
 
 use crate::Game;
 
-#[enum_dispatch]
-pub trait Action {
+pub trait Action: Debug + Send + Sync {
     fn call(&self, actor: Entity, game: &mut Game);
-}
-
-#[enum_dispatch(Action)]
-#[derive(Clone, Debug)]
-pub enum ActionEnum {
-    AirSweeperAttack,
-    EmptyAction,
-    MeleeAttack,
-    SplashDamage,
-    SplashProjectileAttack,
-    TargetProjectileAttack,
-    WithDelay,
-    WithDespawn,
 }

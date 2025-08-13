@@ -9,7 +9,7 @@ use crate::{
     },
 };
 
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub struct MeleeAttack {
     pub damage: f32,
 }

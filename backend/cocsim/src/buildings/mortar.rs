@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use arbitrary::Arbitrary;
 use hecs::World;
 use nalgebra::Vector2;
@@ -145,14 +147,13 @@ impl BuildingModel for MortarModel {
                 rotation_angle: None,
             }
             .into(),
-            SplashProjectileAttack {
+            Arc::new(SplashProjectileAttack {
                 damage: level.attack_damage,
                 damage_radius: MORTAR_SPLASH_ATTACK_RADIUS,
                 damage_air: false,
                 damage_ground: true,
                 projectile_speed: MORTAR_PROJECTILE_SPEED,
-            }
-            .into(),
+            }),
         );
 
         world

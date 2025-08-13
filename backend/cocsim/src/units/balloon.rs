@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use arbitrary::Arbitrary;
 use hecs::{
     Entity,
@@ -147,13 +149,12 @@ impl UnitModel for BalloonModel {
             level.health,
             BALLOON_SPEED,
             BALLOON_ATTACK_COOLDOWN,
-            SplashDamage {
+            Arc::new(SplashDamage {
                 damage_ground: true,
                 damage_air: false,
                 damage: level.attack_damage,
                 radius: BALLOON_SPLASH_ATTACK_RADIUS,
-            }
-            .into(),
+            }),
             draw_balloon,
             team,
             BALLOON.housing_space,
@@ -167,15 +168,12 @@ impl UnitModel for BalloonModel {
                         prioritizer: DefensiveBuildingTargetPrioritizer.into(),
                         attack_range: BALLOON_ATTACK_RANGE,
                     },
-                    OnDespawn(
-                        SplashDamage {
-                            damage_ground: true,
-                            damage_air: false,
-                            damage: level.death_damage,
-                            radius: BALLOON_SPLASH_ATTACK_RADIUS,
-                        }
-                        .into(),
-                    ),
+                    OnDespawn(Arc::new(SplashDamage {
+                        damage_ground: true,
+                        damage_air: false,
+                        damage: level.death_damage,
+                        radius: BALLOON_SPLASH_ATTACK_RADIUS,
+                    })),
                 ),
             )
             .unwrap();

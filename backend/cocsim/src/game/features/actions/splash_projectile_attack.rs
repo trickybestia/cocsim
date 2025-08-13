@@ -13,7 +13,7 @@ use crate::{
     },
 };
 
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub struct SplashProjectileAttack {
     pub damage: f32,
     pub damage_radius: f32,

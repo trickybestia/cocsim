@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use arbitrary::Arbitrary;
 use hecs::World;
 use nalgebra::Vector2;
@@ -145,15 +147,14 @@ impl BuildingModel for AirSweeperModel {
                 rotation_angle,
             }
             .into(),
-            AirSweeperAttack {
+            Arc::new(AirSweeperAttack {
                 push_strength: level.push_strength,
                 projectile_speed: AIR_SWEEPER_PROJECTILE_SPEED,
                 start_radius: AIR_SWEEPER_MIN_ATTACK_RANGE,
                 max_radius: AIR_SWEEPER_MAX_ATTACK_RANGE,
                 angle: AIR_SWEEPER_PROJECTILE_ANGLE,
                 max_arc_length: AIR_SWEEPER_PROJECTILE_MAX_ARC_LENGTH,
-            }
-            .into(),
+            }),
         );
 
         world
