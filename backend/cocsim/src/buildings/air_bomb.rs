@@ -46,6 +46,7 @@ inventory::submit! {AIR_BOMB}
 
 const AIR_BOMB_TRIGGER_RADIUS: f32 = 4.0;
 const AIR_BOMB_DAMAGE_RADIUS: f32 = 3.0;
+const AIR_BOMB_SPEED: f32 = 2.5;
 
 #[derive(Serialize, Deserialize, Debug, Arbitrary, Clone)]
 pub struct AirBombModel {
