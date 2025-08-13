@@ -7,8 +7,7 @@ const getBuildingTypesWithSize = (
 ): BuildingType[] => {
   return buildingTypes.filter(
     (buildingType) =>
-      buildingType.name === "Wall" ||
-      (buildingType.width === width && buildingType.height === height)
+      width % buildingType.width === 0 && height % buildingType.height === 0
   );
 };
 

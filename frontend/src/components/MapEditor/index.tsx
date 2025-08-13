@@ -294,43 +294,34 @@ const MapEditor: React.FC<Props> = ({
 
     const newBuildings = buildings.slice();
 
-    if (building.buildingType.name === "Wall") {
+    const options: { [option: string]: unknown } = {};
+
+    building.buildingType.options.forEach(({ name, values }) => {
+      options[name] = values[0];
+    });
+
+    if (building.buildingType.name === "ClanCastle") {
+      options["units"] = [];
+    }
+
+    for (
+      let tileX = selection!.leftTop.x;
+      tileX <= selection!.rightBottom.x;
+      tileX += building.buildingType.width
+    ) {
       for (
-        let tileX = selection!.leftTop.x;
-        tileX != selection!.rightBottom.x + 1;
-        tileX++
+        let tileY = selection!.leftTop.y;
+        tileY <= selection!.rightBottom.y;
+        tileY += building.buildingType.height
       ) {
-        for (
-          let tileY = selection!.leftTop.y;
-          tileY != selection!.rightBottom.y + 1;
-          tileY++
-        ) {
-          newBuildings.push({
-            name: "Wall",
-            x: tileX,
-            y: tileY,
-            level: building.level
-          });
-        }
+        newBuildings.push({
+          name: building.buildingType.name,
+          x: tileX,
+          y: tileY,
+          level: building.level,
+          ...options
+        });
       }
-    } else {
-      const options: { [option: string]: unknown } = {};
-
-      building.buildingType.options.forEach(({ name, values }) => {
-        options[name] = values[0];
-      });
-
-      if (building.buildingType.name === "ClanCastle") {
-        options["units"] = [];
-      }
-
-      newBuildings.push({
-        name: building.buildingType.name,
-        x: selection!.leftTop.x,
-        y: selection!.leftTop.y,
-        level: building.level,
-        ...options
-      });
     }
 
     setBuildings(newBuildings);
