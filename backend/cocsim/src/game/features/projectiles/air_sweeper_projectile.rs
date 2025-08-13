@@ -20,7 +20,7 @@ use crate::{
         },
         position::Position,
         stunned::Stunned,
-        to_be_deleted::ToBeDeleted,
+        to_be_despawned::ToBeDespawned,
     },
     utils::{
         AnyMapExt,
@@ -56,7 +56,7 @@ struct UpdateCache<'a> {
 pub fn update(game: &mut Game) {
     let cache = game.cache.get_mut_or_default::<UpdateCache>();
 
-    let mut to_be_deleted = Vec::new();
+    let mut to_be_despawned = Vec::new();
     let mut stunned = Vec::new();
 
     for (id, (projectile, projectile_team, projectile_position)) in
@@ -120,12 +120,12 @@ pub fn update(game: &mut Game) {
         projectile.radius = new_radius;
 
         if projectile.radius == projectile.max_radius {
-            to_be_deleted.push(id);
+            to_be_despawned.push(id);
         }
     }
 
-    for id in to_be_deleted {
-        game.world.insert_one(id, ToBeDeleted).unwrap();
+    for id in to_be_despawned {
+        game.world.insert_one(id, ToBeDespawned).unwrap();
     }
 
     for id in stunned {

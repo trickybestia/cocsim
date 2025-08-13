@@ -15,7 +15,7 @@ use crate::{
             Team,
         },
         position::Position,
-        to_be_deleted::ToBeDeleted,
+        to_be_despawned::ToBeDespawned,
     },
     utils::AnyMapExt,
 };
@@ -48,7 +48,7 @@ pub fn handle_entity_damage_events(game: &mut Game) {
         target_health.0 -= damage_event.damage;
     }
 
-    let to_be_deleted = game
+    let to_be_despawned = game
         .cache
         .get_mut_or_default::<PreparedQuery<&Health>>()
         .query_mut(&mut game.world)
@@ -57,8 +57,8 @@ pub fn handle_entity_damage_events(game: &mut Game) {
         .map(|(id, _)| id)
         .collect::<Vec<_>>();
 
-    for id in to_be_deleted {
-        game.world.insert_one(id, ToBeDeleted).unwrap();
+    for id in to_be_despawned {
+        game.world.insert_one(id, ToBeDespawned).unwrap();
     }
 }
 

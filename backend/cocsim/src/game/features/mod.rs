@@ -11,5 +11,5 @@ pub mod mover;
 pub mod position;
 pub mod projectiles;
 pub mod stunned;
-pub mod to_be_deleted;
+pub mod to_be_despawned;
 pub mod unit;

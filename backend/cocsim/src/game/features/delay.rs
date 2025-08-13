@@ -2,17 +2,17 @@ use hecs::PreparedQuery;
 
 use crate::{
     Game,
-    game::features::to_be_deleted::ToBeDeleted,
+    game::features::to_be_despawned::ToBeDespawned,
     utils::AnyMapExt,
 };
 
-/// Despawn entity after time
+/// Despawn entity after time.
 pub struct Delay {
     pub time_left: f32,
 }
 
 pub fn update(game: &mut Game) {
-    let mut to_be_deleted = Vec::new();
+    let mut to_be_despawned = Vec::new();
 
     for (id, delay) in game
         .cache
@@ -22,11 +22,11 @@ pub fn update(game: &mut Game) {
         delay.time_left = 0.0f32.max(delay.time_left - game.delta_time);
 
         if delay.time_left == 0.0 {
-            to_be_deleted.push(id);
+            to_be_despawned.push(id);
         }
     }
 
-    for id in to_be_deleted {
-        game.world.insert_one(id, ToBeDeleted).unwrap();
+    for id in to_be_despawned {
+        game.world.insert_one(id, ToBeDespawned).unwrap();
     }
 }

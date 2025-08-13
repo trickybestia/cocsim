@@ -12,23 +12,23 @@ use crate::{
         attack::Team,
         delay::Delay,
         position::Position,
-        to_be_deleted::OnDelete,
+        to_be_despawned::OnDespawn,
     },
 };
 
 #[derive(Clone, Debug)]
-pub struct Delayed {
+pub struct WithDelay {
     pub time: f32,
     pub action: Box<ActionEnum>,
 }
 
-impl Action for Delayed {
+impl Action for WithDelay {
     fn call(&self, actor: Entity, game: &mut Game) {
         let id = game.world.spawn((
             Delay {
                 time_left: self.time,
             },
-            OnDelete(self.action.deref().clone()),
+            OnDespawn(self.action.deref().clone()),
         ));
 
         let team = game.world.get::<&Team>(actor).map(|team| *team);

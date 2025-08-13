@@ -25,7 +25,7 @@ use crate::{
             },
         },
         position::Position,
-        to_be_deleted::OnDelete,
+        to_be_despawned::OnDespawn,
     },
     units::utils::air_unit::create_air_unit,
     usize_with_max::UsizeWithMax,
@@ -167,7 +167,7 @@ impl UnitModel for BalloonModel {
                         prioritizer: DefensiveBuildingTargetPrioritizer.into(),
                         attack_range: BALLOON_ATTACK_RANGE,
                     },
-                    OnDelete(
+                    OnDespawn(
                         SplashDamage {
                             damage_ground: true,
                             damage_air: false,

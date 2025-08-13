@@ -7,7 +7,7 @@ use crate::{
             Action,
             ActionEnum,
         },
-        to_be_deleted::ToBeDeleted,
+        to_be_despawned::ToBeDespawned,
     },
 };
 
@@ -18,6 +18,6 @@ impl Action for WithDespawn {
     fn call(&self, actor: Entity, game: &mut Game) {
         self.0.call(actor, game);
 
-        game.world.insert_one(actor, ToBeDeleted).unwrap();
+        game.world.insert_one(actor, ToBeDespawned).unwrap();
     }
 }

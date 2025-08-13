@@ -12,7 +12,7 @@ use crate::{
     game::features::{
         health::EntityDamageEvent,
         position::Position,
-        to_be_deleted::ToBeDeleted,
+        to_be_despawned::ToBeDespawned,
     },
     utils::AnyMapExt,
 };
@@ -26,7 +26,7 @@ pub struct TargetProjectile {
 }
 
 pub fn update(game: &mut Game) {
-    let mut to_be_deleted = Vec::new();
+    let mut to_be_despawned = Vec::new();
     let mut entity_damage_event = Vec::new();
 
     for (id, (projectile, position)) in game
@@ -36,7 +36,7 @@ pub fn update(game: &mut Game) {
         .iter()
     {
         if !game.world.contains(projectile.target) {
-            to_be_deleted.push(id);
+            to_be_despawned.push(id);
 
             continue;
         }
@@ -55,12 +55,12 @@ pub fn update(game: &mut Game) {
                 target: projectile.target,
                 damage: projectile.damage,
             },));
-            to_be_deleted.push(id);
+            to_be_despawned.push(id);
         }
     }
 
-    for id in to_be_deleted {
-        game.world.insert_one(id, ToBeDeleted).unwrap();
+    for id in to_be_despawned {
+        game.world.insert_one(id, ToBeDespawned).unwrap();
     }
 
     game.world.spawn_batch(entity_damage_event);

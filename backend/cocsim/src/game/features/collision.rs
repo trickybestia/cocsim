@@ -16,7 +16,7 @@ use crate::{
         MapSize,
         features::{
             buildings::Building,
-            to_be_deleted::ToBeDeleted,
+            to_be_despawned::ToBeDespawned,
         },
     },
     utils::AnyMapExt,
@@ -57,7 +57,7 @@ impl PathfindingCollisionGrid {
 pub fn check_need_redraw_collision(game: &mut Game) {
     if game
         .cache
-        .get_mut_or_default::<PreparedQuery<With<(&Building, &PathfindingCollider), &ToBeDeleted>>>(
+        .get_mut_or_default::<PreparedQuery<With<(&Building, &PathfindingCollider), &ToBeDespawned>>>(
         )
         .query_mut(&mut game.world)
         .into_iter()

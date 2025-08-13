@@ -203,14 +203,14 @@ impl Game {
         features::mover::r#move(self);
         features::health::handle_splash_damage_events(self);
         features::health::handle_entity_damage_events(self);
-        // TODO: run system: remove ToBeDeleted and use hero ability if not used
+        // TODO: run system: remove ToBeDespawned and use hero ability if not used
         features::delay::update(self);
 
         if self.collision_grid.is_some() {
             features::collision::check_need_redraw_collision(self);
         }
 
-        features::to_be_deleted::handle_to_be_deleted(self);
+        features::to_be_despawned::handle_to_be_despawned(self);
 
         self.tick_cleanup();
 

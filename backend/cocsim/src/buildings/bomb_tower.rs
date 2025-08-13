@@ -14,15 +14,15 @@ use crate::{
     consts::MAX_BUILDING_POS,
     game::features::{
         actions::{
-            Delayed,
             SplashDamage,
             SplashProjectileAttack,
+            WithDelay,
         },
         attack::{
             BuildingRetargetCondition,
             targeting::building::BuildingFindTarget,
         },
-        to_be_deleted::OnDelete,
+        to_be_despawned::OnDespawn,
     },
 };
 
@@ -167,8 +167,8 @@ impl BuildingModel for BombTowerModel {
                         max_attack_range: BOMB_TOWER_MAX_ATTACK_RANGE,
                         min_housing_space: 0,
                     },
-                    OnDelete(
-                        Delayed {
+                    OnDespawn(
+                        WithDelay {
                             time: BOMB_TOWER_DEATH_DAMAGE_DELAY,
                             action: Box::new(
                                 SplashDamage {

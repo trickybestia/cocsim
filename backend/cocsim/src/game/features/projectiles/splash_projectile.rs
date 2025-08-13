@@ -12,7 +12,7 @@ use crate::{
         attack::Team,
         health::SplashDamageEvent,
         position::Position,
-        to_be_deleted::ToBeDeleted,
+        to_be_despawned::ToBeDespawned,
     },
     utils::AnyMapExt,
 };
@@ -28,7 +28,7 @@ pub struct SplashProjectile {
 }
 
 pub fn update(game: &mut Game) {
-    let mut to_be_deleted = Vec::new();
+    let mut to_be_despawned = Vec::new();
     let mut splash_damage_event = Vec::new();
 
     for (id, (projectile, position, team)) in game
@@ -51,12 +51,12 @@ pub fn update(game: &mut Game) {
                 damage: projectile.damage,
                 radius: projectile.damage_radius,
             },));
-            to_be_deleted.push(id);
+            to_be_despawned.push(id);
         }
     }
 
-    for id in to_be_deleted {
-        game.world.insert_one(id, ToBeDeleted).unwrap();
+    for id in to_be_despawned {
+        game.world.insert_one(id, ToBeDespawned).unwrap();
     }
 
     game.world.spawn_batch(splash_damage_event);
