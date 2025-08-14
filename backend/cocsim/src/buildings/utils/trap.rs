@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use hecs::{
     Entity,
     World,
@@ -21,7 +19,7 @@ pub fn spawn_trap(
     world: &mut World,
     position: Vector2<usize>,
     size: Vector2<usize>,
-    attack: Arc<dyn Action>,
+    attack: Box<dyn Action>,
 ) -> Entity {
     world.spawn((
         Position(position.cast() + size.cast() / 2.0),

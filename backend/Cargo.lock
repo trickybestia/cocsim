@@ -533,6 +533,7 @@ dependencies = [
  "arbitrary",
  "bitflags 2.9.1",
  "criterion",
+ "dyn-clone",
  "enum_dispatch",
  "hecs",
  "inventory",

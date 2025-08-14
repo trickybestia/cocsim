@@ -15,7 +15,7 @@ use crate::{
     },
 };
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct AirSweeperAttack {
     pub push_strength: f32,
     pub projectile_speed: f32,

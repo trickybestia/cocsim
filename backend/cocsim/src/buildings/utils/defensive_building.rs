@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use hecs::{
     Entity,
     World,
@@ -33,7 +31,7 @@ pub fn spawn_defensive_building(
     size: Vector2<usize>,
     attack_cooldown: f32,
     retarget_condition: RetargetConditionEnum,
-    attack: Arc<dyn Action>,
+    attack: Box<dyn Action>,
 ) -> Entity {
     world.spawn((
         Health(health),

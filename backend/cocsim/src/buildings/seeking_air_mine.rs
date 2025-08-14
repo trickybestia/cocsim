@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use arbitrary::Arbitrary;
 use hecs::World;
 use nalgebra::Vector2;
@@ -72,7 +70,7 @@ impl BuildingModel for SeekingAirMineModel {
             world,
             self.position(),
             SEEKING_AIR_MINE.size,
-            Arc::new(WithDespawn(Arc::new(TargetProjectileAttack {
+            Box::new(WithDespawn(Box::new(TargetProjectileAttack {
                 damage: SEEKING_AIR_MINE_LEVELS[*self.level].damage,
                 projectile_speed: SEEKING_AIR_MINE_SPEED,
             }))),

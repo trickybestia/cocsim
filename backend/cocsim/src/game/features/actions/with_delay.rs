@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use hecs::Entity;
 
 use crate::{
@@ -13,10 +11,10 @@ use crate::{
     },
 };
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct WithDelay {
     pub time: f32,
-    pub action: Arc<dyn Action>,
+    pub action: Box<dyn Action>,
 }
 
 impl Action for WithDelay {

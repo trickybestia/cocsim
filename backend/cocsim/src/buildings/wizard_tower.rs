@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use arbitrary::Arbitrary;
 use hecs::World;
 use nalgebra::Vector2;
@@ -147,7 +145,7 @@ impl BuildingModel for WizardTowerModel {
                 rotation_angle: None,
             }
             .into(),
-            Arc::new(SplashProjectileAttack {
+            Box::new(SplashProjectileAttack {
                 damage: level.attack_damage,
                 damage_radius: WIZARD_TOWER_SPLASH_ATTACK_RADIUS,
                 damage_air: true,

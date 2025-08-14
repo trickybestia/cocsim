@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use arbitrary::Arbitrary;
 use hecs::World;
 use nalgebra::Vector2;
@@ -147,7 +145,7 @@ impl BuildingModel for BombTowerModel {
                 rotation_angle: None,
             }
             .into(),
-            Arc::new(SplashProjectileAttack {
+            Box::new(SplashProjectileAttack {
                 damage: level.attack_damage,
                 damage_radius: BOMB_TOWER_SPLASH_ATTACK_RADIUS,
                 damage_air: false,
@@ -168,9 +166,9 @@ impl BuildingModel for BombTowerModel {
                         max_attack_range: BOMB_TOWER_MAX_ATTACK_RANGE,
                         min_housing_space: 0,
                     },
-                    OnDespawn(Arc::new(WithDelay {
+                    OnDespawn(Box::new(WithDelay {
                         time: BOMB_TOWER_DEATH_DAMAGE_DELAY,
-                        action: Arc::new(SplashDamage {
+                        action: Box::new(SplashDamage {
                             damage_ground: true,
                             damage_air: false,
                             damage: level.death_damage,

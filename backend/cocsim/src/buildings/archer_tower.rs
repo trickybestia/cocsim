@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use arbitrary::Arbitrary;
 use hecs::World;
 use nalgebra::Vector2;
@@ -162,7 +160,7 @@ impl BuildingModel for ArcherTowerModel {
                 rotation_angle: None,
             }
             .into(),
-            Arc::new(TargetProjectileAttack {
+            Box::new(TargetProjectileAttack {
                 damage: level.attack_damage,
                 projectile_speed: ARCHER_TOWER_PROJECTILE_SPEED,
             }),

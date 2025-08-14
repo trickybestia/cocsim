@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use hecs::{
     Entity,
     World,
@@ -33,7 +31,7 @@ pub fn create_air_unit(
     health: f32,
     speed: f32,
     attack_cooldown: f32,
-    attack: Arc<dyn Action>,
+    attack: Box<dyn Action>,
     draw: fn(Entity, &Game, &mut Vec<Shape>),
     team: Team,
     housing_space: usize,

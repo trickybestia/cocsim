@@ -11,6 +11,7 @@ anyhow = "1"
 anymap = "0.12"
 arbitrary = { version = "1", features = ["derive"] }
 bitflags = "2.9"
+dyn-clone = "1"
 enum_dispatch = "0.3"
 hecs = "0.10"
 inventory = "0.3"

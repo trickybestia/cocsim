@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use bitflags::bitflags;
 use enum_dispatch::enum_dispatch;
 use hecs::{
@@ -98,7 +96,7 @@ pub struct Attacker {
     pub target: Entity,
     pub retarget_condition: RetargetConditionEnum,
     pub retarget: bool,
-    pub attack: Arc<dyn Action>,
+    pub attack: Box<dyn Action>,
 }
 
 bitflags! {
@@ -187,7 +185,7 @@ pub fn attack(game: &mut Game) {
     }
 }
 
-fn create_attack_queue(game: &mut Game) -> Vec<(Arc<dyn Action>, Entity)> {
+fn create_attack_queue(game: &mut Game) -> Vec<(Box<dyn Action>, Entity)> {
     let mut result = Vec::new();
 
     for (attacker_id, (attacker, mover)) in game

@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use arbitrary::Arbitrary;
 use hecs::{
     Entity,
@@ -139,7 +137,7 @@ impl UnitModel for DragonModel {
             level.health,
             DRAGON_SPEED,
             DRAGON_ATTACK_COOLDOWN,
-            Arc::new(MeleeAttack {
+            Box::new(MeleeAttack {
                 damage: level.attack_damage,
             }),
             draw_dragon,

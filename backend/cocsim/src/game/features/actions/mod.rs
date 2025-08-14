@@ -9,6 +9,7 @@ mod with_despawn;
 use std::fmt::Debug;
 
 pub use air_sweeper_attack::AirSweeperAttack;
+use dyn_clone::DynClone;
 use hecs::Entity;
 pub use melee_attack::MeleeAttack;
 pub use splash_damage::SplashDamage;
@@ -19,6 +20,8 @@ pub use with_despawn::WithDespawn;
 
 use crate::Game;
 
-pub trait Action: Debug + Send + Sync {
+pub trait Action: Debug + Send + Sync + DynClone {
     fn call(&self, actor: Entity, game: &mut Game);
 }
+
+dyn_clone::clone_trait_object!(Action);

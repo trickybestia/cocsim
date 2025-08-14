@@ -10,7 +10,7 @@ use crate::{
     },
 };
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct TargetProjectileAttack {
     pub damage: f32,
     pub projectile_speed: f32,

@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use arbitrary::Arbitrary;
 use hecs::World;
 use nalgebra::Vector2;
@@ -75,7 +73,7 @@ impl BuildingModel for AirBombModel {
             world,
             self.position(),
             AIR_BOMB.size,
-            Arc::new(SplashProjectileAttack {
+            Box::new(SplashProjectileAttack {
                 damage: AIR_BOMB_LEVELS[*self.level].damage,
                 damage_radius: AIR_BOMB_DAMAGE_RADIUS,
                 damage_air: true,
