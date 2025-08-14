@@ -15,6 +15,7 @@ mod elixir_storage;
 mod goblin_hut;
 mod gold_mine;
 mod gold_storage;
+mod hidden_tesla;
 mod laboratory;
 mod mortar;
 pub mod seeking_air_mine;
@@ -44,6 +45,7 @@ pub use goblin_hut::*;
 pub use gold_mine::*;
 pub use gold_storage::*;
 use hecs::World;
+pub use hidden_tesla::*;
 pub use laboratory::*;
 pub use mortar::*;
 use nalgebra::Vector2;
@@ -120,6 +122,8 @@ pub enum BuildingModelEnum {
     GoldMineModel,
     #[serde(rename = "GoldStorage")]
     GoldStorageModel,
+    #[serde(rename = "HiddenTesla")]
+    HiddenTeslaModel,
     #[serde(rename = "Laboratory")]
     LaboratoryModel,
     #[serde(rename = "Mortar")]

@@ -273,6 +273,14 @@ impl Game {
         features::health::cleanup_events(self);
     }
 
+    pub(crate) fn update_collision_grid(&mut self) {
+        if self.collision_grid.is_some() {
+            self.collision_grid = Some(PathfindingCollisionGrid::new(&self.map_size, &self.world));
+
+            self.need_redraw_collision = true;
+        }
+    }
+
     fn counted_buildings_count(cache: &mut AnyMap, world: &mut World) -> usize {
         cache
             .get_mut_or_default::<PreparedQuery<&Building>>()

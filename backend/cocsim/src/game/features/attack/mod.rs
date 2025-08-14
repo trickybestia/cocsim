@@ -155,9 +155,7 @@ pub fn check_retarget(game: &mut Game) {
             continue;
         }
 
-        let retarget = if !game.world.contains(attacker.target) {
-            true
-        } else {
+        let retarget = attacker.retarget || !game.world.contains(attacker.target) || {
             let attacker_position = game.world.get::<&Position>(attacker_id).unwrap().0;
             let target_position = game.world.get::<&Position>(attacker.target).unwrap().0;
             let attack_target = game.world.get::<&AttackTarget>(attacker.target).unwrap();
@@ -221,4 +219,14 @@ fn create_attack_queue(game: &mut Game) -> Vec<(Box<dyn Action>, Entity)> {
     }
 
     result
+}
+
+pub fn force_retarget(game: &mut Game) {
+    for (_, attacker) in game
+        .cache
+        .get_mut_or_default::<PreparedQuery<&mut Attacker>>()
+        .query_mut(&mut game.world)
+    {
+        attacker.retarget = true;
+    }
 }
