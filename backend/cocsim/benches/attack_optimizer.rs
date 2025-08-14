@@ -50,9 +50,7 @@ fn attack_optimizer_bench(c: &mut Criterion) {
         },
     ];
 
-    let mut group = c.benchmark_group("Attack optimizer");
-
-    group.sample_size(30);
+    let group = c.benchmark_group("Attack optimizer");
 
     bench_with_test_map(group, "single_player/no_flight_zone", &units);
 }
