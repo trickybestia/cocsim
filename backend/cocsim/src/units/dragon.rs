@@ -10,7 +10,6 @@ use serde::{
 };
 
 use crate::{
-    Game,
     Shape,
     ShapeColor,
     UnitModel,
@@ -103,8 +102,8 @@ const DRAGON_SPEED: f32 = 2.0;
 const DRAGON_ATTACK_COOLDOWN: f32 = 1.25;
 const DRAGON_ATTACK_RANGE: f32 = 1.0;
 
-fn draw_dragon(id: Entity, game: &Game, result: &mut Vec<Shape>) {
-    let position = game.world.get::<&Position>(id).unwrap().0;
+fn draw_dragon(id: Entity, world: &World, result: &mut Vec<Shape>) {
+    let position = world.get::<&Position>(id).unwrap().0;
 
     result.push(Shape::Circle {
         x: position.x,

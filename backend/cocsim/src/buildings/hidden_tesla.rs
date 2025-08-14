@@ -13,6 +13,7 @@ use crate::{
     BuildingModel,
     BuildingType,
     Game,
+    ShapeColor,
     UsizeWithMax,
     buildings::utils::{
         defensive_building::spawn_defensive_building,
@@ -22,15 +23,18 @@ use crate::{
     game::features::{
         actions::{
             Action,
-            TargetProjectileAttack,
             WithDespawn,
         },
         attack::{
+            Attacker,
             BuildingRetargetCondition,
             force_retarget,
             targeting::building::BuildingFindTarget,
         },
         buildings::Building,
+        delay::Delay,
+        drawable::Line,
+        health::EntityDamageEvent,
     },
 };
 
@@ -120,7 +124,6 @@ inventory::submit! {HIDDEN_TESLA}
 const HIDDEN_TESLA_MIN_ATTACK_RANGE: f32 = 0.0;
 const HIDDEN_TESLA_MAX_ATTACK_RANGE: f32 = 7.0;
 const HIDDEN_TESLA_ATTACK_COOLDOWN: f32 = 0.6;
-const HIDDEN_TESLA_PROJECTILE_SPEED: f32 = 50.0; // Better apply instant damage than launch projectile, but I don't know how to make animation for that
 const HIDDEN_TESLA_TRIGGER_RADIUS: f32 = 6.0;
 
 #[derive(Serialize, Deserialize, Debug, Arbitrary, Clone)]
@@ -128,6 +131,31 @@ pub struct HiddenTeslaModel {
     pub x: UsizeWithMax<MAX_BUILDING_POS>,
     pub y: UsizeWithMax<MAX_BUILDING_POS>,
     pub level: UsizeWithMax<HIDDEN_TESLA_LEVEL_INDEX_MAX>,
+}
+
+#[derive(Debug, Clone)]
+struct HiddenTeslaAttack {
+    pub damage: f32,
+}
+
+impl Action for HiddenTeslaAttack {
+    fn call(&self, actor: Entity, game: &mut Game) {
+        let target = game.world.get::<&Attacker>(actor).unwrap().target;
+
+        game.world.spawn((EntityDamageEvent {
+            target,
+            damage: self.damage,
+        },));
+        game.world.spawn((
+            Delay { time_left: 0.25 },
+            Line {
+                a: actor,
+                b: target,
+                width: 0.1,
+                color: ShapeColor::new(0, 255, 255),
+            },
+        ));
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -153,9 +181,8 @@ impl Action for SpawnHiddenTesla {
                 rotation_angle: None,
             }
             .into(),
-            Box::new(TargetProjectileAttack {
+            Box::new(HiddenTeslaAttack {
                 damage: level.attack_damage,
-                projectile_speed: HIDDEN_TESLA_PROJECTILE_SPEED,
             }),
         );
 

@@ -5,7 +5,6 @@ use hecs::{
 use nalgebra::Vector2;
 
 use crate::{
-    Game,
     Shape,
     colliders::PointCollider,
     game::features::{
@@ -32,7 +31,7 @@ pub fn create_air_unit(
     speed: f32,
     attack_cooldown: f32,
     attack: Box<dyn Action>,
-    draw: fn(Entity, &Game, &mut Vec<Shape>),
+    draw: fn(Entity, &World, &mut Vec<Shape>),
     team: Team,
     housing_space: usize,
 ) -> Entity {

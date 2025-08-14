@@ -10,7 +10,6 @@ use serde::{
 };
 
 use crate::{
-    Game,
     Shape,
     ShapeColor,
     UnitModel,
@@ -113,8 +112,8 @@ const BALLOON_ATTACK_COOLDOWN: f32 = 3.0;
 const BALLOON_ATTACK_RANGE: f32 = 0.0;
 const BALLOON_SPLASH_ATTACK_RADIUS: f32 = 1.2;
 
-fn draw_balloon(id: Entity, game: &Game, result: &mut Vec<Shape>) {
-    let position = game.world.get::<&Position>(id).unwrap().0;
+fn draw_balloon(id: Entity, world: &World, result: &mut Vec<Shape>) {
+    let position = world.get::<&Position>(id).unwrap().0;
 
     result.push(Shape::Circle {
         x: position.x,
