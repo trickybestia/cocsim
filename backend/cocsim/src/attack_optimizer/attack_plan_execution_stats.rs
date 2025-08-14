@@ -1,3 +1,5 @@
+use core::f32;
+
 use rand_pcg::Pcg64Mcg;
 
 use crate::{
@@ -21,17 +23,27 @@ pub struct AttackPlanExecution {
 #[derive(Clone, Debug)]
 pub struct AttackPlanExecutionStats {
     pub executions: Vec<AttackPlanExecution>,
+    pub min_time_elapsed: f32,
+    pub max_time_elapsed: f32,
     pub avg_time_elapsed: f32,
     pub avg_percentage_destroyed: f32,
+    /// More is better.
+    pub score: f32,
 }
 
 impl AttackPlanExecutionStats {
     pub fn new(executions: Vec<AttackPlanExecution>) -> Self {
+        let mut min_time_elapsed = f32::INFINITY;
+        let mut max_time_elapsed = f32::NEG_INFINITY;
         let mut avg_time_elapsed = 0.0;
+
         let mut avg_percentage_destroyed = 0.0;
 
         for execution in &executions {
+            min_time_elapsed = min_time_elapsed.min(execution.time_elapsed);
+            max_time_elapsed = max_time_elapsed.max(execution.time_elapsed);
             avg_time_elapsed += execution.time_elapsed;
+
             avg_percentage_destroyed += execution.percentage_destroyed;
         }
 
@@ -40,50 +52,14 @@ impl AttackPlanExecutionStats {
 
         Self {
             executions,
+            score: (MAX_ATTACK_DURATION - max_time_elapsed) * 100.0 * 100.0
+                + (MAX_ATTACK_DURATION - avg_time_elapsed) * 100.0
+                + avg_percentage_destroyed,
+            min_time_elapsed,
             avg_time_elapsed,
+            max_time_elapsed,
             avg_percentage_destroyed,
         }
-    }
-
-    pub fn min_time_elapsed(&self) -> f32 {
-        self.executions
-            .iter()
-            .map(|e| e.time_elapsed)
-            .reduce(f32::min)
-            .unwrap()
-    }
-
-    pub fn max_time_elapsed(&self) -> f32 {
-        self.executions
-            .iter()
-            .map(|e| e.time_elapsed)
-            .reduce(f32::max)
-            .unwrap()
-    }
-
-    pub fn avg_time_left(&self) -> f32 {
-        MAX_ATTACK_DURATION - self.avg_time_elapsed
-    }
-
-    /// More is better.
-    pub fn score(&self) -> f32 {
-        self.avg_time_left() * 100.0 + self.avg_percentage_destroyed
-    }
-
-    /// Returns Vec<(rounded time_elapsed, count)>
-    pub fn merge_time_elapsed(&self) -> Vec<(usize, usize)> {
-        let min_time_elapsed = self.min_time_elapsed().round() as usize;
-        let max_time_elapsed = self.max_time_elapsed().round() as usize;
-
-        let mut result = (min_time_elapsed..=max_time_elapsed)
-            .map(|time_elapsed| (time_elapsed, 0usize))
-            .collect::<Vec<_>>();
-
-        for execution in &self.executions {
-            result[execution.time_elapsed.round() as usize - min_time_elapsed].1 += 1;
-        }
-
-        result
     }
 }
 

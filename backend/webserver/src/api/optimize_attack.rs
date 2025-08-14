@@ -12,10 +12,9 @@ use axum::{
 use cocsim::{
     AttackOptimizer,
     AttackPlanExecutor,
-    DerivativeAttackOptimizer,
     Game,
-    GeneticAttackOptimizer,
     Map,
+    SimulatedAnnealingAttackOptimizer,
     UnitsWithCount,
     ValidatedMap,
     consts::MAX_ARMY_HOUSING_SPACE,
@@ -27,7 +26,7 @@ use tokio::task::spawn_blocking;
 use crate::{
     consts::{
         FPS,
-        OPTIMIZE_ATTACK_ITERATIONS,
+        OPTIMIZE_ATTACK_STEPS,
     },
     dto_game_renderer::DtoGameRenderer,
     utils::round_floats,
@@ -60,22 +59,14 @@ async fn optimize_attack_internal(mut socket: WebSocket) -> anyhow::Result<()> {
         ))
         .await?;
 
-    let mut optimizer: Box<dyn AttackOptimizer> = Box::new(GeneticAttackOptimizer::new(
+    let mut optimizer = SimulatedAnnealingAttackOptimizer::new(
         map.clone(),
         units.to_vec(),
-        0.02,
-        0.05,
-    ));
+        None,
+        OPTIMIZE_ATTACK_STEPS,
+    );
 
-    for i in 0..OPTIMIZE_ATTACK_ITERATIONS {
-        if i == OPTIMIZE_ATTACK_ITERATIONS / 2 {
-            optimizer = Box::new(DerivativeAttackOptimizer::new(
-                map.clone(),
-                units.to_vec(),
-                optimizer.best().cloned(),
-            ));
-        }
-
+    for i in 0..OPTIMIZE_ATTACK_STEPS {
         optimizer = spawn_blocking(move || {
             optimizer.step();
 
@@ -87,9 +78,9 @@ async fn optimize_attack_internal(mut socket: WebSocket) -> anyhow::Result<()> {
 
         let progress = format!(
             "Gen. #{i} best plan finished in {:.1} <= {:.1} <= {:.1} seconds",
-            best_plan_stats.min_time_elapsed(),
+            best_plan_stats.min_time_elapsed,
             best_plan_stats.avg_time_elapsed,
-            best_plan_stats.max_time_elapsed()
+            best_plan_stats.max_time_elapsed
         );
 
         socket
