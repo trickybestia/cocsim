@@ -63,7 +63,7 @@ pub fn update(game: &mut Game) {
         game.world.insert_one(id, ToBeDespawned).unwrap();
     }
 
-    game.world.spawn_batch(entity_damage_event);
+    game.world.spawn_batch(entity_damage_event).for_each(drop);
 }
 
 pub fn draw(result: &mut Vec<Shape>, game: &mut Game) {

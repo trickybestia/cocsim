@@ -103,7 +103,7 @@ pub fn handle_splash_damage_events(game: &mut Game) {
         }
     }
 
-    game.world.spawn_batch(damage_queue);
+    game.world.spawn_batch(damage_queue).for_each(drop);
 }
 
 pub fn cleanup_events(game: &mut Game) {
