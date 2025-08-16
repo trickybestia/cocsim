@@ -1,5 +1,6 @@
 use std::fmt::Display;
 
+use nalgebra::Vector2;
 use serde::{
     Serialize,
     ser::SerializeTuple,
@@ -56,6 +57,69 @@ pub enum Shape {
         width: f32,
         color: ShapeColor,
     },
+}
+
+impl Shape {
+    pub fn translate(&self, offset: Vector2<f32>) -> Self {
+        match *self {
+            Shape::Rect {
+                x,
+                y,
+                width,
+                height,
+                color,
+            } => Self::Rect {
+                x: x + offset.x,
+                y: y + offset.y,
+                width,
+                height,
+                color,
+            },
+            Shape::Circle {
+                x,
+                y,
+                radius,
+                color,
+            } => Self::Circle {
+                x: x + offset.x,
+                y: y + offset.y,
+                radius,
+                color,
+            },
+            Shape::Line {
+                x1,
+                y1,
+                x2,
+                y2,
+                width,
+                color,
+            } => Self::Line {
+                x1: x1 + offset.x,
+                y1: y1 + offset.y,
+                x2: x2 + offset.x,
+                y2: y2 + offset.y,
+                width,
+                color,
+            },
+            Shape::Arc {
+                x,
+                y,
+                radius,
+                rotation,
+                angle,
+                width,
+                color,
+            } => Self::Arc {
+                x: x + offset.x,
+                y: y + offset.y,
+                radius,
+                rotation,
+                angle,
+                width,
+                color,
+            },
+        }
+    }
 }
 
 impl Serialize for Shape {

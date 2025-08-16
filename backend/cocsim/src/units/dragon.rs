@@ -1,8 +1,5 @@
 use arbitrary::Arbitrary;
-use hecs::{
-    Entity,
-    World,
-};
+use hecs::World;
 use nalgebra::Vector2;
 use serde::{
     Deserialize,
@@ -23,7 +20,7 @@ use crate::{
                 DragonTargetPrioritizer,
             },
         },
-        position::Position,
+        drawable::Drawable,
     },
     units::utils::air_unit::create_air_unit,
     usize_with_max::UsizeWithMax,
@@ -102,17 +99,6 @@ const DRAGON_SPEED: f32 = 2.0;
 const DRAGON_ATTACK_COOLDOWN: f32 = 1.25;
 const DRAGON_ATTACK_RANGE: f32 = 1.0;
 
-fn draw_dragon(id: Entity, world: &World, result: &mut Vec<Shape>) {
-    let position = world.get::<&Position>(id).unwrap().0;
-
-    result.push(Shape::Circle {
-        x: position.x,
-        y: position.y,
-        radius: 0.25,
-        color: ShapeColor::new(255, 0, 0),
-    });
-}
-
 #[derive(Serialize, Deserialize, Debug, Clone, Arbitrary)]
 pub struct DragonModel {
     pub level: UsizeWithMax<DRAGON_LEVEL_INDEX_MAX>,
@@ -139,7 +125,12 @@ impl UnitModel for DragonModel {
             Box::new(MeleeAttack {
                 damage: level.attack_damage,
             }),
-            draw_dragon,
+            Drawable::Shapes(vec![Shape::Circle {
+                x: 0.0,
+                y: 0.0,
+                radius: 0.25,
+                color: ShapeColor::new(255, 0, 0),
+            }]),
             team,
             DRAGON.housing_space,
         );

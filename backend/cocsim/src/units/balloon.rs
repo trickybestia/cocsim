@@ -1,8 +1,5 @@
 use arbitrary::Arbitrary;
-use hecs::{
-    Entity,
-    World,
-};
+use hecs::World;
 use nalgebra::Vector2;
 use serde::{
     Deserialize,
@@ -23,7 +20,7 @@ use crate::{
                 DefensiveBuildingTargetPrioritizer,
             },
         },
-        position::Position,
+        drawable::Drawable,
         to_be_despawned::OnDespawn,
     },
     units::utils::air_unit::create_air_unit,
@@ -112,17 +109,6 @@ const BALLOON_ATTACK_COOLDOWN: f32 = 3.0;
 const BALLOON_ATTACK_RANGE: f32 = 0.0;
 const BALLOON_SPLASH_ATTACK_RADIUS: f32 = 1.2;
 
-fn draw_balloon(id: Entity, world: &World, result: &mut Vec<Shape>) {
-    let position = world.get::<&Position>(id).unwrap().0;
-
-    result.push(Shape::Circle {
-        x: position.x,
-        y: position.y,
-        radius: 0.25,
-        color: ShapeColor::new(0, 0, 0),
-    });
-}
-
 #[derive(Serialize, Deserialize, Debug, Clone, Arbitrary)]
 pub struct BalloonModel {
     pub level: UsizeWithMax<BALLOON_LEVEL_INDEX_MAX>,
@@ -152,7 +138,12 @@ impl UnitModel for BalloonModel {
                 damage: level.attack_damage,
                 radius: BALLOON_SPLASH_ATTACK_RADIUS,
             }),
-            draw_balloon,
+            Drawable::Shapes(vec![Shape::Circle {
+                x: 0.0,
+                y: 0.0,
+                radius: 0.25,
+                color: ShapeColor::new(0, 0, 0),
+            }]),
             team,
             BALLOON.housing_space,
         );

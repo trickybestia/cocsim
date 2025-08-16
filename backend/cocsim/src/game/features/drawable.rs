@@ -12,8 +12,9 @@ use crate::{
     utils::AnyMapExt,
 };
 
-pub struct Drawable {
-    pub draw_fn: fn(Entity, &World, &mut Vec<Shape>),
+pub enum Drawable {
+    Shapes(Vec<Shape>),
+    Custom(fn(Entity, &World, &mut Vec<Shape>)),
 }
 
 pub struct Line {
@@ -24,13 +25,21 @@ pub struct Line {
 }
 
 pub fn draw(result: &mut Vec<Shape>, game: &mut Game) {
-    for (id, drawable) in game
+    for (id, (drawable, position)) in game
         .cache
-        .get_mut_or_default::<PreparedQuery<&Drawable>>()
+        .get_mut_or_default::<PreparedQuery<(&Drawable, Option<&Position>)>>()
         .query(&game.world)
         .iter()
     {
-        (drawable.draw_fn)(id, &game.world, result);
+        match drawable {
+            Drawable::Shapes(shapes) => {
+                let offset = position
+                    .expect("Expected Position component on entity with Drawable::Shapes")
+                    .0;
+                result.extend(shapes.iter().map(|shape| shape.translate(offset)))
+            }
+            Drawable::Custom(draw_fn) => (draw_fn)(id, &game.world, result),
+        };
     }
 
     for (_, line) in game

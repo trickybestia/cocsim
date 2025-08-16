@@ -5,7 +5,6 @@ use hecs::{
 use nalgebra::Vector2;
 
 use crate::{
-    Shape,
     colliders::PointCollider,
     game::features::{
         actions::Action,
@@ -31,7 +30,7 @@ pub fn create_air_unit(
     speed: f32,
     attack_cooldown: f32,
     attack: Box<dyn Action>,
-    draw: fn(Entity, &World, &mut Vec<Shape>),
+    drawable: Drawable,
     team: Team,
     housing_space: usize,
 ) -> Entity {
@@ -57,6 +56,6 @@ pub fn create_air_unit(
             collider: PointCollider::zero().into(),
             flags: AttackTargetFlags::UNIT | AttackTargetFlags::AIR,
         },
-        Drawable { draw_fn: draw },
+        drawable,
     ))
 }
