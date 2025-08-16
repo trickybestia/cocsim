@@ -40,14 +40,28 @@ fn main() {
                 level: 6.try_into().unwrap(),
             }
             .into(),
-            count: 4,
+            count: 2,
         },
         UnitWithCount {
             unit: BalloonModel {
                 level: 6.try_into().unwrap(),
             }
             .into(),
-            count: 4,
+            count: 2,
+        },
+        UnitWithCount {
+            unit: BalloonModel {
+                level: 6.try_into().unwrap(),
+            }
+            .into(),
+            count: 2,
+        },
+        UnitWithCount {
+            unit: BalloonModel {
+                level: 6.try_into().unwrap(),
+            }
+            .into(),
+            count: 2,
         },
     ];
     let spells: Vec<SpellWithCount> = vec![SpellWithCount {
@@ -61,9 +75,9 @@ fn main() {
     let (map, map_image) = load_test_map("single_player/no_flight_zone").unwrap();
 
     let mut optimizer =
-        GeneticAttackOptimizer::new(map.clone(), units.clone(), spells.clone(), 0.01, 0.01);
+        GeneticAttackOptimizer::new(map.clone(), units.clone(), spells.clone(), 0.02, 0.02);
 
-    for i in 0..40 {
+    for i in 0..20 {
         let (_, best_plan_stats) = optimizer.step();
 
         println!(
@@ -82,11 +96,11 @@ fn main() {
         units.clone(),
         spells.clone(),
         Some(optimizer.best().unwrap().clone()),
-        10000,
+        100 * 20,
         100,
     );
 
-    for i in 0..40 {
+    for i in 0..20 {
         let (_, best_plan_stats) = optimizer.step();
 
         println!(

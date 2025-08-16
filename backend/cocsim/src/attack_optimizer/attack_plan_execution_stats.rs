@@ -52,9 +52,7 @@ impl AttackPlanExecutionStats {
 
         Self {
             executions,
-            score: (MAX_ATTACK_DURATION - max_time_elapsed) * 100.0 * 100.0
-                + (MAX_ATTACK_DURATION - avg_time_elapsed) * 100.0
-                + avg_percentage_destroyed,
+            score: avg_percentage_destroyed * 4.0 + (MAX_ATTACK_DURATION - avg_time_elapsed),
             min_time_elapsed,
             avg_time_elapsed,
             max_time_elapsed,
