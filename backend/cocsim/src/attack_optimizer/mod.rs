@@ -8,6 +8,7 @@ mod execute_attack_plan_no_rayon;
 #[cfg(feature = "rayon")]
 mod execute_attack_plan_rayon;
 mod genetic_attack_optimizer;
+mod random_attack_optimizer;
 mod simulated_annealing_attack_optimizer;
 
 pub use attack_plan::AttackPlan;
@@ -20,6 +21,7 @@ pub use execute_attack_plan_no_rayon::execute_attack_plan;
 #[cfg(feature = "rayon")]
 pub use execute_attack_plan_rayon::execute_attack_plan;
 pub use genetic_attack_optimizer::GeneticAttackOptimizer;
+pub use random_attack_optimizer::RandomAttackOptimizer;
 pub use simulated_annealing_attack_optimizer::SimulatedAnnealingAttackOptimizer;
 
 pub trait AttackOptimizer: Send {
