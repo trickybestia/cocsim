@@ -40,37 +40,39 @@ fn main() {
                 level: 6.try_into().unwrap(),
             }
             .into(),
-            count: 2,
+            count: 4,
         },
         UnitWithCount {
             unit: BalloonModel {
                 level: 6.try_into().unwrap(),
             }
             .into(),
-            count: 2,
-        },
-        UnitWithCount {
-            unit: BalloonModel {
-                level: 6.try_into().unwrap(),
-            }
-            .into(),
-            count: 2,
-        },
-        UnitWithCount {
-            unit: BalloonModel {
-                level: 6.try_into().unwrap(),
-            }
-            .into(),
-            count: 2,
+            count: 4,
         },
     ];
-    let spells: Vec<SpellWithCount> = vec![SpellWithCount {
-        spell: LightningSpellModel {
-            level: 7.try_into().unwrap(),
-        }
-        .into(),
-        count: 11,
-    }];
+    let spells: Vec<SpellWithCount> = vec![
+        SpellWithCount {
+            spell: LightningSpellModel {
+                level: 7.try_into().unwrap(),
+            }
+            .into(),
+            count: 4,
+        },
+        SpellWithCount {
+            spell: LightningSpellModel {
+                level: 7.try_into().unwrap(),
+            }
+            .into(),
+            count: 4,
+        },
+        SpellWithCount {
+            spell: LightningSpellModel {
+                level: 7.try_into().unwrap(),
+            }
+            .into(),
+            count: 3,
+        },
+    ];
 
     let (map, map_image) = load_test_map("single_player/no_flight_zone").unwrap();
 

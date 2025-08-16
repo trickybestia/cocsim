@@ -1,5 +1,3 @@
-use std::iter::repeat;
-
 use arbitrary::Arbitrary;
 use rand::{
     Rng,
@@ -34,9 +32,7 @@ impl AttackPlan {
                 .collect(),
             spells: spells
                 .iter()
-                .map(|spell| repeat(spell.spell.clone()).take(spell.count))
-                .flatten()
-                .map(|spell| AttackPlanSpell::new_randomized(spell, rng))
+                .map(|spell| AttackPlanSpell::new_randomized(spell.spell.clone(), spell.count, rng))
                 .collect(),
         }
     }

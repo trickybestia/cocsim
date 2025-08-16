@@ -17,15 +17,17 @@ use crate::{
 #[derive(Clone, Debug)]
 pub struct AttackPlanSpell {
     pub spell_model: SpellModelEnum,
+    pub count: usize,
     /// 0.0 <= each component <= 1.0.
     pub position: Vector2<f32>,
     pub drop_time: f32,
 }
 
 impl AttackPlanSpell {
-    pub fn new_randomized(spell_model: SpellModelEnum, rng: &mut impl Rng) -> Self {
+    pub fn new_randomized(spell_model: SpellModelEnum, count: usize, rng: &mut impl Rng) -> Self {
         Self {
             spell_model,
+            count,
             position: Vector2::new(rng.random_range(0.0..=1.0), rng.random_range(0.0..=1.0)),
             drop_time: rng.random_range(0.0..=MAX_UNIT_DROP_TIME),
         }
@@ -34,6 +36,7 @@ impl AttackPlanSpell {
     pub fn mutate(&self, rng: &mut impl Rng, temperature: f32) -> Self {
         Self {
             spell_model: self.spell_model.clone(),
+            count: self.count,
             position: Vector2::new(
                 clamp(
                     self.position.x + rng.random_range((-0.2)..=0.2) * temperature,
@@ -63,6 +66,7 @@ impl<'a> Arbitrary<'a> for AttackPlanSpell {
     fn arbitrary(u: &mut Unstructured<'a>) -> arbitrary::Result<Self> {
         Ok(Self {
             spell_model: u.arbitrary()?,
+            count: 1,
             position: Vector2::new(
                 u.int_in_range::<u8>(0..=255)? as f32 / 255.0,
                 u.int_in_range::<u8>(0..=255)? as f32 / 255.0,

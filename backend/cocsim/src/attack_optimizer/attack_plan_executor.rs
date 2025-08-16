@@ -10,8 +10,9 @@ use crate::{
     attack_optimizer::AttackPlanUnitGroup,
     consts::{
         SPELL_DROP_COOLDOWN,
+        SPELL_GROUP_DROP_COOLDOWN,
         UNIT_DROP_COOLDOWN,
-        UNIT_DROP_GROUP_COOLDOWN,
+        UNIT_GROUP_DROP_COOLDOWN,
     },
 };
 
@@ -103,20 +104,24 @@ impl AttackPlanExecutor {
                             next_drop_time += UNIT_DROP_COOLDOWN;
                         }
 
-                        next_drop_time += UNIT_DROP_GROUP_COOLDOWN;
+                        next_drop_time += UNIT_GROUP_DROP_COOLDOWN;
                     }
                     UnitGroupOrSpell::Spell(spell) => {
                         let position = spell.cartesian_position(&game.map_size);
 
                         next_drop_time = next_drop_time.max(spell.drop_time);
 
-                        actions.push(AttackPlanExecutorAction {
-                            spawnable: Spawnable::Spell(spell.spell_model.clone()),
-                            position,
-                            drop_time: next_drop_time,
-                        });
+                        for _ in 0..spell.count {
+                            actions.push(AttackPlanExecutorAction {
+                                spawnable: Spawnable::Spell(spell.spell_model.clone()),
+                                position,
+                                drop_time: next_drop_time,
+                            });
 
-                        next_drop_time += SPELL_DROP_COOLDOWN;
+                            next_drop_time += SPELL_DROP_COOLDOWN;
+                        }
+
+                        next_drop_time += SPELL_GROUP_DROP_COOLDOWN;
                     }
                 }
             }
