@@ -38,7 +38,7 @@ fn main() {
     let mut optimizer =
         SimulatedAnnealingAttackOptimizer::new(map.clone(), units.clone(), None, 1000);
 
-    for i in 0..1000 {
+    for i in 0..10 {
         let (_, best_plan_stats) = optimizer.step();
 
         println!(
