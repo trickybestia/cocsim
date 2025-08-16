@@ -162,7 +162,7 @@ impl Game {
         let collision_grid =
             enable_collision_grid.then(|| PathfindingCollisionGrid::new(&map_size, &world));
 
-        let mut result = Self {
+        Self {
             world,
             cache,
 
@@ -178,11 +178,7 @@ impl Game {
             need_redraw_collision: true,
 
             initial_counted_buildings_count,
-        };
-
-        result.tick_cleanup();
-
-        result
+        }
     }
 
     pub fn spawn_attack_unit(&mut self, model: &UnitModelEnum, position: Vector2<f32>) {
@@ -202,7 +198,7 @@ impl Game {
         features::projectiles::air_sweeper_projectile::update(self);
         features::mover::r#move(self);
         features::health::handle_splash_damage_events(self);
-        features::health::handle_entity_damage_events(self);
+        features::health::handle_incoming_damage(self);
         // TODO: run system: remove ToBeDespawned and use hero ability if not used
         features::delay::update(self);
 
@@ -211,8 +207,6 @@ impl Game {
         }
 
         features::to_be_despawned::handle_to_be_despawned(self);
-
-        self.tick_cleanup();
 
         self.time_elapsed = MAX_ATTACK_DURATION.min(self.time_elapsed + self.delta_time);
     }
@@ -267,10 +261,6 @@ impl Game {
             }
             None => Vec::new(),
         }
-    }
-
-    fn tick_cleanup(&mut self) {
-        features::health::cleanup_events(self);
     }
 
     pub(crate) fn update_collision_grid(&mut self) {

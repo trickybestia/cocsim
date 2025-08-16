@@ -28,7 +28,10 @@ pub fn spawn_resource_building(
     size: Vector2<usize>,
 ) -> Entity {
     world.spawn((
-        Health(health),
+        Health {
+            health,
+            incoming_damage: 0.0,
+        },
         Position(position.cast() + size.cast() / 2.0),
         Building {
             position,

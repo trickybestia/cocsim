@@ -1,8 +1,4 @@
-use hecs::{
-    Entity,
-    Or,
-    PreparedQuery,
-};
+use hecs::PreparedQuery;
 use nalgebra::Vector2;
 
 use crate::{
@@ -20,11 +16,9 @@ use crate::{
     utils::AnyMapExt,
 };
 
-pub struct Health(pub f32);
-
-pub struct EntityDamageEvent {
-    pub target: Entity,
-    pub damage: f32,
+pub struct Health {
+    pub health: f32,
+    pub incoming_damage: f32,
 }
 
 pub struct SplashDamageEvent {
@@ -36,26 +30,21 @@ pub struct SplashDamageEvent {
     pub radius: f32,
 }
 
-pub fn handle_entity_damage_events(game: &mut Game) {
-    for (_, damage_event) in game
-        .cache
-        .get_mut_or_default::<PreparedQuery<&EntityDamageEvent>>()
-        .query(&game.world)
-        .iter()
-    {
-        let mut target_health = game.world.get::<&mut Health>(damage_event.target).unwrap();
+pub fn handle_incoming_damage(game: &mut Game) {
+    let mut to_be_despawned = Vec::new();
 
-        target_health.0 -= damage_event.damage;
-    }
-
-    let to_be_despawned = game
+    for (id, health) in game
         .cache
-        .get_mut_or_default::<PreparedQuery<&Health>>()
+        .get_mut_or_default::<PreparedQuery<&mut Health>>()
         .query_mut(&mut game.world)
-        .into_iter()
-        .filter(|(_, health)| health.0 <= 0.0)
-        .map(|(id, _)| id)
-        .collect::<Vec<_>>();
+    {
+        health.health = 0.0f32.max(health.health - health.incoming_damage);
+        health.incoming_damage = 0.0;
+
+        if health.health == 0.0 {
+            to_be_despawned.push(id);
+        }
+    }
 
     for id in to_be_despawned {
         game.world.insert_one(id, ToBeDespawned).unwrap();
@@ -65,7 +54,7 @@ pub fn handle_entity_damage_events(game: &mut Game) {
 #[derive(Default)]
 struct HandleSplashDamageEventsCache<'a> {
     pub event_query: PreparedQuery<&'a SplashDamageEvent>,
-    pub target_query: PreparedQuery<(&'a AttackTarget, &'a Position, &'a Team)>,
+    pub target_query: PreparedQuery<(&'a AttackTarget, &'a mut Health, &'a Position, &'a Team)>,
 }
 
 pub fn handle_splash_damage_events(game: &mut Game) {
@@ -73,10 +62,12 @@ pub fn handle_splash_damage_events(game: &mut Game) {
         .cache
         .get_mut_or_default::<HandleSplashDamageEventsCache>();
 
-    let mut damage_queue = Vec::new();
+    let mut to_be_despawned = Vec::new();
 
-    for (_, splash_damage_event) in cache.event_query.query(&game.world).iter() {
-        for (id, (attack_target, position, team)) in cache.target_query.query(&game.world).iter() {
+    for (event_id, splash_damage_event) in cache.event_query.query(&game.world).iter() {
+        for (_, (attack_target, health, position, team)) in
+            cache.target_query.query(&game.world).iter()
+        {
             if splash_damage_event.attacker_team == *team {
                 continue;
             }
@@ -95,27 +86,14 @@ pub fn handle_splash_damage_events(game: &mut Game) {
                 .attack_area(splash_damage_event.radius)
                 .contains(splash_damage_event.target)
             {
-                damage_queue.push((EntityDamageEvent {
-                    target: id,
-                    damage: splash_damage_event.damage,
-                },));
+                health.incoming_damage += splash_damage_event.damage;
             }
         }
+
+        to_be_despawned.push(event_id);
     }
 
-    game.world.spawn_batch(damage_queue).for_each(drop);
-}
-
-pub fn cleanup_events(game: &mut Game) {
-    let despawn_queue = game
-        .cache
-        .get_mut_or_default::<PreparedQuery<Or<&EntityDamageEvent, &SplashDamageEvent>>>()
-        .query_mut(&mut game.world)
-        .into_iter()
-        .map(|(id, _)| id)
-        .collect::<Vec<_>>();
-
-    for id in despawn_queue {
+    for id in to_be_despawned {
         game.world.despawn(id).unwrap();
     }
 }

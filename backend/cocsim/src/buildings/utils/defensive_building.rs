@@ -34,7 +34,10 @@ pub fn spawn_defensive_building(
     attack: Box<dyn Action>,
 ) -> Entity {
     world.spawn((
-        Health(health),
+        Health {
+            health,
+            incoming_damage: 0.0,
+        },
         Position(position.cast() + size.cast() / 2.0),
         Building {
             position,

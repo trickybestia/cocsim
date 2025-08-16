@@ -4,6 +4,8 @@ mod utils;
 use cocsim::{
     BalloonModel,
     Game,
+    LightningSpellModel,
+    SpellModel,
     utils::load_test_map,
 };
 use nalgebra::Vector2;
@@ -24,6 +26,11 @@ fn main() {
             Vector2::new(0.5, 0.5),
         );
     }
+
+    LightningSpellModel {
+        level: 11.try_into().unwrap(),
+    }
+    .spawn(&mut game, Vector2::from_element(20.0));
 
     macroquad_run_game(game, map_image, None);
 }

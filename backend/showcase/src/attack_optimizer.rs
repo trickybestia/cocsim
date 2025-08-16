@@ -36,7 +36,7 @@ fn main() {
     let (map, map_image) = load_test_map("single_player/no_flight_zone").unwrap();
 
     let mut optimizer =
-        SimulatedAnnealingAttackOptimizer::new(map.clone(), units.clone(), None, 1000);
+        SimulatedAnnealingAttackOptimizer::new(map.clone(), units.clone(), vec![], None, 500, 100);
 
     for i in 0..10 {
         let (_, best_plan_stats) = optimizer.step();

@@ -23,7 +23,7 @@ use crate::{
     },
 };
 
-pub fn create_air_unit(
+pub fn spawn_air_unit(
     world: &mut World,
     position: Vector2<f32>,
     health: f32,
@@ -42,7 +42,10 @@ pub fn create_air_unit(
             arrived: true,
             target: position,
         },
-        Health(health),
+        Health {
+            health,
+            incoming_damage: 0.0,
+        },
         team,
         Attacker {
             attack_cooldown,

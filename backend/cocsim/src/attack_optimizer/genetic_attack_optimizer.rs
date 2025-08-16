@@ -12,6 +12,7 @@ use crate::{
     AttackOptimizer,
     AttackPlan,
     AttackPlanExecutionStats,
+    SpellWithCount,
     UnitWithCount,
     ValidatedMap,
     attack_optimizer::execute_attack_plan,
@@ -28,6 +29,7 @@ use crate::{
 pub struct GeneticAttackOptimizer {
     map: ValidatedMap,
     units: Vec<UnitWithCount>,
+    spells: Vec<SpellWithCount>,
     rng: Pcg64Mcg,
     population: Vec<(AttackPlan, AttackPlanExecutionStats)>,
     pub mutation_probability: f64,
@@ -40,12 +42,14 @@ impl GeneticAttackOptimizer {
     pub fn new(
         map: ValidatedMap,
         units: Vec<UnitWithCount>,
+        spells: Vec<SpellWithCount>,
         mutation_probability_decay: f64,
         merge_probability_decay: f64,
     ) -> Self {
         Self {
             map,
             units,
+            spells,
             rng: Pcg64Mcg::new(RNG_INITIAL_STATE),
             population: Vec::new(),
             mutation_probability: 1.0,
@@ -65,7 +69,7 @@ impl AttackOptimizer for GeneticAttackOptimizer {
         let mut new_population = Vec::new();
 
         while new_population.len() != NEW_RANDOM_PLANS {
-            let new_plan = AttackPlan::new_randomized(&self.units, &mut self.rng);
+            let new_plan = AttackPlan::new_randomized(&self.units, &self.spells, &mut self.rng);
             let new_plan_stats = execute_attack_plan(
                 &self.map,
                 &new_plan,

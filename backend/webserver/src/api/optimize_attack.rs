@@ -26,6 +26,8 @@ use tokio::task::spawn_blocking;
 use crate::{
     consts::{
         FPS,
+        OPTIMIZE_ATTACK_ITERATIONS,
+        OPTIMIZE_ATTACK_ITERATIONS_PER_STEP,
         OPTIMIZE_ATTACK_STEPS,
     },
     dto_game_renderer::DtoGameRenderer,
@@ -62,8 +64,10 @@ async fn optimize_attack_internal(mut socket: WebSocket) -> anyhow::Result<()> {
     let mut optimizer = SimulatedAnnealingAttackOptimizer::new(
         map.clone(),
         units.to_vec(),
+        vec![],
         None,
-        OPTIMIZE_ATTACK_STEPS,
+        OPTIMIZE_ATTACK_ITERATIONS,
+        OPTIMIZE_ATTACK_ITERATIONS_PER_STEP,
     );
 
     for i in 0..OPTIMIZE_ATTACK_STEPS {

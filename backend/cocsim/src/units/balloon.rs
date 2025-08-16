@@ -23,7 +23,7 @@ use crate::{
         drawable::Drawable,
         to_be_despawned::OnDespawn,
     },
-    units::utils::air_unit::create_air_unit,
+    units::utils::air_unit::spawn_air_unit,
     usize_with_max::UsizeWithMax,
 };
 
@@ -126,7 +126,7 @@ impl UnitModel for BalloonModel {
     fn spawn(&self, world: &mut World, position: Vector2<f32>, team: Team) {
         let level = &BALLOON_LEVELS[*self.level];
 
-        let id = create_air_unit(
+        let id = spawn_air_unit(
             world,
             position,
             level.health,

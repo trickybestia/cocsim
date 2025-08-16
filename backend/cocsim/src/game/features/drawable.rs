@@ -3,6 +3,7 @@ use hecs::{
     PreparedQuery,
     World,
 };
+use nalgebra::Vector2;
 
 use crate::{
     Game,
@@ -33,9 +34,8 @@ pub fn draw(result: &mut Vec<Shape>, game: &mut Game) {
     {
         match drawable {
             Drawable::Shapes(shapes) => {
-                let offset = position
-                    .expect("Expected Position component on entity with Drawable::Shapes")
-                    .0;
+                let offset = position.map(|pos| pos.0).unwrap_or(Vector2::zeros());
+
                 result.extend(shapes.iter().map(|shape| shape.translate(offset)))
             }
             Drawable::Custom(draw_fn) => (draw_fn)(id, &game.world, result),

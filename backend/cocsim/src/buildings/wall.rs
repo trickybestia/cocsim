@@ -81,7 +81,10 @@ impl BuildingModel for WallModel {
 
     fn spawn(&self, world: &mut World) {
         world.spawn((
-            Health(WALL_LEVELS[*self.level].health),
+            Health {
+                health: WALL_LEVELS[*self.level].health,
+                incoming_damage: 0.0,
+            },
             Position(self.position().cast() + WALL.size.cast() / 2.0),
             Building {
                 position: Vector2::new(*self.x, *self.y),

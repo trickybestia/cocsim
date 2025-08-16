@@ -6,6 +6,7 @@ mod game;
 mod geometry;
 mod map;
 mod shape;
+mod spells;
 mod units;
 mod usize_with_max;
 pub mod utils;
@@ -18,5 +19,6 @@ pub use shape::{
     Shape,
     ShapeColor,
 };
+pub use spells::*;
 pub use units::*;
 pub use usize_with_max::*;

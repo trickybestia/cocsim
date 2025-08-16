@@ -34,7 +34,7 @@ use crate::{
         buildings::Building,
         delay::Delay,
         drawable::Line,
-        health::EntityDamageEvent,
+        health::Health,
     },
 };
 
@@ -141,11 +141,12 @@ struct HiddenTeslaAttack {
 impl Action for HiddenTeslaAttack {
     fn call(&self, actor: Entity, game: &mut Game) {
         let target = game.world.get::<&Attacker>(actor).unwrap().target;
+        let mut target_health = game.world.get::<&mut Health>(target).unwrap();
 
-        game.world.spawn((EntityDamageEvent {
-            target,
-            damage: self.damage,
-        },));
+        target_health.incoming_damage += self.damage;
+
+        drop(target_health);
+
         game.world.spawn((
             Delay { time_left: 0.25 },
             Line {

@@ -6,6 +6,7 @@ use crate::{
     AttackOptimizer,
     AttackPlan,
     AttackPlanExecutionStats,
+    SpellWithCount,
     UnitWithCount,
     ValidatedMap,
     consts::{
@@ -17,37 +18,41 @@ use crate::{
     execute_attack_plan,
 };
 
-const ITERATIONS_PER_STEP: usize = 100;
-
 pub struct SimulatedAnnealingAttackOptimizer {
     map: ValidatedMap,
     units: Vec<UnitWithCount>,
+    spells: Vec<SpellWithCount>,
     rng: Pcg64Mcg,
     plan: Option<(AttackPlan, AttackPlanExecutionStats)>,
-    steps: usize,
-    current_step: usize,
+    iterations_per_step: usize,
+    iterations: usize,
+    current_iteration: usize,
 }
 
 impl SimulatedAnnealingAttackOptimizer {
     pub fn new(
         map: ValidatedMap,
         units: Vec<UnitWithCount>,
+        spells: Vec<SpellWithCount>,
         initial_plan: Option<(AttackPlan, AttackPlanExecutionStats)>,
-        steps: usize,
+        iterations: usize,
+        iterations_per_step: usize,
     ) -> Self {
         Self {
             map,
             units,
+            spells,
             rng: Pcg64Mcg::new(RNG_INITIAL_STATE),
             plan: initial_plan,
-            steps,
-            current_step: 0,
+            iterations,
+            iterations_per_step,
+            current_iteration: 0,
         }
     }
 
     fn init_plan(&mut self) {
         if self.plan.is_none() {
-            let plan = AttackPlan::new_randomized(&self.units, &mut self.rng);
+            let plan = AttackPlan::new_randomized(&self.units, &self.spells, &mut self.rng);
             let stats = execute_attack_plan(
                 &self.map,
                 &plan,
@@ -55,7 +60,7 @@ impl SimulatedAnnealingAttackOptimizer {
                 ATTACK_PLAN_EXECUTOR_TPS,
             );
 
-            self.plan = Some((plan, stats))
+            self.plan = Some((plan, stats));
         }
     }
 
@@ -85,16 +90,16 @@ impl AttackOptimizer for SimulatedAnnealingAttackOptimizer {
             self.init_plan();
         }
 
-        if self.steps == self.current_step {
-            return self.plan.as_ref().unwrap();
-        }
-
-        let temperature = 1.0 - self.current_step as f32 / self.steps as f32;
-
         let (plan, stats) = self.plan.as_mut().unwrap();
 
-        for _ in 0..ITERATIONS_PER_STEP {
+        for _ in 0..self.iterations_per_step {
+            if self.current_iteration == self.iterations {
+                break;
+            }
+
             let mut new_plan = plan.clone();
+
+            let temperature = 1.0 - self.current_iteration as f32 / self.iterations as f32;
 
             for unit in &mut new_plan.units {
                 unit.drop_time = Self::next_value(
@@ -128,6 +133,8 @@ impl AttackOptimizer for SimulatedAnnealingAttackOptimizer {
                 *stats = new_stats;
                 *plan = new_plan;
             }
+
+            self.current_iteration += 1;
         }
 
         self.plan.as_ref().unwrap()

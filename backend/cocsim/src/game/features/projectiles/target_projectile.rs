@@ -10,7 +10,7 @@ use crate::{
     Shape,
     ShapeColor,
     game::features::{
-        health::EntityDamageEvent,
+        health::Health,
         position::Position,
         to_be_despawned::ToBeDespawned,
     },
@@ -27,7 +27,6 @@ pub struct TargetProjectile {
 
 pub fn update(game: &mut Game) {
     let mut to_be_despawned = Vec::new();
-    let mut entity_damage_event = Vec::new();
 
     for (id, (projectile, position)) in game
         .cache
@@ -51,10 +50,11 @@ pub fn update(game: &mut Game) {
         projectile.remaining_time = 0.0f32.max(projectile.remaining_time - game.delta_time);
 
         if projectile.remaining_time == 0.0 {
-            entity_damage_event.push((EntityDamageEvent {
-                target: projectile.target,
-                damage: projectile.damage,
-            },));
+            game.world
+                .get::<&mut Health>(projectile.target)
+                .unwrap()
+                .incoming_damage += projectile.damage;
+
             to_be_despawned.push(id);
         }
     }
@@ -62,8 +62,6 @@ pub fn update(game: &mut Game) {
     for id in to_be_despawned {
         game.world.insert_one(id, ToBeDespawned).unwrap();
     }
-
-    game.world.spawn_batch(entity_damage_event).for_each(drop);
 }
 
 pub fn draw(result: &mut Vec<Shape>, game: &mut Game) {

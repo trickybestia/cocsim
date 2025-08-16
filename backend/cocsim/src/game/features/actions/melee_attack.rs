@@ -5,7 +5,7 @@ use crate::{
     game::features::{
         actions::Action,
         attack::Attacker,
-        health::EntityDamageEvent,
+        health::Health,
     },
 };
 
@@ -17,10 +17,8 @@ pub struct MeleeAttack {
 impl Action for MeleeAttack {
     fn call(&self, actor: Entity, game: &mut Game) {
         let target = game.world.get::<&Attacker>(actor).unwrap().target;
+        let mut target_health = game.world.get::<&mut Health>(target).unwrap();
 
-        game.world.spawn((EntityDamageEvent {
-            target,
-            damage: self.damage,
-        },));
+        target_health.incoming_damage += self.damage;
     }
 }
