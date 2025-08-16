@@ -31,15 +31,23 @@ impl AttackPlanSpell {
         }
     }
 
-    pub fn mutate(&self, rng: &mut impl Rng) -> Self {
+    pub fn mutate(&self, rng: &mut impl Rng, temperature: f32) -> Self {
         Self {
             spell_model: self.spell_model.clone(),
             position: Vector2::new(
-                clamp(self.position.x + rng.random_range((-0.2)..=0.2), 0.0, 1.0),
-                clamp(self.position.y + rng.random_range((-0.2)..=0.2), 0.0, 1.0),
+                clamp(
+                    self.position.x + rng.random_range((-0.2)..=0.2) * temperature,
+                    0.0,
+                    1.0,
+                ),
+                clamp(
+                    self.position.y + rng.random_range((-0.2)..=0.2) * temperature,
+                    0.0,
+                    1.0,
+                ),
             ),
             drop_time: clamp(
-                self.drop_time + rng.random_range((-0.5)..=0.5),
+                self.drop_time + rng.random_range((-0.5)..=0.5) * temperature,
                 0.0,
                 MAX_UNIT_DROP_TIME,
             ),

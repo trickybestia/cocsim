@@ -4,9 +4,13 @@ mod utils;
 use cocsim::{
     AttackOptimizer,
     AttackPlanExecutor,
+    BalloonModel,
     DragonModel,
     Game,
+    GeneticAttackOptimizer,
+    LightningSpellModel,
     SimulatedAnnealingAttackOptimizer,
+    SpellWithCount,
     UnitWithCount,
     consts::RNG_INITIAL_STATE,
     utils::load_test_map,
@@ -29,16 +33,60 @@ fn main() {
                 level: 5.try_into().unwrap(),
             }
             .into(),
-            count: 7,
+            count: 5,
+        },
+        UnitWithCount {
+            unit: BalloonModel {
+                level: 6.try_into().unwrap(),
+            }
+            .into(),
+            count: 4,
+        },
+        UnitWithCount {
+            unit: BalloonModel {
+                level: 6.try_into().unwrap(),
+            }
+            .into(),
+            count: 4,
         },
     ];
+    let spells: Vec<SpellWithCount> = vec![SpellWithCount {
+        spell: LightningSpellModel {
+            level: 7.try_into().unwrap(),
+        }
+        .into(),
+        count: 11,
+    }];
 
     let (map, map_image) = load_test_map("single_player/no_flight_zone").unwrap();
 
     let mut optimizer =
-        SimulatedAnnealingAttackOptimizer::new(map.clone(), units.clone(), vec![], None, 500, 100);
+        GeneticAttackOptimizer::new(map.clone(), units.clone(), spells.clone(), 0.01, 0.01);
 
-    for i in 0..10 {
+    for i in 0..40 {
+        let (_, best_plan_stats) = optimizer.step();
+
+        println!(
+            "Gen. #{i} best plan finished in {:.1} <= {:.1} <= {:.1} seconds (avg. percentage destroyed = {})",
+            best_plan_stats.min_time_elapsed,
+            best_plan_stats.avg_time_elapsed,
+            best_plan_stats.max_time_elapsed,
+            best_plan_stats.avg_percentage_destroyed
+        );
+    }
+
+    println!("Switching to SimulatedAnnealingAttackOptimizer");
+
+    let mut optimizer = SimulatedAnnealingAttackOptimizer::new(
+        map.clone(),
+        units.clone(),
+        spells.clone(),
+        Some(optimizer.best().unwrap().clone()),
+        10000,
+        100,
+    );
+
+    for i in 0..40 {
         let (_, best_plan_stats) = optimizer.step();
 
         println!(
@@ -51,7 +99,7 @@ fn main() {
     }
 
     let game = Game::new(&map, true, Some(Pcg64Mcg::new(RNG_INITIAL_STATE)));
-    let mut plan_executor = AttackPlanExecutor::new(optimizer.best().unwrap().0.units.clone());
+    let mut plan_executor = AttackPlanExecutor::new(&optimizer.best().unwrap().0);
 
     macroquad_run_game(
         game,

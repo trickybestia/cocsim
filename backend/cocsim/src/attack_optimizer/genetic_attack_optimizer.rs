@@ -32,8 +32,8 @@ pub struct GeneticAttackOptimizer {
     spells: Vec<SpellWithCount>,
     rng: Pcg64Mcg,
     population: Vec<(AttackPlan, AttackPlanExecutionStats)>,
-    pub mutation_probability: f64,
-    pub mutation_probability_decay: f64,
+    pub mutation_temperature: f32,
+    pub mutation_temperature_decay: f32,
     pub merge_probability: f64,
     pub merge_probability_decay: f64,
 }
@@ -43,7 +43,7 @@ impl GeneticAttackOptimizer {
         map: ValidatedMap,
         units: Vec<UnitWithCount>,
         spells: Vec<SpellWithCount>,
-        mutation_probability_decay: f64,
+        mutation_temperature_decay: f32,
         merge_probability_decay: f64,
     ) -> Self {
         Self {
@@ -52,8 +52,8 @@ impl GeneticAttackOptimizer {
             spells,
             rng: Pcg64Mcg::new(RNG_INITIAL_STATE),
             population: Vec::new(),
-            mutation_probability: 1.0,
-            mutation_probability_decay,
+            mutation_temperature: 1.0,
+            mutation_temperature_decay,
             merge_probability: 1.0,
             merge_probability_decay,
         }
@@ -97,7 +97,7 @@ impl AttackOptimizer for GeneticAttackOptimizer {
                     self.population.choose(&mut self.rng).unwrap().0.clone()
                 };
 
-                let new_plan = new_plan.mutate(&mut self.rng, self.mutation_probability);
+                let new_plan = new_plan.mutate(&mut self.rng, self.mutation_temperature);
                 let new_plan_stats = execute_attack_plan(
                     &self.map,
                     &new_plan,
@@ -116,8 +116,8 @@ impl AttackOptimizer for GeneticAttackOptimizer {
 
         self.population = new_population;
 
-        self.mutation_probability = clamp(
-            self.mutation_probability - self.mutation_probability_decay,
+        self.mutation_temperature = clamp(
+            self.mutation_temperature - self.mutation_temperature_decay,
             0.0,
             1.0,
         );

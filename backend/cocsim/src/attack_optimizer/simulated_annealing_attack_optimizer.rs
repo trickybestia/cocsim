@@ -1,5 +1,3 @@
-use nalgebra::clamp;
-use rand::Rng;
 use rand_pcg::Pcg64Mcg;
 
 use crate::{
@@ -12,7 +10,6 @@ use crate::{
     consts::{
         ATTACK_PLAN_EXECUTIONS_COUNT,
         ATTACK_PLAN_EXECUTOR_TPS,
-        MAX_UNIT_DROP_TIME,
         RNG_INITIAL_STATE,
     },
     execute_attack_plan,
@@ -63,21 +60,6 @@ impl SimulatedAnnealingAttackOptimizer {
             self.plan = Some((plan, stats));
         }
     }
-
-    fn next_value(
-        value: f32,
-        min: f32,
-        max: f32,
-        scale: f32,
-        temperature: f32,
-        rng: &mut impl Rng,
-    ) -> f32 {
-        clamp(
-            value + rng.random_range(-scale..=scale) * temperature,
-            min,
-            max,
-        )
-    }
 }
 
 impl AttackOptimizer for SimulatedAnnealingAttackOptimizer {
@@ -102,24 +84,11 @@ impl AttackOptimizer for SimulatedAnnealingAttackOptimizer {
             let temperature = 1.0 - self.current_iteration as f32 / self.iterations as f32;
 
             for unit in &mut new_plan.units {
-                unit.drop_time = Self::next_value(
-                    unit.drop_time,
-                    0.0,
-                    MAX_UNIT_DROP_TIME,
-                    10.0,
-                    temperature,
-                    &mut self.rng,
-                );
-                unit.distance =
-                    Self::next_value(unit.distance, 0.0, 1.0, 5.0, temperature, &mut self.rng);
-                unit.angle = Self::next_value(
-                    unit.angle,
-                    -10000.0,
-                    10000.0,
-                    5.0,
-                    temperature,
-                    &mut self.rng,
-                );
+                *unit = unit.mutate(&mut self.rng, temperature);
+            }
+
+            for spell in &mut new_plan.spells {
+                *spell = spell.mutate(&mut self.rng, temperature);
             }
 
             let new_stats = execute_attack_plan(

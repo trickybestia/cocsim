@@ -16,11 +16,14 @@ pub const COLLISION_TILE_SIZE: f32 = 1.0 / COLLISION_TILES_PER_MAP_TILE as f32;
 
 /// Unit distance to waypoint to consider it visited.
 pub const UNIT_DISTANCE_TO_WAYPOINT_EPS: f32 = 0.1;
+
 /// Time between unit drops when deploying multiple units of same type (unit
 /// group).
 pub const UNIT_DROP_COOLDOWN: f32 = 0.125;
 /// Cooldown after switching active unit group.
 pub const UNIT_DROP_GROUP_COOLDOWN: f32 = 2.0;
+/// Cooldown after dropping the spell.
+pub const SPELL_DROP_COOLDOWN: f32 = 2.0;
 
 pub const MAX_ATTACK_DURATION: f32 = 180.0;
 

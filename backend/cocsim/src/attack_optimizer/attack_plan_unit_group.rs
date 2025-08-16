@@ -56,14 +56,18 @@ impl AttackPlanUnitGroup {
         }
     }
 
-    pub fn mutate(&self, rng: &mut impl Rng) -> Self {
+    pub fn mutate(&self, rng: &mut impl Rng, temperature: f32) -> Self {
         Self {
             unit_model: self.unit_model.clone(),
             count: self.count,
-            angle: self.angle + rng.random_range((-1.0)..=1.0),
-            distance: clamp(self.distance + rng.random_range((-0.2)..=0.2), 0.0, 1.0),
+            angle: self.angle + rng.random_range((-1.0)..=1.0) * temperature,
+            distance: clamp(
+                self.distance + rng.random_range((-0.2)..=0.2) * temperature,
+                0.0,
+                1.0,
+            ),
             drop_time: clamp(
-                self.drop_time + rng.random_range((-0.5)..=0.5),
+                self.drop_time + rng.random_range((-0.5)..=0.5) * temperature,
                 0.0,
                 MAX_UNIT_DROP_TIME,
             ),

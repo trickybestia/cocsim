@@ -15,6 +15,7 @@ use crate::{
 
 pub enum Drawable {
     Shapes(Vec<Shape>),
+    #[allow(dead_code, reason = "reserved for future use")]
     Custom(fn(Entity, &World, &mut Vec<Shape>)),
 }
 

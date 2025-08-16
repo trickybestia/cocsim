@@ -58,28 +58,16 @@ impl AttackPlan {
         Self { units, spells }
     }
 
-    pub fn mutate(&self, rng: &mut impl Rng, probability: f64) -> Self {
+    pub fn mutate(&self, rng: &mut impl Rng, temperature: f32) -> Self {
         let units = self
             .units
             .iter()
-            .map(|unit| {
-                if rng.random_bool(probability) {
-                    unit.mutate(rng)
-                } else {
-                    unit.clone()
-                }
-            })
+            .map(|unit| unit.mutate(rng, temperature))
             .collect();
         let spells = self
             .spells
             .iter()
-            .map(|spell| {
-                if rng.random_bool(probability) {
-                    spell.mutate(rng)
-                } else {
-                    spell.clone()
-                }
-            })
+            .map(|spell| spell.mutate(rng, temperature))
             .collect();
 
         Self { units, spells }
