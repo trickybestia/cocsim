@@ -83,6 +83,7 @@ impl BuildingModel for WallModel {
         world.spawn((
             Health {
                 health: WALL_LEVELS[*self.level].health,
+                max_health: WALL_LEVELS[*self.level].health,
                 incoming_damage: 0.0,
             },
             Position(self.position().cast() + WALL.size.cast() / 2.0),

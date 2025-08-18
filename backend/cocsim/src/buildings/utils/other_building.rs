@@ -67,6 +67,7 @@ pub fn spawn_other_building(
     world.spawn((
         Health {
             health,
+            max_health: health,
             incoming_damage: 0.0,
         },
         Position(position.cast() + size.cast() / 2.0),

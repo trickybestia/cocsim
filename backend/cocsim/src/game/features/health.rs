@@ -18,6 +18,8 @@ use crate::{
 
 pub struct Health {
     pub health: f32,
+    pub max_health: f32,
+    /// Can be both positive (damage) and negative (heal).
     pub incoming_damage: f32,
 }
 
@@ -38,10 +40,12 @@ pub fn handle_incoming_damage(game: &mut Game) {
         .get_mut_or_default::<PreparedQuery<&mut Health>>()
         .query_mut(&mut game.world)
     {
-        health.health = 0.0f32.max(health.health - health.incoming_damage);
+        health.health = health
+            .max_health
+            .min(health.health - health.incoming_damage);
         health.incoming_damage = 0.0;
 
-        if health.health == 0.0 {
+        if health.health <= 0.0 {
             to_be_despawned.push(id);
         }
     }

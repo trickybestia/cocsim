@@ -50,6 +50,7 @@ pub fn spawn_air_unit(
         },
         Health {
             health,
+            max_health: health,
             incoming_damage: 0.0,
         },
         team,
