@@ -72,6 +72,7 @@ const LIGHTNING_SPELL: SpellType = SpellType {
 inventory::submit! {LIGHTNING_SPELL}
 
 const LIGHTNING_SPELL_DAMAGE_RADIUS: f32 = 2.0;
+const LIGHTNING_SPELL_COLOR: ShapeColor = ShapeColor::new(0, 255, 255);
 
 #[derive(Serialize, Deserialize, Debug, Clone, Arbitrary)]
 pub struct LightningSpellModel {
@@ -100,7 +101,7 @@ impl SpellModel for LightningSpellModel {
                 y: 0.0,
                 width: 0.2,
                 height: 0.5,
-                color: ShapeColor::new(0, 255, 255),
+                color: LIGHTNING_SPELL_COLOR,
             }]),
         );
     }
@@ -151,7 +152,7 @@ impl Action for LightningSpellAttack {
                 x: self.position.x,
                 y: self.position.y,
                 radius: LIGHTNING_SPELL_DAMAGE_RADIUS,
-                color: ShapeColor::new(0, 255, 255),
+                color: LIGHTNING_SPELL_COLOR,
             }]),
         ));
     }

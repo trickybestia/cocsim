@@ -5,6 +5,7 @@ use crate::{
     game::features::{
         actions::Action,
         attack::Attacker,
+        damage::DamageMultiplier,
         position::Position,
         projectiles::target_projectile::TargetProjectile,
     },
@@ -22,11 +23,17 @@ impl Action for TargetProjectileAttack {
         let target = game.world.get::<&Attacker>(actor).unwrap().target;
         let target_position = game.world.get::<&Position>(target).unwrap().0;
 
+        let damage_multiplier = game
+            .world
+            .get::<&DamageMultiplier>(actor)
+            .map(|m| m.value)
+            .unwrap_or(1.0);
+
         let relative_position = attacker_position - target_position;
 
         game.world.spawn((
             TargetProjectile {
-                damage: self.damage,
+                damage: self.damage * damage_multiplier,
                 target,
                 relative_position,
                 speed: self.projectile_speed,

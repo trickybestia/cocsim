@@ -83,6 +83,7 @@ inventory::submit! {HASTE_SPELL}
 const HASTE_SPELL_RADIUS: f32 = 4.0;
 const HASTE_SPELL_TIME_PER_TICK: f32 = 0.25;
 const HASTE_SPELL_BOOST_TIME: f32 = 1.0;
+const HASTE_SPELL_COLOR: ShapeColor = ShapeColor::new(255, 192, 203); // pink
 
 #[derive(Serialize, Deserialize, Debug, Clone, Arbitrary)]
 pub struct HasteSpellModel {
@@ -111,7 +112,7 @@ impl SpellModel for HasteSpellModel {
                 y: 0.0,
                 width: 0.2,
                 height: 0.5,
-                color: ShapeColor::new(255, 192, 203),
+                color: HASTE_SPELL_COLOR,
             }]),
         );
     }
@@ -144,7 +145,7 @@ impl Action for HasteSpellDrop {
                 rotation: 0.0,
                 angle: 360.0,
                 width: 0.1,
-                color: ShapeColor::new(255, 192, 203),
+                color: HASTE_SPELL_COLOR,
             }]),
         ));
     }
@@ -178,12 +179,12 @@ impl Action for HasteSpellTick {
         }
 
         for id in add_haste_speed_modifier {
-            let insert_component = match game.world.get::<&HasteSpellSpeedModifier>(id) {
+            let insert_speed_modifier = match game.world.get::<&HasteSpellSpeedModifier>(id) {
                 Ok(modifier) => self.speed_increase >= modifier.amount,
                 Err(_) => true,
             };
 
-            if insert_component {
+            if insert_speed_modifier {
                 game.world
                     .insert_one(
                         id,

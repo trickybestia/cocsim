@@ -6,6 +6,7 @@ use cocsim::{
     Game,
     HasteSpellModel,
     LightningSpellModel,
+    RageSpellModel,
     SpellModel,
     utils::load_test_map,
 };
@@ -37,6 +38,11 @@ fn main() {
         level: 5.try_into().unwrap(),
     }
     .spawn(&mut game, Vector2::from_element(7.0));
+
+    RageSpellModel {
+        level: 5.try_into().unwrap(),
+    }
+    .spawn(&mut game, Vector2::from_element(5.0));
 
     macroquad_run_game(game, map_image, None);
 }

@@ -5,6 +5,7 @@ use crate::{
     game::features::{
         actions::Action,
         attack::Attacker,
+        damage::DamageMultiplier,
         health::Health,
     },
 };
@@ -19,6 +20,12 @@ impl Action for MeleeAttack {
         let target = game.world.get::<&Attacker>(actor).unwrap().target;
         let mut target_health = game.world.get::<&mut Health>(target).unwrap();
 
-        target_health.incoming_damage += self.damage;
+        let damage_multiplier = game
+            .world
+            .get::<&DamageMultiplier>(actor)
+            .map(|m| m.value)
+            .unwrap_or(1.0);
+
+        target_health.incoming_damage += self.damage * damage_multiplier;
     }
 }

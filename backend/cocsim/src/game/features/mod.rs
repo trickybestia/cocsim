@@ -3,6 +3,7 @@ pub mod attack;
 pub mod buildings;
 pub mod clan_castle;
 pub mod collision;
+pub mod damage;
 pub mod delay;
 pub mod drawable;
 pub mod health;

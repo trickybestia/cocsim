@@ -10,6 +10,7 @@ use cocsim::{
     GeneticAttackOptimizer,
     HasteSpellModel,
     LightningSpellModel,
+    RageSpellModel,
     SimulatedAnnealingAttackOptimizer,
     SpellModelEnum,
     UnitModelEnum,
@@ -58,24 +59,24 @@ fn main() {
                 level: 7.try_into().unwrap(),
             }
             .into(),
-            count: 4,
+            count: 3,
         },
         WithCount {
             value: LightningSpellModel {
                 level: 7.try_into().unwrap(),
             }
             .into(),
-            count: 4,
+            count: 3,
         },
         WithCount {
-            value: HasteSpellModel {
+            value: RageSpellModel {
                 level: 4.try_into().unwrap(),
             }
             .into(),
             count: 1,
         },
         WithCount {
-            value: HasteSpellModel {
+            value: RageSpellModel {
                 level: 4.try_into().unwrap(),
             }
             .into(),

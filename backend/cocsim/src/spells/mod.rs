@@ -1,5 +1,6 @@
 mod haste_spell;
 mod lightning_spell;
+mod rage_spell;
 mod utils;
 
 use arbitrary::Arbitrary;
@@ -7,6 +8,7 @@ use enum_dispatch::enum_dispatch;
 pub use haste_spell::*;
 pub use lightning_spell::*;
 use nalgebra::Vector2;
+pub use rage_spell::*;
 use serde::{
     Deserialize,
     Serialize,
@@ -43,6 +45,8 @@ pub enum SpellModelEnum {
     HasteSpellModel,
     #[serde(rename = "Lightning")]
     LightningSpellModel,
+    #[serde(rename = "Rage")]
+    RageSpellModel,
 }
 
 impl WithHousingSpace for SpellModelEnum {

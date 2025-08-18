@@ -5,16 +5,15 @@ use crate::{
     utils::AnyMapExt,
 };
 
-pub struct Speed {
-    /// Raw speed, before applying any modifiers (like spells).
-    pub raw: f32,
-    /// Speed after applying modifiers (like spells).
-    pub real: f32,
+pub struct DamageMultiplier {
+    /// Default value is 1.0.
+    pub value: f32,
 }
 
-macro_rules! declare_speed_modififer {
+macro_rules! declare_damage_modififer {
     ($name:ident) => {
         pub struct $name {
+            /// Value to be added to [`DamageMultiplier::value`].
             pub amount: f32,
             pub remaining_time: f32,
         }
@@ -23,12 +22,12 @@ macro_rules! declare_speed_modififer {
             pub fn update(game: &mut Game) {
                 let mut remove_modifier_ids = Vec::new();
 
-                for (id, (speed, modifier)) in game
+                for (id, (multiplier, modifier)) in game
                     .cache
-                    .get_mut_or_default::<PreparedQuery<(&mut Speed, &mut Self)>>()
+                    .get_mut_or_default::<PreparedQuery<(&mut DamageMultiplier, &mut Self)>>()
                     .query_mut(&mut game.world)
                 {
-                    speed.real += modifier.amount;
+                    multiplier.value += modifier.amount;
 
                     modifier.remaining_time -= game.delta_time;
 
@@ -44,16 +43,14 @@ macro_rules! declare_speed_modififer {
         }
     };
 }
-
-declare_speed_modififer!(HasteSpellSpeedModifier);
-declare_speed_modififer!(RageSpellSpeedModifier);
+declare_damage_modififer!(RageSpellDamageModifier);
 
 pub fn reset_modifiers(game: &mut Game) {
-    for (_, speed) in game
+    for (_, multiplier) in game
         .cache
-        .get_mut_or_default::<PreparedQuery<&mut Speed>>()
+        .get_mut_or_default::<PreparedQuery<&mut DamageMultiplier>>()
         .query_mut(&mut game.world)
     {
-        speed.real = speed.raw;
+        multiplier.value = 1.0;
     }
 }

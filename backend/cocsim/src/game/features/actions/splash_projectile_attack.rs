@@ -8,6 +8,7 @@ use crate::{
             Attacker,
             Team,
         },
+        damage::DamageMultiplier,
         position::Position,
         projectiles::splash_projectile::SplashProjectile,
     },
@@ -29,9 +30,15 @@ impl Action for SplashProjectileAttack {
         let target = game.world.get::<&Attacker>(actor).unwrap().target;
         let target_position = game.world.get::<&Position>(target).unwrap().0;
 
+        let damage_multiplier = game
+            .world
+            .get::<&DamageMultiplier>(actor)
+            .map(|m| m.value)
+            .unwrap_or(1.0);
+
         game.world.spawn((
             SplashProjectile {
-                damage: self.damage,
+                damage: self.damage * damage_multiplier,
                 damage_radius: self.damage_radius,
                 damage_air: self.damage_air,
                 damage_ground: self.damage_ground,

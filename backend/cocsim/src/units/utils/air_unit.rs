@@ -15,6 +15,7 @@ use crate::{
             FalseRetargetCondition,
             Team,
         },
+        damage::DamageMultiplier,
         drawable::Drawable,
         health::Health,
         mover::Mover,
@@ -38,6 +39,7 @@ pub fn spawn_air_unit(
     world.spawn((
         Position(position),
         Unit { housing_space },
+        DamageMultiplier { value: 1.0 },
         Speed {
             raw: speed,
             real: speed,

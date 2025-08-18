@@ -5,6 +5,7 @@ use crate::{
     game::features::{
         actions::Action,
         attack::Team,
+        damage::DamageMultiplier,
         health::SplashDamageEvent,
         position::Position,
     },
@@ -23,12 +24,18 @@ impl Action for SplashDamage {
         let attacker_position = game.world.get::<&Position>(actor).unwrap().0;
         let attacker_team = *game.world.get::<&Team>(actor).unwrap();
 
+        let damage_multiplier = game
+            .world
+            .get::<&DamageMultiplier>(actor)
+            .map(|m| m.value)
+            .unwrap_or(1.0);
+
         game.world.spawn((SplashDamageEvent {
             attacker_team,
             damage_ground: self.damage_ground,
             damage_air: self.damage_air,
             target: attacker_position,
-            damage: self.damage,
+            damage: self.damage * damage_multiplier,
             radius: self.radius,
         },));
     }

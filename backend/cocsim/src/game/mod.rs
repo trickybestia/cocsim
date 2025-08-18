@@ -188,6 +188,15 @@ impl Game {
     pub fn tick(&mut self, delta_time: f32) {
         self.delta_time = delta_time;
 
+        features::tick_spell::update(self);
+
+        features::speed::reset_modifiers(self);
+        features::speed::HasteSpellSpeedModifier::update(self);
+        features::speed::RageSpellSpeedModifier::update(self);
+
+        features::damage::reset_modifiers(self);
+        features::damage::RageSpellDamageModifier::update(self);
+
         features::clan_castle::update(self);
         features::attack::check_retarget(self);
         features::attack::targeting::update(self);
@@ -197,14 +206,11 @@ impl Game {
         features::stunned::clear(self);
         features::projectiles::air_sweeper_projectile::update(self);
 
-        features::tick_spell::update(self);
-
-        features::speed::reset_modifiers(self);
-        features::speed::HasteSpellSpeedModifier::update(self);
         features::mover::r#move(self);
 
         features::health::handle_splash_damage_events(self);
         features::health::handle_incoming_damage(self);
+
         // TODO: run system: remove ToBeDespawned and use hero ability if not used
         features::delay::update(self);
 
