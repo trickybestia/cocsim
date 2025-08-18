@@ -5,6 +5,7 @@ use cocsim::{
     BalloonModel,
     Game,
     HasteSpellModel,
+    HealingSpellModel,
     LightningSpellModel,
     RageSpellModel,
     SpellModel,
@@ -43,6 +44,11 @@ fn main() {
         level: 5.try_into().unwrap(),
     }
     .spawn(&mut game, Vector2::from_element(5.0));
+
+    HealingSpellModel {
+        level: 10.try_into().unwrap(),
+    }
+    .spawn(&mut game, Vector2::from_element(20.0));
 
     macroquad_run_game(game, map_image, None);
 }

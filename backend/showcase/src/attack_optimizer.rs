@@ -9,6 +9,7 @@ use cocsim::{
     Game,
     GeneticAttackOptimizer,
     HasteSpellModel,
+    HealingSpellModel,
     LightningSpellModel,
     RageSpellModel,
     SimulatedAnnealingAttackOptimizer,
@@ -76,8 +77,8 @@ fn main() {
             count: 1,
         },
         WithCount {
-            value: RageSpellModel {
-                level: 4.try_into().unwrap(),
+            value: HealingSpellModel {
+                level: 6.try_into().unwrap(),
             }
             .into(),
             count: 1,

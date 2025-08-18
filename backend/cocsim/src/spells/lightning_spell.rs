@@ -122,8 +122,7 @@ impl Action for LightningSpellAttack {
             .get_mut_or_default::<PreparedQuery<
                 Without<(&AttackTarget, &mut Health, &Position, &Team), Or<&TownHall, &ClanCastle>>,
             >>()
-            .query(&game.world)
-            .iter()
+            .query_mut(&mut game.world)
         {
             if *target_team == Team::Attack
                 || attack_target

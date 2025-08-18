@@ -1,4 +1,5 @@
 mod haste_spell;
+mod healing_spell;
 mod lightning_spell;
 mod rage_spell;
 mod utils;
@@ -6,6 +7,7 @@ mod utils;
 use arbitrary::Arbitrary;
 use enum_dispatch::enum_dispatch;
 pub use haste_spell::*;
+pub use healing_spell::HealingSpellModel;
 pub use lightning_spell::*;
 use nalgebra::Vector2;
 pub use rage_spell::*;
@@ -43,6 +45,8 @@ pub trait SpellModel {
 pub enum SpellModelEnum {
     #[serde(rename = "Haste")]
     HasteSpellModel,
+    #[serde(rename = "Healing")]
+    HealingSpellModel,
     #[serde(rename = "Lightning")]
     LightningSpellModel,
     #[serde(rename = "Rage")]

@@ -3,7 +3,9 @@ use cocsim::{
     BalloonModel,
     Game,
     HasteSpellModel,
+    HealingSpellModel,
     LightningSpellModel,
+    RageSpellModel,
     SpellModel,
     utils::load_test_map,
 };
@@ -47,6 +49,16 @@ fn get_showcase_attack_internal() -> Json<Value> {
         level: 5.try_into().unwrap(),
     }
     .spawn(&mut game, Vector2::from_element(7.0));
+
+    RageSpellModel {
+        level: 5.try_into().unwrap(),
+    }
+    .spawn(&mut game, Vector2::from_element(5.0));
+
+    HealingSpellModel {
+        level: 10.try_into().unwrap(),
+    }
+    .spawn(&mut game, Vector2::from_element(20.0));
 
     let mut renderer = DtoGameRenderer::new(1);
 

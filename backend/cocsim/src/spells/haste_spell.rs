@@ -166,8 +166,7 @@ impl Action for HasteSpellTick {
         for (target_id, (target_position, target_team)) in game
             .cache
             .get_mut_or_default::<PreparedQuery<With<(&Position, &Team), &Speed>>>()
-            .query(&game.world)
-            .iter()
+            .query_mut(&mut game.world)
         {
             if *target_team == Team::Defense {
                 continue;
