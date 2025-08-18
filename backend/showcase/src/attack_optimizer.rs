@@ -22,28 +22,28 @@ use crate::utils::macroquad_run_game;
 fn main() {
     let units: Vec<UnitWithCount> = vec![
         UnitWithCount {
-            unit: DragonModel {
+            value: DragonModel {
                 level: 5.try_into().unwrap(),
             }
             .into(),
             count: 6,
         },
         UnitWithCount {
-            unit: DragonModel {
+            value: DragonModel {
                 level: 5.try_into().unwrap(),
             }
             .into(),
             count: 5,
         },
         UnitWithCount {
-            unit: BalloonModel {
+            value: BalloonModel {
                 level: 6.try_into().unwrap(),
             }
             .into(),
             count: 4,
         },
         UnitWithCount {
-            unit: BalloonModel {
+            value: BalloonModel {
                 level: 6.try_into().unwrap(),
             }
             .into(),
@@ -52,21 +52,21 @@ fn main() {
     ];
     let spells: Vec<SpellWithCount> = vec![
         SpellWithCount {
-            spell: LightningSpellModel {
+            value: LightningSpellModel {
                 level: 7.try_into().unwrap(),
             }
             .into(),
             count: 4,
         },
         SpellWithCount {
-            spell: LightningSpellModel {
+            value: LightningSpellModel {
                 level: 7.try_into().unwrap(),
             }
             .into(),
             count: 4,
         },
         SpellWithCount {
-            spell: LightningSpellModel {
+            value: LightningSpellModel {
                 level: 7.try_into().unwrap(),
             }
             .into(),

@@ -6,15 +6,23 @@ import { getOptimizeAttackWebSocketUrl } from "../api";
 import ArmyEditor from "../components/ArmyEditor";
 import GameRenderer from "../components/GameRenderer";
 import Header from "../components/Header";
-import { UnitTypesContext } from "../hooks/use-unit-types";
+import useSpellTypesSWR from "../hooks/use-spell-types-swr";
 import useUnitTypesSWR from "../hooks/use-unit-types-swr";
-import type { Map, OptimizeAttackMessage, UnitWithCount } from "../types";
+import type {
+  Map,
+  OptimizeAttackMessage,
+  SpellWithCount,
+  UnitWithCount
+} from "../types";
 import { importFromZip } from "../utils/map-editor";
 import readFiles from "../utils/read-files";
 
 const AttackOptimizerPage: React.FC = () => {
   const unitTypes = useUnitTypesSWR();
+  const spellTypes = useSpellTypesSWR();
+
   const [units, setUnits] = useState<UnitWithCount[] | undefined>(undefined);
+  const [spells, setSpells] = useState<SpellWithCount[] | undefined>(undefined);
   const [optimizationStarted, setOptimizationStarted] = useState(false);
   const [progressMessageHistory, setMessageHistory] = useState<string[]>([]);
   const [mapData, setMapData] = useState<
@@ -29,7 +37,7 @@ const AttackOptimizerPage: React.FC = () => {
 
         webSocket.send(JSON.stringify(mapData!.map));
         webSocket.send(JSON.stringify(units));
-        console.log(units);
+        webSocket.send(JSON.stringify(spells));
       }
     },
     optimizationStarted
@@ -85,25 +93,31 @@ const AttackOptimizerPage: React.FC = () => {
           <div className="flex h-full flex-col items-center">
             <div className="w-full grow lg:max-w-[var(--breakpoint-lg)]">
               {!optimizationStarted ? (
-                unitTypes !== undefined && (
+                unitTypes !== undefined &&
+                spellTypes !== undefined && (
                   <div className="flex flex-col gap-2">
-                    <h3 className="text-xl">Choose troops</h3>
-                    <UnitTypesContext value={unitTypes}>
-                      <ArmyEditor
-                        units={units === undefined ? [] : units}
-                        setUnits={setUnits}
-                      />
-                      <button
-                        onClick={() => {
-                          if (units !== undefined && units.length != 0) {
-                            setOptimizationStarted(true);
-                          }
-                        }}
-                        className="w-min cursor-pointer bg-blue-400 px-2 py-1 text-sm font-bold text-white hover:bg-blue-600"
-                      >
-                        OK
-                      </button>
-                    </UnitTypesContext>
+                    <h3 className="text-xl">Troops</h3>
+                    <ArmyEditor
+                      items={units === undefined ? [] : units}
+                      setItems={setUnits}
+                      types={unitTypes}
+                    />
+                    <h3 className="text-xl">Spells</h3>
+                    <ArmyEditor
+                      items={spells === undefined ? [] : spells}
+                      setItems={setSpells}
+                      types={spellTypes}
+                    />
+                    <button
+                      onClick={() => {
+                        if (units !== undefined && units.length != 0) {
+                          setOptimizationStarted(true);
+                        }
+                      }}
+                      className="w-min cursor-pointer bg-blue-400 px-2 py-1 text-sm font-bold text-white hover:bg-blue-600"
+                    >
+                      OK
+                    </button>
                   </div>
                 )
               ) : (
@@ -120,8 +134,23 @@ const AttackOptimizerPage: React.FC = () => {
                               "px-1 py-0.5"
                             )}
                           >
-                            {unit.count}x {unit.unit.name} lvl.{" "}
-                            {unit.unit.level + 1}
+                            {unit.count}x {unit.value.name} lvl.{" "}
+                            {unit.value.level + 1}
+                          </p>
+                        ))}
+                      </div>
+                      <h4 className="text-lg">Spells:</h4>
+                      <div>
+                        {spells!.map((spell, index) => (
+                          <p
+                            key={index}
+                            className={twJoin(
+                              index % 2 == 1 ? "bg-gray-200" : "bg-gray-100",
+                              "px-1 py-0.5"
+                            )}
+                          >
+                            {spell.count}x {spell.value.name} lvl.{" "}
+                            {spell.value.level + 1}
                           </p>
                         ))}
                       </div>

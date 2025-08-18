@@ -39,14 +39,14 @@ fn bench_with_test_map<M: Measurement>(
 fn attack_optimizer_bench(c: &mut Criterion) {
     let units: Vec<UnitWithCount> = vec![
         UnitWithCount {
-            unit: DragonModel {
+            value: DragonModel {
                 level: 5.try_into().unwrap(),
             }
             .into(),
             count: 6,
         },
         UnitWithCount {
-            unit: DragonModel {
+            value: DragonModel {
                 level: 5.try_into().unwrap(),
             }
             .into(),
@@ -54,7 +54,7 @@ fn attack_optimizer_bench(c: &mut Criterion) {
         },
     ];
     let spells: Vec<SpellWithCount> = vec![SpellWithCount {
-        spell: LightningSpellModel {
+        value: LightningSpellModel {
             level: 7.try_into().unwrap(),
         }
         .into(),

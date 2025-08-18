@@ -48,7 +48,7 @@ pub enum SpellModelEnum {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct SpellWithCount {
-    pub spell: SpellModelEnum,
+    pub value: SpellModelEnum,
     pub count: usize,
 }
 
@@ -61,7 +61,7 @@ impl<const MAX_HOUSING_SPACE: usize> SpellsWithCount<MAX_HOUSING_SPACE> {
         let housing_space = spells
             .iter()
             .map(|spell_with_count| {
-                spell_with_count.spell.r#type().housing_space * spell_with_count.count
+                spell_with_count.value.r#type().housing_space * spell_with_count.count
             })
             .sum();
 
@@ -79,7 +79,7 @@ impl<const MAX_HOUSING_SPACE: usize> SpellsWithCount<MAX_HOUSING_SPACE> {
         self.0
             .iter()
             .map(|spell_with_count| {
-                repeat(spell_with_count.spell.clone()).take(spell_with_count.count)
+                repeat(spell_with_count.value.clone()).take(spell_with_count.count)
             })
             .flatten()
     }
@@ -131,7 +131,10 @@ impl<'a, const MAX_HOUSING_SPACE: usize> Arbitrary<'a> for SpellsWithCount<MAX_H
 
             if housing_space + spell.r#type().housing_space <= MAX_HOUSING_SPACE {
                 housing_space += spell.r#type().housing_space;
-                result.push(SpellWithCount { spell, count: 1 });
+                result.push(SpellWithCount {
+                    value: spell,
+                    count: 1,
+                });
             } else {
                 return Ok(Self(result.into_boxed_slice()));
             }

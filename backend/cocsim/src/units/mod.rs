@@ -86,7 +86,7 @@ impl UnitModelEnum {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct UnitWithCount {
-    pub unit: UnitModelEnum,
+    pub value: UnitModelEnum,
     pub count: usize,
 }
 
@@ -99,7 +99,7 @@ impl<const MAX_HOUSING_SPACE: usize> UnitsWithCount<MAX_HOUSING_SPACE> {
         let housing_space = units
             .iter()
             .map(|unit_with_count| {
-                unit_with_count.unit.r#type().housing_space * unit_with_count.count
+                unit_with_count.value.r#type().housing_space * unit_with_count.count
             })
             .sum();
 
@@ -116,7 +116,9 @@ impl<const MAX_HOUSING_SPACE: usize> UnitsWithCount<MAX_HOUSING_SPACE> {
     pub fn flatten(&self) -> impl Iterator<Item = UnitModelEnum> {
         self.0
             .iter()
-            .map(|unit_with_count| repeat(unit_with_count.unit.clone()).take(unit_with_count.count))
+            .map(|unit_with_count| {
+                repeat(unit_with_count.value.clone()).take(unit_with_count.count)
+            })
             .flatten()
     }
 }
@@ -167,7 +169,10 @@ impl<'a, const MAX_HOUSING_SPACE: usize> Arbitrary<'a> for UnitsWithCount<MAX_HO
 
             if housing_space + unit.r#type().housing_space <= MAX_HOUSING_SPACE {
                 housing_space += unit.r#type().housing_space;
-                result.push(UnitWithCount { unit, count: 1 });
+                result.push(UnitWithCount {
+                    value: unit,
+                    count: 1,
+                });
             } else {
                 return Ok(Self(result.into_boxed_slice()));
             }

@@ -38,6 +38,7 @@ async fn main() {
             get(get_showcase_attack_base_image),
         )
         .route("/api/get-showcase-attack", get(get_showcase_attack))
+        .route("/api/get-spell-types", get(get_spell_types))
         .route("/api/get-unit-types", get(get_unit_types))
         .route("/api/optimize-attack", any(optimize_attack))
         .route("/api/reverse-projection", post(reverse_projection))

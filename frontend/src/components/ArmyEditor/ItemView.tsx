@@ -1,17 +1,17 @@
-import type { Unit } from "../../types";
+import type { WithCount, WithLevel, WithName } from "../../types";
 import IntegerNumberInput from "../IntegerNumberInput";
 
 type Props = {
-  unit: Unit;
+  value: {
+    value: WithName & WithLevel;
+  } & WithCount;
   onRemove: () => void;
-  defaultCount: number;
   onCountChange: (value: number) => void;
 };
 
-const UnitView: React.FC<Props> = ({
-  unit,
+const ItemView: React.FC<Props> = ({
+  value,
   onRemove,
-  defaultCount,
   onCountChange
 }: Props) => {
   return (
@@ -24,18 +24,18 @@ const UnitView: React.FC<Props> = ({
           X
         </button>
       </div>
-      <p>{unit.name}</p>
-      <p>Lvl. {unit.level + 1}</p>
+      <p>{value.value.name}</p>
+      <p>Lvl. {value.value.level + 1}</p>
       <IntegerNumberInput
         text="Count:"
         min={1}
         max={1000}
-        defaultValue={defaultCount}
+        defaultValue={value.count}
         onChange={onCountChange}
       />
     </div>
   );
 };
 
-export default UnitView;
+export default ItemView;
 export type { Props };

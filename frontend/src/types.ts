@@ -4,6 +4,18 @@ type Map = {
   buildings: Building[];
 };
 
+type WithName = {
+  name: string;
+};
+
+type WithCount = {
+  count: number;
+};
+
+type WithLevel = {
+  level: number;
+};
+
 type GenericBuilding = {
   name: string;
   x: number;
@@ -40,11 +52,27 @@ type Unit = {
 };
 
 type UnitWithCount = {
-  unit: Unit;
+  value: Unit;
   count: number;
 };
 
 type UnitType = {
+  name: string;
+  levels: number;
+  housingSpace: number;
+};
+
+type Spell = {
+  name: string;
+  level: number;
+};
+
+type SpellWithCount = {
+  value: Spell;
+  count: number;
+};
+
+type SpellType = {
   name: string;
   levels: number;
   housingSpace: number;
@@ -116,5 +144,11 @@ export type {
   Unit,
   UnitWithCount,
   UnitType,
-  OptimizeAttackMessage
+  Spell,
+  SpellWithCount,
+  SpellType,
+  OptimizeAttackMessage,
+  WithCount,
+  WithName,
+  WithLevel
 };

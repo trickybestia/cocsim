@@ -7,6 +7,7 @@ pub const MAX_BORDER_SIZE: usize = 4;
 pub const MAX_BUILDINGS_COUNT: usize = 1000;
 pub const MAX_ARMY_HOUSING_SPACE: usize = 395;
 pub const MAX_CLAN_CASTLE_HOUSING_SPACE: usize = 55;
+pub const MAX_SPELLS_HOUSING_SPACE: usize = 14;
 
 pub const MAX_BUILDING_POS: usize = MAX_BORDER_SIZE + MAX_BASE_SIZE - 1;
 

@@ -2,43 +2,57 @@ import { create } from "mutative";
 import { useState } from "react";
 import { twMerge } from "tailwind-merge";
 
-import useUnitTypes from "../../hooks/use-unit-types";
-import type { UnitType, UnitWithCount } from "../../types";
-import UnitCreationModal from "./UnitCreationModal";
-import UnitView from "./UnitView";
+import type { WithCount, WithLevel, WithName } from "../../types";
+import UnitCreationModal from "./ItemCreationModal";
+import ItemView from "./ItemView";
+
+type ItemType = {
+  name: string;
+  levels: number;
+  housingSpace: number;
+};
+
+type Item = {
+  value: WithLevel & WithName;
+} & WithCount;
 
 type Props = {
   className?: string;
-  units: UnitWithCount[];
-  setUnits: (units: UnitWithCount[]) => void;
+  items: Item[];
+  setItems: (items: Item[]) => void;
+  types: ItemType[];
 };
 
-const ArmyEditor: React.FC<Props> = ({ className, units, setUnits }: Props) => {
-  const { getUnitType } = useUnitTypes();
-
+const ArmyEditor: React.FC<Props> = ({
+  className,
+  items,
+  setItems,
+  types
+}: Props) => {
   const [isUnitCreationModalOpen, setIsUnitCreationModalOpen] = useState(false);
 
   let occupiedSpace = 0;
 
-  units.forEach((unit) => {
-    occupiedSpace += getUnitType(unit.unit).housingSpace * unit.count;
+  items.forEach((item) => {
+    occupiedSpace +=
+      types.find((type) => type.name === item.value.name)!.housingSpace *
+      item.count;
   });
 
-  const unitViews = units.map((unit, index) => (
-    <UnitView
+  const itemViews = items.map((item, index) => (
+    <ItemView
       key={index}
-      unit={unit.unit}
-      defaultCount={unit.count}
+      value={item}
       onCountChange={(newCount) =>
-        setUnits(
-          create(units, (draft) => {
+        setItems(
+          create(items, (draft) => {
             draft[index].count = newCount;
           })
         )
       }
       onRemove={() => {
-        setUnits(
-          create(units, (draft) => {
+        setItems(
+          create(items, (draft) => {
             draft.splice(index, 1);
           })
         );
@@ -46,21 +60,21 @@ const ArmyEditor: React.FC<Props> = ({ className, units, setUnits }: Props) => {
     />
   ));
 
-  const onAddUnitButtonClick = () => {
+  const onAddButtonClick = () => {
     setIsUnitCreationModalOpen(true);
   };
 
-  const onUnitCreationModalClose = (
-    unit: { unitType: UnitType; level: number } | undefined
+  const onItemCreationModalClose = (
+    value: { name: string; level: number } | undefined
   ) => {
     setIsUnitCreationModalOpen(false);
 
-    if (unit === undefined) return;
+    if (value === undefined) return;
 
-    setUnits(
-      create(units, (draft) => {
+    setItems(
+      create(items, (draft) => {
         draft.push({
-          unit: { name: unit.unitType.name, level: unit.level },
+          value,
           count: 1
         });
       })
@@ -70,11 +84,11 @@ const ArmyEditor: React.FC<Props> = ({ className, units, setUnits }: Props) => {
   return (
     <div className={twMerge("flex flex-col gap-2", className)}>
       <div className="flex flex-wrap gap-2">
-        {unitViews}
+        {itemViews}
         <button
           className="w-20 cursor-pointer bg-blue-400 px-2 py-1 text-base font-bold text-white hover:bg-blue-600"
           key="0"
-          onClick={onAddUnitButtonClick}
+          onClick={onAddButtonClick}
         >
           +
         </button>
@@ -83,7 +97,8 @@ const ArmyEditor: React.FC<Props> = ({ className, units, setUnits }: Props) => {
 
       <UnitCreationModal
         isOpen={isUnitCreationModalOpen}
-        onClose={onUnitCreationModalClose}
+        types={types}
+        onClose={onItemCreationModalClose}
       />
     </div>
   );

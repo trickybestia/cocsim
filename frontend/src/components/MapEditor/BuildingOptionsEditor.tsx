@@ -1,7 +1,8 @@
 import { create } from "mutative";
-import { Fragment } from "react";
+import { Fragment, useContext } from "react";
 
 import useBuildingTypes from "../../hooks/use-building-types";
+import { UnitTypesContext } from "../../hooks/use-unit-types";
 import type { Building, UnitWithCount } from "../../types";
 import ArmyEditor from "../ArmyEditor";
 import IntegerNumberInput from "../IntegerNumberInput";
@@ -15,6 +16,7 @@ const BuildingOptionsEditor: React.FC<Props> = ({
   building,
   onChange
 }: Props) => {
+  const unitTypes = useContext(UnitTypesContext);
   const buildingType = useBuildingTypes().getBuildingType(building);
 
   return (
@@ -59,14 +61,15 @@ const BuildingOptionsEditor: React.FC<Props> = ({
           <p className="col-span-2 text-start">Troops inside:</p>
           <ArmyEditor
             className="col-span-2"
-            units={building.units as UnitWithCount[]}
-            setUnits={(units) =>
+            items={building.units as UnitWithCount[]}
+            setItems={(items) =>
               onChange(
                 create(building, (draft) => {
-                  draft.units = units;
+                  draft.units = items;
                 })
               )
             }
+            types={unitTypes}
           />
         </>
       )}

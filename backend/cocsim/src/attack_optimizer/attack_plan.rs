@@ -28,11 +28,11 @@ impl AttackPlan {
         Self {
             units: units
                 .iter()
-                .map(|unit| AttackPlanUnitGroup::new_randomized(unit.unit.clone(), unit.count, rng))
+                .map(|unit| AttackPlanUnitGroup::new_randomized(unit.value.clone(), unit.count, rng))
                 .collect(),
             spells: spells
                 .iter()
-                .map(|spell| AttackPlanSpell::new_randomized(spell.spell.clone(), spell.count, rng))
+                .map(|spell| AttackPlanSpell::new_randomized(spell.value.clone(), spell.count, rng))
                 .collect(),
         }
     }
