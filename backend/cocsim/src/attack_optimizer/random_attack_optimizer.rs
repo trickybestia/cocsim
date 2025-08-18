@@ -4,9 +4,10 @@ use crate::{
     AttackOptimizer,
     AttackPlan,
     AttackPlanExecutionStats,
-    SpellWithCount,
-    UnitWithCount,
+    SpellModelEnum,
+    UnitModelEnum,
     ValidatedMap,
+    WithCount,
     consts::{
         ATTACK_PLAN_EXECUTIONS_COUNT,
         ATTACK_PLAN_EXECUTOR_TPS,
@@ -17,8 +18,8 @@ use crate::{
 
 pub struct RandomAttackOptimizer {
     map: ValidatedMap,
-    units: Vec<UnitWithCount>,
-    spells: Vec<SpellWithCount>,
+    units: Vec<WithCount<UnitModelEnum>>,
+    spells: Vec<WithCount<SpellModelEnum>>,
     rng: Pcg64Mcg,
     plan: Option<(AttackPlan, AttackPlanExecutionStats)>,
     plans_per_step: usize,
@@ -27,8 +28,8 @@ pub struct RandomAttackOptimizer {
 impl RandomAttackOptimizer {
     pub fn new(
         map: ValidatedMap,
-        units: Vec<UnitWithCount>,
-        spells: Vec<SpellWithCount>,
+        units: Vec<WithCount<UnitModelEnum>>,
+        spells: Vec<WithCount<SpellModelEnum>>,
         plans_per_step: usize,
     ) -> Self {
         Self {

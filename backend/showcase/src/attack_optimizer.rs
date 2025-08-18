@@ -10,8 +10,9 @@ use cocsim::{
     GeneticAttackOptimizer,
     LightningSpellModel,
     SimulatedAnnealingAttackOptimizer,
-    SpellWithCount,
-    UnitWithCount,
+    SpellModelEnum,
+    UnitModelEnum,
+    WithCount,
     consts::RNG_INITIAL_STATE,
     utils::load_test_map,
 };
@@ -20,29 +21,29 @@ use rand_pcg::Pcg64Mcg;
 use crate::utils::macroquad_run_game;
 
 fn main() {
-    let units: Vec<UnitWithCount> = vec![
-        UnitWithCount {
+    let units: Vec<WithCount<UnitModelEnum>> = vec![
+        WithCount {
             value: DragonModel {
                 level: 5.try_into().unwrap(),
             }
             .into(),
             count: 6,
         },
-        UnitWithCount {
+        WithCount {
             value: DragonModel {
                 level: 5.try_into().unwrap(),
             }
             .into(),
             count: 5,
         },
-        UnitWithCount {
+        WithCount {
             value: BalloonModel {
                 level: 6.try_into().unwrap(),
             }
             .into(),
             count: 4,
         },
-        UnitWithCount {
+        WithCount {
             value: BalloonModel {
                 level: 6.try_into().unwrap(),
             }
@@ -50,22 +51,22 @@ fn main() {
             count: 4,
         },
     ];
-    let spells: Vec<SpellWithCount> = vec![
-        SpellWithCount {
+    let spells: Vec<WithCount<SpellModelEnum>> = vec![
+        WithCount {
             value: LightningSpellModel {
                 level: 7.try_into().unwrap(),
             }
             .into(),
             count: 4,
         },
-        SpellWithCount {
+        WithCount {
             value: LightningSpellModel {
                 level: 7.try_into().unwrap(),
             }
             .into(),
             count: 4,
         },
-        SpellWithCount {
+        WithCount {
             value: LightningSpellModel {
                 level: 7.try_into().unwrap(),
             }

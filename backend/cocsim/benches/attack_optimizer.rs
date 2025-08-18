@@ -3,9 +3,10 @@ use cocsim::{
     DragonModel,
     GeneticAttackOptimizer,
     LightningSpellModel,
-    SpellWithCount,
-    UnitWithCount,
+    SpellModelEnum,
+    UnitModelEnum,
     ValidatedMap,
+    WithCount,
     utils::load_test_map,
 };
 use criterion::{
@@ -16,7 +17,11 @@ use criterion::{
     measurement::Measurement,
 };
 
-fn optimize_attack(map: &ValidatedMap, units: &[UnitWithCount], spells: &[SpellWithCount]) {
+fn optimize_attack(
+    map: &ValidatedMap,
+    units: &[WithCount<UnitModelEnum>],
+    spells: &[WithCount<SpellModelEnum>],
+) {
     let mut optimizer =
         GeneticAttackOptimizer::new(map.clone(), units.to_owned(), spells.to_owned(), 0.02, 0.05);
 
@@ -26,8 +31,8 @@ fn optimize_attack(map: &ValidatedMap, units: &[UnitWithCount], spells: &[SpellW
 fn bench_with_test_map<M: Measurement>(
     mut group: BenchmarkGroup<'_, M>,
     map_path: &str,
-    units: &[UnitWithCount],
-    spells: &[SpellWithCount],
+    units: &[WithCount<UnitModelEnum>],
+    spells: &[WithCount<SpellModelEnum>],
 ) {
     let (map, _) = load_test_map(map_path).unwrap();
 
@@ -37,15 +42,15 @@ fn bench_with_test_map<M: Measurement>(
 }
 
 fn attack_optimizer_bench(c: &mut Criterion) {
-    let units: Vec<UnitWithCount> = vec![
-        UnitWithCount {
+    let units: Vec<WithCount<UnitModelEnum>> = vec![
+        WithCount {
             value: DragonModel {
                 level: 5.try_into().unwrap(),
             }
             .into(),
             count: 6,
         },
-        UnitWithCount {
+        WithCount {
             value: DragonModel {
                 level: 5.try_into().unwrap(),
             }
@@ -53,7 +58,7 @@ fn attack_optimizer_bench(c: &mut Criterion) {
             count: 7,
         },
     ];
-    let spells: Vec<SpellWithCount> = vec![SpellWithCount {
+    let spells: Vec<WithCount<SpellModelEnum>> = vec![WithCount {
         value: LightningSpellModel {
             level: 7.try_into().unwrap(),
         }

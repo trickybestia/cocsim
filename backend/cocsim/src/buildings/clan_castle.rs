@@ -1,3 +1,8 @@
+use std::{
+    iter::repeat,
+    ops::Deref,
+};
+
 use arbitrary::Arbitrary;
 use hecs::World;
 use nalgebra::Vector2;
@@ -9,8 +14,10 @@ use serde::{
 use crate::{
     BuildingModel,
     BuildingType,
-    UnitsWithCount,
+    UnitModelEnum,
     UsizeWithMax,
+    WithCount,
+    WithMaxHousingSpace,
     buildings::utils::resource_building::spawn_resource_building,
     consts::{
         MAX_BUILDING_POS,
@@ -58,7 +65,7 @@ pub struct ClanCastleModel {
     pub x: UsizeWithMax<MAX_BUILDING_POS>,
     pub y: UsizeWithMax<MAX_BUILDING_POS>,
     pub level: UsizeWithMax<CLAN_CASTLE_LEVEL_INDEX_MAX>,
-    pub units: UnitsWithCount<MAX_CLAN_CASTLE_HOUSING_SPACE>,
+    pub units: WithMaxHousingSpace<MAX_CLAN_CASTLE_HOUSING_SPACE, WithCount<UnitModelEnum>>,
 }
 
 impl BuildingModel for ClanCastleModel {
@@ -78,7 +85,15 @@ impl BuildingModel for ClanCastleModel {
             CLAN_CASTLE.size,
         );
 
-        let mut units = self.units.flatten().collect::<Vec<_>>();
+        let mut units = self
+            .units
+            .deref()
+            .iter()
+            .map(|unit_with_count| {
+                repeat(unit_with_count.value.clone()).take(unit_with_count.count)
+            })
+            .flatten()
+            .collect::<Vec<_>>();
         units.sort_unstable_by(|a, b| b.clan_castle_deployment_cmp(a));
 
         world

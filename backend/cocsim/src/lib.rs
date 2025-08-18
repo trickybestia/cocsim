@@ -10,6 +10,7 @@ mod spells;
 mod units;
 mod usize_with_max;
 pub mod utils;
+mod with_housing_space;
 
 pub use attack_optimizer::*;
 pub use buildings::*;
@@ -22,3 +23,4 @@ pub use shape::{
 pub use spells::*;
 pub use units::*;
 pub use usize_with_max::*;
+pub use with_housing_space::*;

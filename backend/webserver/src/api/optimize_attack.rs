@@ -15,9 +15,11 @@ use cocsim::{
     Game,
     Map,
     SimulatedAnnealingAttackOptimizer,
-    SpellsWithCount,
-    UnitsWithCount,
+    SpellModelEnum,
+    UnitModelEnum,
     ValidatedMap,
+    WithCount,
+    WithMaxHousingSpace,
     consts::{
         MAX_ARMY_HOUSING_SPACE,
         MAX_SPELLS_HOUSING_SPACE,
@@ -52,12 +54,13 @@ async fn optimize_attack_internal(mut socket: WebSocket) -> anyhow::Result<()> {
     let map = ValidatedMap::try_from(map)?;
 
     let units_message = socket.recv().await.context("Expected message")??;
-    let units =
-        serde_json::from_str::<UnitsWithCount<MAX_ARMY_HOUSING_SPACE>>(units_message.to_text()?)?;
+    let units = serde_json::from_str::<
+        WithMaxHousingSpace<MAX_ARMY_HOUSING_SPACE, WithCount<UnitModelEnum>>,
+    >(units_message.to_text()?)?;
     let spells_message = socket.recv().await.context("Expected message")??;
-    let spells = serde_json::from_str::<SpellsWithCount<MAX_SPELLS_HOUSING_SPACE>>(
-        spells_message.to_text()?,
-    )?;
+    let spells = serde_json::from_str::<
+        WithMaxHousingSpace<MAX_SPELLS_HOUSING_SPACE, WithCount<SpellModelEnum>>,
+    >(spells_message.to_text()?)?;
 
     socket
         .send(Message::text(

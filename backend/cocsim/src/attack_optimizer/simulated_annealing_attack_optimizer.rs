@@ -4,9 +4,10 @@ use crate::{
     AttackOptimizer,
     AttackPlan,
     AttackPlanExecutionStats,
-    SpellWithCount,
-    UnitWithCount,
+    SpellModelEnum,
+    UnitModelEnum,
     ValidatedMap,
+    WithCount,
     consts::{
         ATTACK_PLAN_EXECUTIONS_COUNT,
         ATTACK_PLAN_EXECUTOR_TPS,
@@ -17,8 +18,8 @@ use crate::{
 
 pub struct SimulatedAnnealingAttackOptimizer {
     map: ValidatedMap,
-    units: Vec<UnitWithCount>,
-    spells: Vec<SpellWithCount>,
+    units: Vec<WithCount<UnitModelEnum>>,
+    spells: Vec<WithCount<SpellModelEnum>>,
     rng: Pcg64Mcg,
     plan: Option<(AttackPlan, AttackPlanExecutionStats)>,
     iterations_per_step: usize,
@@ -29,8 +30,8 @@ pub struct SimulatedAnnealingAttackOptimizer {
 impl SimulatedAnnealingAttackOptimizer {
     pub fn new(
         map: ValidatedMap,
-        units: Vec<UnitWithCount>,
-        spells: Vec<SpellWithCount>,
+        units: Vec<WithCount<UnitModelEnum>>,
+        spells: Vec<WithCount<SpellModelEnum>>,
         initial_plan: Option<(AttackPlan, AttackPlanExecutionStats)>,
         iterations: usize,
         iterations_per_step: usize,

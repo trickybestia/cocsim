@@ -5,12 +5,13 @@ use rand::{
 };
 
 use crate::{
-    SpellWithCount,
-    UnitWithCount,
+    SpellModelEnum,
+    UnitModelEnum,
     attack_optimizer::{
         AttackPlanUnitGroup,
         attack_plan_spell::AttackPlanSpell,
     },
+    with_housing_space::WithCount,
 };
 
 #[derive(Clone, Arbitrary, Debug)]
@@ -21,14 +22,16 @@ pub struct AttackPlan {
 
 impl AttackPlan {
     pub fn new_randomized(
-        units: &[UnitWithCount],
-        spells: &[SpellWithCount],
+        units: &[WithCount<UnitModelEnum>],
+        spells: &[WithCount<SpellModelEnum>],
         rng: &mut impl Rng,
     ) -> Self {
         Self {
             units: units
                 .iter()
-                .map(|unit| AttackPlanUnitGroup::new_randomized(unit.value.clone(), unit.count, rng))
+                .map(|unit| {
+                    AttackPlanUnitGroup::new_randomized(unit.value.clone(), unit.count, rng)
+                })
                 .collect(),
             spells: spells
                 .iter()
