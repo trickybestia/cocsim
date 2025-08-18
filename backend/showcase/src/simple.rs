@@ -4,6 +4,7 @@ mod utils;
 use cocsim::{
     BalloonModel,
     Game,
+    HasteSpellModel,
     LightningSpellModel,
     SpellModel,
     utils::load_test_map,
@@ -31,6 +32,11 @@ fn main() {
         level: 11.try_into().unwrap(),
     }
     .spawn(&mut game, Vector2::from_element(20.0));
+
+    HasteSpellModel {
+        level: 5.try_into().unwrap(),
+    }
+    .spawn(&mut game, Vector2::from_element(7.0));
 
     macroquad_run_game(game, map_image, None);
 }

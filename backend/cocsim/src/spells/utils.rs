@@ -12,6 +12,7 @@ use crate::game::features::{
     drawable::Drawable,
     mover::Mover,
     position::Position,
+    speed::Speed,
     to_be_despawned::OnDespawn,
 };
 
@@ -28,8 +29,11 @@ pub fn spawn_spell(
     world.spawn((
         Position(position + Vector2::new(SPELL_DROP_OFFSET, -SPELL_DROP_OFFSET)),
         drawable,
+        Speed {
+            raw: SPELL_DROP_SPEED,
+            real: SPELL_DROP_SPEED,
+        },
         Mover {
-            speed: SPELL_DROP_SPEED,
             target: position,
             arrived: false,
         },

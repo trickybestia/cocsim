@@ -8,6 +8,7 @@ use cocsim::{
     DragonModel,
     Game,
     GeneticAttackOptimizer,
+    HasteSpellModel,
     LightningSpellModel,
     SimulatedAnnealingAttackOptimizer,
     SpellModelEnum,
@@ -67,11 +68,25 @@ fn main() {
             count: 4,
         },
         WithCount {
-            value: LightningSpellModel {
-                level: 7.try_into().unwrap(),
+            value: HasteSpellModel {
+                level: 4.try_into().unwrap(),
             }
             .into(),
-            count: 3,
+            count: 1,
+        },
+        WithCount {
+            value: HasteSpellModel {
+                level: 4.try_into().unwrap(),
+            }
+            .into(),
+            count: 1,
+        },
+        WithCount {
+            value: HasteSpellModel {
+                level: 4.try_into().unwrap(),
+            }
+            .into(),
+            count: 1,
         },
     ];
 

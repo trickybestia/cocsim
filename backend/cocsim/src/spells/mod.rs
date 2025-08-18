@@ -1,8 +1,10 @@
+mod haste_spell;
 mod lightning_spell;
 mod utils;
 
 use arbitrary::Arbitrary;
 use enum_dispatch::enum_dispatch;
+pub use haste_spell::*;
 pub use lightning_spell::*;
 use nalgebra::Vector2;
 use serde::{
@@ -37,7 +39,9 @@ pub trait SpellModel {
 #[derive(Serialize, Deserialize, Debug, Clone, Arbitrary)]
 #[serde(tag = "name")]
 pub enum SpellModelEnum {
-    #[serde(rename = "LightningSpell")]
+    #[serde(rename = "Haste")]
+    HasteSpellModel,
+    #[serde(rename = "Lightning")]
     LightningSpellModel,
 }
 

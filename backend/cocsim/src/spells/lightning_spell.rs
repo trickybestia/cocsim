@@ -64,7 +64,7 @@ const LIGHTNING_SPELL_LEVELS: [LightningSpellLevel; LIGHTNING_SPELL_LEVELS_LEN] 
 ];
 
 const LIGHTNING_SPELL: SpellType = SpellType {
-    name: "LightningSpell",
+    name: "Lightning",
     housing_space: 1,
     levels: LIGHTNING_SPELL_LEVELS.len(),
 };

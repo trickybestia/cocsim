@@ -2,6 +2,9 @@ use axum::Json;
 use cocsim::{
     BalloonModel,
     Game,
+    HasteSpellModel,
+    LightningSpellModel,
+    SpellModel,
     utils::load_test_map,
 };
 use nalgebra::Vector2;
@@ -34,6 +37,16 @@ fn get_showcase_attack_internal() -> Json<Value> {
             Vector2::new(0.5, 0.5),
         );
     }
+
+    LightningSpellModel {
+        level: 11.try_into().unwrap(),
+    }
+    .spawn(&mut game, Vector2::from_element(20.0));
+
+    HasteSpellModel {
+        level: 5.try_into().unwrap(),
+    }
+    .spawn(&mut game, Vector2::from_element(7.0));
 
     let mut renderer = DtoGameRenderer::new(1);
 

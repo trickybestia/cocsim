@@ -10,6 +10,8 @@ pub mod map_size;
 pub mod mover;
 pub mod position;
 pub mod projectiles;
+pub mod speed;
 pub mod stunned;
+pub mod tick_spell;
 pub mod to_be_despawned;
 pub mod unit;

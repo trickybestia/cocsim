@@ -196,7 +196,13 @@ impl Game {
         features::projectiles::splash_projectile::update(self);
         features::stunned::clear(self);
         features::projectiles::air_sweeper_projectile::update(self);
+
+        features::tick_spell::update(self);
+
+        features::speed::reset_modifiers(self);
+        features::speed::HasteSpellSpeedModifier::update(self);
         features::mover::r#move(self);
+
         features::health::handle_splash_damage_events(self);
         features::health::handle_incoming_damage(self);
         // TODO: run system: remove ToBeDespawned and use hero ability if not used

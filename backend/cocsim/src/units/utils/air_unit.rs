@@ -19,6 +19,7 @@ use crate::{
         health::Health,
         mover::Mover,
         position::Position,
+        speed::Speed,
         unit::Unit,
     },
 };
@@ -37,8 +38,11 @@ pub fn spawn_air_unit(
     world.spawn((
         Position(position),
         Unit { housing_space },
+        Speed {
+            raw: speed,
+            real: speed,
+        },
         Mover {
-            speed,
             arrived: true,
             target: position,
         },
