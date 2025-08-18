@@ -15,7 +15,7 @@ use crate::game::features::{
     to_be_despawned::OnDespawn,
 };
 
-const SPELL_DROP_DELAY: f32 = 1.0;
+const SPELL_DROP_DELAY: f32 = 0.8;
 const SPELL_DROP_OFFSET: f32 = 5.0;
 const SPELL_DROP_SPEED: f32 = SPELL_DROP_OFFSET * SQRT_2 / SPELL_DROP_DELAY;
 
