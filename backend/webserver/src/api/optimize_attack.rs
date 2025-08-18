@@ -14,6 +14,7 @@ use cocsim::{
     AttackPlanExecutor,
     Game,
     Map,
+    RandomAttackOptimizer,
     SimulatedAnnealingAttackOptimizer,
     SpellModelEnum,
     UnitModelEnum,
@@ -72,11 +73,42 @@ async fn optimize_attack_internal(mut socket: WebSocket) -> anyhow::Result<()> {
         ))
         .await?;
 
+    let mut optimizer =
+        RandomAttackOptimizer::new(map.clone(), units.to_vec(), spells.to_vec(), 100);
+
+    for i in 0..10 {
+        optimizer = spawn_blocking(move || {
+            optimizer.step();
+
+            optimizer
+        })
+        .await?;
+
+        let (_, best_plan_stats) = optimizer.best().expect("Best plan exists here");
+
+        let progress = format!(
+            "Gen. #{i} best plan finished in {:.1} <= {:.1} <= {:.1} seconds",
+            best_plan_stats.min_time_elapsed,
+            best_plan_stats.avg_time_elapsed,
+            best_plan_stats.max_time_elapsed
+        );
+
+        socket
+            .send(Message::text(
+                json!({
+                    "type": "progress",
+                    "progress": progress,
+                })
+                .to_string(),
+            ))
+            .await?;
+    }
+
     let mut optimizer = SimulatedAnnealingAttackOptimizer::new(
         map.clone(),
         units.to_vec(),
         spells.to_vec(),
-        None,
+        optimizer.best().cloned(),
         OPTIMIZE_ATTACK_ITERATIONS,
         OPTIMIZE_ATTACK_ITERATIONS_PER_STEP,
     );
