@@ -11,7 +11,6 @@ use crate::{
     BuildingType,
     UsizeWithMax,
     buildings::utils::defensive_building::spawn_defensive_building,
-    consts::MAX_BUILDING_POS,
     game::features::{
         actions::{
             SplashDamage,
@@ -116,8 +115,6 @@ const BOMB_TOWER_DEATH_DAMAGE_DELAY: f32 = 1.0;
 
 #[derive(Serialize, Deserialize, Debug, Arbitrary, Clone)]
 pub struct BombTowerModel {
-    pub x: UsizeWithMax<MAX_BUILDING_POS>,
-    pub y: UsizeWithMax<MAX_BUILDING_POS>,
     pub level: UsizeWithMax<BOMB_TOWER_LEVEL_INDEX_MAX>,
 }
 
@@ -126,17 +123,13 @@ impl BuildingModel for BombTowerModel {
         &BOMB_TOWER
     }
 
-    fn position(&self) -> Vector2<usize> {
-        Vector2::new(*self.x, *self.y)
-    }
-
-    fn spawn(&self, world: &mut World) {
+    fn spawn(&self, world: &mut World, position: Vector2<usize>) {
         let level = &BOMB_TOWER_LEVELS[*self.level];
 
         let id = spawn_defensive_building(
             world,
             level.health,
-            Vector2::new(*self.x, *self.y),
+            position,
             BOMB_TOWER.size,
             BOMB_TOWER_ATTACK_COOLDOWN,
             BuildingRetargetCondition {

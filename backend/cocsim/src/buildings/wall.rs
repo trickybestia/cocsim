@@ -14,7 +14,6 @@ use crate::{
         default_attack_collider,
         default_pathfinding_collider,
     },
-    consts::MAX_BUILDING_POS,
     game::features::{
         attack::{
             AttackTarget,
@@ -65,8 +64,6 @@ inventory::submit! {WALL}
 
 #[derive(Serialize, Deserialize, Debug, Arbitrary, Clone)]
 pub struct WallModel {
-    pub x: UsizeWithMax<MAX_BUILDING_POS>,
-    pub y: UsizeWithMax<MAX_BUILDING_POS>,
     pub level: UsizeWithMax<WALL_LEVEL_INDEX_MAX>,
 }
 
@@ -75,20 +72,16 @@ impl BuildingModel for WallModel {
         &WALL
     }
 
-    fn position(&self) -> Vector2<usize> {
-        Vector2::new(*self.x, *self.y)
-    }
-
-    fn spawn(&self, world: &mut World) {
+    fn spawn(&self, world: &mut World, position: Vector2<usize>) {
         world.spawn((
             Health {
                 health: WALL_LEVELS[*self.level].health,
                 max_health: WALL_LEVELS[*self.level].health,
                 incoming_damage: 0.0,
             },
-            Position(self.position().cast() + WALL.size.cast() / 2.0),
+            Position(position.cast() + WALL.size.cast() / 2.0),
             Building {
-                position: Vector2::new(*self.x, *self.y),
+                position,
                 size: WALL.size,
                 affects_drop_zone: true,
                 affects_percentage_destroyed: false,

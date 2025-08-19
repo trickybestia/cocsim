@@ -11,7 +11,6 @@ use crate::{
     BuildingType,
     UsizeWithMax,
     buildings::utils::defensive_building::spawn_defensive_building,
-    consts::MAX_BUILDING_POS,
     game::features::{
         actions::TargetProjectileAttack,
         attack::{
@@ -107,8 +106,6 @@ const AIR_DEFENSE_PROJECTILE_SPEED: f32 = 8.0;
 
 #[derive(Serialize, Deserialize, Debug, Arbitrary, Clone)]
 pub struct AirDefenseModel {
-    pub x: UsizeWithMax<MAX_BUILDING_POS>,
-    pub y: UsizeWithMax<MAX_BUILDING_POS>,
     pub level: UsizeWithMax<AIR_DEFENSE_LEVEL_INDEX_MAX>,
 }
 
@@ -117,17 +114,13 @@ impl BuildingModel for AirDefenseModel {
         &AIR_DEFENSE
     }
 
-    fn position(&self) -> Vector2<usize> {
-        Vector2::new(*self.x, *self.y)
-    }
-
-    fn spawn(&self, world: &mut World) {
+    fn spawn(&self, world: &mut World, position: Vector2<usize>) {
         let level = &AIR_DEFENSE_LEVELS[*self.level];
 
         let id = spawn_defensive_building(
             world,
             level.health,
-            Vector2::new(*self.x, *self.y),
+            position,
             AIR_DEFENSE.size,
             AIR_DEFENSE_ATTACK_COOLDOWN,
             BuildingRetargetCondition {

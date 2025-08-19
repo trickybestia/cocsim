@@ -11,7 +11,6 @@ use crate::{
     BuildingType,
     UsizeWithMax,
     buildings::utils::defensive_building::spawn_defensive_building,
-    consts::MAX_BUILDING_POS,
     game::features::{
         actions::TargetProjectileAttack,
         attack::{
@@ -131,8 +130,6 @@ const CANNON_PROJECTILE_SPEED: f32 = 12.0;
 
 #[derive(Serialize, Deserialize, Debug, Arbitrary, Clone)]
 pub struct CannonModel {
-    pub x: UsizeWithMax<MAX_BUILDING_POS>,
-    pub y: UsizeWithMax<MAX_BUILDING_POS>,
     pub level: UsizeWithMax<CANNON_LEVEL_INDEX_MAX>,
 }
 
@@ -141,17 +138,13 @@ impl BuildingModel for CannonModel {
         &CANNON
     }
 
-    fn position(&self) -> Vector2<usize> {
-        Vector2::new(*self.x, *self.y)
-    }
-
-    fn spawn(&self, world: &mut World) {
+    fn spawn(&self, world: &mut World, position: Vector2<usize>) {
         let level = &CANNON_LEVELS[*self.level];
 
         let id = spawn_defensive_building(
             world,
             level.health,
-            Vector2::new(*self.x, *self.y),
+            position,
             CANNON.size,
             CANNON_ATTACK_COOLDOWN,
             BuildingRetargetCondition {

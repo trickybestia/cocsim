@@ -11,7 +11,6 @@ use crate::{
     BuildingType,
     UsizeWithMax,
     buildings::utils::resource_building::spawn_resource_building,
-    consts::MAX_BUILDING_POS,
 };
 
 struct DarkElixirDrillLevel {
@@ -44,8 +43,6 @@ inventory::submit! {DARK_ELIXIR_DRILL}
 
 #[derive(Serialize, Deserialize, Debug, Arbitrary, Clone)]
 pub struct DarkElixirDrillModel {
-    pub x: UsizeWithMax<MAX_BUILDING_POS>,
-    pub y: UsizeWithMax<MAX_BUILDING_POS>,
     pub level: UsizeWithMax<DARK_ELIXIR_DRILL_LEVEL_INDEX_MAX>,
 }
 
@@ -54,15 +51,11 @@ impl BuildingModel for DarkElixirDrillModel {
         &DARK_ELIXIR_DRILL
     }
 
-    fn position(&self) -> Vector2<usize> {
-        Vector2::new(*self.x, *self.y)
-    }
-
-    fn spawn(&self, world: &mut World) {
+    fn spawn(&self, world: &mut World, position: Vector2<usize>) {
         spawn_resource_building(
             world,
             DARK_ELIXIR_DRILL_LEVELS[*self.level].health,
-            Vector2::new(*self.x, *self.y),
+            position,
             DARK_ELIXIR_DRILL.size,
         );
     }

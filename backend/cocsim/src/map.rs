@@ -9,6 +9,7 @@ use serde::{
 };
 
 use crate::{
+    Building,
     BuildingModel,
     BuildingModelEnum,
     consts::{
@@ -26,7 +27,7 @@ pub struct Map {
     pub base_size: usize,
     pub border_size: usize,
 
-    pub buildings: Vec<BuildingModelEnum>,
+    pub buildings: Vec<Building>,
 }
 
 #[derive(Clone, Debug)]
@@ -44,20 +45,20 @@ impl TryFrom<Map> for ValidatedMap {
         let mut buildings_grid = DMatrix::from_element(value.base_size, value.base_size, false);
 
         for building in &value.buildings {
-            if let BuildingModelEnum::TownHallModel(_) = building {
+            if let BuildingModelEnum::TownHallModel(_) = building.model {
                 ensure!(!has_town_hall);
 
                 has_town_hall = true;
             }
 
-            let start_x = building.position().x;
-            let start_y = building.position().y;
+            let start_x = *building.x;
+            let start_y = *building.y;
 
             ensure!(start_x >= value.border_size && start_x < value.base_size + value.border_size);
             ensure!(start_y >= value.border_size && start_y < value.base_size + value.border_size);
 
-            let end_x = start_x + building.r#type().size.x;
-            let end_y = start_y + building.r#type().size.y;
+            let end_x = start_x + building.model.r#type().size.x;
+            let end_y = start_y + building.model.r#type().size.y;
 
             ensure!(end_x <= value.base_size + value.border_size);
             ensure!(end_y <= value.base_size + value.border_size);

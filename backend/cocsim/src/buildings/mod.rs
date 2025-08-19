@@ -59,6 +59,11 @@ pub use wall::*;
 pub use wizard_tower::*;
 pub use x_bow::*;
 
+use crate::{
+    UsizeWithMax,
+    consts::MAX_BUILDING_POS,
+};
+
 #[derive(Serialize)]
 pub struct BuildingOption {
     pub name: &'static str,
@@ -79,9 +84,7 @@ inventory::collect!(BuildingType);
 pub trait BuildingModel {
     fn r#type(&self) -> &'static BuildingType;
 
-    fn position(&self) -> Vector2<usize>;
-
-    fn spawn(&self, world: &mut World);
+    fn spawn(&self, world: &mut World, position: Vector2<usize>);
 }
 
 #[enum_dispatch(BuildingModel)]
@@ -138,4 +141,18 @@ pub enum BuildingModelEnum {
     WizardTowerModel,
     #[serde(rename = "XBow")]
     XBowModel,
+}
+
+#[derive(Serialize, Deserialize, Debug, Arbitrary, Clone)]
+pub struct Building {
+    #[serde(flatten)]
+    pub model: BuildingModelEnum,
+    pub x: UsizeWithMax<MAX_BUILDING_POS>,
+    pub y: UsizeWithMax<MAX_BUILDING_POS>,
+}
+
+impl Building {
+    pub fn spawn(&self, world: &mut World) {
+        self.model.spawn(world, Vector2::new(*self.x, *self.y));
+    }
 }

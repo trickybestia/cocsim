@@ -12,7 +12,6 @@ use crate::{
     BuildingType,
     UsizeWithMax,
     buildings::utils::defensive_building::spawn_defensive_building,
-    consts::MAX_BUILDING_POS,
     game::features::{
         actions::AirSweeperAttack,
         attack::{
@@ -104,8 +103,6 @@ pub enum AirSweeperRotation {
 
 #[derive(Serialize, Deserialize, Debug, Arbitrary, Clone)]
 pub struct AirSweeperModel {
-    pub x: UsizeWithMax<MAX_BUILDING_POS>,
-    pub y: UsizeWithMax<MAX_BUILDING_POS>,
     pub level: UsizeWithMax<AIR_SWEEPER_LEVEL_INDEX_MAX>,
     pub rotation: AirSweeperRotation,
 }
@@ -115,11 +112,7 @@ impl BuildingModel for AirSweeperModel {
         &AIR_SWEEPER
     }
 
-    fn position(&self) -> Vector2<usize> {
-        Vector2::new(*self.x, *self.y)
-    }
-
-    fn spawn(&self, world: &mut World) {
+    fn spawn(&self, world: &mut World, position: Vector2<usize>) {
         let level = &AIR_SWEEPER_LEVELS[*self.level];
         let rotation = match self.rotation {
             AirSweeperRotation::Right => 0.0,
@@ -136,7 +129,7 @@ impl BuildingModel for AirSweeperModel {
         let id = spawn_defensive_building(
             world,
             level.health,
-            self.position(),
+            position,
             AIR_SWEEPER.size,
             AIR_SWEEPER_ATTACK_COOLDOWN,
             BuildingRetargetCondition {

@@ -19,7 +19,6 @@ use crate::{
         defensive_building::spawn_defensive_building,
         trap::spawn_trap,
     },
-    consts::MAX_BUILDING_POS,
     game::features::{
         actions::{
             Action,
@@ -128,8 +127,6 @@ const HIDDEN_TESLA_TRIGGER_RADIUS: f32 = 6.0;
 
 #[derive(Serialize, Deserialize, Debug, Arbitrary, Clone)]
 pub struct HiddenTeslaModel {
-    pub x: UsizeWithMax<MAX_BUILDING_POS>,
-    pub y: UsizeWithMax<MAX_BUILDING_POS>,
     pub level: UsizeWithMax<HIDDEN_TESLA_LEVEL_INDEX_MAX>,
 }
 
@@ -212,14 +209,10 @@ impl BuildingModel for HiddenTeslaModel {
         &HIDDEN_TESLA
     }
 
-    fn position(&self) -> Vector2<usize> {
-        Vector2::new(*self.x, *self.y)
-    }
-
-    fn spawn(&self, world: &mut World) {
+    fn spawn(&self, world: &mut World, position: Vector2<usize>) {
         let id = spawn_trap(
             world,
-            self.position(),
+            position,
             HIDDEN_TESLA.size,
             Box::new(WithDespawn(Box::new(SpawnHiddenTesla {
                 level: self.level,

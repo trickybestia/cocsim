@@ -19,10 +19,7 @@ use crate::{
     WithCount,
     WithMaxHousingSpace,
     buildings::utils::resource_building::spawn_resource_building,
-    consts::{
-        MAX_BUILDING_POS,
-        MAX_CLAN_CASTLE_HOUSING_SPACE,
-    },
+    consts::MAX_CLAN_CASTLE_HOUSING_SPACE,
     game::features::clan_castle::ClanCastle,
 };
 
@@ -62,8 +59,6 @@ const CLAN_CASTLE_UNIT_DEPLOY_COOLDOWN: f32 = 0.25;
 
 #[derive(Serialize, Deserialize, Debug, Arbitrary, Clone)]
 pub struct ClanCastleModel {
-    pub x: UsizeWithMax<MAX_BUILDING_POS>,
-    pub y: UsizeWithMax<MAX_BUILDING_POS>,
     pub level: UsizeWithMax<CLAN_CASTLE_LEVEL_INDEX_MAX>,
     pub units: WithMaxHousingSpace<MAX_CLAN_CASTLE_HOUSING_SPACE, WithCount<UnitModelEnum>>,
 }
@@ -73,15 +68,11 @@ impl BuildingModel for ClanCastleModel {
         &CLAN_CASTLE
     }
 
-    fn position(&self) -> Vector2<usize> {
-        Vector2::new(*self.x, *self.y)
-    }
-
-    fn spawn(&self, world: &mut World) {
+    fn spawn(&self, world: &mut World, position: Vector2<usize>) {
         let id = spawn_resource_building(
             world,
             CLAN_CASTLE_LEVELS[*self.level].health,
-            Vector2::new(*self.x, *self.y),
+            position,
             CLAN_CASTLE.size,
         );
 

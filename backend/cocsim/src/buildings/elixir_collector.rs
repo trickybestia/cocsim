@@ -11,7 +11,6 @@ use crate::{
     BuildingType,
     UsizeWithMax,
     buildings::utils::resource_building::spawn_resource_building,
-    consts::MAX_BUILDING_POS,
 };
 
 struct ElixirCollectorLevel {
@@ -50,8 +49,6 @@ inventory::submit! {ELIXIR_COLLECTOR}
 
 #[derive(Serialize, Deserialize, Debug, Arbitrary, Clone)]
 pub struct ElixirCollectorModel {
-    pub x: UsizeWithMax<MAX_BUILDING_POS>,
-    pub y: UsizeWithMax<MAX_BUILDING_POS>,
     pub level: UsizeWithMax<ELIXIR_COLLECTOR_LEVEL_INDEX_MAX>,
 }
 
@@ -60,15 +57,11 @@ impl BuildingModel for ElixirCollectorModel {
         &ELIXIR_COLLECTOR
     }
 
-    fn position(&self) -> Vector2<usize> {
-        Vector2::new(*self.x, *self.y)
-    }
-
-    fn spawn(&self, world: &mut World) {
+    fn spawn(&self, world: &mut World, position: Vector2<usize>) {
         spawn_resource_building(
             world,
             ELIXIR_COLLECTOR_LEVELS[*self.level].health,
-            Vector2::new(*self.x, *self.y),
+            position,
             ELIXIR_COLLECTOR.size,
         );
     }

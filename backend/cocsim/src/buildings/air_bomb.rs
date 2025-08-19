@@ -11,7 +11,6 @@ use crate::{
     BuildingType,
     UsizeWithMax,
     buildings::utils::trap::spawn_trap,
-    consts::MAX_BUILDING_POS,
     game::features::{
         actions::SplashProjectileAttack,
         attack::targeting::building::BuildingFindTarget,
@@ -54,8 +53,6 @@ const AIR_BOMB_SPEED: f32 = 2.5;
 
 #[derive(Serialize, Deserialize, Debug, Arbitrary, Clone)]
 pub struct AirBombModel {
-    pub x: UsizeWithMax<MAX_BUILDING_POS>,
-    pub y: UsizeWithMax<MAX_BUILDING_POS>,
     pub level: UsizeWithMax<AIR_BOMB_LEVEL_INDEX_MAX>,
 }
 
@@ -64,14 +61,10 @@ impl BuildingModel for AirBombModel {
         &AIR_BOMB
     }
 
-    fn position(&self) -> Vector2<usize> {
-        Vector2::new(*self.x, *self.y)
-    }
-
-    fn spawn(&self, world: &mut World) {
+    fn spawn(&self, world: &mut World, position: Vector2<usize>) {
         let id = spawn_trap(
             world,
-            self.position(),
+            position,
             AIR_BOMB.size,
             Box::new(SplashProjectileAttack {
                 damage: AIR_BOMB_LEVELS[*self.level].damage,

@@ -11,7 +11,6 @@ use crate::{
     BuildingType,
     UsizeWithMax,
     buildings::utils::defensive_building::spawn_defensive_building,
-    consts::MAX_BUILDING_POS,
     game::features::{
         actions::TargetProjectileAttack,
         attack::{
@@ -131,8 +130,6 @@ const ARCHER_TOWER_PROJECTILE_SPEED: f32 = 18.0;
 
 #[derive(Serialize, Deserialize, Debug, Arbitrary, Clone)]
 pub struct ArcherTowerModel {
-    pub x: UsizeWithMax<MAX_BUILDING_POS>,
-    pub y: UsizeWithMax<MAX_BUILDING_POS>,
     pub level: UsizeWithMax<ARCHER_TOWER_LEVEL_INDEX_MAX>,
 }
 
@@ -141,17 +138,13 @@ impl BuildingModel for ArcherTowerModel {
         &ARCHER_TOWER
     }
 
-    fn position(&self) -> Vector2<usize> {
-        Vector2::new(*self.x, *self.y)
-    }
-
-    fn spawn(&self, world: &mut World) {
+    fn spawn(&self, world: &mut World, position: Vector2<usize>) {
         let level = &ARCHER_TOWER_LEVELS[*self.level];
 
         let id = spawn_defensive_building(
             world,
             level.health,
-            Vector2::new(*self.x, *self.y),
+            position,
             ARCHER_TOWER.size,
             ARCHER_TOWER_ATTACK_COOLDOWN,
             BuildingRetargetCondition {

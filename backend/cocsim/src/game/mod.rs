@@ -9,7 +9,6 @@ use nalgebra::Vector2;
 use rand_pcg::Pcg64Mcg;
 
 use crate::{
-    BuildingModel,
     Shape,
     UnitModel,
     UnitModelEnum,

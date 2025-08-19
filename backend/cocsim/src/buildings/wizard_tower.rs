@@ -11,7 +11,6 @@ use crate::{
     BuildingType,
     UsizeWithMax,
     buildings::utils::defensive_building::spawn_defensive_building,
-    consts::MAX_BUILDING_POS,
     game::features::{
         actions::SplashProjectileAttack,
         attack::{
@@ -115,8 +114,6 @@ const WIZARD_TOWER_SPLASH_ATTACK_RADIUS: f32 = 1.0;
 
 #[derive(Serialize, Deserialize, Debug, Arbitrary, Clone)]
 pub struct WizardTowerModel {
-    pub x: UsizeWithMax<MAX_BUILDING_POS>,
-    pub y: UsizeWithMax<MAX_BUILDING_POS>,
     pub level: UsizeWithMax<WIZARD_TOWER_LEVEL_INDEX_MAX>,
 }
 
@@ -125,18 +122,14 @@ impl BuildingModel for WizardTowerModel {
         &WIZARD_TOWER
     }
 
-    fn position(&self) -> Vector2<usize> {
-        Vector2::new(*self.x, *self.y)
-    }
-
-    fn spawn(&self, world: &mut World) {
+    fn spawn(&self, world: &mut World, position: Vector2<usize>) {
         let projectile_speed = if *self.level >= 4 { 9.0 } else { 5.0 };
         let level = &WIZARD_TOWER_LEVELS[*self.level];
 
         let id = spawn_defensive_building(
             world,
             level.health,
-            Vector2::new(*self.x, *self.y),
+            position,
             WIZARD_TOWER.size,
             WIZARD_TOWER_ATTACK_COOLDOWN,
             BuildingRetargetCondition {

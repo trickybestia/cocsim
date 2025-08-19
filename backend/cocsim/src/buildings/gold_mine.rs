@@ -11,7 +11,6 @@ use crate::{
     BuildingType,
     UsizeWithMax,
     buildings::utils::resource_building::spawn_resource_building,
-    consts::MAX_BUILDING_POS,
 };
 
 struct GoldMineLevel {
@@ -50,8 +49,6 @@ inventory::submit! {GOLD_MINE}
 
 #[derive(Serialize, Deserialize, Debug, Arbitrary, Clone)]
 pub struct GoldMineModel {
-    pub x: UsizeWithMax<MAX_BUILDING_POS>,
-    pub y: UsizeWithMax<MAX_BUILDING_POS>,
     pub level: UsizeWithMax<GOLD_MINE_LEVEL_INDEX_MAX>,
 }
 
@@ -60,15 +57,11 @@ impl BuildingModel for GoldMineModel {
         &GOLD_MINE
     }
 
-    fn position(&self) -> Vector2<usize> {
-        Vector2::new(*self.x, *self.y)
-    }
-
-    fn spawn(&self, world: &mut World) {
+    fn spawn(&self, world: &mut World, position: Vector2<usize>) {
         spawn_resource_building(
             world,
             GOLD_MINE_LEVELS[*self.level].health,
-            Vector2::new(*self.x, *self.y),
+            position,
             GOLD_MINE.size,
         );
     }

@@ -11,7 +11,6 @@ use crate::{
     BuildingType,
     UsizeWithMax,
     buildings::utils::defensive_building::spawn_defensive_building,
-    consts::MAX_BUILDING_POS,
     game::features::{
         actions::SplashProjectileAttack,
         attack::{
@@ -116,8 +115,6 @@ const MORTAR_SPLASH_ATTACK_RADIUS: f32 = 1.5;
 
 #[derive(Serialize, Deserialize, Debug, Arbitrary, Clone)]
 pub struct MortarModel {
-    pub x: UsizeWithMax<MAX_BUILDING_POS>,
-    pub y: UsizeWithMax<MAX_BUILDING_POS>,
     pub level: UsizeWithMax<MORTAR_LEVEL_INDEX_MAX>,
 }
 
@@ -126,17 +123,13 @@ impl BuildingModel for MortarModel {
         &MORTAR
     }
 
-    fn position(&self) -> Vector2<usize> {
-        Vector2::new(*self.x, *self.y)
-    }
-
-    fn spawn(&self, world: &mut World) {
+    fn spawn(&self, world: &mut World, position: Vector2<usize>) {
         let level = &MORTAR_LEVELS[*self.level];
 
         let id = spawn_defensive_building(
             world,
             level.health,
-            Vector2::new(*self.x, *self.y),
+            position,
             MORTAR.size,
             MORTAR_ATTACK_COOLDOWN,
             BuildingRetargetCondition {

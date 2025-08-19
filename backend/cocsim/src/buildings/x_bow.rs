@@ -12,7 +12,6 @@ use crate::{
     BuildingType,
     UsizeWithMax,
     buildings::utils::defensive_building::spawn_defensive_building,
-    consts::MAX_BUILDING_POS,
     game::features::{
         actions::TargetProjectileAttack,
         attack::{
@@ -103,8 +102,6 @@ pub enum XBowTargetType {
 
 #[derive(Serialize, Deserialize, Debug, Arbitrary, Clone)]
 pub struct XBowModel {
-    pub x: UsizeWithMax<MAX_BUILDING_POS>,
-    pub y: UsizeWithMax<MAX_BUILDING_POS>,
     pub level: UsizeWithMax<X_BOW_LEVEL_INDEX_MAX>,
     pub target: XBowTargetType,
 }
@@ -114,11 +111,7 @@ impl BuildingModel for XBowModel {
         &X_BOW
     }
 
-    fn position(&self) -> Vector2<usize> {
-        Vector2::new(*self.x, *self.y)
-    }
-
-    fn spawn(&self, world: &mut World) {
+    fn spawn(&self, world: &mut World, position: Vector2<usize>) {
         let max_attack_range = match self.target {
             XBowTargetType::Ground => 14.0,
             XBowTargetType::AirAndGround => 11.5,
@@ -133,7 +126,7 @@ impl BuildingModel for XBowModel {
         let id = spawn_defensive_building(
             world,
             level.health,
-            Vector2::new(*self.x, *self.y),
+            position,
             X_BOW.size,
             X_BOW_ATTACK_COOLDOWN,
             BuildingRetargetCondition {

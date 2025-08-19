@@ -1,17 +1,16 @@
 use arbitrary::Arbitrary;
+use hecs::World;
 use nalgebra::Vector2;
 use serde::{
     Deserialize,
     Serialize,
 };
-use hecs::World;
 
 use crate::{
     BuildingModel,
     BuildingType,
     UsizeWithMax,
     buildings::utils::other_building::spawn_other_building,
-    consts::MAX_BUILDING_POS,
 };
 
 struct GoblinHutLevel {
@@ -34,8 +33,6 @@ inventory::submit! {GOBLIN_HUT}
 
 #[derive(Serialize, Deserialize, Debug, Arbitrary, Clone)]
 pub struct GoblinHutModel {
-    pub x: UsizeWithMax<MAX_BUILDING_POS>,
-    pub y: UsizeWithMax<MAX_BUILDING_POS>,
     pub level: UsizeWithMax<GOBLIN_HUT_LEVEL_INDEX_MAX>,
 }
 
@@ -44,15 +41,11 @@ impl BuildingModel for GoblinHutModel {
         &GOBLIN_HUT
     }
 
-    fn position(&self) -> Vector2<usize> {
-        Vector2::new(*self.x, *self.y)
-    }
-
-    fn spawn(&self, world: &mut World) {
+    fn spawn(&self, world: &mut World, position: Vector2<usize>) {
         spawn_other_building(
             world,
             GOBLIN_HUT_LEVELS[*self.level].health,
-            Vector2::new(*self.x, *self.y),
+            position,
             GOBLIN_HUT.size,
         );
     }
