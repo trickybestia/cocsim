@@ -12,13 +12,14 @@
                 "args": [
                     "build",
                     "--manifest-path=backend/compose_base_images/Cargo.toml",
-                    "--example",
-                    "compose_base_images"
+                    "--features",
+                    "cli"
                 ]
             },
             "cwd": "${workspaceFolder}",
             "args": [
-                "test_images/single_player/goblin_gauntlet"
+                "--images",
+                "test_images/single_player/goblin_gauntlet",
             ]
         },
         {

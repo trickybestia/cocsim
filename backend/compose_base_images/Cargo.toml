@@ -3,8 +3,17 @@ name = "compose_base_images"
 version = "0.1.0"
 edition = "2024"
 
+[features]
+cli = ["dep:clap"]
+
+[[bin]]
+name = "compose-base-images"
+path = "src/main.rs"
+required-features = ["cli"]
+
 [dependencies]
 anyhow = "1"
+clap = { version = "4.5", optional = true, features = ["derive"] }
 image = "0.25"
 magick_rust = "1"
 ndarray = "0.16"
