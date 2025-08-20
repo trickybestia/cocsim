@@ -1,9 +1,9 @@
 import { create } from "mutative";
 import { Fragment, useContext } from "react";
 
-import useBuildingTypes from "../../hooks/use-building-types";
-import { UnitTypesContext } from "../../hooks/use-unit-types";
+import { GameTypesContext } from "../../hooks/use-game-types";
 import type { Building, UnitWithCount } from "../../types";
+import getGameType from "../../utils/get-game-type";
 import ArmyEditor from "../ArmyEditor";
 import IntegerNumberInput from "../IntegerNumberInput";
 
@@ -16,8 +16,8 @@ const BuildingOptionsEditor: React.FC<Props> = ({
   building,
   onChange
 }: Props) => {
-  const unitTypes = useContext(UnitTypesContext);
-  const buildingType = useBuildingTypes().getBuildingType(building);
+  const gameTypes = useContext(GameTypesContext);
+  const buildingType = getGameType(gameTypes.buildings, building.name);
 
   return (
     <fieldset className="grid-col grid grid-cols-[auto_min-content] gap-1 border-2 pr-1 pb-1 pl-1 text-end text-nowrap">
@@ -69,7 +69,7 @@ const BuildingOptionsEditor: React.FC<Props> = ({
                 })
               )
             }
-            types={unitTypes}
+            types={gameTypes.units}
           />
         </>
       )}

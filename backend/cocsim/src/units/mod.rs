@@ -20,19 +20,15 @@ use crate::{
     game::features::attack::Team,
 };
 
-#[derive(Serialize)]
 pub struct UnitType {
     pub name: &'static str,
     pub housing_space: usize,
     pub levels: usize,
     /// https://clashofclans.fandom.com/wiki/Clan_Castle#Deployment_Order
-    #[serde(skip)]
     pub clan_castle_deployment_priority: u8,
     /// Used by ClanCastle.
-    #[serde(skip)]
     pub attack_air: bool,
     /// Used by ClanCastle.
-    #[serde(skip)]
     pub attack_ground: bool,
 }
 

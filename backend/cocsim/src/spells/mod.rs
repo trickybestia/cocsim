@@ -21,7 +21,6 @@ use crate::{
     WithHousingSpace,
 };
 
-#[derive(Serialize)]
 pub struct SpellType {
     pub name: &'static str,
     pub housing_space: usize,

@@ -5,7 +5,7 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { Image, Layer, Rect, Stage } from "react-konva";
 import { twMerge } from "tailwind-merge";
 
-import { BuildingTypesContext } from "../../hooks/use-building-types";
+import { GameTypesContext } from "../../hooks/use-game-types";
 import type { Building, BuildingType, Map } from "../../types";
 import clamp from "../../utils/clamp";
 import {
@@ -93,11 +93,11 @@ const MapEditor: React.FC<Props> = ({
   const [isBuildingCreationModalOpen, setIsBuildingCreationModalOpen] =
     useState(false);
 
-  const buildingTypes = useContext(BuildingTypesContext);
+  const gameTypes = useContext(GameTypesContext);
   const pixelsPerTile = canvasSize / (baseSize + 2 * borderSize);
   const buildingsGrid = createBuildingsGrid(
     buildings,
-    buildingTypes,
+    gameTypes.buildings,
     baseSize + 2 * borderSize
   );
   const highlightedBuilding =

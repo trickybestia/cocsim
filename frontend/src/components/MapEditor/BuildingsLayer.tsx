@@ -1,9 +1,10 @@
-import { type ReactNode, memo } from "react";
+import { type ReactNode, memo, useContext } from "react";
 import React from "react";
 import { Layer, Line, Rect } from "react-konva";
 
-import useBuildingTypes from "../../hooks/use-building-types";
+import { GameTypesContext } from "../../hooks/use-game-types";
 import type { Building } from "../../types";
+import getGameType from "../../utils/get-game-type";
 
 type Props = {
   buildings: Building[];
@@ -13,7 +14,7 @@ type Props = {
 
 const BuildingsLayer: React.FC<Props> = memo(
   ({ buildings, selectedBuilding, pixelsPerTile }: Props) => {
-    const { getBuildingType } = useBuildingTypes();
+    const gameTypes = useContext(GameTypesContext);
 
     const shapes: ReactNode[] = [];
 
@@ -22,7 +23,7 @@ const BuildingsLayer: React.FC<Props> = memo(
         // handle later
         return;
 
-      const buildingType = getBuildingType(building);
+      const buildingType = getGameType(gameTypes.buildings, building.name);
 
       shapes.push(
         <React.Fragment key={`${building.x}:${building.y}`}>
@@ -53,7 +54,10 @@ const BuildingsLayer: React.FC<Props> = memo(
         {shapes}
         {selectedBuilding !== undefined &&
           (() => {
-            const selectedBuildingType = getBuildingType(selectedBuilding);
+            const selectedBuildingType = getGameType(
+              gameTypes.buildings,
+              selectedBuilding.name
+            );
 
             return (
               <Rect

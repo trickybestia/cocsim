@@ -32,14 +32,12 @@ async fn main() {
         .route("/api/compose-base-images", post(compose_base_images))
         .layer(DefaultBodyLimit::disable())
         .layer(RequestBodyLimitLayer::new(50 * 1024 * 1024))
-        .route("/api/get-building-types", get(get_building_types))
+        .route("/api/get-game-types", get(get_game_types))
         .route(
             "/api/get-showcase-attack-base-image",
             get(get_showcase_attack_base_image),
         )
         .route("/api/get-showcase-attack", get(get_showcase_attack))
-        .route("/api/get-spell-types", get(get_spell_types))
-        .route("/api/get-unit-types", get(get_unit_types))
         .route("/api/optimize-attack", any(optimize_attack))
         .route("/api/reverse-projection", post(reverse_projection))
         .layer(

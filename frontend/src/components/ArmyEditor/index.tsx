@@ -3,6 +3,7 @@ import { useState } from "react";
 import { twMerge } from "tailwind-merge";
 
 import type { WithCount, WithLevel, WithName } from "../../types";
+import getGameType from "../../utils/get-game-type";
 import UnitCreationModal from "./ItemCreationModal";
 import ItemView from "./ItemView";
 
@@ -35,8 +36,7 @@ const ArmyEditor: React.FC<Props> = ({
 
   items.forEach((item) => {
     occupiedSpace +=
-      types.find((type) => type.name === item.value.name)!.housingSpace *
-      item.count;
+      getGameType(types, item.value.name).housingSpace * item.count;
   });
 
   const itemViews = items.map((item, index) => (

@@ -8,6 +8,7 @@ import {
 } from "@zip.js/zip.js";
 
 import type { Building, BuildingType, Map } from "../types";
+import getGameType from "./get-game-type";
 
 const createBuildingsGrid = (
   buildings: Building[],
@@ -21,9 +22,7 @@ const createBuildingsGrid = (
   }
 
   buildings.forEach((building) => {
-    const buildingType = buildingTypes.find(
-      (buildingType) => buildingType.name === building.name
-    )!;
+    const buildingType = getGameType(buildingTypes, building.name);
 
     for (
       let tileX = building.x;
@@ -67,9 +66,7 @@ const resizeBuildings = (
   mapTotalSize: number
 ): Building[] => {
   return buildings.filter((building) => {
-    const buildingType = buildingTypes.find(
-      (buildingType) => buildingType.name === building.name
-    )!;
+    const buildingType = getGameType(buildingTypes, building.name);
 
     return (
       building.x + buildingType.width < mapTotalSize &&

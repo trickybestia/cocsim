@@ -70,7 +70,6 @@ pub struct BuildingOption {
     pub values: &'static [&'static str],
 }
 
-#[derive(Serialize)]
 pub struct BuildingType {
     pub name: &'static str,
     pub size: Vector2<usize>,

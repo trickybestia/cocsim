@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import Modal from "react-modal";
 
-import useBuildingTypes from "../../hooks/use-building-types";
+import { GameTypesContext } from "../../hooks/use-game-types";
 import type { BuildingType } from "../../types";
 import getBuildingTypesWithSize from "../../utils/get-building-types-with-size";
+import getGameType from "../../utils/get-game-type";
 import StringSelector from "../StringSelector";
 
 type Props = {
@@ -19,10 +20,11 @@ const BuildingCreationModal: React.FC<Props> = ({
   selection,
   onClose
 }: Props) => {
+  const gameTypes = useContext(GameTypesContext);
+
   const [selectedBuildingType, setSelectedBuildingType] = useState<
     BuildingType | undefined
   >(undefined);
-  const { buildingTypes, getBuildingType } = useBuildingTypes();
 
   if (!isOpen && selectedBuildingType !== undefined) {
     setSelectedBuildingType(undefined);
@@ -32,7 +34,7 @@ const BuildingCreationModal: React.FC<Props> = ({
     selection === undefined
       ? []
       : getBuildingTypesWithSize(
-          buildingTypes,
+          gameTypes.buildings,
           selection.width,
           selection.height
         );
@@ -60,7 +62,7 @@ const BuildingCreationModal: React.FC<Props> = ({
             (buildingType) => buildingType.name
           )}
           onSelected={(value) =>
-            setSelectedBuildingType(getBuildingType(value))
+            setSelectedBuildingType(getGameType(gameTypes.buildings, value))
           }
           inputPlaceholder="search for a building"
         />

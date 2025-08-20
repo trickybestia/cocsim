@@ -2,6 +2,7 @@ import { useState } from "react";
 import Modal from "react-modal";
 
 import type { WithLevel, WithName } from "../../types";
+import getGameType from "../../utils/get-game-type";
 import StringSelector from "../StringSelector";
 
 type ItemType = {
@@ -51,7 +52,7 @@ const UnitCreationModal: React.FC<Props> = ({
         <StringSelector
           values={types.map((type) => type.name)}
           onSelected={(value) => {
-            setSelectedType(types.find((type) => type.name === value)!);
+            setSelectedType(getGameType(types, value));
           }}
           inputPlaceholder="search by name"
         />

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-import type { BuildingType, Frame, SpellType, UnitType } from "./types";
+import type { Frame, GameTypes } from "./types";
 
 const axiosInstance = axios.create({
   baseURL: "http://localhost:8000/api"
@@ -41,16 +41,8 @@ const reverseProjection = async (image: Blob): Promise<Blob> => {
   ).data;
 };
 
-const getBuildingTypes = async (): Promise<BuildingType[]> => {
-  return (await axiosInstance.get("/get-building-types")).data;
-};
-
-const getUnitTypes = async (): Promise<UnitType[]> => {
-  return (await axiosInstance.get("/get-unit-types")).data;
-};
-
-const getSpellTypes = async (): Promise<SpellType[]> => {
-  return (await axiosInstance.get("/get-spell-types")).data;
+const getGameTypes = async (): Promise<GameTypes> => {
+  return (await axiosInstance.get("/get-game-types")).data;
 };
 
 const getShowcaseAttackBaseImage = (): Promise<HTMLImageElement> => {
@@ -80,9 +72,7 @@ const getOptimizeAttackWebSocketUrl = (): string => {
 export {
   composeBaseImages,
   reverseProjection,
-  getBuildingTypes,
-  getUnitTypes,
-  getSpellTypes,
+  getGameTypes,
   getShowcaseAttackBaseImage,
   getShowcaseAttack,
   getOptimizeAttackWebSocketUrl

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import useWebSocket from "react-use-websocket";
 import { twJoin } from "tailwind-merge";
 
@@ -6,8 +6,7 @@ import { getOptimizeAttackWebSocketUrl } from "../api";
 import ArmyEditor from "../components/ArmyEditor";
 import GameRenderer from "../components/GameRenderer";
 import Header from "../components/Header";
-import useSpellTypesSWR from "../hooks/use-spell-types-swr";
-import useUnitTypesSWR from "../hooks/use-unit-types-swr";
+import { GameTypesContext } from "../hooks/use-game-types";
 import type {
   Map,
   OptimizeAttackMessage,
@@ -18,8 +17,7 @@ import { importFromZip } from "../utils/map-editor";
 import readFiles from "../utils/read-files";
 
 const AttackOptimizerPage: React.FC = () => {
-  const unitTypes = useUnitTypesSWR();
-  const spellTypes = useSpellTypesSWR();
+  const gameTypes = useContext(GameTypesContext);
 
   const [units, setUnits] = useState<UnitWithCount[] | undefined>(undefined);
   const [spells, setSpells] = useState<SpellWithCount[] | undefined>(undefined);
@@ -93,33 +91,30 @@ const AttackOptimizerPage: React.FC = () => {
           <div className="flex h-full flex-col items-center">
             <div className="w-full grow lg:max-w-[var(--breakpoint-lg)]">
               {!optimizationStarted ? (
-                unitTypes !== undefined &&
-                spellTypes !== undefined && (
-                  <div className="flex flex-col gap-2">
-                    <h3 className="text-xl">Troops</h3>
-                    <ArmyEditor
-                      items={units === undefined ? [] : units}
-                      setItems={setUnits}
-                      types={unitTypes}
-                    />
-                    <h3 className="text-xl">Spells</h3>
-                    <ArmyEditor
-                      items={spells === undefined ? [] : spells}
-                      setItems={setSpells}
-                      types={spellTypes}
-                    />
-                    <button
-                      onClick={() => {
-                        if (units !== undefined && units.length != 0) {
-                          setOptimizationStarted(true);
-                        }
-                      }}
-                      className="w-min cursor-pointer bg-blue-400 px-2 py-1 text-sm font-bold text-white hover:bg-blue-600"
-                    >
-                      OK
-                    </button>
-                  </div>
-                )
+                <div className="flex flex-col gap-2">
+                  <h3 className="text-xl">Troops</h3>
+                  <ArmyEditor
+                    items={units === undefined ? [] : units}
+                    setItems={setUnits}
+                    types={gameTypes.units}
+                  />
+                  <h3 className="text-xl">Spells</h3>
+                  <ArmyEditor
+                    items={spells === undefined ? [] : spells}
+                    setItems={setSpells}
+                    types={gameTypes.spells}
+                  />
+                  <button
+                    onClick={() => {
+                      if (units !== undefined && units.length != 0) {
+                        setOptimizationStarted(true);
+                      }
+                    }}
+                    className="w-min cursor-pointer bg-blue-400 px-2 py-1 text-sm font-bold text-white hover:bg-blue-600"
+                  >
+                    OK
+                  </button>
+                </div>
               ) : (
                 <div className="flex h-full gap-2">
                   <div className="flex grow-1 basis-0 flex-col gap-2">

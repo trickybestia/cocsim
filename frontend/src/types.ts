@@ -78,6 +78,12 @@ type SpellType = {
   housingSpace: number;
 };
 
+type GameTypes = {
+  buildings: BuildingType[];
+  units: UnitType[];
+  spells: SpellType[];
+};
+
 /**
  * Shape type. Represents shape possible to get from backend and draw on canvas.
  */
@@ -150,5 +156,6 @@ export type {
   OptimizeAttackMessage,
   WithCount,
   WithName,
-  WithLevel
+  WithLevel,
+  GameTypes
 };
