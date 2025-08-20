@@ -1,3 +1,5 @@
+pub const UNIX_SOCKET_PATH: &str = "/var/run/cocsim-webserver.sock";
+
 pub const FPS: usize = 60;
 pub const SHOWCASE_MAP: &str = "single_player/no_flight_zone";
 

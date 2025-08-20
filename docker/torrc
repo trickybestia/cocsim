@@ -12,6 +12,8 @@
 ## Tor will look for this file in various places based on your platform:
 ## https://support.torproject.org/tbb/tbb-editing-torrc/
 
+User debian-tor
+
 ## Tor opens a SOCKS proxy on port 9050 by default -- even if you don't
 ## configure one below. Set "SOCKSPort 0" if you plan to run Tor only
 ## as a relay, and not make any local application connections yourself.
@@ -73,7 +75,7 @@ DataDirectory /var/lib/tor
 #HiddenServicePort 80 127.0.0.1:80
 #HiddenServicePort 22 127.0.0.1:22
 
-HiddenServiceDir /var/lib/tor/cocsim/
+HiddenServiceDir /var/lib/tor/cocsim-webserver/
 HiddenServicePort 80 unix:/var/run/cocsim-webserver.sock
 
 ################ This section is just for relays #####################

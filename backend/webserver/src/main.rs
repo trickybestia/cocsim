@@ -4,17 +4,24 @@ pub mod dto_game_renderer;
 pub mod utils;
 mod webserver_error;
 
+use std::{
+    fs::Permissions,
+    os::unix::fs::PermissionsExt,
+};
+
 #[cfg(not(feature = "publish"))]
 use axum::http::HeaderValue;
 use axum::{
     Router,
     extract::DefaultBodyLimit,
+    response::Html,
     routing::{
         any,
         get,
         post,
     },
 };
+use tokio::fs::set_permissions;
 use tower::ServiceBuilder;
 #[cfg(not(feature = "publish"))]
 use tower_http::cors::CorsLayer;
@@ -24,7 +31,10 @@ use tower_http::{
     trace::TraceLayer,
 };
 
-use crate::api::*;
+use crate::{
+    api::*,
+    consts::UNIX_SOCKET_PATH,
+};
 
 #[tokio::main]
 async fn main() {
@@ -54,9 +64,13 @@ async fn main() {
         .layer(layers);
 
     if cfg!(feature = "publish") {
-        let app = app.route("/", get(async || include_str!("../index.html")));
+        let app = app.fallback(async || Html::<&'static str>::from(include_str!("../index.html")));
 
-        let listener = tokio::net::UnixListener::bind("/var/run/cocsim-webserver.sock").unwrap();
+        let listener = tokio::net::UnixListener::bind(UNIX_SOCKET_PATH).unwrap();
+
+        set_permissions(UNIX_SOCKET_PATH, Permissions::from_mode(0o666))
+            .await
+            .unwrap();
 
         axum::serve(listener, app).await.unwrap();
     } else {
