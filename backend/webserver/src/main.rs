@@ -4,10 +4,11 @@ pub mod dto_game_renderer;
 pub mod utils;
 mod webserver_error;
 
+#[cfg(not(feature = "publish"))]
+use axum::http::HeaderValue;
 use axum::{
     Router,
     extract::DefaultBodyLimit,
-    http::HeaderValue,
     routing::{
         any,
         get,
@@ -15,9 +16,10 @@ use axum::{
     },
 };
 use tower::ServiceBuilder;
+#[cfg(not(feature = "publish"))]
+use tower_http::cors::CorsLayer;
 use tower_http::{
     compression::CompressionLayer,
-    cors::CorsLayer,
     limit::RequestBodyLimitLayer,
     trace::TraceLayer,
 };
@@ -27,6 +29,15 @@ use crate::api::*;
 #[tokio::main]
 async fn main() {
     tracing_subscriber::fmt::init();
+
+    let layers = ServiceBuilder::new()
+        .layer(TraceLayer::new_for_http())
+        .layer(CompressionLayer::new());
+
+    #[cfg(not(feature = "publish"))]
+    let layers = layers.layer(
+        CorsLayer::new().allow_origin("http://localhost:5173".parse::<HeaderValue>().unwrap()),
+    );
 
     let app = Router::new()
         .route("/api/compose-base-images", post(compose_base_images))
@@ -40,19 +51,17 @@ async fn main() {
         .route("/api/get-showcase-attack", get(get_showcase_attack))
         .route("/api/optimize-attack", any(optimize_attack))
         .route("/api/reverse-projection", post(reverse_projection))
-        .layer(
-            ServiceBuilder::new()
-                .layer(TraceLayer::new_for_http())
-                .layer(
-                    CorsLayer::new()
-                        .allow_origin("http://localhost:5173".parse::<HeaderValue>().unwrap()),
-                )
-                .layer(CompressionLayer::new()),
-        );
+        .layer(layers);
 
-    let listener = tokio::net::TcpListener::bind("127.0.0.1:8000")
-        .await
-        .unwrap();
+    if cfg!(feature = "publish") {
+        let listener = tokio::net::UnixListener::bind("webserver.sock").unwrap();
 
-    axum::serve(listener, app).await.unwrap();
+        axum::serve(listener, app).await.unwrap();
+    } else {
+        let listener = tokio::net::TcpListener::bind("127.0.0.1:8000")
+            .await
+            .unwrap();
+
+        axum::serve(listener, app).await.unwrap();
+    }
 }
