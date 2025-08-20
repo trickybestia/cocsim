@@ -54,7 +54,9 @@ async fn main() {
         .layer(layers);
 
     if cfg!(feature = "publish") {
-        let listener = tokio::net::UnixListener::bind("webserver.sock").unwrap();
+        let app = app.route("/", get(async || include_str!("../index.html")));
+
+        let listener = tokio::net::UnixListener::bind("/var/run/cocsim-webserver.sock").unwrap();
 
         axum::serve(listener, app).await.unwrap();
     } else {
