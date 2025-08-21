@@ -1,5 +1,5 @@
 import { saveAs } from "file-saver";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import Header from "../components/Header";
 import MapEditor from "../components/MapEditor";
@@ -48,24 +48,6 @@ const MapEditorPage: React.FC = () => {
       false
     );
   };
-
-  if (import.meta.env.PROD) {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    useEffect(() => {
-      if (loadedData === undefined) return;
-
-      const onBeforeUnload = (e: BeforeUnloadEvent) => {
-        e.preventDefault();
-        e.returnValue = "";
-      };
-
-      window.addEventListener("beforeunload", onBeforeUnload);
-
-      return () => {
-        window.removeEventListener("beforeunload", onBeforeUnload);
-      };
-    }, [loadedData]);
-  }
 
   return (
     <>
