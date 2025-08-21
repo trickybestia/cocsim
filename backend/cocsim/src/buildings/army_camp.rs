@@ -40,6 +40,7 @@ const ARMY_CAMP: BuildingType = BuildingType {
     size: Vector2::new(4, 4),
     levels: ARMY_CAMP_LEVELS.len(),
     options: &[],
+    affects_drop_zone: true,
 };
 
 inventory::submit! {ARMY_CAMP}

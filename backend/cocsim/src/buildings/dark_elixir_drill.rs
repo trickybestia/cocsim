@@ -37,6 +37,7 @@ const DARK_ELIXIR_DRILL: BuildingType = BuildingType {
     size: Vector2::new(3, 3),
     levels: DARK_ELIXIR_DRILL_LEVELS.len(),
     options: &[],
+    affects_drop_zone: true,
 };
 
 inventory::submit! {DARK_ELIXIR_DRILL}

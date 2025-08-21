@@ -43,6 +43,7 @@ const ELIXIR_COLLECTOR: BuildingType = BuildingType {
     size: Vector2::new(3, 3),
     levels: ELIXIR_COLLECTOR_LEVELS.len(),
     options: &[],
+    affects_drop_zone: true,
 };
 
 inventory::submit! {ELIXIR_COLLECTOR}

@@ -87,6 +87,7 @@ const X_BOW: BuildingType = BuildingType {
         name: "target",
         values: &["Ground", "AirAndGround"],
     }],
+    affects_drop_zone: true,
 };
 
 inventory::submit! {X_BOW}

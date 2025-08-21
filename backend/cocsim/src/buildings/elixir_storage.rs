@@ -45,6 +45,7 @@ const ELIXIR_STORAGE: BuildingType = BuildingType {
     size: Vector2::new(3, 3),
     levels: ELIXIR_STORAGE_LEVELS.len(),
     options: &[],
+    affects_drop_zone: true,
 };
 
 inventory::submit! {ELIXIR_STORAGE}

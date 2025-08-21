@@ -34,6 +34,7 @@ const BUILDERS_HUT: BuildingType = BuildingType {
     size: Vector2::new(2, 2),
     levels: BUILDERS_HUT_LEVELS.len(),
     options: &[],
+    affects_drop_zone: true,
 };
 
 inventory::submit! {BUILDERS_HUT}

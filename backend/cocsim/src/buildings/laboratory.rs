@@ -41,6 +41,7 @@ const LABORATORY: BuildingType = BuildingType {
     size: Vector2::new(3, 3),
     levels: LABORATORY_LEVELS.len(),
     options: &[],
+    affects_drop_zone: true,
 };
 
 inventory::submit! {LABORATORY}

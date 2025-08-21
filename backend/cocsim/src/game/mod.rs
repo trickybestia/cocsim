@@ -5,7 +5,10 @@ use hecs::{
     PreparedQuery,
     World,
 };
-use nalgebra::Vector2;
+use nalgebra::{
+    DMatrix,
+    Vector2,
+};
 use rand_pcg::Pcg64Mcg;
 
 use crate::{
@@ -22,7 +25,6 @@ use crate::{
         buildings::{
             Building,
             BuildingsGrid,
-            DropZone,
             TownHall,
         },
         collision::PathfindingCollisionGrid,
@@ -43,7 +45,7 @@ pub struct Game {
     pub(crate) map_size: MapSize,
     pub(crate) rng: Pcg64Mcg,
     pub(crate) buildings_grid: BuildingsGrid,
-    pub(crate) drop_zone: DropZone,
+    pub(crate) drop_zone: DMatrix<bool>,
     pub(crate) collision_grid: Option<PathfindingCollisionGrid>,
 
     pub(crate) time_elapsed: f32,
@@ -67,7 +69,7 @@ impl Game {
         &self.map_size
     }
 
-    pub fn drop_zone(&self) -> &DropZone {
+    pub fn drop_zone(&self) -> &DMatrix<bool> {
         &self.drop_zone
     }
 
@@ -157,7 +159,7 @@ impl Game {
         let initial_counted_buildings_count = Self::counted_buildings_count(&mut cache, &mut world);
 
         let buildings_grid = BuildingsGrid::new(&map_size, &mut world);
-        let drop_zone = DropZone::new(&map_size, &buildings_grid);
+        let drop_zone = map.drop_zone().to_owned();
         let collision_grid =
             enable_collision_grid.then(|| PathfindingCollisionGrid::new(&map_size, &world));
 
@@ -246,7 +248,7 @@ impl Game {
                     color: get_tile_color(
                         (y ^ x) % 2 == 0,
                         self.map_size.is_border(Vector2::new(x, y)),
-                        self.drop_zone.0[(x as usize, y as usize)],
+                        self.drop_zone[(x as usize, y as usize)],
                         self.world
                             .contains(self.buildings_grid.0[(x as usize, y as usize)]),
                     ),

@@ -45,6 +45,7 @@ const BARRACKS: BuildingType = BuildingType {
     size: Vector2::new(3, 3),
     levels: BARRACKS_LEVELS.len(),
     options: &[],
+    affects_drop_zone: true,
 };
 
 inventory::submit! {BARRACKS}

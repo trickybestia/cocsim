@@ -119,6 +119,7 @@ const ARCHER_TOWER: BuildingType = BuildingType {
     size: Vector2::new(3, 3),
     levels: ARCHER_TOWER_LEVELS.len(),
     options: &[],
+    affects_drop_zone: true,
 };
 
 inventory::submit! {ARCHER_TOWER}

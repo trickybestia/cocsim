@@ -103,6 +103,7 @@ const MORTAR: BuildingType = BuildingType {
     size: Vector2::new(3, 3),
     levels: MORTAR_LEVELS.len(),
     options: &[],
+    affects_drop_zone: true,
 };
 
 inventory::submit! {MORTAR}

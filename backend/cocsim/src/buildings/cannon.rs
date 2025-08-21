@@ -119,6 +119,7 @@ const CANNON: BuildingType = BuildingType {
     size: Vector2::new(3, 3),
     levels: CANNON_LEVELS.len(),
     options: &[],
+    affects_drop_zone: true,
 };
 
 inventory::submit! {CANNON}

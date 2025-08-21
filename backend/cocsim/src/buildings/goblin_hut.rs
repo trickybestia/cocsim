@@ -27,6 +27,7 @@ const GOBLIN_HUT: BuildingType = BuildingType {
     size: Vector2::new(2, 2),
     levels: GOBLIN_HUT_LEVELS.len(),
     options: &[],
+    affects_drop_zone: true,
 };
 
 inventory::submit! {GOBLIN_HUT}

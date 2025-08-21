@@ -90,7 +90,7 @@ impl AttackPlanExecutor {
                 match unit_group_or_spell {
                     UnitGroupOrSpell::UnitGroup(unit_group) => {
                         let position =
-                            unit_group.cartesian_position(&game.map_size, &game.drop_zone.0);
+                            unit_group.cartesian_position(&game.map_size, &game.drop_zone);
 
                         next_drop_time = next_drop_time.max(unit_group.drop_time);
 

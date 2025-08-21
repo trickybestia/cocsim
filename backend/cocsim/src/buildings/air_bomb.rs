@@ -43,6 +43,7 @@ const AIR_BOMB: BuildingType = BuildingType {
     size: Vector2::new(1, 1),
     levels: AIR_BOMB_LEVELS.len(),
     options: &[],
+    affects_drop_zone: false,
 };
 
 inventory::submit! {AIR_BOMB}

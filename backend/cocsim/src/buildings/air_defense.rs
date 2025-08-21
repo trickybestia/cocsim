@@ -95,6 +95,7 @@ const AIR_DEFENSE: BuildingType = BuildingType {
     size: Vector2::new(3, 3),
     levels: AIR_DEFENSE_LEVELS.len(),
     options: &[],
+    affects_drop_zone: true,
 };
 
 inventory::submit! {AIR_DEFENSE}

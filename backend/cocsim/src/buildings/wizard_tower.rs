@@ -103,6 +103,7 @@ const WIZARD_TOWER: BuildingType = BuildingType {
     size: Vector2::new(3, 3),
     levels: WIZARD_TOWER_LEVELS.len(),
     options: &[],
+    affects_drop_zone: true,
 };
 
 inventory::submit! {WIZARD_TOWER}

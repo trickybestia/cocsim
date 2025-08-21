@@ -41,6 +41,7 @@ const SEEKING_AIR_MINE: BuildingType = BuildingType {
     size: Vector2::new(1, 1),
     levels: SEEKING_AIR_MINE_LEVELS.len(),
     options: &[],
+    affects_drop_zone: false,
 };
 
 inventory::submit! {SEEKING_AIR_MINE}

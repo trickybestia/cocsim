@@ -75,6 +75,7 @@ pub struct BuildingType {
     pub size: Vector2<usize>,
     pub levels: usize,
     pub options: &'static [BuildingOption],
+    pub affects_drop_zone: bool,
 }
 
 inventory::collect!(BuildingType);

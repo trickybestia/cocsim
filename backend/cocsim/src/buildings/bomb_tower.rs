@@ -101,6 +101,7 @@ const BOMB_TOWER: BuildingType = BuildingType {
     size: Vector2::new(3, 3),
     levels: BOMB_TOWER_LEVELS.len(),
     options: &[],
+    affects_drop_zone: true,
 };
 
 inventory::submit! {BOMB_TOWER}

@@ -76,6 +76,7 @@ const AIR_SWEEPER: BuildingType = BuildingType {
             "RightDown",
         ],
     }],
+    affects_drop_zone: true,
 };
 
 inventory::submit! {AIR_SWEEPER}

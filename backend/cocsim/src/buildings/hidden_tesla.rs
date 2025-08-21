@@ -116,6 +116,7 @@ const HIDDEN_TESLA: BuildingType = BuildingType {
     size: Vector2::new(2, 2),
     levels: HIDDEN_TESLA_LEVELS.len(),
     options: &[],
+    affects_drop_zone: false,
 };
 
 inventory::submit! {HIDDEN_TESLA}

@@ -58,6 +58,7 @@ const WALL: BuildingType = BuildingType {
     size: Vector2::new(1, 1),
     levels: WALL_LEVELS.len(),
     options: &[],
+    affects_drop_zone: true,
 };
 
 inventory::submit! {WALL}

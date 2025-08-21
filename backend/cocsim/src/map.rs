@@ -19,6 +19,7 @@ use crate::{
         MIN_BASE_SIZE,
         MIN_BORDER_SIZE,
     },
+    game::features::map_size::MapSize,
 };
 
 #[derive(Serialize, Deserialize, Debug, Arbitrary, Clone)]
@@ -31,7 +32,16 @@ pub struct Map {
 }
 
 #[derive(Clone, Debug)]
-pub struct ValidatedMap(Map);
+pub struct ValidatedMap {
+    map: Map,
+    drop_zone: DMatrix<bool>,
+}
+
+impl ValidatedMap {
+    pub fn drop_zone(&self) -> &DMatrix<bool> {
+        &self.drop_zone
+    }
+}
 
 impl TryFrom<Map> for ValidatedMap {
     type Error = anyhow::Error;
@@ -41,8 +51,22 @@ impl TryFrom<Map> for ValidatedMap {
         ensure!(value.border_size >= MIN_BORDER_SIZE && value.border_size <= MAX_BORDER_SIZE);
         ensure!(value.buildings.len() <= MAX_BUILDINGS_COUNT);
 
+        let map_size = MapSize {
+            base_size: value.base_size as i32,
+            border_size: value.border_size as i32,
+        };
+
         let mut has_town_hall = false;
-        let mut buildings_grid = DMatrix::from_element(value.base_size, value.base_size, false);
+        let mut buildings_grid = DMatrix::from_element(
+            map_size.total_size() as usize,
+            map_size.total_size() as usize,
+            false,
+        );
+        let mut affects_drop_zone = DMatrix::from_element(
+            map_size.total_size() as usize,
+            map_size.total_size() as usize,
+            false,
+        );
 
         for building in &value.buildings {
             if let BuildingModelEnum::TownHallModel(_) = building.model {
@@ -65,18 +89,38 @@ impl TryFrom<Map> for ValidatedMap {
 
             for x in start_x..end_x {
                 for y in start_y..end_y {
-                    let tile = &mut buildings_grid[(x - value.border_size, y - value.border_size)];
+                    let tile = &mut buildings_grid[(x, y)];
 
                     ensure!(!*tile);
 
                     *tile = true;
+                    affects_drop_zone[(x, y)] = building.model.r#type().affects_drop_zone;
                 }
             }
         }
 
         ensure!(has_town_hall);
 
-        Ok(Self(value))
+        let mut drop_zone = DMatrix::from_element(
+            map_size.total_size() as usize,
+            map_size.total_size() as usize,
+            true,
+        );
+
+        for x in 0..map_size.total_size() {
+            for y in 0..map_size.total_size() {
+                if affects_drop_zone[(x as usize, y as usize)] {
+                    for neighbor in map_size.get_neighbors(x, y) {
+                        drop_zone[neighbor] = false;
+                    }
+                }
+            }
+        }
+
+        Ok(Self {
+            map: value,
+            drop_zone,
+        })
     }
 }
 
@@ -84,6 +128,6 @@ impl Deref for ValidatedMap {
     type Target = Map;
 
     fn deref(&self) -> &Self::Target {
-        &self.0
+        &self.map
     }
 }

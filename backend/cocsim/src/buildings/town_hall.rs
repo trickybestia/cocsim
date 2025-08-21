@@ -44,6 +44,7 @@ const TOWN_HALL: BuildingType = BuildingType {
     size: Vector2::new(4, 4),
     levels: TOWN_HALL_LEVELS.len(),
     options: &[],
+    affects_drop_zone: true,
 };
 
 inventory::submit! {TOWN_HALL}
