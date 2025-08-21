@@ -64,7 +64,10 @@ async fn main() {
         .layer(layers);
 
     if cfg!(feature = "publish") {
-        let app = app.fallback(async || Html::<&'static str>::from(include_str!("../index.html")));
+        let app = app.route(
+            "/",
+            get(async || Html::<&str>::from(include_str!("../index.html"))),
+        );
 
         let listener = tokio::net::UnixListener::bind(UNIX_SOCKET_PATH).unwrap();
 

@@ -1,4 +1,5 @@
-import { Route, Switch } from "wouter";
+import { Route, Router, Switch } from "wouter";
+import { useHashLocation } from "wouter/use-hash-location";
 
 import { GameTypesContext, useGameTypesSWR } from "../hooks/use-game-types";
 import AttackOptimizerPage from "../pages/attack-optimizer";
@@ -15,14 +16,16 @@ const App: React.FC = () => {
     "Loading..."
   ) : (
     <GameTypesContext value={gameTypes}>
-      <Switch>
-        <Route path="/" component={IndexPage} />
-        <Route path="compose-base-images" component={ComposeBaseImagesPage} />
-        <Route path="map-editor" component={MapEditorPage} />
-        <Route path="showcase" component={ShowcasePage} />
-        <Route path="attack-optimizer" component={AttackOptimizerPage} />
-        <Route component={NotFoundPage} />
-      </Switch>
+      <Router hook={useHashLocation}>
+        <Switch>
+          <Route path="/" component={IndexPage} />
+          <Route path="compose-base-images" component={ComposeBaseImagesPage} />
+          <Route path="map-editor" component={MapEditorPage} />
+          <Route path="showcase" component={ShowcasePage} />
+          <Route path="attack-optimizer" component={AttackOptimizerPage} />
+          <Route component={NotFoundPage} />
+        </Switch>
+      </Router>
     </GameTypesContext>
   );
 };
