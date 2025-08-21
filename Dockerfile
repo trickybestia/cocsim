@@ -13,7 +13,8 @@ COPY --from=frontend-builder /usr/src/frontend/dist/index.html ./webserver/index
 RUN cd webserver && cargo install --features=publish --path .
 
 FROM debian:trixie-slim
-RUN apt update -y && apt install --no-install-recommends -y imagemagick tor htop
+RUN apt update -y && apt install --no-install-recommends -y imagemagick tor htop && rm -rf /var/lib/apt/lists/
+RUN mkdir /tor-keys
 COPY ./docker/torrc /etc/tor/torrc
 COPY --from=backend-builder /usr/local/cargo/bin/webserver /usr/local/bin/webserver
 COPY ./docker/container-main.sh /usr/local/bin/container-main.sh

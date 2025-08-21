@@ -1,0 +1,9 @@
+services:
+  cocsim-webserver:
+    image: cocsim/cocsim-webserver
+    pull_policy: never
+    restart: always
+    volumes:
+      - type: bind
+        source: /var/lib/cocsim-webserver/tor-keys
+        target: /tor-keys
