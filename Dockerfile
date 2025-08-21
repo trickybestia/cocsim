@@ -10,7 +10,7 @@ WORKDIR /usr/src/backend
 RUN apt update -y && apt install --no-install-recommends -y libclang-dev
 COPY ./backend .
 COPY --from=frontend-builder /usr/src/frontend/dist/index.html ./webserver/index.html
-RUN cd webserver && cargo install --features=publish --path .
+RUN cd webserver && cargo install --features=publish --path . && strip /usr/local/cargo/bin/webserver
 
 FROM debian:trixie-slim
 RUN apt update -y && apt install --no-install-recommends -y imagemagick tor htop && rm -rf /var/lib/apt/lists/
