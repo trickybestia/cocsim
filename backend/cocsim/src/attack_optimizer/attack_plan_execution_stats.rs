@@ -74,7 +74,7 @@ pub fn execute_attack_plan_single(
         false,
         Some(Pcg64Mcg::new(RNG_INITIAL_STATE + i as u128)),
     );
-    let mut attack_plan_executor = AttackPlanExecutor::new(plan);
+    let mut attack_plan_executor = AttackPlanExecutor::new(plan, map);
     let mut early_loose = false;
 
     while !game.done() {

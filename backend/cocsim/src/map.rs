@@ -41,6 +41,13 @@ impl ValidatedMap {
     pub fn drop_zone(&self) -> &DMatrix<bool> {
         &self.drop_zone
     }
+
+    pub fn map_size(&self) -> MapSize {
+        MapSize {
+            base_size: self.base_size as i32,
+            border_size: self.border_size as i32,
+        }
+    }
 }
 
 impl TryFrom<Map> for ValidatedMap {
