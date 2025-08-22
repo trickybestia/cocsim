@@ -5,6 +5,9 @@ cp -R /tor-keys /var/lib/tor/cocsim-webserver
 chown -R tor:tor /var/lib/tor/cocsim-webserver
 chmod -R 700 /var/lib/tor/cocsim-webserver
 
+# Delete unix socket from previous container run (if exists)
+rm -f /run/cocsim-webserver.sock
+
 /usr/bin/tor &
 
 sleep 1
