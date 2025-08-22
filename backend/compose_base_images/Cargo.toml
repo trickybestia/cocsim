@@ -15,7 +15,6 @@ required-features = ["cli"]
 anyhow = "1"
 clap = { version = "4.5", optional = true, features = ["derive"] }
 image = "0.25"
-magick_rust = "1"
 ndarray = "0.16"
 ndarray-stats = "0.6"
 nshare = "0.10"

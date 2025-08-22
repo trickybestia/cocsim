@@ -1,21 +1,17 @@
+mod raster_stolen_functions;
 mod utils;
 
 use std::{
     cmp::min,
-    io::Cursor,
+    f32::consts::FRAC_PI_4,
 };
 
 use image::{
-    ImageFormat,
-    ImageReader,
     RgbImage,
-};
-use magick_rust::{
-    FilterType,
-    GravityType,
-    MagickWand,
-    PixelWand,
-    magick_wand_genesis,
+    imageops::{
+        FilterType,
+        resize,
+    },
 };
 use ndarray::{
     Array2,
@@ -33,40 +29,27 @@ use nshare::{
 };
 pub use utils::load_base_images;
 
-use crate::utils::{
-    crop,
-    crop_mut,
-    height,
-    width,
+use crate::{
+    raster_stolen_functions::rotate,
+    utils::{
+        crop,
+        crop_mut,
+        height,
+        width,
+    },
 };
 
 const VIGNETTE_STRENGTH: f32 = 0.26;
 
-pub fn reverse_projection<T: AsRef<[u8]>>(image: T) -> anyhow::Result<RgbImage> {
-    magick_wand_genesis();
-
-    let mut wand = MagickWand::new();
-
-    wand.read_image_blob(image)?;
-
-    wand.resize_image(
-        wand.get_image_width(),
-        wand.get_image_height() * 4 / 3,
+pub fn reverse_projection(image: &RgbImage) -> RgbImage {
+    let resized = resize(
+        image,
+        image.width(),
+        image.height() * 4 / 3,
         FilterType::Triangle,
-    )?;
+    );
 
-    wand.set_image_gravity(GravityType::Center)?;
-
-    let mut background = PixelWand::new();
-    background.set_color("black")?;
-
-    wand.rotate_image(&background, 45.0)?;
-
-    Ok(
-        ImageReader::with_format(Cursor::new(wand.write_image_blob("BMP")?), ImageFormat::Bmp)
-            .decode()?
-            .to_rgb8(),
-    )
+    rotate(&resized, FRAC_PI_4)
 }
 
 pub fn compose_base_images(left: &[RgbImage], right: &[RgbImage]) -> RgbImage {

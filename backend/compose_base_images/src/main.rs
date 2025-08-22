@@ -1,7 +1,4 @@
-use std::{
-    io::Cursor,
-    path::PathBuf,
-};
+use std::path::PathBuf;
 
 use clap::Parser;
 use compose_base_images::{
@@ -9,7 +6,6 @@ use compose_base_images::{
     load_base_images,
     reverse_projection,
 };
-use image::codecs::bmp::BmpEncoder;
 
 #[derive(Parser)]
 #[command(
@@ -41,12 +37,7 @@ fn main() {
         composed.save(composed_path).unwrap();
     }
 
-    let mut buffer = Cursor::new(Vec::new());
-    let encoder = BmpEncoder::new(&mut buffer);
-
-    composed.write_with_encoder(encoder).unwrap();
-
-    let reversed = reverse_projection(buffer.into_inner()).unwrap();
+    let reversed = reverse_projection(&composed);
 
     if let Some(reversed_path) = cli.reversed {
         reversed.save(reversed_path).unwrap();
