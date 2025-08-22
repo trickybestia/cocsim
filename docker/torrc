@@ -59,7 +59,8 @@ DataDirectory /var/lib/tor
 #HashedControlPassword 16:872860B76453A77D60CA2BB8C1A7042072093276A3D701AD684053EC4C
 #CookieAuthentication 1
 
-ControlSocket /run/tor/control
+# Was used with vanguards:
+#ControlSocket /run/tor/control
 
 ############### This section is just for location-hidden services ###
 

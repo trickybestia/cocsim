@@ -11,8 +11,4 @@ sleep 1
 
 cat /var/lib/tor/cocsim-webserver/hostname
 
-cd /usr/local/bin/vanguards
-source venv/bin/activate
-vanguards &
-
 TEST_MAPS_PATH=/usr/local/share/cocsim_test_maps RUST_LOG=tower_http=trace,webserver=debug RUST_BACKTRACE=1 exec /usr/local/bin/webserver
