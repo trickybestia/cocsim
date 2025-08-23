@@ -1,5 +1,3 @@
-use std::iter::repeat;
-
 use nalgebra::Vector2;
 use rand::{
     Rng,
@@ -8,7 +6,13 @@ use rand::{
 
 use crate::{
     ValidatedMap,
-    attack_optimizer::Army,
+    attack_optimizer::{
+        Army,
+        attack_plan_executor::{
+            AttackPlanExecutorAction,
+            Spawnable,
+        },
+    },
     consts::MAX_UNIT_DROP_TIME,
 };
 
@@ -110,69 +114,82 @@ impl AttackPlanTime {
     }
 }
 
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Hash, Clone)]
 pub struct AttackPlan {
     pub positions: Vec<AttackPlanPosition>,
-    pub times: Vec<AttackPlanTime>,
+    pub drop_times: Vec<AttackPlanTime>,
 }
 
 impl AttackPlan {
     pub fn new_randomized(army: &Army, map: &ValidatedMap, rng: &mut impl Rng) -> Self {
         let mut positions = Vec::new();
-        let mut times = Vec::new();
+        let mut drop_times = Vec::new();
 
         for _unit in &army.units {
             positions.push(AttackPlanPosition::new_randomized(map, true, rng));
-            times.push(AttackPlanTime::new_randomized(rng));
+            drop_times.push(AttackPlanTime::new_randomized(rng));
         }
 
         for _spell in &army.spells {
             positions.push(AttackPlanPosition::new_randomized(map, false, rng));
-            times.push(AttackPlanTime::new_randomized(rng));
+            drop_times.push(AttackPlanTime::new_randomized(rng));
         }
 
-        Self { positions, times }
+        Self {
+            positions,
+            drop_times,
+        }
     }
 
-    pub fn neighbors(
-        &self,
-        map: &ValidatedMap,
-        radius: usize,
-        rng: &mut impl Rng,
-    ) -> impl Iterator<Item = Self> {
+    pub fn random_neighbor(&self, map: &ValidatedMap, radius: usize, rng: &mut impl Rng) -> Self {
         let positions_variants = self
             .positions
             .iter()
             .map(|p| p.neighbors(map, radius))
             .collect::<Vec<_>>();
-        let times_variants = self
-            .times
+        let drop_times_variants = self
+            .drop_times
             .iter()
             .map(|t| t.neighbors(radius))
             .collect::<Vec<_>>();
 
-        let all_variants = positions_variants
+        let positions = positions_variants
             .iter()
-            .map(|variants| variants.len())
-            .product::<usize>()
-            * times_variants
-                .iter()
-                .map(|variants| variants.len())
-                .product::<usize>();
+            .map(|variants| variants.choose(rng).unwrap().to_owned())
+            .collect::<Vec<_>>();
+        let drop_times = drop_times_variants
+            .iter()
+            .map(|variants| variants.choose(rng).unwrap().to_owned())
+            .collect::<Vec<_>>();
 
-        println!("All variants: {}", all_variants);
+        Self {
+            positions,
+            drop_times,
+        }
+    }
 
-        repeat(()).map(move |_| {
-            let positions = positions_variants
-                .iter()
-                .map(|variants| variants.choose(rng).unwrap().to_owned())
-                .collect::<Vec<_>>();
-            let times = times_variants
-                .iter()
-                .map(|variants| variants.choose(rng).unwrap().to_owned())
-                .collect::<Vec<_>>();
+    pub fn executor_actions(&self, army: &Army) -> Vec<AttackPlanExecutorAction> {
+        let mut result = Vec::new();
 
-            Self { positions, times }
-        })
+        let mut positions_iter = self.positions.iter();
+        let mut drop_times_iter = self.drop_times.iter();
+
+        for unit in &army.units {
+            result.push(AttackPlanExecutorAction {
+                spawnable: Spawnable::UnitGroup(unit.clone()),
+                position: positions_iter.next().unwrap().to_position(),
+                drop_time: drop_times_iter.next().unwrap().to_time(),
+            });
+        }
+
+        for spell in &army.spells {
+            result.push(AttackPlanExecutorAction {
+                spawnable: Spawnable::SpellGroup(spell.clone()),
+                position: positions_iter.next().unwrap().to_position(),
+                drop_time: drop_times_iter.next().unwrap().to_time(),
+            });
+        }
+
+        result
     }
 }

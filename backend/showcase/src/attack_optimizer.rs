@@ -13,9 +13,8 @@ use cocsim::{
     attack_optimizer::{
         Army,
         AttackPlanExecutor,
-        v1::{
-            AttackOptimizer,
-            GeneticAttackOptimizer,
+        v2::{
+            RandomAttackOptimizer,
             SimulatedAnnealingAttackOptimizer,
         },
     },
@@ -99,10 +98,16 @@ fn main() {
 
     let (map, map_image) = load_test_map("single_player/no_flight_zone").unwrap();
 
-    let mut optimizer = GeneticAttackOptimizer::new(map.clone(), army.clone(), 0.02, 0.02);
+    let mut optimizer = RandomAttackOptimizer::new(map.clone(), army.clone(), 100);
 
     for i in 0..20 {
-        let (_, best_plan_stats) = optimizer.step();
+        optimizer.step();
+
+        let (_, best_plan_stats) = optimizer
+            .plans()
+            .iter()
+            .max_by(|a, b| a.1.score.total_cmp(&b.1.score))
+            .unwrap();
 
         println!(
             "Gen. #{i} best plan finished in {:.1} <= {:.1} <= {:.1} seconds (avg. percentage destroyed = {})",
@@ -113,18 +118,22 @@ fn main() {
         );
     }
 
-    println!("Switching to SimulatedAnnealingAttackOptimizer");
+    let best_plan = optimizer
+        .plans()
+        .iter()
+        .max_by(|a, b| a.1.score.total_cmp(&b.1.score))
+        .unwrap();
 
     let mut optimizer = SimulatedAnnealingAttackOptimizer::new(
         map.clone(),
         army.clone(),
-        Some(optimizer.best().unwrap().clone()),
-        100 * 20,
-        100,
+        Some((best_plan.0.clone(), best_plan.1.clone())),
     );
 
-    for i in 0..20 {
-        let (_, best_plan_stats) = optimizer.step();
+    for i in 0..100 {
+        println!("{}", optimizer.iterations_since_last_new_found());
+
+        let (_, best_plan_stats) = optimizer.step(100);
 
         println!(
             "Gen. #{i} best plan finished in {:.1} <= {:.1} <= {:.1} seconds (avg. percentage destroyed = {})",
@@ -135,9 +144,10 @@ fn main() {
         );
     }
 
+    let best_plan = &optimizer.best().unwrap().0;
+
     let game = Game::new(&map, true, Some(Pcg64Mcg::new(RNG_INITIAL_STATE)));
-    let mut plan_executor =
-        AttackPlanExecutor::new(&optimizer.best().unwrap().0.executor_actions(&map));
+    let mut plan_executor = AttackPlanExecutor::new(best_plan.executor_actions(&army));
 
     macroquad_run_game(
         game,

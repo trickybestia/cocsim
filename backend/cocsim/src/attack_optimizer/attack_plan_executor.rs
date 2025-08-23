@@ -5,12 +5,32 @@ use crate::{
     SpellModel,
     SpellModelEnum,
     UnitModelEnum,
+    WithCount,
+    consts::{
+        SPELL_DROP_COOLDOWN,
+        SPELL_GROUP_DROP_COOLDOWN,
+        UNIT_DROP_COOLDOWN,
+        UNIT_GROUP_DROP_COOLDOWN,
+    },
 };
 
 #[derive(Clone)]
-pub enum Spawnable {
+enum SingleSpawnable {
     Unit(UnitModelEnum),
     Spell(SpellModelEnum),
+}
+
+#[derive(Clone)]
+struct AttackPlanExecutorActionInternal {
+    pub spawnable: SingleSpawnable,
+    pub position: Vector2<f32>,
+    pub drop_time: f32,
+}
+
+#[derive(Clone)]
+pub enum Spawnable {
+    UnitGroup(WithCount<UnitModelEnum>),
+    SpellGroup(WithCount<SpellModelEnum>),
 }
 
 #[derive(Clone)]
@@ -21,14 +41,55 @@ pub struct AttackPlanExecutorAction {
 }
 
 pub struct AttackPlanExecutor {
-    actions: Vec<AttackPlanExecutorAction>,
+    actions: Vec<AttackPlanExecutorActionInternal>,
 }
 
 impl AttackPlanExecutor {
-    pub fn new(actions: &[AttackPlanExecutorAction]) -> Self {
-        Self {
-            actions: actions.to_owned(),
+    pub fn new(mut actions: Vec<AttackPlanExecutorAction>) -> Self {
+        // sort reversed by drop_time key
+        actions.sort_unstable_by(|a, b| b.drop_time.total_cmp(&a.drop_time));
+
+        let mut result = Vec::new();
+        let mut next_drop_time = 0.0f32;
+
+        for action in actions {
+            match action.spawnable {
+                Spawnable::UnitGroup(unit_group) => {
+                    next_drop_time = next_drop_time.max(action.drop_time);
+
+                    for _ in 0..unit_group.count {
+                        result.push(AttackPlanExecutorActionInternal {
+                            spawnable: SingleSpawnable::Unit(unit_group.value.clone()),
+                            position: action.position,
+                            drop_time: next_drop_time,
+                        });
+
+                        next_drop_time += UNIT_DROP_COOLDOWN;
+                    }
+
+                    next_drop_time += UNIT_GROUP_DROP_COOLDOWN;
+                }
+                Spawnable::SpellGroup(spell_group) => {
+                    next_drop_time = next_drop_time.max(action.drop_time);
+
+                    for _ in 0..spell_group.count {
+                        result.push(AttackPlanExecutorActionInternal {
+                            spawnable: SingleSpawnable::Spell(spell_group.value.clone()),
+                            position: action.position,
+                            drop_time: next_drop_time,
+                        });
+
+                        next_drop_time += SPELL_DROP_COOLDOWN;
+                    }
+
+                    next_drop_time += SPELL_GROUP_DROP_COOLDOWN;
+                }
+            }
         }
+
+        result.reverse();
+
+        Self { actions: result }
     }
 
     pub fn is_empty(&self) -> bool {
@@ -42,10 +103,12 @@ impl AttackPlanExecutor {
             let action = self.actions.pop().unwrap();
 
             match action.spawnable {
-                Spawnable::Unit(unit_model_enum) => {
+                SingleSpawnable::Unit(unit_model_enum) => {
                     game.spawn_attack_unit(&unit_model_enum, action.position)
                 }
-                Spawnable::Spell(spell_model_enum) => spell_model_enum.spawn(game, action.position),
+                SingleSpawnable::Spell(spell_model_enum) => {
+                    spell_model_enum.spawn(game, action.position)
+                }
             }
         }
     }
