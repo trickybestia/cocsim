@@ -1,9 +1,9 @@
 use rayon::prelude::*;
 
 use crate::{
-    AttackPlanExecutionStats,
     ValidatedMap,
     attack_optimizer::{
+        AttackPlanExecutionStats,
         attack_plan_execution_stats::execute_attack_plan_single,
         attack_plan_executor::AttackPlanExecutorAction,
     },

@@ -2,20 +2,23 @@ mod consts;
 mod utils;
 
 use cocsim::{
-    AttackOptimizer,
-    AttackPlanExecutor,
     BalloonModel,
     DragonModel,
     Game,
-    GeneticAttackOptimizer,
     HasteSpellModel,
     HealingSpellModel,
     LightningSpellModel,
     RageSpellModel,
-    SimulatedAnnealingAttackOptimizer,
-    SpellModelEnum,
-    UnitModelEnum,
     WithCount,
+    attack_optimizer::{
+        Army,
+        AttackPlanExecutor,
+        v1::{
+            AttackOptimizer,
+            GeneticAttackOptimizer,
+            SimulatedAnnealingAttackOptimizer,
+        },
+    },
     consts::RNG_INITIAL_STATE,
     utils::load_test_map,
 };
@@ -24,78 +27,79 @@ use rand_pcg::Pcg64Mcg;
 use crate::utils::macroquad_run_game;
 
 fn main() {
-    let units: Vec<WithCount<UnitModelEnum>> = vec![
-        WithCount {
-            value: DragonModel {
-                level: 5.try_into().unwrap(),
-            }
-            .into(),
-            count: 6,
-        },
-        WithCount {
-            value: DragonModel {
-                level: 5.try_into().unwrap(),
-            }
-            .into(),
-            count: 5,
-        },
-        WithCount {
-            value: BalloonModel {
-                level: 6.try_into().unwrap(),
-            }
-            .into(),
-            count: 4,
-        },
-        WithCount {
-            value: BalloonModel {
-                level: 6.try_into().unwrap(),
-            }
-            .into(),
-            count: 4,
-        },
-    ];
-    let spells: Vec<WithCount<SpellModelEnum>> = vec![
-        WithCount {
-            value: LightningSpellModel {
-                level: 7.try_into().unwrap(),
-            }
-            .into(),
-            count: 3,
-        },
-        WithCount {
-            value: LightningSpellModel {
-                level: 7.try_into().unwrap(),
-            }
-            .into(),
-            count: 3,
-        },
-        WithCount {
-            value: RageSpellModel {
-                level: 4.try_into().unwrap(),
-            }
-            .into(),
-            count: 1,
-        },
-        WithCount {
-            value: HealingSpellModel {
-                level: 6.try_into().unwrap(),
-            }
-            .into(),
-            count: 1,
-        },
-        WithCount {
-            value: HasteSpellModel {
-                level: 4.try_into().unwrap(),
-            }
-            .into(),
-            count: 1,
-        },
-    ];
+    let army = Army {
+        units: vec![
+            WithCount {
+                value: DragonModel {
+                    level: 5.try_into().unwrap(),
+                }
+                .into(),
+                count: 6,
+            },
+            WithCount {
+                value: DragonModel {
+                    level: 5.try_into().unwrap(),
+                }
+                .into(),
+                count: 5,
+            },
+            WithCount {
+                value: BalloonModel {
+                    level: 6.try_into().unwrap(),
+                }
+                .into(),
+                count: 4,
+            },
+            WithCount {
+                value: BalloonModel {
+                    level: 6.try_into().unwrap(),
+                }
+                .into(),
+                count: 4,
+            },
+        ],
+        spells: vec![
+            WithCount {
+                value: LightningSpellModel {
+                    level: 7.try_into().unwrap(),
+                }
+                .into(),
+                count: 3,
+            },
+            WithCount {
+                value: LightningSpellModel {
+                    level: 7.try_into().unwrap(),
+                }
+                .into(),
+                count: 3,
+            },
+            WithCount {
+                value: RageSpellModel {
+                    level: 4.try_into().unwrap(),
+                }
+                .into(),
+                count: 1,
+            },
+            WithCount {
+                value: HealingSpellModel {
+                    level: 6.try_into().unwrap(),
+                }
+                .into(),
+                count: 1,
+            },
+            WithCount {
+                value: HasteSpellModel {
+                    level: 4.try_into().unwrap(),
+                }
+                .into(),
+                count: 1,
+            },
+        ],
+    };
 
     let (map, map_image) = load_test_map("single_player/no_flight_zone").unwrap();
 
-    let mut optimizer =
-        GeneticAttackOptimizer::new(map.clone(), units.clone(), spells.clone(), 0.02, 0.02);
+    let mut optimizer = GeneticAttackOptimizer::new(map.clone(), army.clone(), 0.02, 0.02);
 
     for i in 0..20 {
         let (_, best_plan_stats) = optimizer.step();
@@ -113,8 +117,7 @@ fn main() {
 
     let mut optimizer = SimulatedAnnealingAttackOptimizer::new(
         map.clone(),
-        units.clone(),
-        spells.clone(),
+        army.clone(),
         Some(optimizer.best().unwrap().clone()),
         100 * 20,
         100,

@@ -3,10 +3,12 @@ use core::f32;
 use rand_pcg::Pcg64Mcg;
 
 use crate::{
-    AttackPlanExecutor,
     Game,
     ValidatedMap,
-    attack_optimizer::attack_plan_executor::AttackPlanExecutorAction,
+    attack_optimizer::{
+        AttackPlanExecutor,
+        attack_plan_executor::AttackPlanExecutorAction,
+    },
     consts::{
         MAX_ATTACK_DURATION,
         RNG_INITIAL_STATE,

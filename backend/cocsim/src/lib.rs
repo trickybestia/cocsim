@@ -1,4 +1,4 @@
-mod attack_optimizer;
+pub mod attack_optimizer;
 mod buildings;
 pub mod colliders;
 pub mod consts;
@@ -12,7 +12,6 @@ mod usize_with_max;
 pub mod utils;
 mod with_housing_space;
 
-pub use attack_optimizer::*;
 pub use buildings::*;
 pub use game::Game;
 pub use map::*;

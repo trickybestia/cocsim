@@ -9,14 +9,16 @@ use rand::{
 use rand_pcg::Pcg64Mcg;
 
 use crate::{
-    AttackOptimizer,
-    AttackPlan,
-    AttackPlanExecutionStats,
-    SpellModelEnum,
-    UnitModelEnum,
     ValidatedMap,
-    WithCount,
-    attack_optimizer::execute_attack_plan,
+    attack_optimizer::{
+        Army,
+        AttackPlanExecutionStats,
+        execute_attack_plan,
+        v1::{
+            AttackOptimizer,
+            AttackPlan,
+        },
+    },
     consts::{
         ATTACK_PLAN_EXECUTIONS_COUNT,
         ATTACK_PLAN_EXECUTOR_TPS,
@@ -29,8 +31,7 @@ use crate::{
 
 pub struct GeneticAttackOptimizer {
     map: ValidatedMap,
-    units: Vec<WithCount<UnitModelEnum>>,
-    spells: Vec<WithCount<SpellModelEnum>>,
+    army: Army,
     rng: Pcg64Mcg,
     population: Vec<(AttackPlan, AttackPlanExecutionStats)>,
     pub mutation_temperature: f32,
@@ -42,15 +43,13 @@ pub struct GeneticAttackOptimizer {
 impl GeneticAttackOptimizer {
     pub fn new(
         map: ValidatedMap,
-        units: Vec<WithCount<UnitModelEnum>>,
-        spells: Vec<WithCount<SpellModelEnum>>,
+        army: Army,
         mutation_temperature_decay: f32,
         merge_probability_decay: f64,
     ) -> Self {
         Self {
             map,
-            units,
-            spells,
+            army,
             rng: Pcg64Mcg::new(RNG_INITIAL_STATE),
             population: Vec::new(),
             mutation_temperature: 1.0,
@@ -70,7 +69,7 @@ impl AttackOptimizer for GeneticAttackOptimizer {
         let mut new_population = Vec::new();
 
         while new_population.len() != NEW_RANDOM_PLANS {
-            let new_plan = AttackPlan::new_randomized(&self.units, &self.spells, &mut self.rng);
+            let new_plan = AttackPlan::new_randomized(&self.army, &mut self.rng);
             let new_plan_stats = execute_attack_plan(
                 &self.map,
                 &new_plan.executor_actions(&self.map),

@@ -1,13 +1,15 @@
 use crate::{
-    AttackPlan,
-    AttackPlanExecutionStats,
     ValidatedMap,
-    attack_optimizer::attack_plan_execution_stats::execute_attack_plan_single,
+    attack_optimizer::{
+        AttackPlanExecutionStats,
+        attack_plan_execution_stats::execute_attack_plan_single,
+        attack_plan_executor::AttackPlanExecutorAction,
+    },
 };
 
 pub fn execute_attack_plan(
     map: &ValidatedMap,
-    plan: &AttackPlan,
+    actions: &[AttackPlanExecutorAction],
     executions_count: usize,
     tps: usize,
 ) -> AttackPlanExecutionStats {
@@ -15,7 +17,7 @@ pub fn execute_attack_plan(
     let mut executions = Vec::with_capacity(executions_count);
 
     for i in 0..executions_count {
-        executions.push(execute_attack_plan_single(map, plan, i, delta_time));
+        executions.push(execute_attack_plan_single(map, &actions, i, delta_time));
     }
 
     AttackPlanExecutionStats::new(executions)

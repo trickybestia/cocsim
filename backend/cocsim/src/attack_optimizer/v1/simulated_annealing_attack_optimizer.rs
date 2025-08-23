@@ -1,25 +1,26 @@
 use rand_pcg::Pcg64Mcg;
 
 use crate::{
-    AttackOptimizer,
-    AttackPlan,
-    AttackPlanExecutionStats,
-    SpellModelEnum,
-    UnitModelEnum,
     ValidatedMap,
-    WithCount,
+    attack_optimizer::{
+        Army,
+        AttackPlanExecutionStats,
+        execute_attack_plan,
+        v1::{
+            AttackOptimizer,
+            AttackPlan,
+        },
+    },
     consts::{
         ATTACK_PLAN_EXECUTIONS_COUNT,
         ATTACK_PLAN_EXECUTOR_TPS,
         RNG_INITIAL_STATE,
     },
-    execute_attack_plan,
 };
 
 pub struct SimulatedAnnealingAttackOptimizer {
     map: ValidatedMap,
-    units: Vec<WithCount<UnitModelEnum>>,
-    spells: Vec<WithCount<SpellModelEnum>>,
+    army: Army,
     rng: Pcg64Mcg,
     plan: Option<(AttackPlan, AttackPlanExecutionStats)>,
     iterations_per_step: usize,
@@ -30,16 +31,14 @@ pub struct SimulatedAnnealingAttackOptimizer {
 impl SimulatedAnnealingAttackOptimizer {
     pub fn new(
         map: ValidatedMap,
-        units: Vec<WithCount<UnitModelEnum>>,
-        spells: Vec<WithCount<SpellModelEnum>>,
+        army: Army,
         initial_plan: Option<(AttackPlan, AttackPlanExecutionStats)>,
         iterations: usize,
         iterations_per_step: usize,
     ) -> Self {
         Self {
             map,
-            units,
-            spells,
+            army,
             rng: Pcg64Mcg::new(RNG_INITIAL_STATE),
             plan: initial_plan,
             iterations,
@@ -50,7 +49,7 @@ impl SimulatedAnnealingAttackOptimizer {
 
     fn init_plan(&mut self) {
         if self.plan.is_none() {
-            let plan = AttackPlan::new_randomized(&self.units, &self.spells, &mut self.rng);
+            let plan = AttackPlan::new_randomized(&self.army, &mut self.rng);
             let stats = execute_attack_plan(
                 &self.map,
                 &plan.executor_actions(&self.map),

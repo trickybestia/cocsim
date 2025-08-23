@@ -10,17 +10,22 @@ use axum::{
     response::Response,
 };
 use cocsim::{
-    AttackOptimizer,
-    AttackPlanExecutor,
     Game,
     Map,
-    RandomAttackOptimizer,
-    SimulatedAnnealingAttackOptimizer,
     SpellModelEnum,
     UnitModelEnum,
     ValidatedMap,
     WithCount,
     WithMaxHousingSpace,
+    attack_optimizer::{
+        Army,
+        AttackPlanExecutor,
+        v1::{
+            AttackOptimizer,
+            RandomAttackOptimizer,
+            SimulatedAnnealingAttackOptimizer,
+        },
+    },
     consts::{
         MAX_ARMY_HOUSING_SPACE,
         MAX_SPELLS_HOUSING_SPACE,
@@ -63,6 +68,11 @@ async fn optimize_attack_internal(mut socket: WebSocket) -> anyhow::Result<()> {
         WithMaxHousingSpace<MAX_SPELLS_HOUSING_SPACE, WithCount<SpellModelEnum>>,
     >(spells_message.to_text()?)?;
 
+    let army = Army {
+        units: units.to_vec(),
+        spells: spells.to_vec(),
+    };
+
     socket
         .send(Message::text(
             json!({
@@ -73,8 +83,7 @@ async fn optimize_attack_internal(mut socket: WebSocket) -> anyhow::Result<()> {
         ))
         .await?;
 
-    let mut optimizer =
-        RandomAttackOptimizer::new(map.clone(), units.to_vec(), spells.to_vec(), 100);
+    let mut optimizer = RandomAttackOptimizer::new(map.clone(), army.clone(), 100);
 
     for i in 0..10 {
         optimizer = spawn_blocking(move || {
@@ -106,8 +115,7 @@ async fn optimize_attack_internal(mut socket: WebSocket) -> anyhow::Result<()> {
 
     let mut optimizer = SimulatedAnnealingAttackOptimizer::new(
         map.clone(),
-        units.to_vec(),
-        spells.to_vec(),
+        army.clone(),
         optimizer.best().cloned(),
         OPTIMIZE_ATTACK_ITERATIONS,
         OPTIMIZE_ATTACK_ITERATIONS_PER_STEP,
