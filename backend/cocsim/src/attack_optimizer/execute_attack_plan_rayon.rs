@@ -1,15 +1,17 @@
 use rayon::prelude::*;
 
 use crate::{
-    AttackPlan,
     AttackPlanExecutionStats,
     ValidatedMap,
-    attack_optimizer::attack_plan_execution_stats::execute_attack_plan_single,
+    attack_optimizer::{
+        attack_plan_execution_stats::execute_attack_plan_single,
+        attack_plan_executor::AttackPlanExecutorAction,
+    },
 };
 
 pub fn execute_attack_plan(
     map: &ValidatedMap,
-    plan: &AttackPlan,
+    actions: &[AttackPlanExecutorAction],
     executions_count: usize,
     tps: usize,
 ) -> AttackPlanExecutionStats {
@@ -18,7 +20,7 @@ pub fn execute_attack_plan(
 
     (0..executions_count)
         .into_par_iter()
-        .map(|i| execute_attack_plan_single(map, plan, i, delta_time))
+        .map(|i| execute_attack_plan_single(map, actions, i, delta_time))
         .collect_into_vec(&mut executions);
 
     AttackPlanExecutionStats::new(executions)

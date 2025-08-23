@@ -32,7 +32,7 @@ fuzz_target!(|inputs: FuzzInputs| {
         //dbg!(inputs);
 
         let mut game = Game::new(&map, false, None);
-        let mut plan_executor = AttackPlanExecutor::new(&inputs.plan, &map);
+        let mut plan_executor = AttackPlanExecutor::new(&inputs.plan.executor_actions(&map));
 
         while !game.done() && (game.is_attacker_team_present() || !plan_executor.is_empty()) {
             plan_executor.tick(&mut game);

@@ -35,6 +35,7 @@ pub struct Map {
 pub struct ValidatedMap {
     map: Map,
     drop_zone: DMatrix<bool>,
+    drop_zone_free_tiles: Vec<(usize, usize)>,
 }
 
 impl ValidatedMap {
@@ -47,6 +48,10 @@ impl ValidatedMap {
             base_size: self.base_size as i32,
             border_size: self.border_size as i32,
         }
+    }
+
+    pub fn drop_zone_free_tiles(&self) -> &[(usize, usize)] {
+        &self.drop_zone_free_tiles
     }
 }
 
@@ -124,9 +129,20 @@ impl TryFrom<Map> for ValidatedMap {
             }
         }
 
+        let mut drop_zone_free_tiles = Vec::new();
+
+        for x in 0..map_size.total_size() {
+            for y in 0..map_size.total_size() {
+                if drop_zone[(x as usize, y as usize)] {
+                    drop_zone_free_tiles.push((x as usize, y as usize));
+                }
+            }
+        }
+
         Ok(Self {
             map: value,
             drop_zone,
+            drop_zone_free_tiles,
         })
     }
 }

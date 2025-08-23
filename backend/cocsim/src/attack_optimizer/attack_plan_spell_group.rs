@@ -15,7 +15,7 @@ use crate::{
 };
 
 #[derive(Clone, Debug)]
-pub struct AttackPlanSpell {
+pub struct AttackPlanSpellGroup {
     pub spell_model: SpellModelEnum,
     pub count: usize,
     /// 0.0 <= each component <= 1.0.
@@ -23,7 +23,7 @@ pub struct AttackPlanSpell {
     pub drop_time: f32,
 }
 
-impl AttackPlanSpell {
+impl AttackPlanSpellGroup {
     pub fn new_randomized(spell_model: SpellModelEnum, count: usize, rng: &mut impl Rng) -> Self {
         Self {
             spell_model,
@@ -62,7 +62,7 @@ impl AttackPlanSpell {
     }
 }
 
-impl<'a> Arbitrary<'a> for AttackPlanSpell {
+impl<'a> Arbitrary<'a> for AttackPlanSpellGroup {
     fn arbitrary(u: &mut Unstructured<'a>) -> arbitrary::Result<Self> {
         Ok(Self {
             spell_model: u.arbitrary()?,

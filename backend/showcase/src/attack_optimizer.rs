@@ -133,7 +133,8 @@ fn main() {
     }
 
     let game = Game::new(&map, true, Some(Pcg64Mcg::new(RNG_INITIAL_STATE)));
-    let mut plan_executor = AttackPlanExecutor::new(&optimizer.best().unwrap().0, &map);
+    let mut plan_executor =
+        AttackPlanExecutor::new(&optimizer.best().unwrap().0.executor_actions(&map));
 
     macroquad_run_game(
         game,

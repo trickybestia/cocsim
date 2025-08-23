@@ -3,10 +3,10 @@ use core::f32;
 use rand_pcg::Pcg64Mcg;
 
 use crate::{
-    AttackPlan,
     AttackPlanExecutor,
     Game,
     ValidatedMap,
+    attack_optimizer::attack_plan_executor::AttackPlanExecutorAction,
     consts::{
         MAX_ATTACK_DURATION,
         RNG_INITIAL_STATE,
@@ -63,7 +63,7 @@ impl AttackPlanExecutionStats {
 
 pub fn execute_attack_plan_single(
     map: &ValidatedMap,
-    plan: &AttackPlan,
+    actions: &[AttackPlanExecutorAction],
     i: usize,
     delta_time: f32,
 ) -> AttackPlanExecution {
@@ -74,7 +74,7 @@ pub fn execute_attack_plan_single(
         false,
         Some(Pcg64Mcg::new(RNG_INITIAL_STATE + i as u128)),
     );
-    let mut attack_plan_executor = AttackPlanExecutor::new(plan, map);
+    let mut attack_plan_executor = AttackPlanExecutor::new(actions);
     let mut early_loose = false;
 
     while !game.done() {

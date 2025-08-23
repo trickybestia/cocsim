@@ -73,7 +73,7 @@ impl AttackOptimizer for GeneticAttackOptimizer {
             let new_plan = AttackPlan::new_randomized(&self.units, &self.spells, &mut self.rng);
             let new_plan_stats = execute_attack_plan(
                 &self.map,
-                &new_plan,
+                &new_plan.executor_actions(&self.map),
                 ATTACK_PLAN_EXECUTOR_TPS,
                 ATTACK_PLAN_EXECUTIONS_COUNT,
             );
@@ -101,7 +101,7 @@ impl AttackOptimizer for GeneticAttackOptimizer {
                 let new_plan = new_plan.mutate(&mut self.rng, self.mutation_temperature);
                 let new_plan_stats = execute_attack_plan(
                     &self.map,
-                    &new_plan,
+                    &new_plan.executor_actions(&self.map),
                     ATTACK_PLAN_EXECUTOR_TPS,
                     ATTACK_PLAN_EXECUTIONS_COUNT,
                 );

@@ -53,7 +53,7 @@ impl SimulatedAnnealingAttackOptimizer {
             let plan = AttackPlan::new_randomized(&self.units, &self.spells, &mut self.rng);
             let stats = execute_attack_plan(
                 &self.map,
-                &plan,
+                &plan.executor_actions(&self.map),
                 ATTACK_PLAN_EXECUTIONS_COUNT,
                 ATTACK_PLAN_EXECUTOR_TPS,
             );
@@ -94,7 +94,7 @@ impl AttackOptimizer for SimulatedAnnealingAttackOptimizer {
 
             let new_stats = execute_attack_plan(
                 &self.map,
-                &new_plan,
+                &new_plan.executor_actions(&self.map),
                 ATTACK_PLAN_EXECUTIONS_COUNT,
                 ATTACK_PLAN_EXECUTOR_TPS,
             );
