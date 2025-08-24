@@ -19,7 +19,7 @@
             "cwd": "${workspaceFolder}",
             "args": [
                 "--images",
-                "test_images/single_player/goblin_gauntlet",
+                "test_images/Single Player/Goblin Gauntlet",
             ]
         },
         {

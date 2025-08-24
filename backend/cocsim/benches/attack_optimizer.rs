@@ -65,7 +65,7 @@ fn attack_optimizer_bench(c: &mut Criterion) {
 
     let group = c.benchmark_group("Attack optimizer");
 
-    bench_with_test_map(group, "single_player/no_flight_zone", &army);
+    bench_with_test_map(group, "Single Player/No Flight Zone", &army);
 }
 
 criterion_group!(benches, attack_optimizer_bench);

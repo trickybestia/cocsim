@@ -96,7 +96,7 @@ fn main() {
         ],
     };
 
-    let (map, map_image) = load_test_map("single_player/no_flight_zone").unwrap();
+    let (map, map_image) = load_test_map("Single Player/No Flight Zone").unwrap();
 
     let mut optimizer = RandomAttackOptimizer::new(map.clone(), army.clone(), 100);
 

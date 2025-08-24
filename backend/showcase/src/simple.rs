@@ -16,7 +16,7 @@ use nalgebra::Vector2;
 use crate::utils::macroquad_run_game;
 
 fn main() {
-    let (map, map_image) = load_test_map("single_player/no_flight_zone").unwrap();
+    let (map, map_image) = load_test_map("Single Player/No Flight Zone").unwrap();
 
     let mut game = Game::new(&map, true, None);
 
