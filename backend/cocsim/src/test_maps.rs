@@ -8,12 +8,18 @@ use std::{
     path::PathBuf,
 };
 
+use include_dir::{
+    Dir,
+    include_dir,
+};
 use zip::ZipArchive;
 
 use crate::{
     Map,
     ValidatedMap,
 };
+
+static TEST_MAPS_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/../../test_maps");
 
 pub fn load_test_map_raw(name: &str) -> anyhow::Result<(String, Vec<u8>)> {
     let path = PathBuf::from(env::var("TEST_MAPS_PATH")?)

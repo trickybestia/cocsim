@@ -5,7 +5,7 @@ edition = "2024"
 
 [features]
 rayon = ["dep:rayon"]
-test-maps = ["dep:zip"]
+test-maps = ["dep:zip", "dep:include_dir"]
 
 [dependencies]
 anyhow = "1"
@@ -15,6 +15,7 @@ bitflags = "2.9"
 dyn-clone = "1"
 enum_dispatch = "0.3"
 hecs = "0.10"
+include_dir = { version = "0.7", optional = true }
 inventory = "0.3"
 nalgebra = { version = "0.33", features = ["serde-serialize"] }
 rand = "0.9"
