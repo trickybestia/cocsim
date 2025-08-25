@@ -1,13 +1,12 @@
 use std::{
-    env,
-    fs::File,
     io::{
-        BufReader,
+        Cursor,
         Read,
     },
     path::PathBuf,
 };
 
+use anyhow::Context;
 use include_dir::{
     Dir,
     include_dir,
@@ -22,11 +21,10 @@ use crate::{
 static TEST_MAPS_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/../../test_maps");
 
 pub fn load_test_map_raw(name: &str) -> anyhow::Result<(String, Vec<u8>)> {
-    let path = PathBuf::from(env::var("TEST_MAPS_PATH")?)
-        .join(name)
-        .with_extension("zip");
-    let file = File::open(path)?;
-    let reader = BufReader::new(file);
+    let path = PathBuf::from(name).with_extension("zip");
+
+    let file = TEST_MAPS_DIR.get_file(path).context("Test map not found")?;
+    let reader = Cursor::new(file.contents());
 
     let mut archive = ZipArchive::new(reader)?;
 
