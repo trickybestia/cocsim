@@ -28,7 +28,7 @@ const DrawCoordsLayer: React.FC<Props> = memo(
             align="center"
             verticalAlign="center"
             rotation={45}
-            fontSize={10}
+            fontSize={8}
             text={text}
           />
         );

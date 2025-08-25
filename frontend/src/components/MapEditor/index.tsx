@@ -461,6 +461,11 @@ const MapEditor: React.FC<Props> = ({
                 image={image}
               />
             </Layer>
+            <BuildingsLayer
+              buildings={buildings}
+              selectedBuilding={selectedBuilding}
+              pixelsPerTile={pixelsPerTile}
+            />
             {drawGrid && (
               <DrawGridLayer
                 totalSize={baseSize + 2 * borderSize}
@@ -473,11 +478,6 @@ const MapEditor: React.FC<Props> = ({
                 canvasSize={canvasSize}
               />
             )}
-            <BuildingsLayer
-              buildings={buildings}
-              selectedBuilding={selectedBuilding}
-              pixelsPerTile={pixelsPerTile}
-            />
             <Layer>
               {cursorPosition !== undefined && (
                 <Rect
