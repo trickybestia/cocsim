@@ -8,8 +8,8 @@ use cocsim::{
         RageSpellModel,
         SpellModel,
     },
+    test_maps::load_test_map,
     units::BalloonModel,
-    utils::load_test_map,
 };
 use nalgebra::Vector2;
 use serde_json::{

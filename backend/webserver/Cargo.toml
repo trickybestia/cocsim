@@ -10,7 +10,7 @@ publish = []
 anyhow = "1"
 axum = { version = "0.8", features = ["multipart", "ws"] }
 bytes = "1.10"
-cocsim = { path = "../cocsim", features = ["rayon"] }
+cocsim = { path = "../cocsim", features = ["rayon", "test-maps"] }
 compose_base_images = { path = "../compose_base_images" }
 image = "0.25"
 inventory = "0.3"

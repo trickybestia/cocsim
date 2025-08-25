@@ -6,10 +6,11 @@ mod webserver_error;
 
 #[cfg(not(feature = "publish"))]
 use axum::http::HeaderValue;
+#[cfg(feature = "publish")]
+use axum::response::Html;
 use axum::{
     Router,
     extract::DefaultBodyLimit,
-    response::Html,
     routing::{
         any,
         get,

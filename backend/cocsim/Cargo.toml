@@ -5,6 +5,7 @@ edition = "2024"
 
 [features]
 rayon = ["dep:rayon"]
+test-maps = ["dep:zip"]
 
 [dependencies]
 anyhow = "1"
@@ -22,7 +23,7 @@ rayon = { version = "1.10", optional = true }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 serde_with = "3.14"
-zip = "4.3"
+zip = { version = "4.3", optional = true }
 
 [dev-dependencies]
 criterion = { version = "0.7" }

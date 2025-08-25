@@ -5,7 +5,7 @@ use axum::{
     },
     response::IntoResponse,
 };
-use cocsim::utils::load_test_map_raw;
+use cocsim::test_maps::load_test_map_raw;
 
 use crate::consts::SHOWCASE_MAP;
 

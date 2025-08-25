@@ -9,8 +9,8 @@ use cocsim::{
         },
     },
     spells::LightningSpellModel,
+    test_maps::load_test_map,
     units::DragonModel,
-    utils::load_test_map,
 };
 use criterion::{
     BenchmarkGroup,

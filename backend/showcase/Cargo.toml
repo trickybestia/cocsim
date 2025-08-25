@@ -19,7 +19,7 @@ name = "nearest-point-on-arc"
 path = "src/math/nearest_point_on_arc.rs"
 
 [dependencies]
-cocsim = { path = "../cocsim" }
+cocsim = { path = "../cocsim", features = ["test-maps"] }
 image = { version = "0.24", default-features = false, features = ["jpeg"] }
 macroquad = "0.4"
 nalgebra = "0.33"

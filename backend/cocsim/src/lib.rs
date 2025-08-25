@@ -7,6 +7,8 @@ mod geometry;
 mod map;
 mod shape;
 pub mod spells;
+#[cfg(feature = "test-maps")]
+pub mod test_maps;
 pub mod units;
 mod usize_with_max;
 pub mod utils;

@@ -19,11 +19,11 @@ use cocsim::{
         LightningSpellModel,
         RageSpellModel,
     },
+    test_maps::load_test_map,
     units::{
         BalloonModel,
         DragonModel,
     },
-    utils::load_test_map,
 };
 use rand_pcg::Pcg64Mcg;
 
