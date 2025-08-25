@@ -2,6 +2,8 @@
 
 Clash of Clans attack simulation project.
 
+This material is unofficial and is not endorsed by Supercell. For more information see Supercell's Fan Content Policy: [www.supercell.com/fan-content-policy](https://www.supercell.com/fan-content-policy).
+
 ## Deploying using docker-compose
 
 1. Building and export container image:
