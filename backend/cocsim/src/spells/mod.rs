@@ -7,7 +7,7 @@ mod utils;
 use arbitrary::Arbitrary;
 use enum_dispatch::enum_dispatch;
 pub use haste_spell::*;
-pub use healing_spell::HealingSpellModel;
+pub use healing_spell::*;
 pub use lightning_spell::*;
 use nalgebra::Vector2;
 pub use rage_spell::*;

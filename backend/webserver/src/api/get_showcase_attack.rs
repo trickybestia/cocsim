@@ -1,12 +1,14 @@
 use axum::Json;
 use cocsim::{
-    BalloonModel,
     Game,
-    HasteSpellModel,
-    HealingSpellModel,
-    LightningSpellModel,
-    RageSpellModel,
-    SpellModel,
+    spells::{
+        HasteSpellModel,
+        HealingSpellModel,
+        LightningSpellModel,
+        RageSpellModel,
+        SpellModel,
+    },
+    units::BalloonModel,
     utils::load_test_map,
 };
 use nalgebra::Vector2;

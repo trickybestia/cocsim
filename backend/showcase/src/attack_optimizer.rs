@@ -2,13 +2,7 @@ mod consts;
 mod utils;
 
 use cocsim::{
-    BalloonModel,
-    DragonModel,
     Game,
-    HasteSpellModel,
-    HealingSpellModel,
-    LightningSpellModel,
-    RageSpellModel,
     WithCount,
     attack_optimizer::{
         Army,
@@ -19,6 +13,16 @@ use cocsim::{
         },
     },
     consts::RNG_INITIAL_STATE,
+    spells::{
+        HasteSpellModel,
+        HealingSpellModel,
+        LightningSpellModel,
+        RageSpellModel,
+    },
+    units::{
+        BalloonModel,
+        DragonModel,
+    },
     utils::load_test_map,
 };
 use rand_pcg::Pcg64Mcg;

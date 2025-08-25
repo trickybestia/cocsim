@@ -24,7 +24,7 @@ pub struct UnitType {
     pub name: &'static str,
     pub housing_space: usize,
     pub levels: usize,
-    /// https://clashofclans.fandom.com/wiki/Clan_Castle#Deployment_Order
+    /// See <https://clashofclans.fandom.com/wiki/Clan_Castle#Deployment_Order>.
     pub clan_castle_deployment_priority: u8,
     /// Used by ClanCastle.
     pub attack_air: bool,
@@ -54,7 +54,7 @@ pub enum UnitModelEnum {
 }
 
 impl UnitModelEnum {
-    /// "Smallest" should be deployed first
+    /// See <https://clashofclans.fandom.com/wiki/Clan_Castle#Deployment_Order>. "Smallest" should be deployed first
     pub fn clan_castle_deployment_cmp(&self, other: &Self) -> Ordering {
         let housing_space_ord = self
             .r#type()

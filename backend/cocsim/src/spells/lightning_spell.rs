@@ -15,7 +15,6 @@ use crate::{
     Game,
     Shape,
     ShapeColor,
-    SpellModel,
     colliders::{
         CircleCollider,
         Collider,
@@ -35,6 +34,7 @@ use crate::{
         position::Position,
     },
     spells::{
+        SpellModel,
         SpellType,
         utils::spawn_spell,
     },

@@ -7,10 +7,12 @@ use serde::{
 };
 
 use crate::{
-    BuildingModel,
-    BuildingType,
     UsizeWithMax,
-    buildings::utils::other_building::spawn_other_building,
+    buildings::{
+        BuildingModel,
+        BuildingType,
+        utils::other_building::spawn_other_building,
+    },
 };
 
 struct BuildersHutLevel {

@@ -7,10 +7,12 @@ use serde::{
 };
 
 use crate::{
-    BuildingModel,
-    BuildingType,
     UsizeWithMax,
-    buildings::utils::resource_building::spawn_resource_building,
+    buildings::{
+        BuildingModel,
+        BuildingType,
+        utils::resource_building::spawn_resource_building,
+    },
 };
 
 struct ElixirCollectorLevel {

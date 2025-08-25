@@ -12,15 +12,17 @@ use serde::{
 };
 
 use crate::{
-    BuildingModel,
-    BuildingType,
-    UnitModelEnum,
     UsizeWithMax,
     WithCount,
     WithMaxHousingSpace,
-    buildings::utils::resource_building::spawn_resource_building,
+    buildings::{
+        BuildingModel,
+        BuildingType,
+        utils::resource_building::spawn_resource_building,
+    },
     consts::MAX_CLAN_CASTLE_HOUSING_SPACE,
     game::features::clan_castle::ClanCastle,
+    units::UnitModelEnum,
 };
 
 struct ClanCastleLevel {

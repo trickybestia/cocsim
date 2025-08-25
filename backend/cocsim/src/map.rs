@@ -9,9 +9,11 @@ use serde::{
 };
 
 use crate::{
-    Building,
-    BuildingModel,
-    BuildingModelEnum,
+    buildings::{
+        Building,
+        BuildingModel,
+        BuildingModelEnum,
+    },
     consts::{
         MAX_BASE_SIZE,
         MAX_BORDER_SIZE,
@@ -43,7 +45,7 @@ impl ValidatedMap {
         &self.drop_zone
     }
 
-    pub fn map_size(&self) -> MapSize {
+    pub fn size(&self) -> MapSize {
         MapSize {
             base_size: self.base_size as i32,
             border_size: self.border_size as i32,

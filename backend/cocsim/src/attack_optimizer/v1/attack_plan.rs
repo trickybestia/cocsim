@@ -15,7 +15,7 @@ use crate::{
         },
         v1::{
             AttackPlanSpellGroup,
-            AttackPlanUnitGroup,
+            attack_plan_unit_group::AttackPlanUnitGroup,
         },
     },
 };
@@ -82,7 +82,7 @@ impl AttackPlan {
         let mut result = Vec::new();
 
         for unit_group in &self.units {
-            let position = unit_group.cartesian_position(&map.map_size(), map.drop_zone());
+            let position = unit_group.cartesian_position(&map.size(), map.drop_zone());
 
             result.push(AttackPlanExecutorAction {
                 spawnable: Spawnable::UnitGroup(WithCount {
@@ -95,7 +95,7 @@ impl AttackPlan {
         }
 
         for spell_group in &self.spells {
-            let position = spell_group.cartesian_position(&map.map_size());
+            let position = spell_group.cartesian_position(&map.size());
 
             result.push(AttackPlanExecutorAction {
                 spawnable: Spawnable::SpellGroup(WithCount {

@@ -4,13 +4,13 @@ use arbitrary::Arbitrary;
 use cocsim::{
     Game,
     Map,
-    UnitModel,
     ValidatedMap,
     attack_optimizer::{
         AttackPlanExecutor,
         v1::AttackPlan,
     },
     consts::MAX_ARMY_HOUSING_SPACE,
+    units::UnitModel,
 };
 use libfuzzer_sys::fuzz_target;
 

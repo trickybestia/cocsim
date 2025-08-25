@@ -3,8 +3,6 @@ use nalgebra::Vector2;
 
 use crate::{
     Game,
-    UnitModel,
-    UnitModelEnum,
     colliders::Collider,
     consts::UNIT_DISTANCE_TO_WAYPOINT_EPS,
     game::features::{
@@ -14,6 +12,10 @@ use crate::{
             Team,
         },
         position::Position,
+    },
+    units::{
+        UnitModel,
+        UnitModelEnum,
     },
     utils::AnyMapExt,
 };

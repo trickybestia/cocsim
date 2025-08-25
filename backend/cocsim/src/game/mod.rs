@@ -13,8 +13,6 @@ use rand_pcg::Pcg64Mcg;
 
 use crate::{
     Shape,
-    UnitModel,
-    UnitModelEnum,
     consts::{
         COLLISION_TILE_COLOR,
         COLLISION_TILE_SIZE,
@@ -31,6 +29,10 @@ use crate::{
         map_size::MapSize,
     },
     map::ValidatedMap,
+    units::{
+        UnitModel,
+        UnitModelEnum,
+    },
     utils::{
         AnyMapExt,
         draw_bool_grid,
@@ -145,11 +147,6 @@ impl Game {
         let mut world = World::new();
         let mut cache = AnyMap::new();
 
-        let map_size = MapSize {
-            base_size: map.base_size as i32,
-            border_size: map.border_size as i32,
-        };
-
         let rng = rng.unwrap_or(Pcg64Mcg::new(rand::random()));
 
         for building in &map.buildings {
@@ -158,19 +155,18 @@ impl Game {
 
         let initial_counted_buildings_count = Self::counted_buildings_count(&mut cache, &mut world);
 
-        let buildings_grid = BuildingsGrid::new(&map_size, &mut world);
-        let drop_zone = map.drop_zone().to_owned();
+        let buildings_grid = BuildingsGrid::new(&map.size(), &mut world);
         let collision_grid =
-            enable_collision_grid.then(|| PathfindingCollisionGrid::new(&map_size, &world));
+            enable_collision_grid.then(|| PathfindingCollisionGrid::new(&map.size(), &world));
 
         Self {
             world,
             cache,
 
-            map_size,
+            map_size: map.size(),
             rng,
             buildings_grid,
-            drop_zone,
+            drop_zone: map.drop_zone().to_owned(),
             collision_grid,
 
             time_elapsed: 0.0,

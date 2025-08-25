@@ -9,8 +9,6 @@ use serde::{
 use crate::{
     Shape,
     ShapeColor,
-    UnitModel,
-    UnitType,
     game::features::{
         actions::MeleeAttack,
         attack::{
@@ -22,7 +20,11 @@ use crate::{
         },
         drawable::Drawable,
     },
-    units::utils::air_unit::spawn_air_unit,
+    units::{
+        UnitModel,
+        UnitType,
+        utils::air_unit::spawn_air_unit,
+    },
     usize_with_max::UsizeWithMax,
 };
 

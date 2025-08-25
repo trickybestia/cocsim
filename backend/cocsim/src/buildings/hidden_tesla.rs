@@ -10,14 +10,16 @@ use serde::{
 };
 
 use crate::{
-    BuildingModel,
-    BuildingType,
     Game,
     ShapeColor,
     UsizeWithMax,
-    buildings::utils::{
-        defensive_building::spawn_defensive_building,
-        trap::spawn_trap,
+    buildings::{
+        BuildingModel,
+        BuildingType,
+        utils::{
+            defensive_building::spawn_defensive_building,
+            trap::spawn_trap,
+        },
     },
     game::features::{
         actions::{

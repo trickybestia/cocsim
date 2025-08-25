@@ -9,9 +9,9 @@ use nalgebra::{
 use rand::Rng;
 
 use crate::{
-    SpellModelEnum,
     consts::MAX_UNIT_DROP_TIME,
     game::features::map_size::MapSize,
+    spells::SpellModelEnum,
 };
 
 #[derive(Clone, Debug)]

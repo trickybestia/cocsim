@@ -1,4 +1,4 @@
-pub mod air_bomb;
+mod air_bomb;
 mod air_defense;
 mod air_sweeper;
 mod archer_tower;
@@ -18,9 +18,9 @@ mod gold_storage;
 mod hidden_tesla;
 mod laboratory;
 mod mortar;
-pub mod seeking_air_mine;
+mod seeking_air_mine;
 mod town_hall;
-pub mod utils;
+mod utils;
 mod wall;
 mod wizard_tower;
 mod x_bow;

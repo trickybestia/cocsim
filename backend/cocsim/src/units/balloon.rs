@@ -9,8 +9,6 @@ use serde::{
 use crate::{
     Shape,
     ShapeColor,
-    UnitModel,
-    UnitType,
     game::features::{
         actions::SplashDamage,
         attack::{
@@ -23,7 +21,11 @@ use crate::{
         drawable::Drawable,
         to_be_despawned::OnDespawn,
     },
-    units::utils::air_unit::spawn_air_unit,
+    units::{
+        UnitModel,
+        UnitType,
+        utils::air_unit::spawn_air_unit,
+    },
     usize_with_max::UsizeWithMax,
 };
 

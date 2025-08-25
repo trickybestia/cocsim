@@ -2,9 +2,6 @@ use nalgebra::Vector2;
 
 use crate::{
     Game,
-    SpellModel,
-    SpellModelEnum,
-    UnitModelEnum,
     WithCount,
     consts::{
         SPELL_DROP_COOLDOWN,
@@ -12,6 +9,11 @@ use crate::{
         UNIT_DROP_COOLDOWN,
         UNIT_GROUP_DROP_COOLDOWN,
     },
+    spells::{
+        SpellModel,
+        SpellModelEnum,
+    },
+    units::UnitModelEnum,
 };
 
 #[derive(Clone)]

@@ -1,8 +1,8 @@
 use arbitrary::Arbitrary;
 
 use crate::{
-    SpellModelEnum,
-    UnitModelEnum,
+    spells::SpellModelEnum,
+    units::UnitModelEnum,
     with_housing_space::WithCount,
 };
 

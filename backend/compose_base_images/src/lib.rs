@@ -1,5 +1,5 @@
 mod raster_stolen_functions;
-mod utils;
+pub mod utils;
 
 use std::{
     cmp::min,
@@ -27,7 +27,6 @@ use nshare::{
     AsNdarray3,
     AsNdarray3Mut,
 };
-pub use utils::load_base_images;
 
 use crate::{
     raster_stolen_functions::rotate,

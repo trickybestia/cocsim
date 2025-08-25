@@ -7,10 +7,12 @@ use serde::{
 };
 
 use crate::{
-    BuildingModel,
-    BuildingType,
     UsizeWithMax,
-    buildings::utils::defensive_building::spawn_defensive_building,
+    buildings::{
+        BuildingModel,
+        BuildingType,
+        utils::defensive_building::spawn_defensive_building,
+    },
     game::features::{
         actions::TargetProjectileAttack,
         attack::{

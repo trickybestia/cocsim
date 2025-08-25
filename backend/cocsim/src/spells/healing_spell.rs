@@ -13,7 +13,6 @@ use crate::{
     Game,
     Shape,
     ShapeColor,
-    SpellModel,
     colliders::{
         CircleCollider,
         Collider,
@@ -27,6 +26,7 @@ use crate::{
         tick_spell::TickSpell,
     },
     spells::{
+        SpellModel,
         SpellType,
         utils::spawn_spell,
     },

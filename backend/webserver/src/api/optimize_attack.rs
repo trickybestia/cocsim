@@ -12,8 +12,6 @@ use axum::{
 use cocsim::{
     Game,
     Map,
-    SpellModelEnum,
-    UnitModelEnum,
     ValidatedMap,
     WithCount,
     WithMaxHousingSpace,
@@ -30,6 +28,8 @@ use cocsim::{
         MAX_ARMY_HOUSING_SPACE,
         MAX_SPELLS_HOUSING_SPACE,
     },
+    spells::SpellModelEnum,
+    units::UnitModelEnum,
 };
 use log::warn;
 use serde_json::json;

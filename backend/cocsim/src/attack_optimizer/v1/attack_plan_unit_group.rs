@@ -12,7 +12,6 @@ use nalgebra::{
 use rand::Rng;
 
 use crate::{
-    UnitModelEnum,
     consts::MAX_UNIT_DROP_TIME,
     game::features::map_size::MapSize,
     geometry::{
@@ -20,6 +19,7 @@ use crate::{
         Rect,
         Segment,
     },
+    units::UnitModelEnum,
 };
 
 #[derive(Clone, Debug)]

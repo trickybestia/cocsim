@@ -1,8 +1,8 @@
 use axum::Json;
 use cocsim::{
-    BuildingType,
-    SpellType,
-    UnitType,
+    buildings::BuildingType,
+    spells::SpellType,
+    units::UnitType,
 };
 use serde_json::{
     Value,

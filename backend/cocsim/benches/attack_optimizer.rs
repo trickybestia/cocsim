@@ -1,6 +1,4 @@
 use cocsim::{
-    DragonModel,
-    LightningSpellModel,
     ValidatedMap,
     WithCount,
     attack_optimizer::{
@@ -10,6 +8,8 @@ use cocsim::{
             GeneticAttackOptimizer,
         },
     },
+    spells::LightningSpellModel,
+    units::DragonModel,
     utils::load_test_map,
 };
 use criterion::{

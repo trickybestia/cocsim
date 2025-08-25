@@ -7,11 +7,13 @@ use serde::{
 };
 
 use crate::{
-    BuildingModel,
-    BuildingOption,
-    BuildingType,
     UsizeWithMax,
-    buildings::utils::defensive_building::spawn_defensive_building,
+    buildings::{
+        BuildingModel,
+        BuildingOption,
+        BuildingType,
+        utils::defensive_building::spawn_defensive_building,
+    },
     game::features::{
         actions::AirSweeperAttack,
         attack::{

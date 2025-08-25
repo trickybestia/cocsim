@@ -37,8 +37,8 @@ impl AttackPlanPosition {
                 .expect("At least one free tile expected")
         } else {
             (
-                rng.random_range(0..map.map_size().total_size()) as usize,
-                rng.random_range(0..map.map_size().total_size()) as usize,
+                rng.random_range(0..map.size().total_size()) as usize,
+                rng.random_range(0..map.size().total_size()) as usize,
             )
         };
 
@@ -60,7 +60,7 @@ impl AttackPlanPosition {
             for y in (self.y - radius)..=(self.y + radius) {
                 let drop_zone_tile_position = Vector2::new(x, y) / POSITION_QUANTS_PER_TILE;
 
-                if map.map_size().is_inside_map(drop_zone_tile_position)
+                if map.size().is_inside_map(drop_zone_tile_position)
                     && (!self.restricted_to_drop_zone
                         || map.drop_zone()[(
                             drop_zone_tile_position.x as usize,

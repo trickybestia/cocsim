@@ -7,12 +7,14 @@ use serde::{
 };
 
 use crate::{
-    BuildingModel,
-    BuildingType,
     UsizeWithMax,
-    buildings::utils::other_building::{
-        default_attack_collider,
-        default_pathfinding_collider,
+    buildings::{
+        BuildingModel,
+        BuildingType,
+        utils::other_building::{
+            default_attack_collider,
+            default_pathfinding_collider,
+        },
     },
     game::features::{
         attack::{

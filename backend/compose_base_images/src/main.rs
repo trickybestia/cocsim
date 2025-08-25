@@ -3,8 +3,8 @@ use std::path::PathBuf;
 use clap::Parser;
 use compose_base_images::{
     compose_base_images,
-    load_base_images,
     reverse_projection,
+    utils::load_base_images,
 };
 
 #[derive(Parser)]
