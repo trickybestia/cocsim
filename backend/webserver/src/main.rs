@@ -4,11 +4,6 @@ pub mod dto_game_renderer;
 pub mod utils;
 mod webserver_error;
 
-use std::{
-    fs::Permissions,
-    os::unix::fs::PermissionsExt,
-};
-
 #[cfg(not(feature = "publish"))]
 use axum::http::HeaderValue;
 use axum::{
@@ -21,38 +16,30 @@ use axum::{
         post,
     },
 };
-use tokio::fs::set_permissions;
 use tower::ServiceBuilder;
+use tower_http::compression::CompressionLayer;
 #[cfg(not(feature = "publish"))]
-use tower_http::cors::CorsLayer;
 use tower_http::{
-    compression::CompressionLayer,
-    limit::RequestBodyLimitLayer,
+    cors::CorsLayer,
     trace::TraceLayer,
 };
 
-use crate::{
-    api::*,
-    consts::UNIX_SOCKET_PATH,
-};
+use crate::api::*;
 
 #[tokio::main]
 async fn main() {
     tracing_subscriber::fmt::init();
 
-    let layers = ServiceBuilder::new()
-        .layer(TraceLayer::new_for_http())
-        .layer(CompressionLayer::new());
+    let layers = ServiceBuilder::new().layer(CompressionLayer::new());
 
     #[cfg(not(feature = "publish"))]
-    let layers = layers.layer(
+    let layers = layers.layer(TraceLayer::new_for_http()).layer(
         CorsLayer::new().allow_origin("http://localhost:5173".parse::<HeaderValue>().unwrap()),
     );
 
     let app = Router::new()
         .route("/api/compose-base-images", post(compose_base_images))
         .layer(DefaultBodyLimit::disable())
-        .layer(RequestBodyLimitLayer::new(50 * 1024 * 1024))
         .route("/api/get-game-types", get(get_game_types))
         .route(
             "/api/get-showcase-attack-base-image",
@@ -63,24 +50,17 @@ async fn main() {
         .route("/api/reverse-projection", post(reverse_projection))
         .layer(layers);
 
-    if cfg!(feature = "publish") {
-        let app = app.route(
-            "/",
-            get(async || Html::<&str>::from(include_str!("../index.html"))),
-        );
+    #[cfg(feature = "publish")]
+    let app = app.route(
+        "/",
+        get(async || Html::<&str>::from(include_str!("../index.html"))),
+    );
 
-        let listener = tokio::net::UnixListener::bind(UNIX_SOCKET_PATH).unwrap();
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:8000")
+        .await
+        .unwrap();
 
-        set_permissions(UNIX_SOCKET_PATH, Permissions::from_mode(0o666))
-            .await
-            .unwrap();
+    println!("Listening at http://{}", listener.local_addr().unwrap());
 
-        axum::serve(listener, app).await.unwrap();
-    } else {
-        let listener = tokio::net::TcpListener::bind("127.0.0.1:8000")
-            .await
-            .unwrap();
-
-        axum::serve(listener, app).await.unwrap();
-    }
+    axum::serve(listener, app).await.unwrap();
 }
