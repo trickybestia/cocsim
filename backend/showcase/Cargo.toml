@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [features]
-rayon = ["cocsim/rayon"]
+rayon = ["cocsim/rayon", "image/rayon"]
 
 [[bin]]
 name = "simple"
@@ -20,8 +20,8 @@ path = "src/math/nearest_point_on_arc.rs"
 
 [dependencies]
 cocsim = { path = "../cocsim", features = ["test-maps"] }
-image = { version = "0.24", default-features = false, features = ["jpeg"] }
+image = { version = "0.24", default-features = false, features = ["jpeg", "png"] }
 macroquad = "0.4"
 nalgebra = "0.33"
-rand = "0.9"
+rand = { version = "0.9", default-features = false }
 rand_pcg = "0.9"

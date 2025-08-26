@@ -17,6 +17,7 @@ use crate::{
         COLLISION_TILE_COLOR,
         COLLISION_TILE_SIZE,
         MAX_ATTACK_DURATION,
+        RNG_INITIAL_STATE,
     },
     game::features::{
         attack::Team,
@@ -147,7 +148,7 @@ impl Game {
         let mut world = World::new();
         let mut cache = AnyMap::new();
 
-        let rng = rng.unwrap_or(Pcg64Mcg::new(rand::random()));
+        let rng = rng.unwrap_or(Pcg64Mcg::new(RNG_INITIAL_STATE));
 
         for building in &map.buildings {
             building.spawn(&mut world);

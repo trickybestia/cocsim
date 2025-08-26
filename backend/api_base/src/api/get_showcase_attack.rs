@@ -1,0 +1,72 @@
+use cocsim::{
+    Game,
+    spells::{
+        HasteSpellModel,
+        HealingSpellModel,
+        LightningSpellModel,
+        RageSpellModel,
+        SpellModel,
+    },
+    test_maps::load_test_map,
+    units::BalloonModel,
+};
+use nalgebra::Vector2;
+use serde_json::{
+    Value,
+    to_value,
+};
+
+use crate::{
+    consts::{
+        FPS,
+        SHOWCASE_MAP,
+    },
+    dto_game_renderer::DtoGameRenderer,
+};
+
+pub fn get_showcase_attack() -> Value {
+    let (map, _) = load_test_map(SHOWCASE_MAP).expect("Map should be loaded successfully");
+
+    let mut game = Game::new(&map, true, None);
+
+    for _i in 0..10 {
+        game.spawn_attack_unit(
+            &BalloonModel {
+                level: 10.try_into().unwrap(),
+            }
+            .into(),
+            Vector2::new(0.5, 0.5),
+        );
+    }
+
+    LightningSpellModel {
+        level: 11.try_into().unwrap(),
+    }
+    .spawn(&mut game, Vector2::from_element(20.0));
+
+    HasteSpellModel {
+        level: 5.try_into().unwrap(),
+    }
+    .spawn(&mut game, Vector2::from_element(7.0));
+
+    RageSpellModel {
+        level: 5.try_into().unwrap(),
+    }
+    .spawn(&mut game, Vector2::from_element(5.0));
+
+    HealingSpellModel {
+        level: 10.try_into().unwrap(),
+    }
+    .spawn(&mut game, Vector2::from_element(20.0));
+
+    let mut renderer = DtoGameRenderer::new(1);
+
+    renderer.draw(&mut game);
+
+    while !game.done() && game.is_attacker_team_present() {
+        game.tick(1.0 / FPS as f32);
+        renderer.draw(&mut game);
+    }
+
+    to_value(renderer.finish(&mut game)).expect("Should not fail")
+}

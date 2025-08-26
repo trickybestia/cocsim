@@ -1,4 +1,3 @@
-use anyhow::Context;
 use axum::{
     extract::{
         WebSocketUpgrade,
@@ -9,41 +8,10 @@ use axum::{
     },
     response::Response,
 };
-use cocsim::{
-    Game,
-    Map,
-    ValidatedMap,
-    WithCount,
-    WithMaxHousingSpace,
-    attack_optimizer::{
-        Army,
-        AttackPlanExecutor,
-        v1::{
-            AttackOptimizer,
-            RandomAttackOptimizer,
-            SimulatedAnnealingAttackOptimizer,
-        },
-    },
-    consts::{
-        MAX_ARMY_HOUSING_SPACE,
-        MAX_SPELLS_HOUSING_SPACE,
-    },
-    spells::SpellModelEnum,
-    units::UnitModelEnum,
-};
 use log::warn;
-use serde_json::json;
-use tokio::task::spawn_blocking;
-
-use crate::{
-    consts::{
-        FPS,
-        OPTIMIZE_ATTACK_ITERATIONS,
-        OPTIMIZE_ATTACK_ITERATIONS_PER_STEP,
-        OPTIMIZE_ATTACK_STEPS,
-    },
-    dto_game_renderer::DtoGameRenderer,
-    utils::round_floats,
+use tokio::{
+    select,
+    task::spawn_blocking,
 };
 
 pub async fn optimize_attack(ws: WebSocketUpgrade) -> Response {
@@ -55,149 +23,37 @@ pub async fn optimize_attack(ws: WebSocketUpgrade) -> Response {
 }
 
 async fn optimize_attack_internal(mut socket: WebSocket) -> anyhow::Result<()> {
-    let map_message = socket.recv().await.context("Expected message")??;
-    let map: Map = serde_json::from_str(map_message.to_text()?)?;
-    let map = ValidatedMap::try_from(map)?;
+    let (send_tx, mut send_rx) = tokio::sync::mpsc::channel::<String>(10);
+    let (recv_tx, mut recv_rx) = tokio::sync::mpsc::channel::<String>(10);
 
-    let units_message = socket.recv().await.context("Expected message")??;
-    let units = serde_json::from_str::<
-        WithMaxHousingSpace<MAX_ARMY_HOUSING_SPACE, WithCount<UnitModelEnum>>,
-    >(units_message.to_text()?)?;
-    let spells_message = socket.recv().await.context("Expected message")??;
-    let spells = serde_json::from_str::<
-        WithMaxHousingSpace<MAX_SPELLS_HOUSING_SPACE, WithCount<SpellModelEnum>>,
-    >(spells_message.to_text()?)?;
+    let send = move |s: String| send_tx.blocking_send(s).unwrap();
+    let recv = move || recv_rx.blocking_recv().unwrap();
 
-    let army = Army {
-        units: units.to_vec(),
-        spells: spells.to_vec(),
-    };
+    let mut join_handle = spawn_blocking(|| api_base::optimize_attack(send, recv));
 
-    socket
-        .send(Message::text(
-            json!({
-                "type": "progress",
-                "progress": "Attack optimization process started...",
-            })
-            .to_string(),
-        ))
-        .await?;
-
-    let mut optimizer = RandomAttackOptimizer::new(map.clone(), army.clone(), 100);
-
-    for i in 0..10 {
-        optimizer = spawn_blocking(move || {
-            optimizer.step();
-
-            optimizer
-        })
-        .await?;
-
-        let (_, best_plan_stats) = optimizer.best().expect("Best plan exists here");
-
-        let progress = format!(
-            "Gen. #{i} best plan finished in {:.1} <= {:.1} <= {:.1} seconds",
-            best_plan_stats.min_time_elapsed,
-            best_plan_stats.avg_time_elapsed,
-            best_plan_stats.max_time_elapsed
-        );
-
-        socket
-            .send(Message::text(
-                json!({
-                    "type": "progress",
-                    "progress": progress,
-                })
-                .to_string(),
-            ))
-            .await?;
-    }
-
-    let mut optimizer = SimulatedAnnealingAttackOptimizer::new(
-        map.clone(),
-        army.clone(),
-        optimizer.best().cloned(),
-        OPTIMIZE_ATTACK_ITERATIONS,
-        OPTIMIZE_ATTACK_ITERATIONS_PER_STEP,
-    );
-
-    for i in 0..OPTIMIZE_ATTACK_STEPS {
-        optimizer = spawn_blocking(move || {
-            optimizer.step();
-
-            optimizer
-        })
-        .await?;
-
-        let (_, best_plan_stats) = optimizer.best().expect("Best plan exists here");
-
-        let progress = format!(
-            "Gen. #{i} best plan finished in {:.1} <= {:.1} <= {:.1} seconds",
-            best_plan_stats.min_time_elapsed,
-            best_plan_stats.avg_time_elapsed,
-            best_plan_stats.max_time_elapsed
-        );
-
-        socket
-            .send(Message::text(
-                json!({
-                    "type": "progress",
-                    "progress": progress,
-                })
-                .to_string(),
-            ))
-            .await?;
-    }
-
-    socket
-        .send(Message::text(
-            json!({
-                "type": "progress",
-                "progress": "Attack optimization done, rendering result...",
-            })
-            .to_string(),
-        ))
-        .await?;
-
-    let result = spawn_blocking(move || {
-        let mut game = Game::new(&map, true, None);
-        let mut plan_executor = AttackPlanExecutor::new(
-            optimizer
-                .best()
-                .expect("Best plan exists here")
-                .0
-                .executor_actions(&map),
-        );
-
-        let mut renderer = DtoGameRenderer::new(1);
-
-        plan_executor.tick(&mut game);
-        renderer.draw(&mut game);
-
-        while !game.done() && (!plan_executor.is_empty() || game.is_attacker_team_present()) {
-            plan_executor.tick(&mut game); // no problem calling it twice on first loop iteration
-            game.tick(1.0 / FPS as f32);
-            renderer.draw(&mut game);
+    loop {
+        select! {
+            _done = &mut join_handle => break,
+            value_to_send = send_rx.recv() => {
+                match value_to_send {
+                    None => break,
+                    Some(value_to_send) => {
+                        socket.send(Message::Text(value_to_send.into())).await?;
+                    }
+                }
+            }
+            recv_value = socket.recv() => {
+                match recv_value {
+                    None => break,
+                    Some(recv_value) => {
+                        recv_tx.send(recv_value?.into_text()?.as_str().to_owned()).await?;
+                    }
+                }
+            }
         }
+    }
 
-        let mut result: serde_json::Value =
-            serde_json::to_value(renderer.finish(&mut game)).expect("Should not fail");
-
-        round_floats(&mut result, 2);
-
-        result
-    })
-    .await?;
-
-    socket
-        .send(Message::text(
-            json!({
-                "type": "result",
-                "result": result,
-            })
-            .to_string(),
-        ))
-        .await?;
+    join_handle.await??;
 
     socket.send(Message::Close(None)).await?;
 
