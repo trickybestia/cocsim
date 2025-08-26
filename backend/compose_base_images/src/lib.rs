@@ -22,7 +22,6 @@ use ndarray::{
     Ix3,
     s,
 };
-use ndarray_stats::QuantileExt;
 use nshare::{
     AsNdarray3,
     AsNdarray3Mut,
@@ -139,7 +138,7 @@ where
         1.0 - strength * (x.powi(2) + y.powi(2))
     });
 
-    let max = *vignette.max().unwrap();
+    let max = *vignette.iter().max_by(|a, b| a.total_cmp(b)).unwrap();
 
     let mut image = image.to_owned();
 
