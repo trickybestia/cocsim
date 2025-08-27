@@ -6,6 +6,7 @@ use web_sys::{
     BlobPropertyBag,
     js_sys::{
         Array,
+        JSON,
         Uint8Array,
     },
 };
@@ -52,6 +53,34 @@ pub async fn compose_base_images(left: Vec<Blob>, right: Vec<Blob>) -> Result<Bl
     }
 
     match api_base::compose_base_images(left_images_bytes, right_images_bytes) {
+        Ok(result) => Ok(blob_from_slice(result.as_slice(), "image/jpeg")),
+        Err(error) => Err(error.to_string()),
+    }
+}
+
+#[wasm_bindgen]
+pub async fn get_game_types() -> JsValue {
+    JSON::parse(&serde_json::to_string(&api_base::get_game_types()).unwrap()).unwrap()
+}
+
+#[wasm_bindgen]
+pub async fn get_showcase_attack_base_image() -> Blob {
+    blob_from_slice(
+        api_base::get_showcase_attack_base_image().as_slice(),
+        "image/jpeg",
+    )
+}
+
+#[wasm_bindgen]
+pub async fn get_showcase_attack() -> JsValue {
+    JSON::parse(&serde_json::to_string(&api_base::get_showcase_attack()).unwrap()).unwrap()
+}
+
+#[wasm_bindgen]
+pub async fn reverse_projection(image: Blob) -> Result<Blob, String> {
+    let image_bytes = blob_to_bytes(&image).await;
+
+    match api_base::reverse_projection(image_bytes) {
         Ok(result) => Ok(blob_from_slice(result.as_slice(), "image/jpeg")),
         Err(error) => Err(error.to_string()),
     }

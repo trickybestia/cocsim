@@ -2,5 +2,9 @@
 members = ["api_base", "api_wasm", "cocsim", "cocsim/fuzz", "compose_base_images", "showcase", "webserver"]
 resolver = "3"
 
+# https://github.com/wasm-bindgen/wasm-bindgen/issues/4446
+[patch.crates-io]
+wasm-bindgen = { git = "https://github.com/wasm-bindgen/wasm-bindgen" }
+
 [profile.release]
 lto = "thin"
