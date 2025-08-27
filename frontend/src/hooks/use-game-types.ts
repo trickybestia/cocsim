@@ -1,7 +1,7 @@
 import { createContext } from "react";
 import useSWR from "swr";
 
-import { getGameTypes } from "../api";
+import api from "../api";
 import type { GameTypes } from "../types";
 
 const GameTypesContext = createContext<GameTypes>({
@@ -11,7 +11,7 @@ const GameTypesContext = createContext<GameTypes>({
 });
 
 const useGameTypesSWR = (): GameTypes | undefined => {
-  const { data } = useSWR("get-game-types", getGameTypes, {
+  const { data } = useSWR("get-game-types", api.getGameTypes, {
     revalidateIfStale: false,
     revalidateOnFocus: false,
     revalidateOnReconnect: false

@@ -1,9 +1,10 @@
 import axios from "axios";
 
-import type { Frame, GameTypes } from "./types";
+import type { API } from ".";
+import type { Frame, GameTypes } from "../types";
 
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL
+  baseURL: import.meta.env.VITE_AXIOS_API_BASE_URL
 });
 
 const composeBaseImages = async (
@@ -69,7 +70,7 @@ const getOptimizeAttackWebSocketUrl = (): string => {
   return axiosInstance.getUri({ url: "/optimize-attack" });
 };
 
-export {
+const axiosAPI: API = {
   composeBaseImages,
   reverseProjection,
   getGameTypes,
@@ -77,3 +78,5 @@ export {
   getShowcaseAttack,
   getOptimizeAttackWebSocketUrl
 };
+
+export default axiosAPI;

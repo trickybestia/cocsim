@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { twJoin, twMerge } from "tailwind-merge";
 
-import { composeBaseImages, reverseProjection } from "../../api";
+import api from "../../api";
 import readFiles from "../../utils/read-files";
 import Hint from "../Hint";
 import GridImage from "./GridImage";
@@ -203,7 +203,8 @@ const ComposeBaseImages: React.FC<Props> = ({
 
     setIsReversing(true);
 
-    reverseProjection(composedImage!.blob)
+    api
+      .reverseProjection(composedImage!.blob)
       .then((image) =>
         setReversedImage({ blob: image, url: URL.createObjectURL(image) })
       )
@@ -215,10 +216,11 @@ const ComposeBaseImages: React.FC<Props> = ({
 
     setIsComposing(true);
 
-    composeBaseImages(
-      leftImages.map((image) => image.blob),
-      rightImages.map((image) => image.blob)
-    )
+    api
+      .composeBaseImages(
+        leftImages.map((image) => image.blob),
+        rightImages.map((image) => image.blob)
+      )
       .then((image) =>
         setComposedImage({ blob: image, url: URL.createObjectURL(image) })
       )

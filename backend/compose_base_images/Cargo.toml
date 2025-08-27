@@ -15,6 +15,6 @@ required-features = ["cli"]
 [dependencies]
 anyhow = "1"
 clap = { version = "4.5", optional = true, features = ["derive"] }
-image = { version = "0.25", default-features = false, features = ["jpeg", "png"] }
+image = { version = "0.25", default-features = false }
 ndarray = "0.16"
 nshare = "0.10"

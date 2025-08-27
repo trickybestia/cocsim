@@ -1,18 +1,22 @@
 import useSWR from "swr";
 
-import { getShowcaseAttack, getShowcaseAttackBaseImage } from "../api";
+import api from "../api";
 import GameRenderer from "../components/GameRenderer";
 import Header from "../components/Header";
 
 const ShowcasePage: React.FC = () => {
-  const { data: frames } = useSWR("get-showcase-attack", getShowcaseAttack, {
-    revalidateIfStale: false,
-    revalidateOnFocus: false,
-    revalidateOnReconnect: false
-  });
+  const { data: frames } = useSWR(
+    "get-showcase-attack",
+    api.getShowcaseAttack,
+    {
+      revalidateIfStale: false,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false
+    }
+  );
   const { data: baseImage } = useSWR(
     "get-showcase-attack-base-image",
-    getShowcaseAttackBaseImage,
+    api.getShowcaseAttackBaseImage,
     {
       revalidateIfStale: false,
       revalidateOnFocus: false,

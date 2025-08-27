@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import useWebSocket from "react-use-websocket";
 import { twJoin } from "tailwind-merge";
 
-import { getOptimizeAttackWebSocketUrl } from "../api";
+import api from "../api";
 import ArmyEditor from "../components/ArmyEditor";
 import GameRenderer from "../components/GameRenderer";
 import Header from "../components/Header";
@@ -28,7 +28,7 @@ const AttackOptimizerPage: React.FC = () => {
   >(undefined);
 
   const { lastJsonMessage } = useWebSocket<OptimizeAttackMessage | null>(
-    getOptimizeAttackWebSocketUrl(),
+    api.getOptimizeAttackWebSocketUrl(),
     {
       onOpen: (event) => {
         const webSocket: WebSocket = event.target as WebSocket;
