@@ -24,6 +24,7 @@ use serde_json::{
     json,
     to_value,
 };
+use thiserror::Error;
 
 use crate::{
     consts::{
@@ -35,19 +36,25 @@ use crate::{
     dto_game_renderer::DtoGameRenderer,
 };
 
+#[derive(Error, Debug)]
+pub enum SendRecvError {
+    #[error("request was cancelled")]
+    Cancel,
+}
+
 pub fn optimize_attack(
-    mut send: impl FnMut(String),
-    mut recv: impl FnMut() -> String,
+    mut send: impl FnMut(String) -> Result<(), SendRecvError>,
+    mut recv: impl FnMut() -> Result<String, SendRecvError>,
 ) -> anyhow::Result<()> {
-    let map: Map = serde_json::from_str(&recv())?;
+    let map: Map = serde_json::from_str(&recv()?)?;
     let map = ValidatedMap::try_from(map)?;
 
     let units = serde_json::from_str::<
         WithMaxHousingSpace<MAX_ARMY_HOUSING_SPACE, WithCount<UnitModelEnum>>,
-    >(&recv())?;
+    >(&recv()?)?;
     let spells = serde_json::from_str::<
         WithMaxHousingSpace<MAX_SPELLS_HOUSING_SPACE, WithCount<SpellModelEnum>>,
-    >(&recv())?;
+    >(&recv()?)?;
 
     let army = Army {
         units: units.to_vec(),
@@ -60,7 +67,7 @@ pub fn optimize_attack(
             "progress": "Attack optimization process started...",
         })
         .to_string(),
-    );
+    )?;
 
     let mut optimizer = RandomAttackOptimizer::new(map.clone(), army.clone(), 100);
 
@@ -82,7 +89,7 @@ pub fn optimize_attack(
                 "progress": progress,
             })
             .to_string(),
-        );
+        )?;
     }
 
     let mut optimizer = SimulatedAnnealingAttackOptimizer::new(
@@ -111,7 +118,7 @@ pub fn optimize_attack(
                 "progress": progress,
             })
             .to_string(),
-        );
+        )?;
     }
 
     send(
@@ -120,7 +127,7 @@ pub fn optimize_attack(
             "progress": "Attack optimization done, rendering result...",
         })
         .to_string(),
-    );
+    )?;
 
     let mut game = Game::new(&map, true, None);
     let mut plan_executor = AttackPlanExecutor::new(
@@ -150,7 +157,7 @@ pub fn optimize_attack(
             "result": result,
         })
         .to_string(),
-    );
+    )?;
 
     Ok(())
 }

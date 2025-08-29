@@ -1,14 +1,26 @@
 import type { Frame, GameTypes } from "../types";
 import api from "./api_impl";
 
-type API = {
+type ApiStream = {
+  send: (data: string) => void;
+  close: () => void;
+};
+
+type ApiStreamConnector = {
+  connect: (
+    onOpen: (stream: ApiStream) => void,
+    onMessage: (data: string) => void
+  ) => ApiStream;
+};
+
+type Api = {
   composeBaseImages: (left: Blob[], right: Blob[]) => Promise<Blob>;
   reverseProjection: (image: Blob) => Promise<Blob>;
   getGameTypes: () => Promise<GameTypes>;
   getShowcaseAttackBaseImage: () => Promise<HTMLImageElement>;
   getShowcaseAttack: () => Promise<Frame[]>;
-  getOptimizeAttackWebSocketUrl: () => string;
+  optimizeAttack: ApiStreamConnector;
 };
 
 export default api;
-export type { API };
+export type { ApiStream, ApiStreamConnector, Api };

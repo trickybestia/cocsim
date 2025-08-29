@@ -1,6 +1,6 @@
 import axios from "axios";
 
-import type { API } from ".";
+import type { Api, ApiStream, ApiStreamConnector } from ".";
 import type { Frame, GameTypes } from "../types";
 
 const axiosInstance = axios.create({
@@ -66,17 +66,42 @@ const getShowcaseAttack = async (): Promise<Frame[]> => {
   return (await axiosInstance.get("/get-showcase-attack")).data;
 };
 
-const getOptimizeAttackWebSocketUrl = (): string => {
-  return axiosInstance.getUri({ url: "/optimize-attack" });
+const optimizeAttack: ApiStreamConnector = {
+  connect: (
+    onOpen: (stream: ApiStream) => void,
+    onMessage: (data: string) => void
+  ): ApiStream => {
+    const socket = new WebSocket(
+      axiosInstance.getUri({ url: "/optimize-attack" })
+    );
+
+    const apiStream: ApiStream = {
+      send: (data: string) => {
+        socket.send(data);
+      },
+      close() {
+        socket.close();
+      }
+    };
+
+    socket.onopen = () => {
+      onOpen(socket);
+    };
+    socket.onmessage = (e) => {
+      onMessage(e.data);
+    };
+
+    return apiStream;
+  }
 };
 
-const axiosAPI: API = {
+const axiosAPI: Api = {
   composeBaseImages,
   reverseProjection,
   getGameTypes,
   getShowcaseAttackBaseImage,
   getShowcaseAttack,
-  getOptimizeAttackWebSocketUrl
+  optimizeAttack
 };
 
 export default axiosAPI;

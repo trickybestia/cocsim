@@ -1,13 +1,13 @@
 import { useContext, useEffect, useState } from "react";
-import useWebSocket from "react-use-websocket";
 import { twJoin } from "tailwind-merge";
 
-import api from "../api";
+import api, { type ApiStream } from "../api";
 import ArmyEditor from "../components/ArmyEditor";
 import GameRenderer from "../components/GameRenderer";
 import Header from "../components/Header";
 import { GameTypesContext } from "../hooks/use-game-types";
 import type {
+  Frame,
   Map,
   OptimizeAttackMessage,
   SpellWithCount,
@@ -21,38 +21,25 @@ const AttackOptimizerPage: React.FC = () => {
 
   const [units, setUnits] = useState<UnitWithCount[] | undefined>(undefined);
   const [spells, setSpells] = useState<SpellWithCount[] | undefined>(undefined);
-  const [optimizationStarted, setOptimizationStarted] = useState(false);
+  const [optimizeAttackStream, setOptimizeAttackStream] = useState<
+    ApiStream | undefined
+  >(undefined);
   const [progressMessageHistory, setMessageHistory] = useState<string[]>([]);
+  const [gameRendererFrames, setGameRendererFrames] = useState<
+    Frame[] | undefined
+  >(undefined);
   const [mapData, setMapData] = useState<
     { map: Map; image: HTMLImageElement } | undefined
   >(undefined);
 
-  const { lastJsonMessage } = useWebSocket<OptimizeAttackMessage | null>(
-    api.getOptimizeAttackWebSocketUrl(),
-    {
-      onOpen: (event) => {
-        const webSocket: WebSocket = event.target as WebSocket;
-
-        webSocket.send(JSON.stringify(mapData!.map));
-        webSocket.send(JSON.stringify(units));
-        webSocket.send(JSON.stringify(spells));
+  useEffect(
+    () => () => {
+      if (optimizeAttackStream !== undefined) {
+        optimizeAttackStream.close();
       }
     },
-    optimizationStarted
+    [optimizeAttackStream]
   );
-
-  const gameRendererFrames =
-    lastJsonMessage !== null && lastJsonMessage.type === "result"
-      ? lastJsonMessage.result
-      : undefined;
-
-  useEffect(() => {
-    if (lastJsonMessage !== null && lastJsonMessage.type === "progress") {
-      const progressMessage = `[${new Date().toLocaleTimeString()}] ${lastJsonMessage.progress}`;
-
-      setMessageHistory((prev) => prev.concat(progressMessage));
-    }
-  }, [lastJsonMessage]);
 
   const onOpenMapButtonClick = () => {
     readFiles(
@@ -69,6 +56,31 @@ const AttackOptimizerPage: React.FC = () => {
       "application/zip",
       false
     );
+  };
+
+  const onOptimizeAttackButtonClick = () => {
+    if (units !== undefined && units.length != 0) {
+      setOptimizeAttackStream(
+        api.optimizeAttack.connect(
+          (stream) => {
+            stream.send(JSON.stringify(mapData!.map));
+            stream.send(JSON.stringify(units));
+            stream.send(JSON.stringify(spells));
+          },
+          (data) => {
+            const message = JSON.parse(data) as OptimizeAttackMessage;
+
+            if (message.type === "progress") {
+              const progressMessage = `[${new Date().toLocaleTimeString()}] ${message.progress}`;
+
+              setMessageHistory((prev) => prev.concat(progressMessage));
+            } else {
+              setGameRendererFrames(message.result);
+            }
+          }
+        )
+      );
+    }
   };
 
   return (
@@ -90,7 +102,7 @@ const AttackOptimizerPage: React.FC = () => {
         ) : (
           <div className="flex h-full flex-col items-center">
             <div className="w-full grow lg:max-w-[var(--breakpoint-lg)]">
-              {!optimizationStarted ? (
+              {optimizeAttackStream === undefined ? (
                 <div className="flex flex-col gap-2">
                   <h3 className="text-xl">Troops</h3>
                   <ArmyEditor
@@ -105,11 +117,7 @@ const AttackOptimizerPage: React.FC = () => {
                     types={gameTypes.spells}
                   />
                   <button
-                    onClick={() => {
-                      if (units !== undefined && units.length != 0) {
-                        setOptimizationStarted(true);
-                      }
-                    }}
+                    onClick={onOptimizeAttackButtonClick}
                     className="w-min cursor-pointer bg-blue-400 px-2 py-1 text-sm font-bold text-white hover:bg-blue-600"
                   >
                     OK

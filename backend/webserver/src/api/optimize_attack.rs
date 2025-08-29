@@ -1,3 +1,4 @@
+use api_base::SendRecvError;
 use axum::{
     extract::{
         WebSocketUpgrade,
@@ -26,8 +27,14 @@ async fn optimize_attack_internal(mut socket: WebSocket) -> anyhow::Result<()> {
     let (send_tx, mut send_rx) = tokio::sync::mpsc::channel::<String>(10);
     let (recv_tx, mut recv_rx) = tokio::sync::mpsc::channel::<String>(10);
 
-    let send = move |s: String| send_tx.blocking_send(s).unwrap();
-    let recv = move || recv_rx.blocking_recv().unwrap();
+    let send = move |s: String| match send_tx.blocking_send(s) {
+        Ok(_) => Ok(()),
+        Err(_) => Err(SendRecvError::Cancel),
+    };
+    let recv = move || match recv_rx.blocking_recv() {
+        Some(s) => Ok(s),
+        None => Err(SendRecvError::Cancel),
+    };
 
     let mut join_handle = spawn_blocking(|| api_base::optimize_attack(send, recv));
 
@@ -52,6 +59,10 @@ async fn optimize_attack_internal(mut socket: WebSocket) -> anyhow::Result<()> {
             }
         }
     }
+
+    // dropping these causes send and recv to return Err(SendRecvError::Cancel)
+    drop(send_rx);
+    drop(recv_tx);
 
     join_handle.await??;
 
