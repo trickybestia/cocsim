@@ -1,9 +1,12 @@
+use std::cell::RefCell;
+
 use api_base::SendRecvError;
 use bytes::Bytes;
 use log::{
     Level,
     info,
 };
+use tokio::select;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::JsFuture;
 pub use wasm_bindgen_rayon::init_thread_pool;
@@ -80,46 +83,80 @@ pub async fn get_showcase_attack() -> JsValue {
 }
 
 #[wasm_bindgen]
-pub struct OptimizeAttackApiStream {
-    recv_tx: tokio::sync::mpsc::Sender<String>,
-    recv_rx: Option<tokio::sync::mpsc::Receiver<String>>,
-    send_tx: Option<tokio::sync::mpsc::Sender<String>>,
-    send_rx: tokio::sync::mpsc::Receiver<String>,
+pub struct OptimizeAttackApiStream(RefCell<OptimizeAttackApiStreamState>);
+
+enum OptimizeAttackApiStreamState {
+    Created {
+        recv_tx: tokio::sync::mpsc::UnboundedSender<String>,
+        recv_rx: tokio::sync::mpsc::UnboundedReceiver<String>,
+    },
+    Working {
+        recv_tx: tokio::sync::mpsc::UnboundedSender<String>,
+        close_tx: Option<tokio::sync::oneshot::Sender<()>>,
+    },
+    Stopped,
 }
 
 #[wasm_bindgen]
 impl OptimizeAttackApiStream {
-    fn new() -> Self {
-        let (send_tx, send_rx) = tokio::sync::mpsc::channel::<String>(10);
-        let (recv_tx, recv_rx) = tokio::sync::mpsc::channel::<String>(10);
+    #[wasm_bindgen(constructor)]
+    pub fn new() -> Self {
+        info!("OptimizeAttackApiStream::new()");
 
-        Self {
+        let (recv_tx, recv_rx) = tokio::sync::mpsc::unbounded_channel();
+
+        Self(RefCell::new(OptimizeAttackApiStreamState::Created {
             recv_tx,
-            recv_rx: Some(recv_rx),
-            send_tx: Some(send_tx),
-            send_rx,
-        }
+            recv_rx,
+        }))
     }
 
     #[wasm_bindgen]
     pub fn send(&self, data: String) {
-        self.recv_tx.blocking_send(data).unwrap();
+        info!("OptimizeAttackApiStream::send()");
+
+        match &*self.0.borrow() {
+            OptimizeAttackApiStreamState::Created {
+                recv_tx,
+                recv_rx: _,
+            } => recv_tx.send(data).unwrap(),
+            OptimizeAttackApiStreamState::Working {
+                recv_tx,
+                close_tx: _,
+            } => recv_tx.send(data).unwrap(),
+            OptimizeAttackApiStreamState::Stopped => panic!(),
+        }
     }
 
     #[wasm_bindgen]
-    pub fn close(&self) {
-        info!("Closed");
-    }
+    pub async fn run(&self, on_message: Function) {
+        info!("OptimizeAttackApiStream::run()");
 
-    #[wasm_bindgen]
-    pub async fn start(&mut self, on_message: Function) {
-        let send_tx = self.send_tx.take().unwrap();
-        let mut recv_rx = self.recv_rx.take().unwrap();
+        let state = self.0.replace(OptimizeAttackApiStreamState::Stopped);
 
-        let send = move |s: String| match send_tx.blocking_send(s) {
+        let (mut recv_rx, mut close_rx) =
+            if let OptimizeAttackApiStreamState::Created { recv_tx, recv_rx } = state {
+                let (close_tx, close_rx) = tokio::sync::oneshot::channel();
+
+                self.0.replace(OptimizeAttackApiStreamState::Working {
+                    recv_tx,
+                    close_tx: Some(close_tx),
+                });
+
+                (recv_rx, close_rx)
+            } else {
+                self.0.replace(state);
+
+                return;
+            };
+
+        let (send_tx, mut send_rx) = tokio::sync::mpsc::unbounded_channel();
+
+        let send = move |s: String| match send_tx.send(s) {
             Ok(_) => Ok(()),
             Err(_) => Err(SendRecvError::Cancel),
         };
+
         let recv = move || match recv_rx.blocking_recv() {
             Some(s) => Ok(s),
             None => Err(SendRecvError::Cancel),
@@ -127,18 +164,41 @@ impl OptimizeAttackApiStream {
 
         rayon::spawn(move || api_base::optimize_attack(send, recv).unwrap());
 
-        while let Some(data) = self.send_rx.recv().await {
-            let args = Array::new();
-            args.push(&JsString::from(data));
+        loop {
+            select! {
+                _ = &mut close_rx => break,
+                data = send_rx.recv() => {
+                    if let Some(data) = data {
+                        let args = Array::new();
+                        args.push(&JsString::from(data));
 
-            let _ = on_message.apply(&JsValue::UNDEFINED, &args);
+                        let _ = on_message.apply(&JsValue::UNDEFINED, &args);
+                    } else {
+                        break;
+                    }
+                }
+            }
         }
-    }
-}
 
-#[wasm_bindgen]
-pub fn optimize_attack_connect() -> OptimizeAttackApiStream {
-    OptimizeAttackApiStream::new()
+        *self.0.borrow_mut() = OptimizeAttackApiStreamState::Stopped;
+    }
+
+    #[wasm_bindgen]
+    pub fn close(&self) {
+        info!("OptimizeAttackApiStream::close()");
+
+        if let OptimizeAttackApiStreamState::Working {
+            recv_tx: _,
+            close_tx,
+        } = &mut *self.0.borrow_mut()
+        {
+            if let Some(close_tx) = close_tx.take() {
+                let _ = close_tx.send(());
+            }
+        }
+
+        *self.0.borrow_mut() = OptimizeAttackApiStreamState::Stopped;
+    }
 }
 
 #[wasm_bindgen]

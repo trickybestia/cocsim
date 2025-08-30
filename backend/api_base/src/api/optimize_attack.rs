@@ -46,28 +46,45 @@ pub fn optimize_attack(
     mut send: impl FnMut(String) -> Result<(), SendRecvError>,
     mut recv: impl FnMut() -> Result<String, SendRecvError>,
 ) -> anyhow::Result<()> {
-    let map: Map = serde_json::from_str(&recv()?)?;
+    macro_rules! send_or_return {
+        ($data:expr) => {
+            match send($data) {
+                Ok(_) => {}
+                Err(_) => return Ok(()),
+            }
+        };
+    }
+    macro_rules! recv_or_return {
+        () => {
+            match recv() {
+                Ok(data) => data,
+                Err(_) => return Ok(()),
+            }
+        };
+    }
+
+    let map: Map = serde_json::from_str(&recv_or_return!())?;
     let map = ValidatedMap::try_from(map)?;
 
     let units = serde_json::from_str::<
         WithMaxHousingSpace<MAX_ARMY_HOUSING_SPACE, WithCount<UnitModelEnum>>,
-    >(&recv()?)?;
+    >(&recv_or_return!())?;
     let spells = serde_json::from_str::<
         WithMaxHousingSpace<MAX_SPELLS_HOUSING_SPACE, WithCount<SpellModelEnum>>,
-    >(&recv()?)?;
+    >(&recv_or_return!())?;
 
     let army = Army {
         units: units.to_vec(),
         spells: spells.to_vec(),
     };
 
-    send(
+    send_or_return!(
         json!({
             "type": "progress",
             "progress": "Attack optimization process started...",
         })
-        .to_string(),
-    )?;
+        .to_string()
+    );
 
     let mut optimizer = RandomAttackOptimizer::new(map.clone(), army.clone(), 100);
 
@@ -83,13 +100,13 @@ pub fn optimize_attack(
             best_plan_stats.max_time_elapsed
         );
 
-        send(
+        send_or_return!(
             json!({
                 "type": "progress",
                 "progress": progress,
             })
-            .to_string(),
-        )?;
+            .to_string()
+        );
     }
 
     let mut optimizer = SimulatedAnnealingAttackOptimizer::new(
@@ -112,22 +129,22 @@ pub fn optimize_attack(
             best_plan_stats.max_time_elapsed
         );
 
-        send(
+        send_or_return!(
             json!({
                 "type": "progress",
                 "progress": progress,
             })
-            .to_string(),
-        )?;
+            .to_string()
+        );
     }
 
-    send(
+    send_or_return!(
         json!({
             "type": "progress",
             "progress": "Attack optimization done, rendering result...",
         })
-        .to_string(),
-    )?;
+        .to_string()
+    );
 
     let mut game = Game::new(&map, true, None);
     let mut plan_executor = AttackPlanExecutor::new(
@@ -151,13 +168,13 @@ pub fn optimize_attack(
 
     let result = to_value(renderer.finish(&mut game)).expect("Should not fail");
 
-    send(
+    send_or_return!(
         json!({
             "type": "result",
             "result": result,
         })
-        .to_string(),
-    )?;
+        .to_string()
+    );
 
     Ok(())
 }

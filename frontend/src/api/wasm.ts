@@ -1,10 +1,10 @@
 import init, {
+  OptimizeAttackApiStream,
   compose_base_images,
   get_game_types,
   get_showcase_attack,
   get_showcase_attack_base_image,
   initThreadPool,
-  optimize_attack_connect,
   reverse_projection
 } from "api_wasm";
 import api_wasm_bg from "api_wasm/api_wasm_bg.wasm?url";
@@ -33,9 +33,9 @@ const optimizeAttack: ApiStreamConnector = {
     onOpen: (stream: ApiStream) => void,
     onMessage: (data: string) => void
   ): ApiStream => {
-    const stream = optimize_attack_connect();
+    const stream = new OptimizeAttackApiStream();
 
-    stream.start(onMessage);
+    stream.run(onMessage);
 
     onOpen(stream);
 
