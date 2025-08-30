@@ -2273,13 +2273,6 @@ uuid@10.0.0:
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-10.0.0.tgz#5a95aa454e6e002725c79055fd42aaba30ca6294"
   integrity sha512-8XkAphELsDnEGrDxUOHB3RGvXz6TeuYSGEZBOjtTtPm2lwhGBjLgOzLHB63IUWfBpNucQjND6d3AOudO+H3RWQ==
 
-vite-plugin-singlefile@^2.3.0:
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/vite-plugin-singlefile/-/vite-plugin-singlefile-2.3.0.tgz#71f7d8f8958cc019295e159355284ca3ecca97f1"
-  integrity sha512-DAcHzYypM0CasNLSz/WG0VdKOCxGHErfrjOoyIPiNxTPTGmO6rRD/te93n1YL/s+miXq66ipF1brMBikf99c6A==
-  dependencies:
-    micromatch "^4.0.8"
-
 vite-plugin-top-level-await@^1.6.0:
   version "1.6.0"
   resolved "https://registry.yarnpkg.com/vite-plugin-top-level-await/-/vite-plugin-top-level-await-1.6.0.tgz#c6ed0be438a1c14f48b4f9a56da859c12821a7c2"
@@ -2289,11 +2282,6 @@ vite-plugin-top-level-await@^1.6.0:
     "@swc/core" "^1.12.14"
     "@swc/wasm" "^1.12.14"
     uuid "10.0.0"
-
-vite-plugin-wasm@^3.5.0:
-  version "3.5.0"
-  resolved "https://registry.yarnpkg.com/vite-plugin-wasm/-/vite-plugin-wasm-3.5.0.tgz#c72af91b1e3687e12f1c339a12e25937b5813ae5"
-  integrity sha512-X5VWgCnqiQEGb+omhlBVsvTfxikKtoOgAzQ95+BZ8gQ+VfMHIjSHr0wyvXFQCa0eKQ0fKyaL0kWcEnYqBac4lQ==
 
 vite@^6.3.5:
   version "6.3.5"
