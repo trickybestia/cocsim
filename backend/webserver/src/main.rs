@@ -3,8 +3,6 @@ mod webserver_error;
 
 #[cfg(not(feature = "publish"))]
 use axum::http::HeaderValue;
-#[cfg(feature = "publish")]
-use axum::response::Html;
 use axum::{
     Router,
     extract::DefaultBodyLimit,
@@ -49,10 +47,11 @@ async fn main() {
         .layer(layers);
 
     #[cfg(feature = "publish")]
-    let app = app.route(
-        "/",
-        get(async || Html::<&str>::from(include_str!("../index.html"))),
-    );
+    let app = {
+        use tower_http::services::ServeDir;
+
+        app.fallback_service(ServeDir::new("./static"))
+    };
 
     let listener = tokio::net::TcpListener::bind("127.0.0.1:8000")
         .await
