@@ -19,8 +19,8 @@ import readFiles from "../utils/read-files";
 const AttackOptimizerPage: React.FC = () => {
   const gameTypes = useContext(GameTypesContext);
 
-  const [units, setUnits] = useState<UnitWithCount[] | undefined>(undefined);
-  const [spells, setSpells] = useState<SpellWithCount[] | undefined>(undefined);
+  const [units, setUnits] = useState<UnitWithCount[]>([]);
+  const [spells, setSpells] = useState<SpellWithCount[]>([]);
   const [optimizeAttackStream, setOptimizeAttackStream] = useState<
     ApiStream | undefined
   >(undefined);
@@ -106,13 +106,13 @@ const AttackOptimizerPage: React.FC = () => {
                 <div className="flex flex-col gap-2">
                   <h3 className="text-xl">Troops</h3>
                   <ArmyEditor
-                    items={units === undefined ? [] : units}
+                    items={units}
                     setItems={setUnits}
                     types={gameTypes.units}
                   />
                   <h3 className="text-xl">Spells</h3>
                   <ArmyEditor
-                    items={spells === undefined ? [] : spells}
+                    items={spells}
                     setItems={setSpells}
                     types={gameTypes.spells}
                   />
@@ -129,7 +129,7 @@ const AttackOptimizerPage: React.FC = () => {
                     <div className="flex flex-col gap-2">
                       <h4 className="text-lg">Troops:</h4>
                       <div>
-                        {units!.map((unit, index) => (
+                        {units.map((unit, index) => (
                           <p
                             key={index}
                             className={twJoin(
@@ -144,7 +144,7 @@ const AttackOptimizerPage: React.FC = () => {
                       </div>
                       <h4 className="text-lg">Spells:</h4>
                       <div>
-                        {spells!.map((spell, index) => (
+                        {spells.map((spell, index) => (
                           <p
                             key={index}
                             className={twJoin(
