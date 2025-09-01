@@ -14,7 +14,10 @@ use crate::{
         utils::trap::spawn_trap,
     },
     game::features::{
-        actions::SplashProjectileAttack,
+        actions::{
+            SplashProjectileAttack,
+            WithDespawn,
+        },
         attack::targeting::building::BuildingFindTarget,
     },
 };
@@ -69,13 +72,13 @@ impl BuildingModel for AirBombModel {
             world,
             position,
             AIR_BOMB.size,
-            Box::new(SplashProjectileAttack {
+            Box::new(WithDespawn(Box::new(SplashProjectileAttack {
                 damage: AIR_BOMB_LEVELS[*self.level].damage,
                 damage_radius: AIR_BOMB_DAMAGE_RADIUS,
                 damage_air: true,
                 damage_ground: false,
                 projectile_speed: AIR_BOMB_SPEED,
-            }),
+            }))),
         );
 
         world
