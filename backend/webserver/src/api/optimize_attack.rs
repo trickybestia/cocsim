@@ -64,8 +64,6 @@ async fn optimize_attack_internal(mut socket: WebSocket) -> anyhow::Result<()> {
     drop(send_rx);
     drop(recv_tx);
 
-    join_handle.await??;
-
     socket.send(Message::Close(None)).await?;
 
     Ok(())
