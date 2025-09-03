@@ -37,10 +37,16 @@ async fn optimize_attack_internal(mut socket: WebSocket) -> anyhow::Result<()> {
     };
 
     let mut join_handle = spawn_blocking(|| api_base::optimize_attack(send, recv));
+    let mut join_handle_awaited = false;
 
     loop {
         select! {
-            _done = &mut join_handle => break,
+            result = &mut join_handle => {
+                result??;
+                join_handle_awaited = true;
+
+                break;
+            },
             value_to_send = send_rx.recv() => {
                 match value_to_send {
                     None => break,
@@ -60,9 +66,14 @@ async fn optimize_attack_internal(mut socket: WebSocket) -> anyhow::Result<()> {
         }
     }
 
-    // dropping these causes send and recv to return Err(SendRecvError::Cancel)
+    // dropping these causes send and recv to return Err(SendRecvError::Cancel) in
+    // api_base::optimize_attack
     drop(send_rx);
     drop(recv_tx);
+
+    if !join_handle_awaited {
+        join_handle.await??;
+    }
 
     socket.send(Message::Close(None)).await?;
 
