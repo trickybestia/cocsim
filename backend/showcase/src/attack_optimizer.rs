@@ -7,12 +7,14 @@ use cocsim::{
     attack_optimizer::{
         Army,
         AttackPlanExecutor,
-        v2::{
-            RandomAttackOptimizer,
-            SimulatedAnnealingAttackOptimizer,
-        },
+        execute_attack_plan,
+        v3::AttackPlan,
     },
-    consts::RNG_INITIAL_STATE,
+    consts::{
+        ATTACK_PLAN_EXECUTIONS_COUNT,
+        ATTACK_PLAN_EXECUTOR_TPS,
+        RNG_INITIAL_STATE,
+    },
     spells::{
         HasteSpellModel,
         HealingSpellModel,
@@ -24,6 +26,11 @@ use cocsim::{
         BalloonModel,
         DragonModel,
     },
+};
+use fastrand::Rng;
+use gomez::{
+    OptimizerDriver,
+    algo::Lipo,
 };
 use rand_pcg::Pcg64Mcg;
 
@@ -102,56 +109,44 @@ fn main() {
 
     let (map, map_image) = load_test_map("Single Player/No Flight Zone").unwrap();
 
-    let mut optimizer = RandomAttackOptimizer::new(map.clone(), army.clone(), 100);
+    let attack_plan = AttackPlan {
+        map: map.clone(),
+        army: army.clone(),
+    };
 
-    for i in 0..20 {
-        optimizer.step();
+    let mut optimizer = OptimizerDriver::builder(&attack_plan)
+        .with_algo(|f, domain| Lipo::new(f, domain, Rng::new()))
+        .build();
 
-        let (_, best_plan_stats) = optimizer
-            .plans()
-            .iter()
-            .max_by(|a, b| a.1.score.total_cmp(&b.1.score))
-            .unwrap();
+    let mut x = optimizer.next().unwrap();
 
-        println!(
-            "Gen. #{i} best plan finished in {:.1} <= {:.1} <= {:.1} seconds (avg. percentage destroyed = {})",
-            best_plan_stats.min_time_elapsed,
-            best_plan_stats.avg_time_elapsed,
-            best_plan_stats.max_time_elapsed,
-            best_plan_stats.avg_percentage_destroyed
-        );
+    println!("0 {} {:?}", x.1, x.0);
+
+    for i in 0..200 {
+        x = optimizer.next().unwrap();
+
+        println!("{i} {} {:?}", x.1, x.0);
     }
 
-    let best_plan = optimizer
-        .plans()
-        .iter()
-        .max_by(|a, b| a.1.score.total_cmp(&b.1.score))
-        .unwrap();
+    let best_plan_actions = attack_plan.executor_actions(x.0.iter().cloned());
 
-    let mut optimizer = SimulatedAnnealingAttackOptimizer::new(
-        map.clone(),
-        army.clone(),
-        Some((best_plan.0.clone(), best_plan.1.clone())),
+    let score = execute_attack_plan(
+        &map,
+        &best_plan_actions,
+        ATTACK_PLAN_EXECUTIONS_COUNT,
+        ATTACK_PLAN_EXECUTOR_TPS,
     );
 
-    for i in 0..100 {
-        println!("{}", optimizer.iterations_since_last_new_found());
-
-        let (_, best_plan_stats) = optimizer.step(100);
-
-        println!(
-            "Gen. #{i} best plan finished in {:.1} <= {:.1} <= {:.1} seconds (avg. percentage destroyed = {})",
-            best_plan_stats.min_time_elapsed,
-            best_plan_stats.avg_time_elapsed,
-            best_plan_stats.max_time_elapsed,
-            best_plan_stats.avg_percentage_destroyed
-        );
-    }
-
-    let best_plan = &optimizer.best().unwrap().0;
+    println!(
+        "Best plan finished in {:.1} <= {:.1} <= {:.1} seconds (avg. percentage destroyed = {})",
+        score.min_time_elapsed,
+        score.avg_time_elapsed,
+        score.max_time_elapsed,
+        score.avg_percentage_destroyed
+    );
 
     let game = Game::new(&map, true, Some(Pcg64Mcg::new(RNG_INITIAL_STATE)));
-    let mut plan_executor = AttackPlanExecutor::new(best_plan.executor_actions(&army));
+    let mut plan_executor = AttackPlanExecutor::new(best_plan_actions);
 
     macroquad_run_game(
         game,

@@ -7,6 +7,7 @@ mod execute_attack_plan_no_rayon;
 mod execute_attack_plan_rayon;
 pub mod v1;
 pub mod v2;
+pub mod v3;
 
 pub use army::Army;
 pub use attack_plan_execution_stats::AttackPlanExecutionStats;
