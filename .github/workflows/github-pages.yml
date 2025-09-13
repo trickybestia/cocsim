@@ -1,0 +1,59 @@
+name: GitHub Pages
+on:
+  # Runs on pushes targeting the default branch
+  push:
+    branches: main
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  # Build job
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install nightly Rust toolchain
+        run: rustup toolchain install nightly
+      - name: Install rust-src
+        run: rustup component add rust-src --toolchain nightly
+      - name: Setup Rust cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: "backend"
+      - name: Install wasm-pack
+        run: cargo install wasm-pack
+      - name: Build api_wasm pkg
+        run: RUSTFLAGS='-C target-feature=+atomics,+bulk-memory' rustup run nightly wasm-pack build --target web backend/api_wasm -- -Z build-std=panic_abort,std
+
+      - name: Install Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: "yarn"
+          cache-dependency-path: "frontend/yarn.lock"
+      - name: Set frontend API implementation to WASM
+        run: ln --force --symbolic wasm.ts frontend/src/api/api_impl.ts
+      - name: Install frontend dependencies
+        run: cd frontend && yarn install
+      - name: Build frontend
+        run: cd frontend && yarn build
+      - name: Insert coi-serviceworker
+        run: cd frontend/dist && wget https://raw.githubusercontent.com/gzuidhof/coi-serviceworker/4dadf687dffc3784e4829019fa3c6c4df5bcb3db/coi-serviceworker.min.js && sed '/<title>cocsim<\/title>/a\ \ \ \ <script src="coi-serviceworker.min.js" integrity="sha384-KrdNrpxe5xTO2w+k1udxUTTQnbPfr7cjgeUzYqnRRacWKlusUweQ2qGY05kBERUj"></script>' -i index.html
+
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: frontend/dist
