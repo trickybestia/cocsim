@@ -29958,7 +29958,7 @@ For more info see: https://github.com/konvajs/react-konva/issues/194
           className: "flex justify-between",
           children: [
             et.jsx("p", {
-              children: i[m].timeElapsed
+              children: i[m].timeElapsed.toFixed(2)
             }),
             et.jsx("p", {
               children: i[m].progressInfo
