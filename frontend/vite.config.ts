@@ -10,6 +10,9 @@ export default defineConfig({
   worker: {
     format: "es"
   },
+  build: {
+    minify: true
+  },
   server: {
     headers: {
       "Cross-Origin-Embedder-Policy": "require-corp",
