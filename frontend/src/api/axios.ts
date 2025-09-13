@@ -54,6 +54,7 @@ const getShowcaseAttackBaseImage = (): Promise<HTMLImageElement> => {
   const image = new Image();
 
   image.src = imageUrl;
+  image.crossOrigin = "anonymous";
 
   return new Promise((resolve) => {
     image.addEventListener("load", () => {
