@@ -171,7 +171,7 @@ const GameRenderer: React.FC<Props> = ({
   return (
     <div className={twMerge("flex h-full grow flex-col gap-2", className)}>
       <div className="flex justify-between">
-        <p>{frames[frameIndex].timeElapsed}</p>
+        <p>{frames[frameIndex].timeElapsed.toFixed(2)}</p>
         <p>{frames[frameIndex].progressInfo}</p>
       </div>
       <input
