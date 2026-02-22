@@ -6,7 +6,7 @@ This material is unofficial and is not endorsed by Supercell. For more informati
 
 ## Showcase
 
-Try yourself! [https://trickybestia.github.io/cocsim/#/showcase](https://trickybestia.github.io/cocsim/#/showcase).
+Try yourself! (reload page a few times if you don't see anything) [https://trickybestia.github.io/cocsim/#/showcase](https://trickybestia.github.io/cocsim/#/showcase).
 
 https://github.com/user-attachments/assets/561dc6ab-6fa9-471c-8528-48afc296a97a
 
