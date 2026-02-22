@@ -25,20 +25,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install nightly-2025-11-15 Rust toolchain
-        run: rustup toolchain install nightly-2025-11-15
+      - name: Install nightly-2025-09-13 Rust toolchain
+        run: rustup toolchain install nightly-2025-09-13
       - name: Install rust-src
-        run: rustup component add rust-src --toolchain nightly-2025-11-15
+        run: rustup component add rust-src --toolchain nightly-2025-09-13
       - name: Setup Rust cache
         uses: Swatinem/rust-cache@v2
         with:
           workspaces: "backend"
       - name: Install wasm-pack
         run: cargo install wasm-pack@0.13.1
-      - name: Install wasm-bindgen
-        run: cargo install wasm-bindgen-cli@0.2.101
       - name: Build api_wasm pkg
-        run: RUSTFLAGS='-C target-feature=+atomics,+bulk-memory' rustup run nightly-2025-11-15 wasm-pack build --mode no-install --target web backend/api_wasm -- -Z build-std=panic_abort,std
+        run: RUSTFLAGS='-C target-feature=+atomics,+bulk-memory' rustup run nightly-2025-09-13 wasm-pack build --target web backend/api_wasm -- -Z build-std=panic_abort,std
 
       - name: Install Node.js
         uses: actions/setup-node@v5
