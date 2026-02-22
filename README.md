@@ -8,6 +8,8 @@ This material is unofficial and is not endorsed by Supercell. For more informati
 
 Try yourself! [https://trickybestia.github.io/cocsim/#/showcase](https://trickybestia.github.io/cocsim/#/showcase).
 
+https://github.com/user-attachments/assets/561dc6ab-6fa9-471c-8528-48afc296a97a
+
 [_link to video_](./docs/showcase.mp4)
 
 The map is Single Player Level 57: No Flight Zone [(wiki)](https://clashofclans.fandom.com/wiki/Single_Player_Campaign#Level_57:No_Flight_Zone) [(.zip)](<./test_maps/Single Player/No Flight Zone.zip>). It shows units, spells, defense, Clan Castle, Air Bombs & Mines simulation.
